@@ -1,13 +1,36 @@
 import os
-import numpy as np
 import itertools
-import warnings
-from mne.utils import logger, verbose
-from joblib import Parallel, delayed
+
+import numpy as np
+from scipy.signal import find_peaks
+
+from mne.utils import logger, verbose, _validate_type
+from mne.preprocessing.ica import _check_start_stop
+from mne.io import BaseRaw
+from mne.parallel import check_n_jobs, parallel_func
+
+def extract_gfps(data, min_peak_dist=2):
+    """ Extract Gfp peaks from input data
+    Parameters
+    ----------
+    min_peak_dist : Required minimal horizontal distance (>= 1)
+                    in samples between neighbouring peaks.
+                    Smaller peaks are removed first until the
+                    condition is fulfilled for all remaining peaks.
+                    Default to 2.
+    X : array-like, shape [n_channels, n_samples]
+                The data to extrat Gfp peaks, row by row. scipy.sparse matrices should be
+                in CSR format to avoid an un-necessary copy.
+
+    """
+    gfp = np.std(data, axis=0)
+    peaks, _ = find_peaks(gfp, distance=min_peak_dist)
+    gfp_peaks = data[:, peaks]
+    return(gfp_peaks)
 
 
-def _mod_kmeans(data, n_states=4, n_inits=10, max_iter=1000, thresh=1e-6,
-                random_state=None, verbose=None):
+def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
+                  random_state=None, verbose=None):
     """The modified K-means clustering algorithm.
     See :func:`segment` for the meaning of the parameters and return
     values.
@@ -35,7 +58,7 @@ def _mod_kmeans(data, n_states=4, n_inits=10, max_iter=1000, thresh=1e-6,
         for state in range(n_states):
             idx = (segmentation == state)
             if np.sum(idx) == 0:
-                warnings.warn('Some microstates are never activated')
+                logger.info('Some microstates are never activated')
                 maps[state] = 0
                 continue
             # Find largest eigenvector
@@ -52,12 +75,12 @@ def _mod_kmeans(data, n_states=4, n_inits=10, max_iter=1000, thresh=1e-6,
 
         # Have we converged?
         if (prev_residual - residual) < (thresh * residual):
-            logger.info('Converged at %d iterations.' % iteration)
+            #logger.info('Converged at %d iterations.' % iteration)
             break
 
         prev_residual = residual
     else:
-        warnings.warn('Modified K-means algorithm failed to converge.')
+         logger.info('Modified K-means algorithm failed to converge.')
 
     return maps
 
@@ -91,54 +114,74 @@ def _corr_vectors(A, B, axis=0):
 
 
 class mod_Kmeans():
-    def __init__(self, n_clusters=4, n_init=100,
-             max_iter=300, tol=1e-6,
-             verbose=None, random_state=None,
-             n_jobs=None):
-
+    def __init__(self, n_clusters=4,
+                 random_state=None,
+                 n_init=100,
+                 max_iter=300,
+                 tol=1e-6,
+                 verbose=None):
         self.n_clusters = n_clusters
+        self.random_state = random_state
         self.n_init = n_init
         self.max_iter = max_iter
         self.tol = tol
         self.verbose = verbose
-        self.random_state = random_state
-        self.n_jobs = n_jobs
 
         self.GEV = None
         self.cluster_centers = None
         self.labels = None
 
-    def _run_mod_kmeans(self, X):
-        gfp_sum_sq = np.sum(X ** 2)
-        maps = _mod_kmeans(X, self.n_clusters, n_inits=None, max_iter=self.max_iter, thresh=self.tol, verbose=self.verbose)
-        activation = maps.dot(X)
+    def _run_mod_kmeans(self, data):
+        gfp_sum_sq = np.sum(data ** 2)
+        maps = _compute_maps(data, self.n_clusters, max_iter=self.max_iter, thresh=self.tol, verbose=self.verbose)
+        activation = maps.dot(data)
         segmentation = np.argmax(np.abs(activation), axis=0)
-        map_corr = _corr_vectors(X , maps[segmentation].T)
+        map_corr = _corr_vectors(data , maps[segmentation].T)
         # Compare across iterations using global explained variance (GEV)
-        gev = np.sum((X * map_corr) ** 2) / gfp_sum_sq
+        gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
         return(gev, maps, segmentation)
 
-    def fit(self, X):
+    def fit(self, raw, start=None, stop=None, reject_by_annotation=None, gfp=False, n_jobs=1):
+        _validate_type(raw, (BaseRaw), 'raw', 'Raw')
+        reject_by_annotation = 'omit' if reject_by_annotation else None
+        start, stop = _check_start_stop(raw, start, stop)
+        n_jobs = check_n_jobs(n_jobs)
+        
+        data = raw.get_data(start, stop, reject_by_annotation)
+        if gfp is True:
+            data = extract_gfps(data)
+   
         best_gev = 0
-
-        if self.n_jobs is not None:
-            runs = Parallel(n_jobs=self.n_jobs)(delayed(self._run_mod_kmeans)(X) for i in range(self.n_init))
+        if n_jobs == 1:
+            for _ in range(self.n_init):
+                gev, maps, segmentation = self._run_mod_kmeans(data)
+                if gev > best_gev:
+                    best_gev, best_maps, best_segmentation = gev, maps, segmentation
+        else:
+            parallel, p_fun, _ = parallel_func(self._run_mod_kmeans, total=self.n_init, n_jobs=n_jobs)
+            runs = parallel(p_fun(data) for i in range(self.n_init))
             runs = np.array(runs)
             best_run = np.argmax(runs[:, 0])
             best_gev, best_maps, best_segmentation = runs[best_run]
-        else:
-            gfp_sum_sq = np.sum(X ** 2)
-            for _ in range(self.n_init):
-                maps = _mod_kmeans(X, self.n_clusters, n_inits=None, max_iter=self.max_iter, thresh=self.tol, verbose=self.verbose)
-                activation = maps.dot(X)
-                segmentation = np.argmax(np.abs(activation), axis=0)
-                map_corr = _corr_vectors(X , maps[segmentation].T)
-                # Compare across iterations using global explained variance (GEV)
-                gev = np.sum((X * map_corr) ** 2) / gfp_sum_sq
-                if gev > best_gev:
-                    best_gev, best_maps, best_segmentation = gev, maps, segmentation
 
         self.cluster_centers = best_maps
         self.GEV = best_gev
         self.labels = best_segmentation
         return(self)
+
+if __name__ == "__main__":
+    from mne.datasets import sample
+    import mne
+    data_path = sample.data_path()
+    raw_fname = data_path + '/MEG/sample/sample_audvis_filt-0-40_raw.fif'
+    event_fname = data_path + '/MEG/sample/sample_audvis_filt-0-40_raw-eve.fif'
+
+    # Setup for reading the raw data
+    raw = mne.io.read_raw_fif(raw_fname, preload=True)
+    raw = raw.pick('eeg')
+    raw = raw.filter(0,40)
+    raw = raw.crop(0,60)
+    
+    modK = mod_Kmeans()
+    modK.fit(raw, gfp=True, n_jobs=5)
+    print(modK.GEV)
