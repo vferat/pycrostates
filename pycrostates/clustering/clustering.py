@@ -2,12 +2,17 @@ import os
 import itertools
 
 import numpy as np
+import scipy
 from scipy.signal import find_peaks
 
+import matplotlib.pyplot as plt
+
+import mne
 from mne.utils import logger, verbose, _validate_type
 from mne.preprocessing.ica import _check_start_stop
 from mne.io import BaseRaw
 from mne.parallel import check_n_jobs, parallel_func
+
 
 def extract_gfps(data, min_peak_dist=2):
     """ Extract Gfp peaks from input data
@@ -28,7 +33,6 @@ def extract_gfps(data, min_peak_dist=2):
     gfp_peaks = data[:, peaks]
     return(gfp_peaks)
 
-
 def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
                   random_state=None, verbose=None):
     """The modified K-means clustering algorithm.
@@ -48,7 +52,7 @@ def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
     maps /= np.linalg.norm(maps, axis=1, keepdims=True)  # Normalize the maps
 
     prev_residual = np.inf
-    for iteration in range(max_iter):
+    for _ in range(max_iter):
         # Assign each sample to the best matching microstate
         activation = maps.dot(data)
         segmentation = np.argmax(np.abs(activation), axis=0)
@@ -84,7 +88,6 @@ def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
 
     return maps
 
-
 def _corr_vectors(A, B, axis=0):
     """Compute pairwise correlation of multiple pairs of vectors.
     Fast way to compute correlation of multiple pairs of vectors without
@@ -112,6 +115,39 @@ def _corr_vectors(A, B, axis=0):
     Bn /= np.linalg.norm(Bn, axis=axis)
     return np.sum(An * Bn, axis=axis)
 
+def segment(raw, states, half_window_size = 3, factor = 10, crit = 10e-6):
+    data = raw.get_data()
+    S0 = 0  
+    states = (states.T / np.linalg.norm(states, axis=1)).T
+    data = (data.T / np.linalg.norm(data, axis=1)).T
+    Ne, Nt = data.shape
+    Nu = states.shape[0]
+    Vvar = np.sum(data * data, axis=0)
+    rmat = np.tile(np.arange(0,Nu), (Nt, 1)).T
+    
+    labels_all = np.argmax(np.abs(np.dot(states, data)), axis=0)
+    
+    w = np.zeros((Nu,Nt))
+    w[(rmat == labels_all)] = 1
+    e = np.sum(Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) **2 / (Nt * (Ne - 1)))
+    
+    window = np.ones((1, 2*half_window_size+1))
+    while True:
+        Nb = scipy.signal.convolve2d(w, window, mode='same')
+        x = (np.tile(Vvar,(Nu,1)) - (np.dot(states, data))**2) / (2* e * (Ne-1)) - factor * Nb   
+        dlt = np.argmin(x, axis=0)
+        
+        labels_all = dlt
+        w = np.zeros((Nu,Nt))
+        w[(rmat == labels_all)] = 1
+        Su = np.sum(Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) **2) / (Nt * (Ne - 1))
+        if np.abs(Su - S0) <= np.abs(crit * Su):
+            break
+        else:
+            S0 = Su
+    labels = labels_all +1
+    return(labels)
+
 
 class mod_Kmeans():
     def __init__(self, n_clusters=4,
@@ -120,6 +156,8 @@ class mod_Kmeans():
                  max_iter=300,
                  tol=1e-6,
                  verbose=None):
+        self.current_fit = False
+        
         self.n_clusters = n_clusters
         self.random_state = random_state
         self.n_init = n_init
@@ -167,7 +205,23 @@ class mod_Kmeans():
         self.cluster_centers = best_maps
         self.GEV = best_gev
         self.labels = best_segmentation
+        self.current_fit = True
         return(self)
+    
+    def predict(self, raw, half_window_size = 3, factor = 10, crit = 10e-6):
+        if self.current_fit == False:
+            raise ValueError('mod_Kmeans is not fitted.')
+        return(segment(raw, self.cluster_centers, half_window_size, factor, crit))
+
+    def plot_topographies(self, info):
+        if self.current_fit == False:
+            raise ValueError('mod_Kmeans is not fitted.')
+        fig, axs = plt.subplots(1, self.n_clusters)
+        for c,center in enumerate(self.cluster_centers):
+            mne.viz.plot_topomap(center, info, axes=axs[c], show=False)  
+        plt.axis('off')
+        plt.show()
+        
 
 if __name__ == "__main__":
     from mne.datasets import sample
