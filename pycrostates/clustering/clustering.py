@@ -8,7 +8,7 @@ from scipy.signal import find_peaks
 import matplotlib.pyplot as plt
 
 import mne
-from mne.utils import logger, verbose, _validate_type
+from mne.utils import logger, warn, verbose, _validate_type
 from mne.preprocessing.ica import _check_start_stop
 from mne.io import BaseRaw
 from mne.parallel import check_n_jobs, parallel_func
@@ -157,7 +157,7 @@ class mod_Kmeans():
                  n_init : int = 100,
                  max_iter: int = 300,
                  tol: float = 1e-6,
-                 verbose=None):
+                 verbose = None):
         self.current_fit = False
         self.n_clusters = n_clusters
         self.random_state = random_state
@@ -191,12 +191,17 @@ class mod_Kmeans():
     @verbose
     def fit(self, raw : mne.io.RawArray, start : float = None, stop : float = None,
             reject_by_annotation : str = None, gfp : bool = False, n_jobs: int = 1,
-            verbose : str = None):
+            verbose = None):
         _validate_type(raw, (BaseRaw), 'raw', 'Raw')
         reject_by_annotation = 'omit' if reject_by_annotation else None
         start, stop = _check_start_stop(raw, start, stop)
         n_jobs = check_n_jobs(n_jobs)
         
+        if len(raw.info['bads']) is not 0:
+            warn('Bad channels are present in the recording.',
+                  'They will stillbe used to compute microstate topographies.',
+                  'Consider using Raw.pick or Raw.interpolate_bads before fitting.')
+
         data = raw.get_data(start, stop, reject_by_annotation)
         if gfp is True:
             data = _extract_gfps(data)
@@ -224,7 +229,7 @@ class mod_Kmeans():
     def predict(self, raw : mne.io.RawArray,
                 half_window_size: int = 3, factor: int = 10, 
                 crit: float = 10e-6,
-                verbose : str = None):
+                verbose : None):
         if self.current_fit == False:
             raise ValueError('mod_Kmeans is not fitted.')
         return(segment(raw, self.cluster_centers, half_window_size, factor, crit))
