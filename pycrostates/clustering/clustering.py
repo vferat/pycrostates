@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 import mne
 from mne.utils import logger, warn, verbose, _validate_type
 from mne.preprocessing.ica import _check_start_stop
+from mne.annotations import _annotations_starts_stops
 from mne.io import BaseRaw
 from mne.parallel import check_n_jobs, parallel_func
-
 
 def _extract_gfps(data, min_peak_dist=2):
     """ Extract Gfp peaks from input data
@@ -116,11 +116,10 @@ def _corr_vectors(A, B, axis=0):
     Bn /= np.linalg.norm(Bn, axis=axis)
     return np.sum(An * Bn, axis=axis)
 
-def segment(raw, states, half_window_size = 3, factor = 10, crit = 10e-6):
-    data = raw.get_data()
+def segment(data, states, half_window_size = 3, factor = 10, crit = 10e-6):
     S0 = 0  
-    states = (states.T / np.linalg.norm(states, axis=1)).T
-    data = (data.T / np.linalg.norm(data, axis=1)).T
+    states = (states.T / np.std(states, axis=1)).T
+    data = (data.T / np.std(data, axis=1)).T
     Ne, Nt = data.shape
     Nu = states.shape[0]
     Vvar = np.sum(data * data, axis=0)
@@ -146,7 +145,20 @@ def segment(raw, states, half_window_size = 3, factor = 10, crit = 10e-6):
             break
         else:
             S0 = Su
-    labels = labels_all +1
+
+    labels = labels_all + 1
+    # set first segment to unlabeled
+    i = 0
+    first_label = labels[i]
+    while labels[i] == first_label and i < len(labels) - 1:
+        labels[i] = 0
+        i += 1
+    # set last segment to unlabeled
+    i = len(labels) - 1
+    last_label = labels[i]
+    while labels[i] == last_label and i > 0:
+        labels[i] = 0
+        i -= 1
     return(labels)
 
 
@@ -198,9 +210,9 @@ class mod_Kmeans():
         n_jobs = check_n_jobs(n_jobs)
         
         if len(raw.info['bads']) is not 0:
-            warn('Bad channels are present in the recording.',
-                  'They will stillbe used to compute microstate topographies.',
-                  'Consider using Raw.pick or Raw.interpolate_bads before fitting.')
+            warn('Bad channels are present in the recording. '
+                 'They will still be used to compute microstate topographies. '
+                 'Consider using Raw.pick() or Raw.interpolate_bads() before fitting.')
 
         data = raw.get_data(start, stop, reject_by_annotation)
         if gfp is True:
@@ -227,12 +239,37 @@ class mod_Kmeans():
     
     @verbose
     def predict(self, raw : mne.io.RawArray,
+                reject_by_annotation: bool = True,
                 half_window_size: int = 3, factor: int = 10, 
                 crit: float = 10e-6,
                 verbose = None):
         if self.current_fit == False:
             raise ValueError('mod_Kmeans is not fitted.')
-        return(segment(raw, self.cluster_centers, half_window_size, factor, crit))
+
+        data = raw.get_data()
+        if reject_by_annotation:
+            onsets, _ends = _annotations_starts_stops(raw, ['BAD'])
+            if len(onsets) == 0:
+                return(segment(data, self.cluster_centers, half_window_size, factor, crit))
+
+            onsets =  onsets.tolist()
+            onsets.append(data.shape[-1] - 1)
+            _ends = _ends.tolist()
+            ends = [0]
+            ends.extend(_ends)
+            print(ends, onsets)
+            segmentation = np.zeros(data.shape[-1])
+            for onset, end in zip(onsets, ends):
+                if  onset - end >= 2* half_window_size + 1: # small segments can't be smoothed
+                    sample = data[:, end:onset]
+                    print(onset, end, type(end), type(onset))
+                    segmentation[end:onset] = segment(sample, self.cluster_centers, half_window_size, factor, crit)
+            return(segmentation)
+
+        else:
+            return(segment(data, self.cluster_centers, half_window_size, factor, crit))
+
+ 
 
     def plot_topographies(self, info : mne.Info):
         if self.current_fit == False:
@@ -256,7 +293,11 @@ if __name__ == "__main__":
     raw = raw.pick('eeg')
     raw = raw.filter(0,40)
     raw = raw.crop(0,60)
-    
+    print(raw.info['sfreq'])
+    raw.plot(block=True)
+    raw.info['bads'].append('Fp1')
     modK = mod_Kmeans()
-    modK.fit(raw, gfp=True, n_jobs=5)
+    modK.fit(raw, gfp=True, n_jobs=5, verbose=False)
+    seg = modK.predict(raw, reject_by_annotation=True)
     print(modK.GEV)
+    print(seg[:500])
