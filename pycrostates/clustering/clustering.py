@@ -14,7 +14,7 @@ from mne.io import BaseRaw
 from mne.parallel import check_n_jobs, parallel_func
 
 
-def extract_gfps(data, min_peak_dist=2):
+def _extract_gfps(data, min_peak_dist=2):
     """ Extract Gfp peaks from input data
     Parameters
     ----------
@@ -33,6 +33,7 @@ def extract_gfps(data, min_peak_dist=2):
     gfp_peaks = data[:, peaks]
     return(gfp_peaks)
 
+@verbose
 def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
                   random_state=None, verbose=None):
     """The modified K-means clustering algorithm.
@@ -150,14 +151,14 @@ def segment(raw, states, half_window_size = 3, factor = 10, crit = 10e-6):
 
 
 class mod_Kmeans():
-    def __init__(self, n_clusters=4,
+    @verbose
+    def __init__(self, n_clusters: int = 4,
                  random_state=None,
-                 n_init=100,
-                 max_iter=300,
-                 tol=1e-6,
+                 n_init : int = 100,
+                 max_iter: int = 300,
+                 tol: float = 1e-6,
                  verbose=None):
         self.current_fit = False
-        
         self.n_clusters = n_clusters
         self.random_state = random_state
         self.n_init = n_init
@@ -169,6 +170,14 @@ class mod_Kmeans():
         self.cluster_centers = None
         self.labels = None
 
+    def __repr__(self):
+        if self.current_fit == True:
+            f = 'unfitted'
+        else:
+            f = 'fitted (raw)'
+        s += f' {str(self.n_clusters)}'
+        return(f'mod_Kmeans | {s}')
+        
     def _run_mod_kmeans(self, data):
         gfp_sum_sq = np.sum(data ** 2)
         maps = _compute_maps(data, self.n_clusters, max_iter=self.max_iter, thresh=self.tol, verbose=self.verbose)
@@ -179,7 +188,10 @@ class mod_Kmeans():
         gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
         return(gev, maps, segmentation)
 
-    def fit(self, raw, start=None, stop=None, reject_by_annotation=None, gfp=False, n_jobs=1):
+    @verbose
+    def fit(self, raw : mne.io.RawArray, start : float = None, stop : float = None,
+            reject_by_annotation : str = None, gfp : bool = False, n_jobs: int = 1,
+            verbose : str = None):
         _validate_type(raw, (BaseRaw), 'raw', 'Raw')
         reject_by_annotation = 'omit' if reject_by_annotation else None
         start, stop = _check_start_stop(raw, start, stop)
@@ -187,7 +199,7 @@ class mod_Kmeans():
         
         data = raw.get_data(start, stop, reject_by_annotation)
         if gfp is True:
-            data = extract_gfps(data)
+            data = _extract_gfps(data)
    
         best_gev = 0
         if n_jobs == 1:
@@ -208,12 +220,16 @@ class mod_Kmeans():
         self.current_fit = True
         return(self)
     
-    def predict(self, raw, half_window_size = 3, factor = 10, crit = 10e-6):
+    @verbose
+    def predict(self, raw : mne.io.RawArray,
+                half_window_size: int = 3, factor: int = 10, 
+                crit: float = 10e-6,
+                verbose : str = None):
         if self.current_fit == False:
             raise ValueError('mod_Kmeans is not fitted.')
         return(segment(raw, self.cluster_centers, half_window_size, factor, crit))
 
-    def plot_topographies(self, info):
+    def plot_topographies(self, info : mne.Info):
         if self.current_fit == False:
             raise ValueError('mod_Kmeans is not fitted.')
         fig, axs = plt.subplots(1, self.n_clusters)
