@@ -229,7 +229,7 @@ class mod_Kmeans():
     def predict(self, raw : mne.io.RawArray,
                 half_window_size: int = 3, factor: int = 10, 
                 crit: float = 10e-6,
-                verbose : None):
+                verbose = None):
         if self.current_fit == False:
             raise ValueError('mod_Kmeans is not fitted.')
         return(segment(raw, self.cluster_centers, half_window_size, factor, crit))
