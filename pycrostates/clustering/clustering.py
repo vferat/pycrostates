@@ -14,6 +14,7 @@ from mne.annotations import _annotations_starts_stops
 from mne.io import BaseRaw
 from mne.parallel import check_n_jobs, parallel_func
 
+
 def _extract_gfps(data, min_peak_dist=2):
     """ Extract Gfp peaks from input data
     Parameters
@@ -80,7 +81,7 @@ def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
 
         # Have we converged?
         if (prev_residual - residual) < (thresh * residual):
-            #logger.info('Converged at %d iterations.' % iteration)
+            # logger.info('Converged at %d iterations.' % iteration)
             break
 
         prev_residual = residual
@@ -116,27 +117,27 @@ def _corr_vectors(A, B, axis=0):
     Bn /= np.linalg.norm(Bn, axis=axis)
     return np.sum(An * Bn, axis=axis)
 
-def segment(data, states, half_window_size = 3, factor = 10, crit = 10e-6):
-    S0 = 0  
+def segment(data, states, half_window_size=3, factor=10, crit=10e-6):
+    S0 = 0
     states = (states.T / np.std(states, axis=1)).T
     data = (data.T / np.std(data, axis=1)).T
     Ne, Nt = data.shape
     Nu = states.shape[0]
     Vvar = np.sum(data * data, axis=0)
     rmat = np.tile(np.arange(0,Nu), (Nt, 1)).T
-    
+
     labels_all = np.argmax(np.abs(np.dot(states, data)), axis=0)
-    
+
     w = np.zeros((Nu,Nt))
     w[(rmat == labels_all)] = 1
     e = np.sum(Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) **2 / (Nt * (Ne - 1)))
-    
+
     window = np.ones((1, 2*half_window_size+1))
     while True:
         Nb = scipy.signal.convolve2d(w, window, mode='same')
-        x = (np.tile(Vvar,(Nu,1)) - (np.dot(states, data))**2) / (2* e * (Ne-1)) - factor * Nb   
+        x = (np.tile(Vvar,(Nu,1)) - (np.dot(states, data))**2) / (2* e * (Ne-1)) - factor * Nb
         dlt = np.argmin(x, axis=0)
-        
+
         labels_all = dlt
         w = np.zeros((Nu,Nt))
         w[(rmat == labels_all)] = 1
@@ -166,10 +167,10 @@ class mod_Kmeans():
     @verbose
     def __init__(self, n_clusters: int = 4,
                  random_state=None,
-                 n_init : int = 100,
+                 n_init: int = 100,
                  max_iter: int = 300,
                  tol: float = 1e-6,
-                 verbose = None):
+                 verbose=None):
         self.current_fit = False
         self.n_clusters = n_clusters
         self.random_state = random_state
@@ -183,41 +184,42 @@ class mod_Kmeans():
         self.labels = None
 
     def __repr__(self):
-        if self.current_fit == True:
+        if self.current_fit is True:
             f = 'unfitted'
         else:
             f = 'fitted (raw)'
         s += f' {str(self.n_clusters)}'
         return(f'mod_Kmeans | {s}')
-        
+
     def _run_mod_kmeans(self, data):
         gfp_sum_sq = np.sum(data ** 2)
-        maps = _compute_maps(data, self.n_clusters, max_iter=self.max_iter, thresh=self.tol, verbose=self.verbose)
+        maps = _compute_maps(data, self.n_clusters, max_iter=self.max_iter,
+                             thresh=self.tol, verbose=self.verbose)
         activation = maps.dot(data)
         segmentation = np.argmax(np.abs(activation), axis=0)
-        map_corr = _corr_vectors(data , maps[segmentation].T)
+        map_corr = _corr_vectors(data, maps[segmentation].T)
         # Compare across iterations using global explained variance (GEV)
         gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
         return(gev, maps, segmentation)
 
     @verbose
-    def fit(self, raw : mne.io.RawArray, start : float = None, stop : float = None,
-            reject_by_annotation : str = None, gfp : bool = False, n_jobs: int = 1,
-            verbose = None):
+    def fit(self, raw : mne.io.RawArray, start: float = None, stop: float = None,
+            reject_by_annotation: str = True, gfp: bool = False, n_jobs: int = 1,
+            verbose=None):
         _validate_type(raw, (BaseRaw), 'raw', 'Raw')
         reject_by_annotation = 'omit' if reject_by_annotation else None
         start, stop = _check_start_stop(raw, start, stop)
         n_jobs = check_n_jobs(n_jobs)
-        
+
         if len(raw.info['bads']) is not 0:
             warn('Bad channels are present in the recording. '
                  'They will still be used to compute microstate topographies. '
                  'Consider using Raw.pick() or Raw.interpolate_bads() before fitting.')
 
-        data = raw.get_data(start, stop, reject_by_annotation)
+        data = raw.get_data(start, stop, reject_by_annotation=reject_by_annotation)
         if gfp is True:
             data = _extract_gfps(data)
-   
+
         best_gev = 0
         if n_jobs == 1:
             for _ in range(self.n_init):
@@ -236,14 +238,14 @@ class mod_Kmeans():
         self.labels = best_segmentation
         self.current_fit = True
         return(self)
-    
+
     @verbose
-    def predict(self, raw : mne.io.RawArray,
+    def predict(self, raw: mne.io.RawArray,
                 reject_by_annotation: bool = True,
-                half_window_size: int = 3, factor: int = 10, 
+                half_window_size: int = 3, factor: int = 10,
                 crit: float = 10e-6,
                 verbose = None):
-        if self.current_fit == False:
+        if self.current_fit is False:
             raise ValueError('mod_Kmeans is not fitted.')
 
         data = raw.get_data()
@@ -252,15 +254,14 @@ class mod_Kmeans():
             if len(onsets) == 0:
                 return(segment(data, self.cluster_centers, half_window_size, factor, crit))
 
-            onsets =  onsets.tolist()
+            onsets = onsets.tolist()
             onsets.append(data.shape[-1] - 1)
             _ends = _ends.tolist()
             ends = [0]
             ends.extend(_ends)
-            print(ends, onsets)
             segmentation = np.zeros(data.shape[-1])
             for onset, end in zip(onsets, ends):
-                if  onset - end >= 2* half_window_size + 1: # small segments can't be smoothed
+                if onset - end >= 2 * half_window_size + 1:  # small segments can't be smoothed
                     sample = data[:, end:onset]
                     print(onset, end, type(end), type(onset))
                     segmentation[end:onset] = segment(sample, self.cluster_centers, half_window_size, factor, crit)
@@ -269,17 +270,17 @@ class mod_Kmeans():
         else:
             return(segment(data, self.cluster_centers, half_window_size, factor, crit))
 
- 
+
 
     def plot_topographies(self, info : mne.Info):
-        if self.current_fit == False:
+        if self.current_fit is False:
             raise ValueError('mod_Kmeans is not fitted.')
         fig, axs = plt.subplots(1, self.n_clusters)
-        for c,center in enumerate(self.cluster_centers):
-            mne.viz.plot_topomap(center, info, axes=axs[c], show=False)  
+        for c, center in enumerate(self.cluster_centers):
+            mne.viz.plot_topomap(center, info, axes=axs[c], show=False)
         plt.axis('off')
         plt.show()
-        
+
 
 if __name__ == "__main__":
     from mne.datasets import sample
@@ -291,8 +292,8 @@ if __name__ == "__main__":
     # Setup for reading the raw data
     raw = mne.io.read_raw_fif(raw_fname, preload=True)
     raw = raw.pick('eeg')
-    raw = raw.filter(0,40)
-    raw = raw.crop(0,60)
+    raw = raw.filter(0, 40)
+    raw = raw.crop(0, 60)
     print(raw.info['sfreq'])
     raw.plot(block=True)
     raw.info['bads'].append('Fp1')
