@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import itertools
 
@@ -5,6 +7,7 @@ import numpy as np
 import scipy
 from scipy.signal import find_peaks
 
+import matplotlib
 import matplotlib.pyplot as plt
 
 import mne
@@ -13,6 +16,8 @@ from mne.preprocessing.ica import _check_start_stop
 from mne.annotations import _annotations_starts_stops
 from mne.io import BaseRaw
 from mne.parallel import check_n_jobs, parallel_func
+
+from typing import Tuple, Union
 
 
 def _extract_gfps(data, min_peak_dist=2):
@@ -33,6 +38,7 @@ def _extract_gfps(data, min_peak_dist=2):
     peaks, _ = find_peaks(gfp, distance=min_peak_dist)
     gfp_peaks = data[:, peaks]
     return(gfp_peaks)
+
 
 @verbose
 def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
@@ -86,9 +92,10 @@ def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
 
         prev_residual = residual
     else:
-         logger.info('Modified K-means algorithm failed to converge.')
+        logger.info('Modified K-means algorithm failed to converge.')
 
     return maps
+
 
 def _corr_vectors(A, B, axis=0):
     """Compute pairwise correlation of multiple pairs of vectors.
@@ -117,6 +124,7 @@ def _corr_vectors(A, B, axis=0):
     Bn /= np.linalg.norm(Bn, axis=axis)
     return np.sum(An * Bn, axis=axis)
 
+
 def segment(data, states, half_window_size=3, factor=10, crit=10e-6):
     S0 = 0
     states = (states.T / np.std(states, axis=1)).T
@@ -124,24 +132,27 @@ def segment(data, states, half_window_size=3, factor=10, crit=10e-6):
     Ne, Nt = data.shape
     Nu = states.shape[0]
     Vvar = np.sum(data * data, axis=0)
-    rmat = np.tile(np.arange(0,Nu), (Nt, 1)).T
+    rmat = np.tile(np.arange(0, Nu), (Nt, 1)).T
 
     labels_all = np.argmax(np.abs(np.dot(states, data)), axis=0)
 
-    w = np.zeros((Nu,Nt))
+    w = np.zeros((Nu, Nt))
     w[(rmat == labels_all)] = 1
-    e = np.sum(Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) **2 / (Nt * (Ne - 1)))
+    e = np.sum(Vvar - np.sum(np.dot(w.T, states).T *
+                             data, axis=0) ** 2 / (Nt * (Ne - 1)))
 
     window = np.ones((1, 2*half_window_size+1))
     while True:
         Nb = scipy.signal.convolve2d(w, window, mode='same')
-        x = (np.tile(Vvar,(Nu,1)) - (np.dot(states, data))**2) / (2* e * (Ne-1)) - factor * Nb
+        x = (np.tile(Vvar, (Nu, 1)) - (np.dot(states, data))**2) / \
+            (2 * e * (Ne - 1)) - factor * Nb
         dlt = np.argmin(x, axis=0)
 
         labels_all = dlt
-        w = np.zeros((Nu,Nt))
+        w = np.zeros((Nu, Nt))
         w[(rmat == labels_all)] = 1
-        Su = np.sum(Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) **2) / (Nt * (Ne - 1))
+        Su = np.sum(Vvar - np.sum(np.dot(w.T, states).T *
+                                  data, axis=0) ** 2) / (Nt * (Ne - 1))
         if np.abs(Su - S0) <= np.abs(crit * Su):
             break
         else:
@@ -166,11 +177,21 @@ def segment(data, states, half_window_size=3, factor=10, crit=10e-6):
 class mod_Kmeans():
     @verbose
     def __init__(self, n_clusters: int = 4,
-                 random_state=None,
+                 random_state: Union[float, np.random.RandomState] = None,
                  n_init: int = 100,
                  max_iter: int = 300,
                  tol: float = 1e-6,
                  verbose=None):
+        """[summary]
+
+        Args:
+            n_clusters (int, optional): [description]. Defaults to 4.
+            random_state (Union[float, np.random.RandomState], optional): [description]. Defaults to None.
+            n_init (int, optional): [description]. Defaults to 100.
+            max_iter (int, optional): [description]. Defaults to 300.
+            tol (float, optional): [description]. Defaults to 1e-6.
+            verbose ([type], optional): [description]. Defaults to None.
+        """
         self.current_fit = False
         self.n_clusters = n_clusters
         self.random_state = random_state
@@ -183,7 +204,7 @@ class mod_Kmeans():
         self.cluster_centers = None
         self.labels = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.current_fit is True:
             f = 'unfitted'
         else:
@@ -191,9 +212,12 @@ class mod_Kmeans():
         s += f' {str(self.n_clusters)}'
         return(f'mod_Kmeans | {s}')
 
-    def _run_mod_kmeans(self, data):
+    def _run_mod_kmeans(self, data: np.ndarray) -> Tuple[float,
+                                                         np.ndarray,
+                                                         np.ndarray]:
         gfp_sum_sq = np.sum(data ** 2)
         maps = _compute_maps(data, self.n_clusters, max_iter=self.max_iter,
+                             random_state=self.random_state,
                              thresh=self.tol, verbose=self.verbose)
         activation = maps.dot(data)
         segmentation = np.argmax(np.abs(activation), axis=0)
@@ -203,9 +227,25 @@ class mod_Kmeans():
         return(gev, maps, segmentation)
 
     @verbose
-    def fit(self, raw : mne.io.RawArray, start: float = None, stop: float = None,
-            reject_by_annotation: str = True, gfp: bool = False, n_jobs: int = 1,
-            verbose=None):
+    def fit(self, raw: mne.io.RawArray,
+            start: float = None, stop: float = None,
+            reject_by_annotation: bool = True,
+            gfp: bool = False, n_jobs: int = 1,
+            verbose=None) -> mod_Kmeans:
+        """[summary]
+
+        Args:
+            raw (mne.io.RawArray): [description]
+            start (float, optional): [description]. Defaults to None.
+            stop (float, optional): [description]. Defaults to None.
+            reject_by_annotation (bool, optional): [description]. Defaults to True.
+            gfp (bool, optional): [description]. Defaults to False.
+            n_jobs (int, optional): [description]. Defaults to 1.
+            verbose ([type], optional): [description]. Defaults to None.
+
+        Returns:
+            mod_Kmeans: [description]
+        """
         _validate_type(raw, (BaseRaw), 'raw', 'Raw')
         reject_by_annotation = 'omit' if reject_by_annotation else None
         start, stop = _check_start_stop(raw, start, stop)
@@ -214,9 +254,11 @@ class mod_Kmeans():
         if len(raw.info['bads']) is not 0:
             warn('Bad channels are present in the recording. '
                  'They will still be used to compute microstate topographies. '
-                 'Consider using Raw.pick() or Raw.interpolate_bads() before fitting.')
+                 'Consider using Raw.pick() or Raw.interpolate_bads()'
+                 ' before fitting.')
 
-        data = raw.get_data(start, stop, reject_by_annotation=reject_by_annotation)
+        data = raw.get_data(start, stop,
+                            reject_by_annotation=reject_by_annotation)
         if gfp is True:
             data = _extract_gfps(data)
 
@@ -227,7 +269,9 @@ class mod_Kmeans():
                 if gev > best_gev:
                     best_gev, best_maps, best_segmentation = gev, maps, segmentation
         else:
-            parallel, p_fun, _ = parallel_func(self._run_mod_kmeans, total=self.n_init, n_jobs=n_jobs)
+            parallel, p_fun, _ = parallel_func(self._run_mod_kmeans,
+                                               total=self.n_init,
+                                               n_jobs=n_jobs)
             runs = parallel(p_fun(data) for i in range(self.n_init))
             runs = np.array(runs)
             best_run = np.argmax(runs[:, 0])
@@ -244,7 +288,23 @@ class mod_Kmeans():
                 reject_by_annotation: bool = True,
                 half_window_size: int = 3, factor: int = 10,
                 crit: float = 10e-6,
-                verbose = None):
+                verbose: str = None) -> np.ndarray:
+        """[summary]
+
+        Args:
+            raw (mne.io.RawArray): [description]
+            reject_by_annotation (bool, optional): [description]. Defaults to True.
+            half_window_size (int, optional): [description]. Defaults to 3.
+            factor (int, optional): [description]. Defaults to 10.
+            crit (float, optional): [description]. Defaults to 10e-6.
+            verbose (str, optional): [description]. Defaults to None.
+
+        Raises:
+            ValueError: [description]
+
+        Returns:
+            np.ndarray: [description]
+        """
         if self.current_fit is False:
             raise ValueError('mod_Kmeans is not fitted.')
 
@@ -252,7 +312,8 @@ class mod_Kmeans():
         if reject_by_annotation:
             onsets, _ends = _annotations_starts_stops(raw, ['BAD'])
             if len(onsets) == 0:
-                return(segment(data, self.cluster_centers, half_window_size, factor, crit))
+                return(segment(data, self.cluster_centers,
+                               half_window_size, factor, crit))
 
             onsets = onsets.tolist()
             onsets.append(data.shape[-1] - 1)
@@ -264,15 +325,32 @@ class mod_Kmeans():
                 if onset - end >= 2 * half_window_size + 1:  # small segments can't be smoothed
                     sample = data[:, end:onset]
                     print(onset, end, type(end), type(onset))
-                    segmentation[end:onset] = segment(sample, self.cluster_centers, half_window_size, factor, crit)
+                    segmentation[end:onset] = segment(sample,
+                                                      self.cluster_centers,
+                                                      half_window_size, factor,
+                                                      crit)
             return(segmentation)
 
         else:
-            return(segment(data, self.cluster_centers, half_window_size, factor, crit))
+            return(segment(data,
+                           self.cluster_centers,
+                           half_window_size, factor,
+                           crit))
 
+    def plot_topographies(self, info: mne.Info) -> Tuple[matplotlib.figure.Figure,
+                                                         matplotlib.axes.Axes]:
+        """[summary]
 
+        Args:
+            info (mne.Info): [description]
 
-    def plot_topographies(self, info : mne.Info):
+        Raises:
+            ValueError: [description]
+
+        Returns:
+            Tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]: [description]
+        """
+
         if self.current_fit is False:
             raise ValueError('mod_Kmeans is not fitted.')
         fig, axs = plt.subplots(1, self.n_clusters)
@@ -280,6 +358,7 @@ class mod_Kmeans():
             mne.viz.plot_topomap(center, info, axes=axs[c], show=False)
         plt.axis('off')
         plt.show()
+        return(fig, axs)
 
 
 if __name__ == "__main__":
