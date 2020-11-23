@@ -23,9 +23,6 @@ copyright = '2020, Victor Férat'
 author = 'Victor Férat'
 
 
-
-
-
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
