@@ -1,4 +1,3 @@
 from . import clustering
-from . import preprocessing
-from . import fitting
-
+from . import metrics
+from . import viz
