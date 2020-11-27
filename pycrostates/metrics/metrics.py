@@ -2,19 +2,9 @@ import itertools
 import numpy as np
 import mne
 from typing import Tuple, Union
-
-
-def compute_gev_and_corr(data, state):
-    gfp = np.std(data, axis=0)
-    norm_gfp = gfp / np.linalg.norm(gfp)
-    stack = np.vstack([state, data.T])
-    corr = np.corrcoef(stack)[0][1:]
-    abs_corr = np.abs(corr)
-    gev = abs_corr *  norm_gfp
-    return gev, abs_corr
+  
     
-    
-def compute_metrics(labels:np.ndarray, states:np.ndarray, raw:mne.io.RawArray, state_as_index=True) -> dict:
+def compute_metrics(labels:np.ndarray, states:np.ndarray, raw:mne.io.RawArray, norm_gfp:bool = True) -> dict:
     """[summary]
 
     Args:
@@ -26,80 +16,51 @@ def compute_metrics(labels:np.ndarray, states:np.ndarray, raw:mne.io.RawArray, s
         dict: [description]
     """
     data = raw.get_data()
+    gfp = np.std(data, axis=0)
+    if norm_gfp:
+        gfp = gfp / np.linalg.norm(gfp)
+
     n_states = states.shape[0]
     states_names = [f'state_{s+1}' for s in range(n_states)]
     
     segments = [(s, list(group)) for s,group in itertools.groupby(labels)]
-    if state_as_index is False:
-        d = {}
-        for s, state in enumerate(states):
-            state_name = states_names[s]
-            
-            labeled_tp = data.T[np.argwhere(labels == s+1)][:,0,:].T
-            gev, corr = compute_gev_and_corr(labeled_tp, state)
-            d[f'{state_name}_dist_gev'] =  gev
-            d[f'{state_name}_dist_corr'] = corr
-            d[f'{state_name}_gev'] = np.sum(gev)
-            d[f'{state_name}_mean_corr'] = np.mean(corr)            
-       
-            s_segments = [len(group) for s_, group in segments if s_ == s+1]
-            occurence = len(s_segments) /len(segments)
-            timecov = np.sum(s_segments) / len(labels)
-            durs = np.array(s_segments) / raw.info['sfreq']
-            
-            d[f'{state_name}_timecov'] =  timecov
-            d[f'{state_name}_meandurs'] = np.mean(durs)
-            d[f'{state_name}_dist_meandurs'] = durs
-            d[f'{state_name}_occurences'] = occurence
-            d[f'{state_name}_durations'] = s_segments
-
-        s_segments = [len(group) for s_, group in segments if s_ == 0]
-        occurence = len(s_segments) /len(segments)
-        timecov = np.sum(s_segments) / len(labels)
-        meandur = np.mean(s_segments) / raw.info['sfreq']
-        d['unlabeled_timecov'] =  timecov
-        d['unlabeled_meandurs'] = meandur
-        d['unlabeled_occurences'] = occurence
-        d['unlabeled_durations'] = s_segments
-        return(d)
+    good_segments = [(s, list(group)) for s,group in itertools.groupby(labels) if s != 0]
     
-    else:
-        ds = list()
-        for s, state in enumerate(states):
-            d = {}
-            state_name = states_names[s]
-            d['state'] = state_name
-            
-            labeled_tp = data.T[np.argwhere(labels == s+1)][:,0,:].T
-            gev, corr = compute_gev_and_corr(labeled_tp, state)
-            d['dist_gev'] =  gev
-            d['dist_corr'] = corr
-            d['gev'] = np.sum(gev)
-            d['mean_corr'] = np.mean(corr)            
-
-            s_segments = [len(group) for s_, group in segments if s_ == s+1]
-            occurence = len(s_segments) /len(segments)
-            timecov = np.sum(s_segments) / len(labels)
-            durs = np.array(s_segments) / raw.info['sfreq']
-            d['timecov'] =  timecov
-            d['meandurs'] = np.mean(durs)
-            d['dist_meandurs'] = durs
-            d['occurences'] = occurence
-            d['durations'] = s_segments
-            ds.append(d)
-            
+    ds = list()
+    for s, state in enumerate(states):
         d = {}
-        s_segments = [len(group) for s_, group in segments if s_ == 0]
-        occurence = len(s_segments) /len(segments)
-        timecov = np.sum(s_segments) / len(labels)
-        meandur = np.mean(s_segments) / raw.info['sfreq']
-        d['state'] = 'unlabeled'
+        state_name = states_names[s]
+        d['state'] = state_name
+        
+        labeled_tp = data.T[np.argwhere(labels == s+1)][:,0,:].T
+        labeled_gfp = gfp[np.argwhere(labels == s+1)][:,0]
+        stack = np.vstack([state, labeled_tp.T])
+        corr = np.corrcoef(stack)[0][1:]
+        abs_corr = np.abs(corr)        
+        gev = abs_corr *  labeled_gfp**2 / np.sum(gfp ** 2)
+        d['dist_gev'] =  gev
+        d['dist_corr'] = abs_corr
+        d['gev'] = np.sum(gev)
+        d['mean_corr'] = np.mean(abs_corr)            
+        d['ev'] = np.sum(abs_corr) / len(gfp)
+        
+        s_segments = [len(group) for s_, group in segments if s_ == s+1]
+        occurence = len(s_segments) /len(good_segments)
+        timecov = np.sum(s_segments) / np.sum(np.where(labels != 0))
+        durs = np.array(s_segments) / raw.info['sfreq']
         d['timecov'] =  timecov
-        d['meandurs'] = meandur
+        d['meandurs'] = np.mean(durs)
+        d['dist_durs'] = durs
         d['occurences'] = occurence
-        d['durations'] = s_segments
         ds.append(d)
-        return(ds) 
+        
+    d = {}
+    s_segments = [len(group) for s_, group in segments if s_ == 0]
+    timecov = np.sum(s_segments) / len(labels)
+    d['state'] = 'unlabeled'
+    d['timecov'] =  timecov
+    ds.append(d)
+    return(ds) 
     
 if __name__ == "__main__":
     from mne.datasets import sample
