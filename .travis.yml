@@ -10,7 +10,7 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
-  - sudo apt-get install pandoc
+  - pip install pytest-cov pytest
 # command to run tests
 script:
   - pytest --cov-report term
