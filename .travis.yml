@@ -1,0 +1,17 @@
+language: python
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+  - sudo apt-get install pandoc
+# command to run tests
+script:
+  - pytest --cov-report term
+
+env:
+
+after_success:
+  - codecov
