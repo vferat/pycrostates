@@ -1,0 +1,20 @@
+language: python
+os:
+  - linux
+  - osx
+  - windows 
+python:
+  - "3.7"
+  - "3.8"
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+  - pip install pytest-cov pytest
+# command to run tests
+script:
+  - pytest --cov-report term
+
+env:
+
+after_success:
+  - codecov
