@@ -39,7 +39,6 @@ def _extract_gfps(data, min_peak_dist=2):
     gfp_peaks = data[:, peaks]
     return(gfp_peaks)
 
-
 @verbose
 def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
                   random_state=None, verbose=None):
@@ -96,7 +95,6 @@ def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
 
     return maps
 
-
 def _corr_vectors(A, B, axis=0):
     """Compute pairwise correlation of multiple pairs of vectors.
     Fast way to compute correlation of multiple pairs of vectors without
@@ -124,8 +122,7 @@ def _corr_vectors(A, B, axis=0):
     Bn /= np.linalg.norm(Bn, axis=axis)
     return np.sum(An * Bn, axis=axis)
 
-
-def segment(data, states, half_window_size=3, factor=10, crit=10e-6):
+def _segment(data, states, half_window_size=3, factor=10, crit=10e-6):
     S0 = 0
     states = (states.T / np.std(states, axis=1)).T
     data = (data.T / np.std(data, axis=1)).T
@@ -173,116 +170,24 @@ def segment(data, states, half_window_size=3, factor=10, crit=10e-6):
         i -= 1
     return(labels)
 
-
-class mod_Kmeans():
-    @verbose
+class Base_Clustering():
     def __init__(self, n_clusters: int = 4,
-                 random_state: Union[float, np.random.RandomState] = None,
-                 n_init: int = 100,
-                 max_iter: int = 300,
-                 tol: float = 1e-6,
-                 verbose=None):
-        """[summary]
-
-        Args:
-            n_clusters (int, optional): [description]. Defaults to 4.
-            random_state (Union[float, np.random.RandomState], optional): [description]. Defaults to None.
-            n_init (int, optional): [description]. Defaults to 100.
-            max_iter (int, optional): [description]. Defaults to 300.
-            tol (float, optional): [description]. Defaults to 1e-6.
-            verbose ([type], optional): [description]. Defaults to None.
-        """
-        self.current_fit = False
+                 verbose=None): 
         self.n_clusters = n_clusters
-        self.random_state = random_state
-        self.n_init = n_init
-        self.max_iter = max_iter
-        self.tol = tol
         self.verbose = verbose
-
+        self.current_fit = False
         self.GEV = None
         self.cluster_centers = None
-        self.labels = None
+        self.Info = None
 
     def __repr__(self) -> str:
-        if self.current_fit is True:
-            f = 'unfitted'
+        if self.current_fit is False:
+            s = '| unfitted'
         else:
-            f = 'fitted (raw)'
-        s += f' {str(self.n_clusters)}'
-        return(f'mod_Kmeans | {s}')
-
-    def _run_mod_kmeans(self, data: np.ndarray) -> Tuple[float,
-                                                         np.ndarray,
-                                                         np.ndarray]:
-        gfp_sum_sq = np.sum(data ** 2)
-        maps = _compute_maps(data, self.n_clusters, max_iter=self.max_iter,
-                             random_state=self.random_state,
-                             thresh=self.tol, verbose=self.verbose)
-        activation = maps.dot(data)
-        segmentation = np.argmax(np.abs(activation), axis=0)
-        map_corr = _corr_vectors(data, maps[segmentation].T)
-        # Compare across iterations using global explained variance (GEV)
-        gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
-        return(gev, maps, segmentation)
-
-    @verbose
-    def fit(self, raw: mne.io.RawArray,
-            start: float = None, stop: float = None,
-            reject_by_annotation: bool = True,
-            gfp: bool = False, n_jobs: int = 1,
-            verbose=None) -> mod_Kmeans:
-        """[summary]
-
-        Args:
-            raw (mne.io.RawArray): [description]
-            start (float, optional): [description]. Defaults to None.
-            stop (float, optional): [description]. Defaults to None.
-            reject_by_annotation (bool, optional): [description]. Defaults to True.
-            gfp (bool, optional): [description]. Defaults to False.
-            n_jobs (int, optional): [description]. Defaults to 1.
-            verbose ([type], optional): [description]. Defaults to None.
-
-        Returns:
-            mod_Kmeans: [description]
-        """
-        _validate_type(raw, (BaseRaw), 'raw', 'Raw')
-        reject_by_annotation = 'omit' if reject_by_annotation else None
-        start, stop = _check_start_stop(raw, start, stop)
-        n_jobs = check_n_jobs(n_jobs)
-
-        if len(raw.info['bads']) is not 0:
-            warn('Bad channels are present in the recording. '
-                 'They will still be used to compute microstate topographies. '
-                 'Consider using Raw.pick() or Raw.interpolate_bads()'
-                 ' before fitting.')
-
-        data = raw.get_data(start, stop,
-                            reject_by_annotation=reject_by_annotation)
-        if gfp is True:
-            data = _extract_gfps(data)
-
-        best_gev = 0
-        if n_jobs == 1:
-            for _ in range(self.n_init):
-                gev, maps, segmentation = self._run_mod_kmeans(data)
-                if gev > best_gev:
-                    best_gev, best_maps, best_segmentation = gev, maps, segmentation
-        else:
-            parallel, p_fun, _ = parallel_func(self._run_mod_kmeans,
-                                               total=self.n_init,
-                                               n_jobs=n_jobs)
-            runs = parallel(p_fun(data) for i in range(self.n_init))
-            runs = np.array(runs)
-            best_run = np.argmax(runs[:, 0])
-            best_gev, best_maps, best_segmentation = runs[best_run]
-
-        self.cluster_centers = best_maps
-        self.GEV = best_gev
-        self.labels = best_segmentation
-        self.current_fit = True
-        return(self)
-
+            s = '| fitted (raw)'
+        s = f' n = {str(self.n_clusters)} cluster centers ' + s
+        return(f'{self.__class__.__name__} | {s}')
+        
     @verbose
     def predict(self, raw: mne.io.RawArray,
                 reject_by_annotation: bool = True,
@@ -324,21 +229,20 @@ class mod_Kmeans():
             for onset, end in zip(onsets, ends):
                 if onset - end >= 2 * half_window_size + 1:  # small segments can't be smoothed
                     sample = data[:, end:onset]
-                    print(onset, end, type(end), type(onset))
-                    segmentation[end:onset] = segment(sample,
-                                                      self.cluster_centers,
-                                                      half_window_size, factor,
-                                                      crit)
+                    segmentation[end:onset] = _segment(sample,
+                                                       self.cluster_centers,
+                                                       half_window_size, factor,
+                                                       crit)
             return(segmentation)
 
         else:
-            return(segment(data,
-                           self.cluster_centers,
-                           half_window_size, factor,
-                           crit))
+            return(_segment(data,
+                            self.cluster_centers,
+                            half_window_size, factor,
+                            crit))       
 
-    def plot_topographies(self, info: mne.Info) -> Tuple[matplotlib.figure.Figure,
-                                                         matplotlib.axes.Axes]:
+    def plot_cluster_centers(self, info: mne.Info = None) -> Tuple[matplotlib.figure.Figure,
+                                                                   matplotlib.axes.Axes]:
         """[summary]
 
         Args:
@@ -353,6 +257,8 @@ class mod_Kmeans():
 
         if self.current_fit is False:
             raise ValueError('mod_Kmeans is not fitted.')
+        if not info:
+            info = self.info
         fig, axs = plt.subplots(1, self.n_clusters)
         for c, center in enumerate(self.cluster_centers):
             mne.viz.plot_topomap(center, info, axes=axs[c], show=False)
@@ -360,24 +266,194 @@ class mod_Kmeans():
         plt.show()
         return(fig, axs)
 
+    def smart_reorder(self):
+        if self.current_fit is False:
+            raise ValueError('mod_Kmeans is not fitted.')
+        info = self.info
+        centers = self.cluster_centers
+        
+        template = np.array([[-0.13234463, -0.19008217, -0.01808156, -0.06665204, -0.18127315,
+        -0.25741473, -0.2313206 ,  0.04239534, -0.14411298, -0.25635016,
+         0.1831745 ,  0.17520883, -0.06034687, -0.21948988, -0.2057277 ,
+         0.27723199,  0.04632557, -0.1383458 ,  0.36954792,  0.33889126,
+         0.1425386 , -0.05140216, -0.07532628,  0.32313928,  0.21629226,
+         0.11352515],
+       [-0.15034466, -0.08511373, -0.19531161, -0.24267313, -0.16871454,
+        -0.04761393,  0.02482456, -0.26414511, -0.15066143,  0.04628036,
+        -0.1973625 , -0.24065874, -0.08569745,  0.1729162 ,  0.22345117,
+        -0.17553494,  0.00688743,  0.25853483, -0.09196588, -0.09478585,
+         0.09460047,  0.32742083,  0.4325027 ,  0.09535141,  0.1959104 ,
+         0.31190313],
+       [ 0.29388541,  0.2886461 ,  0.27804376,  0.22674127,  0.21938115,
+         0.21720292,  0.25153101,  0.12125869,  0.10996983,  0.10638135,
+         0.11575272, -0.01388831, -0.04507772, -0.03708886,  0.08203929,
+        -0.14818182, -0.20299531, -0.16658826, -0.09488949, -0.23512102,
+        -0.30464665, -0.25762648, -0.14058166, -0.22072284, -0.22175042,
+        -0.22167467],
+       [-0.21660409, -0.22350361, -0.27855619, -0.0097109 ,  0.07119601,
+         0.00385336, -0.24792901,  0.08145982,  0.23290418,  0.09985582,
+        -0.24242583,  0.13516244,  0.3304661 ,  0.16710186, -0.21832217,
+         0.15575575,  0.33346027,  0.18885162, -0.21687347,  0.10926662,
+         0.26182733,  0.13760157, -0.19536083, -0.15966419, -0.14684497,
+        -0.15296749],
+       [-0.12444958, -0.12317709, -0.06189361, -0.20820917, -0.25736043,
+        -0.20740485, -0.06941215, -0.18086612, -0.26979589, -0.17602898,
+         0.05332203, -0.10101208, -0.20095764, -0.09582802,  0.06883067,
+         0.0082463 , -0.07052899,  0.00917889,  0.26984673,  0.13288481,
+         0.08062487,  0.13616082,  0.30845643,  0.36843231,  0.35510687,
+         0.35583386]])
+        ch_names_template =  ['Fp1', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8', 'FC3', 'FCz',
+                            'FC4', 'T3', 'C3', 'Cz', 'C4', 'T4', 'CP3', 'CPz', 'CP4',
+                            'T5', 'P3', 'Pz', 'P4','T6', 'O1', 'Oz', 'O2']
+        
+        ch_names_template = [name.lower() for name in ch_names_template]
+        ch_names_centers = [name.lower() for name in info['ch_names']]
+        common_ch_names = list(set(ch_names_centers).intersection(ch_names_template))
+        
+        if len (common_ch_names) <= 10:
+            warn("Not enought common electrodes with built-in template to automaticalv reorder maps. "
+                 "Order hasn't been changed.")
+            return()
+        
+        common_names_template = [ch_names_template.index(name) for name in common_ch_names]
+        common_names_centers = [ch_names_centers.index(name) for name in common_ch_names]
 
+        reduc_template = template[:, common_names_template]
+        reduc_centers = centers[:, common_names_centers]
+          
+        mat = np.corrcoef(reduc_template,reduc_centers)[:len(reduc_template), -len(reduc_centers):]
+        mat = np.abs(mat)
+        mat_ = mat.copy()
+        rows = list()
+        columns = list()
+        while len(columns) < len(template) and len(columns) < len(centers):
+            mask_columns = np.ones(mat.shape[1], bool)
+            mask_rows = np.ones(mat.shape[0], bool)
+            mask_rows[rows] = 0
+            mask_columns[columns] = 0
+            mat_ = mat[mask_rows,:][:,mask_columns]
+            row, column = np.unravel_index(np.where(mat.flatten() == np.max(mat_))[0][0], mat.shape)
+            rows.append(row)
+            columns.append(column)
+            mat[row, column] = -1
+        order = [x for _,x in sorted(zip(rows,columns))]
+        order = order + [x for x in range(len(centers)) if x not in order]
+        self.cluster_centers = centers[order]
+        return()
+
+    def reorder(self, order: list):
+        if (np.sort(order) != np.arange(0,self.n_clusters, 1)).any():
+            raise ValueError('Order contains unexpected values')
+        else:
+            self.cluster_centers = self.cluster_centers[order]
+        return()
+    
+    def _do_fit(self, raw, *args, **kwargs):
+        """Function to overwrite"""
+        return()
+    
+    @verbose
+    def fit(self, raw: mne.io.RawArray, verbose=None, *args, **kwargs):
+        _validate_type(raw, (BaseRaw), 'raw', 'Raw')
+        cluster_centers, GEV, labels =  self._do_fit(raw, verbose=verbose, *args, **kwargs)
+        self.cluster_centers = cluster_centers
+        self.GEV = GEV
+        self.labels = labels
+        self.current_fit = True
+        self.info = raw.info
+        return()
+     
+     def transform(self, instance)
+
+class mod_Kmeans(Base_Clustering):
+    def __init__(self,
+                 random_state: Union[float, np.random.RandomState] = None,
+                 n_init: int = 100,
+                 max_iter: int = 300,
+                 tol: float = 1e-6,
+                 *args,  **kwargs):
+        super().__init__(*args, **kwargs)
+        self.random_state = random_state
+        self.n_init = n_init
+        self.max_iter = max_iter
+        self.tol = tol
+        self.labels = None
+
+    def _run_mod_kmeans(self, data: np.ndarray) -> Tuple[float,
+                                                         np.ndarray,
+                                                         np.ndarray]:
+        gfp_sum_sq = np.sum(data ** 2)
+        maps = _compute_maps(data, self.n_clusters, max_iter=self.max_iter,
+                             random_state=self.random_state,
+                             thresh=self.tol, verbose=self.verbose)
+        activation = maps.dot(data)
+        segmentation = np.argmax(np.abs(activation), axis=0)
+        map_corr = _corr_vectors(data, maps[segmentation].T)
+        # Compare across iterations using global explained variance (GEV)
+        gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
+        return(gev, maps, segmentation)
+
+    def do_fit(self, raw: mne.io.RawArray, start: float = None, stop: float = None,
+            reject_by_annotation: bool = True,
+            gfp: bool = False, n_jobs: int = 1,
+            verbose=None) -> mod_Kmeans:
+
+        reject_by_annotation = 'omit' if reject_by_annotation else None
+        start, stop = _check_start_stop(raw, start, stop)
+        n_jobs = check_n_jobs(n_jobs)
+
+        if len(raw.info['bads']) is not 0:
+            warn('Bad channels are present in the recording. '
+                 'They will still be used to compute microstate topographies. '
+                 'Consider using Raw.pick() or Raw.interpolate_bads()'
+                 ' before fitting.')
+
+        data = raw.get_data(start, stop,
+                            reject_by_annotation=reject_by_annotation)
+        if gfp is True:
+            data = _extract_gfps(data)
+
+        best_gev = 0
+        if n_jobs == 1:
+            for _ in range(self.n_init):
+                gev, maps, segmentation = self._run_mod_kmeans(data)
+                if gev > best_gev:
+                    best_gev, best_maps, best_segmentation = gev, maps, segmentation
+        else:
+            parallel, p_fun, _ = parallel_func(self._run_mod_kmeans,
+                                               total=self.n_init,
+                                               n_jobs=n_jobs)
+            runs = parallel(p_fun(data) for i in range(self.n_init))
+            runs = np.array(runs)
+            best_run = np.argmax(runs[:, 0])
+            best_gev, best_maps, best_segmentation = runs[best_run]
+
+        return(best_maps, best_gev, best_segmentation)
+
+        
 if __name__ == "__main__":
     from mne.datasets import sample
     import mne
+    montage = mne.channels.make_standard_montage('standard_1005')
     data_path = sample.data_path()
-    raw_fname = data_path + '/MEG/sample/sample_audvis_filt-0-40_raw.fif'
-    event_fname = data_path + '/MEG/sample/sample_audvis_filt-0-40_raw-eve.fif'
+    raw_fname = 'E:\\Studies_ADHD\\Arns\\preproc_tomas_CTRL\\origin\\ArnsControls.S12017427.999999.eo.edf'
 
     # Setup for reading the raw data
-    raw = mne.io.read_raw_fif(raw_fname, preload=True)
+    raw = mne.io.read_raw_edf(raw_fname, preload=True)
+    raw.set_montage(montage)
     raw = raw.pick('eeg')
     raw = raw.filter(0, 40)
     raw = raw.crop(0, 60)
     print(raw.info['sfreq'])
-    raw.plot(block=True)
-    raw.info['bads'].append('Fp1')
-    modK = mod_Kmeans()
+    print(raw.info['ch_names'])
+    modK = mod_Kmeans(n_clusters=3)
+    print(modK)
     modK.fit(raw, gfp=True, n_jobs=5, verbose=False)
+    print(modK)
+    modK.plot_cluster_centers() 
+    modK.reorder([2,1,0])
+    modK.reorder([3,1,0])
+    modK.plot_cluster_centers() 
     seg = modK.predict(raw, reject_by_annotation=True)
     print(modK.GEV)
-    print(seg[:500])
+
