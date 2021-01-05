@@ -407,7 +407,7 @@ class ModKMeans(BaseClustering):
         start, stop = _check_start_stop(raw, start, stop)
         n_jobs = check_n_jobs(n_jobs)
 
-        if len(raw.info['bads']) is not 0:
+        if len(raw.info['bads']) != 0:
             warn('Bad channels are present in the recording. '
                  'They will still be used to compute microstate topographies. '
                  'Consider using Raw.pick() or Raw.interpolate_bads()'
