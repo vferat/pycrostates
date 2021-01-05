@@ -170,7 +170,7 @@ def _segment(data, states, half_window_size=3, factor=10, crit=10e-6):
         i -= 1
     return(labels)
 
-class Base_Clustering():
+class BaseClustering():
     def __init__(self, n_clusters: int = 4,
                  verbose=None): 
         self.n_clusters = n_clusters
@@ -187,7 +187,25 @@ class Base_Clustering():
             s = '| fitted (raw)'
         s = f' n = {str(self.n_clusters)} cluster centers ' + s
         return(f'{self.__class__.__name__} | {s}')
-        
+
+    @verbose
+    def fit(self, raw: mne.io.RawArray, verbose=None, *args, **kwargs):
+        _validate_type(raw, (BaseRaw), 'raw', 'Raw')
+        cluster_centers, GEV, labels =  self._do_fit(raw, verbose=verbose, *args, **kwargs)
+        self.cluster_centers = cluster_centers
+        self.GEV = GEV
+        self.current_fit = True
+        self.info = raw.info
+        return()
+
+    @verbose 
+    def transform(self, raw: mne.io.RawArray) -> np.ndarray:
+        data = raw.get_data()
+        stack = np.vstack([self.cluster_centers, data.T])
+        corr = np.corrcoef(stack)[:self.n_clusters, self.n_clusters:]
+        distances = np.max(np.abs(corr), axis=0)
+        return(distances)
+
     @verbose
     def predict(self, raw: mne.io.RawArray,
                 reject_by_annotation: bool = True,
@@ -217,7 +235,7 @@ class Base_Clustering():
         if reject_by_annotation:
             onsets, _ends = _annotations_starts_stops(raw, ['BAD'])
             if len(onsets) == 0:
-                return(segment(data, self.cluster_centers,
+                return(_segment(data, self.cluster_centers,
                                half_window_size, factor, crit))
 
             onsets = onsets.tolist()
@@ -265,6 +283,13 @@ class Base_Clustering():
         plt.axis('off')
         plt.show()
         return(fig, axs)
+
+    def reorder(self, order: list):
+        if (np.sort(order) != np.arange(0,self.n_clusters, 1)).any():
+            raise ValueError('Order contains unexpected values')
+        else:
+            self.cluster_centers = self.cluster_centers[order]
+        return(self)
 
     def smart_reorder(self):
         if self.current_fit is False:
@@ -341,31 +366,11 @@ class Base_Clustering():
         self.cluster_centers = centers[order]
         return()
 
-    def reorder(self, order: list):
-        if (np.sort(order) != np.arange(0,self.n_clusters, 1)).any():
-            raise ValueError('Order contains unexpected values')
-        else:
-            self.cluster_centers = self.cluster_centers[order]
-        return()
-    
     def _do_fit(self, raw, *args, **kwargs):
         """Function to overwrite"""
         return()
-    
-    @verbose
-    def fit(self, raw: mne.io.RawArray, verbose=None, *args, **kwargs):
-        _validate_type(raw, (BaseRaw), 'raw', 'Raw')
-        cluster_centers, GEV, labels =  self._do_fit(raw, verbose=verbose, *args, **kwargs)
-        self.cluster_centers = cluster_centers
-        self.GEV = GEV
-        self.labels = labels
-        self.current_fit = True
-        self.info = raw.info
-        return()
-     
-     def transform(self, instance)
 
-class mod_Kmeans(Base_Clustering):
+class ModKMeans(BaseClustering):
     def __init__(self,
                  random_state: Union[float, np.random.RandomState] = None,
                  n_init: int = 100,
@@ -393,10 +398,10 @@ class mod_Kmeans(Base_Clustering):
         gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
         return(gev, maps, segmentation)
 
-    def do_fit(self, raw: mne.io.RawArray, start: float = None, stop: float = None,
+    def _do_fit(self, raw: mne.io.RawArray, start: float = None, stop: float = None,
             reject_by_annotation: bool = True,
             gfp: bool = False, n_jobs: int = 1,
-            verbose=None) -> mod_Kmeans:
+            verbose=None) -> ModKMeans:
 
         reject_by_annotation = 'omit' if reject_by_annotation else None
         start, stop = _check_start_stop(raw, start, stop)
@@ -429,31 +434,4 @@ class mod_Kmeans(Base_Clustering):
             best_gev, best_maps, best_segmentation = runs[best_run]
 
         return(best_maps, best_gev, best_segmentation)
-
-        
-if __name__ == "__main__":
-    from mne.datasets import sample
-    import mne
-    montage = mne.channels.make_standard_montage('standard_1005')
-    data_path = sample.data_path()
-    raw_fname = 'E:\\Studies_ADHD\\Arns\\preproc_tomas_CTRL\\origin\\ArnsControls.S12017427.999999.eo.edf'
-
-    # Setup for reading the raw data
-    raw = mne.io.read_raw_edf(raw_fname, preload=True)
-    raw.set_montage(montage)
-    raw = raw.pick('eeg')
-    raw = raw.filter(0, 40)
-    raw = raw.crop(0, 60)
-    print(raw.info['sfreq'])
-    print(raw.info['ch_names'])
-    modK = mod_Kmeans(n_clusters=3)
-    print(modK)
-    modK.fit(raw, gfp=True, n_jobs=5, verbose=False)
-    print(modK)
-    modK.plot_cluster_centers() 
-    modK.reorder([2,1,0])
-    modK.reorder([3,1,0])
-    modK.plot_cluster_centers() 
-    seg = modK.predict(raw, reject_by_annotation=True)
-    print(modK.GEV)
 
