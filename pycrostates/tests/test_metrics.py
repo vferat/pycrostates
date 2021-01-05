@@ -6,7 +6,7 @@ from mne.datasets import testing
 from pycrostates.clustering import ModKMeans
 from pycrostates.metrics import compute_metrics
 
-data_path = testing.data_path(download=True)
+data_path = testing.data_path()
 fname_raw_testing = op.join(data_path, 'MEG', 'sample',
                             'sample_audvis_trunc_raw.fif')
 
