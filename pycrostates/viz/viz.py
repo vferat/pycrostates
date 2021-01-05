@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import mne
 
-from typing import Tuple, Union
+from typing import Tuple
 
 
 def plot_segmentation(labels: np.ndarray, raw: mne.io.RawArray,
@@ -54,22 +54,3 @@ def plot_segmentation(labels: np.ndarray, raw: mne.io.RawArray,
     plt.autoscale(tight=True)
     plt.show()
     return(fig, ax)
-    
-if __name__ == "__main__":
-    from mne.datasets import sample
-    from pycrostates.clustering import mod_Kmeans
-    import mne
-    data_path = sample.data_path()
-    raw_fname = data_path + '/MEG/sample/sample_audvis_filt-0-40_raw.fif'
-    event_fname = data_path + '/MEG/sample/sample_audvis_filt-0-40_raw-eve.fif'
-
-    # Setup for reading the raw data
-    raw = mne.io.read_raw_fif(raw_fname, preload=True)
-    raw = raw.pick('eeg')
-    raw = raw.filter(0, 40)
-    raw = raw.crop(0, 60)
-    raw.info['bads'].append('Fp1')
-    modK = mod_Kmeans()
-    modK.fit(raw, gfp=True, n_jobs=5, verbose=False)
-    seg = modK.predict(raw, reject_by_annotation=True)
-    plot_segmentation(seg, raw, tmin=0, tmax=1)

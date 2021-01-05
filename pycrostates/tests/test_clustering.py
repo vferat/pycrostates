@@ -1,7 +1,5 @@
 import os.path as op
 
-import pytest
-
 import numpy as np
 import mne
 from mne.datasets import testing
@@ -28,7 +26,7 @@ def test_ModKMeans_fit():
     assert ModK.current_fit is True
     assert ModK.GEV > 0
     assert ModK.info == raw.info
-    
+
 def test_BaseClustering_transform():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     raw = raw.pick('eeg')

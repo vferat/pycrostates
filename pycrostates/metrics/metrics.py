@@ -1,9 +1,7 @@
 import itertools
 import numpy as np
-import mne
-from typing import Tuple, Union
-  
-    
+import mne  
+
 def compute_metrics(labels:np.ndarray, states:np.ndarray,
                     raw:mne.io.RawArray, norm_gfp:bool = True,
                     state_as_index:bool=False) -> dict:
@@ -39,13 +37,13 @@ def compute_metrics(labels:np.ndarray, states:np.ndarray,
         labeled_gfp = gfp[np.argwhere(labels == s+1)][:,0]
         stack = np.vstack([state, labeled_tp.T])
         corr = np.corrcoef(stack)[0][1:]
-        abs_corr = np.abs(corr)        
+        abs_corr = np.abs(corr)
         gev = abs_corr *  labeled_gfp**2 / np.sum(gfp ** 2)
         d['dist_gev'] =  gev
         d['dist_corr'] = abs_corr
         d['gev'] = np.sum(gev)
-        d['mean_corr'] = np.mean(abs_corr)            
-        d['ev'] = np.sum(abs_corr) / len(gfp)        
+        d['mean_corr'] = np.mean(abs_corr)
+        d['ev'] = np.sum(abs_corr) / len(gfp)
         s_segments = np.array([len(group) for s_, group in segments if s_ == s+1])
         occurence = len(s_segments) /len(good_segments)
         timecov = np.sum(s_segments) / len(np.where(labels != 0)[0])
@@ -56,13 +54,13 @@ def compute_metrics(labels:np.ndarray, states:np.ndarray,
         d['occurences'] = occurence
         ds.append(d)
         
-        d_[f'{state_name}_dist_gev'] = gev   
-        d_[f'{state_name}_dist_corr'] = abs_corr 
-        d_[f'{state_name}_gev'] = np.sum(gev) 
-        d_[f'{state_name}_mean_corr'] = np.mean(abs_corr)  
-        d_[f'{state_name}_ev'] =np.sum(abs_corr) / len(gfp)    
-        d_[f'{state_name}_timecov'] = timecov 
-        d_[f'{state_name}_meandurs'] = np.mean(durs)  
+        d_[f'{state_name}_dist_gev'] = gev
+        d_[f'{state_name}_dist_corr'] = abs_corr
+        d_[f'{state_name}_gev'] = np.sum(gev)
+        d_[f'{state_name}_mean_corr'] = np.mean(abs_corr)
+        d_[f'{state_name}_ev'] =np.sum(abs_corr) / len(gfp)
+        d_[f'{state_name}_timecov'] = timecov
+        d_[f'{state_name}_meandurs'] = np.mean(durs)
         d_[f'{state_name}_dist_durs'] = durs
         d_[f'{state_name}_occurences'] = occurence
 

@@ -1,8 +1,5 @@
 import os.path as op
 
-import pytest
-
-import numpy as np
 import mne
 from mne.datasets import testing
 
