@@ -38,7 +38,7 @@ def test_BaseClustering_transform():
     distances = ModK.transform(raw)
     assert len(distances) == raw.get_data().shape[-1]
     assert (distances > 0).all()
-    
+
 def test_BaseClustering_predict():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     raw = raw.pick('eeg')

@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import os
-import itertools
-
 import numpy as np
 import scipy
 from scipy.signal import find_peaks
@@ -22,6 +19,7 @@ from typing import Tuple, Union
 
 def _extract_gfps(data, min_peak_dist=2):
     """ Extract Gfp peaks from input data
+    
     Parameters
     ----------
     min_peak_dist : Required minimal horizontal distance (>= 1)
@@ -172,7 +170,7 @@ def _segment(data, states, half_window_size=3, factor=10, crit=10e-6):
 
 class BaseClustering():
     def __init__(self, n_clusters: int = 4,
-                 verbose=None): 
+                 verbose=None):
         self.n_clusters = n_clusters
         self.verbose = verbose
         self.current_fit = False
@@ -189,16 +187,20 @@ class BaseClustering():
         return(f'{self.__class__.__name__} | {s}')
 
     @verbose
-    def fit(self, raw: mne.io.RawArray, verbose=None, *args, **kwargs):
+    def fit(self, raw: mne.io.RawArray, *args, **kwargs):
         _validate_type(raw, (BaseRaw), 'raw', 'Raw')
-        cluster_centers, GEV, labels =  self._do_fit(raw, verbose=verbose, *args, **kwargs)
+        cluster_centers, GEV, _ =  self._do_fit(raw, *args, **kwargs)
         self.cluster_centers = cluster_centers
         self.GEV = GEV
         self.current_fit = True
         self.info = raw.info
         return()
 
-    @verbose 
+    @verbose
+    def _do_fit(self, raw: mne.io.RawArray):
+        return()
+    
+    @verbose
     def transform(self, raw: mne.io.RawArray) -> np.ndarray:
         data = raw.get_data()
         stack = np.vstack([self.cluster_centers, data.T])
@@ -366,9 +368,6 @@ class BaseClustering():
         self.cluster_centers = centers[order]
         return()
 
-    def _do_fit(self, raw, *args, **kwargs):
-        """Function to overwrite"""
-        return()
 
 class ModKMeans(BaseClustering):
     def __init__(self,

@@ -1,6 +1,6 @@
 import itertools
 import numpy as np
-import mne  
+import mne
 
 def compute_metrics(labels:np.ndarray, states:np.ndarray,
                     raw:mne.io.RawArray, norm_gfp:bool = True,
@@ -76,5 +76,5 @@ def compute_metrics(labels:np.ndarray, states:np.ndarray,
     if state_as_index:
         return(ds)
     else:
-        return(d_) 
+        return(d_)
 
