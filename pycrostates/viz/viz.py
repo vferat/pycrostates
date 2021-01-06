@@ -1,9 +1,9 @@
+from typing import Tuple
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import numpy as np
 import mne
-
-from typing import Tuple
+import numpy as np
 
 
 def plot_segmentation(labels: np.ndarray, raw: mne.io.RawArray,

@@ -1,6 +1,8 @@
 import itertools
-import numpy as np
+
 import mne
+import numpy as np
+
 
 def compute_metrics(labels:np.ndarray, states:np.ndarray,
                     raw:mne.io.RawArray, norm_gfp:bool = True,
@@ -22,7 +24,7 @@ def compute_metrics(labels:np.ndarray, states:np.ndarray,
 
     n_states = states.shape[0]
     states_names = [f'state_{s+1}' for s in range(n_states)]
-    
+
     segments = [(s, list(group)) for s,group in itertools.groupby(labels)]
     good_segments = [(s, list(group)) for s,group in itertools.groupby(labels) if s != 0]
     

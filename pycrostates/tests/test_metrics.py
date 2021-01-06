@@ -2,7 +2,6 @@ import os.path as op
 
 import mne
 from mne.datasets import testing
-
 from pycrostates.clustering import ModKMeans
 from pycrostates.metrics import compute_metrics
 

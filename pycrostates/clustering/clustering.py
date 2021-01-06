@@ -1,20 +1,21 @@
 from __future__ import annotations
+from functools import wraps
 
-import numpy as np
-import scipy
-from scipy.signal import find_peaks
+from typing import Tuple, Union
 
 import matplotlib
 import matplotlib.pyplot as plt
-
 import mne
-from mne.utils import logger, warn, verbose, _validate_type
-from mne.preprocessing.ica import _check_start_stop
+import numpy as np
+import scipy
 from mne.annotations import _annotations_starts_stops
 from mne.io import BaseRaw
+from mne.epochs import BaseEpochs
+from mne import Evoked
 from mne.parallel import check_n_jobs, parallel_func
-
-from typing import Tuple, Union
+from mne.preprocessing.ica import _check_start_stop
+from mne.utils import _validate_type, logger, verbose, warn, fill_doc
+from scipy.signal import find_peaks
 
 
 def _extract_gfps(data, min_peak_dist=2):
@@ -40,10 +41,6 @@ def _extract_gfps(data, min_peak_dist=2):
 @verbose
 def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
                   random_state=None, verbose=None):
-    """The modified K-means clustering algorithm.
-    See :func:`segment` for the meaning of the parameters and return
-    values.
-    """
     if not isinstance(random_state, np.random.RandomState):
         random_state = np.random.RandomState(random_state)
     n_channels, n_samples = data.shape
@@ -120,7 +117,7 @@ def _corr_vectors(A, B, axis=0):
     Bn /= np.linalg.norm(Bn, axis=axis)
     return np.sum(An * Bn, axis=axis)
 
-def _segment(data, states, half_window_size=3, factor=10, crit=10e-6):
+def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
     S0 = 0
     states = (states.T / np.std(states, axis=1)).T
     data = (data.T / np.std(data, axis=1)).T
@@ -168,77 +165,129 @@ def _segment(data, states, half_window_size=3, factor=10, crit=10e-6):
         i -= 1
     return(labels)
 
+@fill_doc 
 class BaseClustering():
-    def __init__(self, n_clusters: int = 4,
-                 verbose=None):
+    u"""Base Class for Microstate Clustering algorithm.
+    
+    Parameters
+    ----------
+    n_clusters : int
+        The number of clusters to form as well as the number of centroids to generate.  
+          
+    Attributes
+    ----------
+    n_clusters : int
+        The number of clusters to form as well as the number of centroids to generate.
+    current_fit : bool
+        Flag informing about which data type (raw or epochs) was used for the fit.
+    cluster_centers : :class:`numpy.ndarray`, shape ``(n_clusters, n_channels)``
+            Cluster centers (i.e Microstates maps)   
+    GEV : float
+        If fit, the Global explained Variance explained all clusters centers.
+    info : dict
+            :class:`Measurement info <mne.Info>` of fitted instance.
+    """
+
+    def __init__(self, n_clusters: int = 4):
         self.n_clusters = n_clusters
-        self.verbose = verbose
-        self.current_fit = False
-        self.GEV = None
+        self.current_fit = 'unfitted'
         self.cluster_centers = None
-        self.Info = None
+        self.GEV = None
+        self.info = None
 
     def __repr__(self) -> str:
         if self.current_fit is False:
-            s = '| unfitted'
+            s = f'| unfitted'
         else:
-            s = '| fitted (raw)'
+            s = f'| fitted ({self.current_fit})'
         s = f' n = {str(self.n_clusters)} cluster centers ' + s
         return(f'{self.__class__.__name__} | {s}')
 
-    @verbose
-    def fit(self, raw: mne.io.RawArray, *args, **kwargs):
-        _validate_type(raw, (BaseRaw), 'raw', 'Raw')
-        cluster_centers, GEV, _ =  self._do_fit(raw, *args, **kwargs)
-        self.cluster_centers = cluster_centers
-        self.GEV = GEV
-        self.current_fit = True
-        self.info = raw.info
-        return()
+    def _check_fit(self):
+        if self.current_fit is 'unfitted':
+            raise ValueError(f'Algorithm must be fitted before using {self.__class__.__name__}')
+        return()  
 
     @verbose
-    def _do_fit(self, raw: mne.io.RawArray):
-        return()
-    
-    @verbose
-    def transform(self, raw: mne.io.RawArray) -> np.ndarray:
-        data = raw.get_data()
-        stack = np.vstack([self.cluster_centers, data.T])
-        corr = np.corrcoef(stack)[:self.n_clusters, self.n_clusters:]
-        distances = np.max(np.abs(corr), axis=0)
+    def transform(self, inst: Union(BaseRaw, BaseEpochs, Evoked), verbose: str = None) -> numpy.ndarray:
+        """Compute clustering and transform Instance data to cluster-distance space (absolute spatial correlation).
+
+        Parameters
+        ----------
+        inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`, :class:`mne.Evoked`
+            Instance containing data to transform to cluster-distance space (absolute spatial correlation).
+        %(verbose)s
+
+        Returns
+        ----------
+        distances : :class:`numpy.ndarray`
+                Instance data transformed in cluster-distance space (absolute spatial correlation).
+        """
+        self._check_fit()
+        _validate_type(inst, (BaseRaw, BaseEpochs, Evoked), 'inst', 'Raw, Epochs or Evoked')
+        if isinstance(inst, BaseRaw):
+            data = inst.get_data()
+            stack = np.vstack([self.cluster_centers, data.T])
+            corr = np.corrcoef(stack)[:self.n_clusters, self.n_clusters:]
+            distances = np.max(np.abs(corr), axis=0)
+        elif isinstance(inst, BaseEpochs):
+            data = inst.get_data()
+            shape = data.shape
+            reshape_data = data.reshape((data.shape[1], -1))
+            stack = np.vstack([self.cluster_centers, reshape_data.T])
+            corr = np.corrcoef(stack)[:self.n_clusters, self.n_clusters:]
+            distances = np.max(np.abs(corr), axis=0)
+            distances = distances.reshape((shape[0], -1))
+        elif isinstance(inst, Evoked):
+            data = inst.data
+            stack = np.vstack([self.cluster_centers, data.T])
+            corr = np.corrcoef(stack)[:self.n_clusters, self.n_clusters:]
+            distances = np.max(np.abs(corr), axis=0)
         return(distances)
 
     @verbose
-    def predict(self, raw: mne.io.RawArray,
+    def predict(self,  inst: Union(BaseRaw, Evoked),
                 reject_by_annotation: bool = True,
-                half_window_size: int = 3, factor: int = 10,
+                half_window_size: int = 3, factor: int = 0,
                 crit: float = 10e-6,
-                verbose: str = None) -> np.ndarray:
-        """[summary]
+                verbose: str = None) -> numpy.ndarray:
+        """Predict Microstates labels using competitive fitting.
 
-        Args:
-            raw (mne.io.RawArray): [description]
-            reject_by_annotation (bool, optional): [description]. Defaults to True.
-            half_window_size (int, optional): [description]. Defaults to 3.
-            factor (int, optional): [description]. Defaults to 10.
-            crit (float, optional): [description]. Defaults to 10e-6.
-            verbose (str, optional): [description]. Defaults to None.
+        Parameters
+        ----------
+        inst : :class:`mne.io.BaseRaw`, :class:`mne.Evoked`
+            Instance containing data to predict.
+        half_window_size: int
+            Number of samples used for the half windows size while smoothing labels.
+            Window size = 2 * half_window_size + 1
+        factor: int
+            Factor used for label smoothing. 0 means no smoothing.
+            Defaults to 0.
+        crit: float
+            Converge criterion. Default to 10e-6.
+        %(reject_by_annotation_raw)s
+        %(verbose)s
 
-        Raises:
-            ValueError: [description]
-
-        Returns:
-            np.ndarray: [description]
+        Returns
+        ----------
+        segmentation : :class:`numpy.ndarray`
+                Microstate sequence derivated from Instance data. Timepoints are labeled according
+                to cluster centers number: 1 for the first center, 2 for the second ect..
+                0 is used for unlabeled time points.
         """
-        if self.current_fit is False:
-            raise ValueError('mod_Kmeans is not fitted.')
-
-        data = raw.get_data()
+        self._check_fit()
+        _validate_type(inst, (BaseRaw, Evoked), 'inst', 'Raw or Evoked')
+        if isinstance(inst, BaseRaw):
+            data = inst.get_data()
+        elif isinstance(inst, Evoked):
+            data = inst.data
+            reject_by_annotation = False
+            
         if reject_by_annotation:
-            onsets, _ends = _annotations_starts_stops(raw, ['BAD'])
+            onsets, _ends = _annotations_starts_stops(inst, ['BAD'])
             if len(onsets) == 0:
                 return(_segment(data, self.cluster_centers,
-                               half_window_size, factor, crit))
+                            half_window_size, factor, crit))
 
             onsets = onsets.tolist()
             onsets.append(data.shape[-1] - 1)
@@ -250,35 +299,25 @@ class BaseClustering():
                 if onset - end >= 2 * half_window_size + 1:  # small segments can't be smoothed
                     sample = data[:, end:onset]
                     segmentation[end:onset] = _segment(sample,
-                                                       self.cluster_centers,
-                                                       half_window_size, factor,
-                                                       crit)
+                                                    self.cluster_centers,
+                                                    half_window_size, factor,
+                                                    crit)
             return(segmentation)
-
         else:
             return(_segment(data,
                             self.cluster_centers,
                             half_window_size, factor,
                             crit))       
 
-    def plot_cluster_centers(self, info: mne.Info = None) -> Tuple[matplotlib.figure.Figure,
-                                                                   matplotlib.axes.Axes]:
-        """[summary]
-
-        Args:
-            info (mne.Info): [description]
-
-        Raises:
-            ValueError: [description]
-
-        Returns:
-            Tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]: [description]
+    def plot_cluster_centers(self) -> matplotlib.figure.Figure:
+        """Plot cluster centers as topomaps.
+        
+        Returns
+        ----------
+        fig :  matplotlib.figure.Figure
+            The figure.
         """
-
-        if self.current_fit is False:
-            raise ValueError('mod_Kmeans is not fitted.')
-        if not info:
-            info = self.info
+        self._check_fit()
         fig, axs = plt.subplots(1, self.n_clusters)
         for c, center in enumerate(self.cluster_centers):
             mne.viz.plot_topomap(center, info, axes=axs[c], show=False)
@@ -287,6 +326,18 @@ class BaseClustering():
         return(fig, axs)
 
     def reorder(self, order: list):
+        """Reorder cluster centers.Operate in place.
+        Parameters
+        ----------
+        order : list
+            The new cluster centers order. 
+
+        Returns
+        ----------
+        self : self
+            The modfied instance.
+        """
+        self._check_fit()
         if (np.sort(order) != np.arange(0,self.n_clusters, 1)).any():
             raise ValueError('Order contains unexpected values')
         else:
@@ -294,8 +345,14 @@ class BaseClustering():
         return(self)
 
     def smart_reorder(self):
-        if self.current_fit is False:
-            raise ValueError('mod_Kmeans is not fitted.')
+        """ Automaticaly reorder cluster centers.Operate in place.
+
+        Returns
+        ----------
+        self : self
+            The modfied instance.
+        """        
+        self._check_fit()
         info = self.info
         centers = self.cluster_centers
         
@@ -370,8 +427,39 @@ class BaseClustering():
 
 
 class ModKMeans(BaseClustering):
+    """Modified K-Means Clustering algorithm.
+    
+    Parameters
+    ----------
+    n_clusters : int
+        The number of clusters to form as well as the number of centroids to generate.  
+          
+    Attributes
+    ----------
+    n_clusters : int
+        The number of clusters to form as well as the number of centroids to generate.
+    current_fit : bool
+        Flag informing about which data type (raw or epochs) was used for the fit.
+    cluster_centers : :class:`numpy.ndarray`, shape ``(n_clusters, n_channels)``
+            Cluster centers (i.e Microstates maps)         
+    GEV : float
+        If fit, the Global explained Variance explained all clusters centers.
+    info : dict
+        :class:`Measurement info <mne.Info>` of fitted instance.
+    random_state : int, RandomState instance or None 
+        Determines random number generation for centroid initialization. Default=None.
+    n_init : int
+        Number of time the k-means algorithm will be run with different centroid seeds.
+        The final results will be the runs explained the most global explained variance.
+        Default=100
+    max_iter : int
+        Maximum number of iterations of the k-means algorithm for a single run.
+        Default=300
+    tol : float
+        Relative tolerance with regards estimate residual noise in the cluster centers of two consecutive iterations to declare convergence.
+    """
     def __init__(self,
-                 random_state: Union[float, np.random.RandomState] = None,
+                 random_state: Union[int, np.random.RandomState, None] = None,
                  n_init: int = 100,
                  max_iter: int = 300,
                  tol: float = 1e-6,
@@ -383,13 +471,14 @@ class ModKMeans(BaseClustering):
         self.tol = tol
         self.labels = None
 
-    def _run_mod_kmeans(self, data: np.ndarray) -> Tuple[float,
-                                                         np.ndarray,
-                                                         np.ndarray]:
+    @verbose
+    def _run_mod_kmeans(self, data: numpy.ndarray, verbose=None) -> Tuple[float,
+                                                         numpy.ndarray,
+                                                         numpy.ndarray]:
         gfp_sum_sq = np.sum(data ** 2)
         maps = _compute_maps(data, self.n_clusters, max_iter=self.max_iter,
                              random_state=self.random_state,
-                             thresh=self.tol, verbose=self.verbose)
+                             thresh=self.tol, verbose=verbose)
         activation = maps.dot(data)
         segmentation = np.argmax(np.abs(activation), axis=0)
         map_corr = _corr_vectors(data, maps[segmentation].T)
@@ -397,37 +486,89 @@ class ModKMeans(BaseClustering):
         gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
         return(gev, maps, segmentation)
 
-    def _do_fit(self, raw: mne.io.RawArray, start: float = None, stop: float = None,
+    @verbose
+    def fit(self, inst: Union(BaseRaw, BaseEpochs, Evoked), start: float = None, stop: float = None,
+            reject_by_annotation: bool = True,
+            gfp: bool = False, n_jobs: int = 1,
+            verbose=None):
+        """Segment Instance into microstate sequence.
+
+        Parameters
+        ----------
+        inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`, :class:`mne.Evoked`
+            Instance containing data to transform to cluster-distance space (absolute spatial correlation).
+        gfp : bool
+            If True, only takes gfp peaks to fit the algorithm. If False use all available data. 
+        %(n_jobs)s
+        %(raw_tmin)s
+        %(raw_tmax)s
+        %(reject_by_annotation_raw)s
+        %(verbose)s
+
+        Returns
+        ----------
+        distances : :class:`numpy.ndarray`
+                Instance data transformed in cluster-distance space (absolute spatial correlation).
+        """
+        _validate_type(inst, (BaseRaw, BaseEpochs, Evoked), 'inst', 'Raw, Epochs or Evoked')
+        n_jobs = check_n_jobs(n_jobs)
+
+        if len(inst.info['bads']) != 0:
+            warn('Bad channels are present in the recording. '
+                 'They will still be used to compute microstate topographies. '
+                 'Consider using instance.pick() or instance.interpolate_bads()'
+                 ' before fitting.')
+            
+        if isinstance(inst, BaseRaw):
+            current_fit = 'Raw'
+            reject_by_annotation = 'omit' if reject_by_annotation else None
+            start, stop = _check_start_stop(inst, start, stop)
+            data = inst.get_data(start, stop,
+                                reject_by_annotation=reject_by_annotation)
+            if gfp is True:
+                data = _extract_gfps(data)
+                
+        elif isinstance(inst, BaseEpochs):
+            current_fit = 'Epochs'
+            data = inst.get_data()
+            if gfp is True:
+                epochs = list()
+                for epoch in data:
+                    epoch = _extract_gfps(epoch)
+                    epochs.append(epoch)
+                data = np.hstack(epochs)
+            data = data.reshape((data.shape[1], -1))
+
+        if isinstance(inst, Evoked):
+            current_fit = 'Evoked'
+            data = inst.data
+            if gfp is True:
+                data = _extract_gfps(data)
+                
+        cluster_centers, GEV, _ =  self._do_fit(data=data, start=start, stop=stop, gfp=gfp,
+                                            reject_by_annotation=reject_by_annotation,
+                                            n_jobs=n_jobs,verbose=verbose)       
+        self.cluster_centers = cluster_centers
+        self.GEV = GEV
+        self.info = inst.info
+        self.current_fit = current_fit
+        return()
+    
+    def _do_fit(self, data: np.nd.array, start: float = None, stop: float = None,
             reject_by_annotation: bool = True,
             gfp: bool = False, n_jobs: int = 1,
             verbose=None) -> ModKMeans:
-
-        reject_by_annotation = 'omit' if reject_by_annotation else None
-        start, stop = _check_start_stop(raw, start, stop)
-        n_jobs = check_n_jobs(n_jobs)
-
-        if len(raw.info['bads']) != 0:
-            warn('Bad channels are present in the recording. '
-                 'They will still be used to compute microstate topographies. '
-                 'Consider using Raw.pick() or Raw.interpolate_bads()'
-                 ' before fitting.')
-
-        data = raw.get_data(start, stop,
-                            reject_by_annotation=reject_by_annotation)
-        if gfp is True:
-            data = _extract_gfps(data)
-
         best_gev = 0
         if n_jobs == 1:
             for _ in range(self.n_init):
-                gev, maps, segmentation = self._run_mod_kmeans(data)
+                gev, maps, segmentation = self._run_mod_kmeans(data, verbose=verbose)
                 if gev > best_gev:
                     best_gev, best_maps, best_segmentation = gev, maps, segmentation
         else:
             parallel, p_fun, _ = parallel_func(self._run_mod_kmeans,
                                                total=self.n_init,
                                                n_jobs=n_jobs)
-            runs = parallel(p_fun(data) for i in range(self.n_init))
+            runs = parallel(p_fun(data, verbose=verbose) for i in range(self.n_init))
             runs = np.array(runs)
             best_run = np.argmax(runs[:, 0])
             best_gev, best_maps, best_segmentation = runs[best_run]
