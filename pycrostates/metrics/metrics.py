@@ -1,8 +1,6 @@
 import itertools
-
-import mne
 import numpy as np
-
+import mne
 
 def compute_metrics(
     labels: np.ndarray,
@@ -27,6 +25,7 @@ def compute_metrics(
         gfp = gfp / np.linalg.norm(gfp)
 
     n_states = states.shape[0]
+<<<<<<< HEAD
     states_names = [f"state_{s+1}" for s in range(n_states)]
 
     segments = [(s, list(group)) for s, group in itertools.groupby(labels)]
@@ -34,6 +33,13 @@ def compute_metrics(
         (s, list(group)) for s, group in itertools.groupby(labels) if s != 0
     ]
 
+=======
+    states_names = [f'state_{s+1}' for s in range(n_states)]
+    
+    segments = [(s, list(group)) for s,group in itertools.groupby(labels)]
+    good_segments = [(s, list(group)) for s,group in itertools.groupby(labels) if s != 0]
+    
+>>>>>>> parent of 146fe28... Add support for Epochs and Evoked
     d_ = {}
     ds = list()
     for s, state in enumerate(states):

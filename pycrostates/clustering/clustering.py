@@ -1,21 +1,20 @@
 from __future__ import annotations
-from functools import wraps
 
-from typing import Tuple, Union
+import numpy as np
+import scipy
+from scipy.signal import find_peaks
 
 import matplotlib
 import matplotlib.pyplot as plt
+
 import mne
-import numpy as np
-import scipy
+from mne.utils import logger, warn, verbose, _validate_type
+from mne.preprocessing.ica import _check_start_stop
 from mne.annotations import _annotations_starts_stops
 from mne.io import BaseRaw
-from mne.epochs import BaseEpochs
-from mne import Evoked
 from mne.parallel import check_n_jobs, parallel_func
-from mne.preprocessing.ica import _check_start_stop
-from mne.utils import _validate_type, logger, verbose, warn, fill_doc
-from scipy.signal import find_peaks
+
+from typing import Tuple, Union
 
 
 def _extract_gfps(data, min_peak_dist=2):
@@ -40,9 +39,18 @@ def _extract_gfps(data, min_peak_dist=2):
 
 
 @verbose
+<<<<<<< HEAD
 def _compute_maps(
     data, n_states=4, max_iter=1000, thresh=1e-6, random_state=None, verbose=None
 ):
+=======
+def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
+                  random_state=None, verbose=None):
+    """The modified K-means clustering algorithm.
+    See :func:`segment` for the meaning of the parameters and return
+    values.
+    """
+>>>>>>> parent of 146fe28... Add support for Epochs and Evoked
     if not isinstance(random_state, np.random.RandomState):
         random_state = np.random.RandomState(random_state)
     n_channels, n_samples = data.shape
@@ -120,8 +128,12 @@ def _corr_vectors(A, B, axis=0):
     Bn /= np.linalg.norm(Bn, axis=axis)
     return np.sum(An * Bn, axis=axis)
 
+<<<<<<< HEAD
 
 def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
+=======
+def _segment(data, states, half_window_size=3, factor=10, crit=10e-6):
+>>>>>>> parent of 146fe28... Add support for Epochs and Evoked
     S0 = 0
     states = (states.T / np.std(states, axis=1)).T
     data = (data.T / np.std(data, axis=1)).T
@@ -177,6 +189,7 @@ def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
 class BaseClustering:
     """Base Class for Microstate Clustering algorithm.
 
+<<<<<<< HEAD
     Parameters
     ----------
     n_clusters : int
@@ -200,11 +213,21 @@ class BaseClustering:
         self.n_clusters = n_clusters
         self.current_fit = "unfitted"
         self.cluster_centers = None
+=======
+class BaseClustering():
+    def __init__(self, n_clusters: int = 4,
+                 verbose=None):
+        self.n_clusters = n_clusters
+        self.verbose = verbose
+        self.current_fit = False
+>>>>>>> parent of 146fe28... Add support for Epochs and Evoked
         self.GEV = None
-        self.info = None
+        self.cluster_centers = None
+        self.Info = None
 
     def __repr__(self) -> str:
         if self.current_fit is False:
+<<<<<<< HEAD
             s = f"| unfitted"
         else:
             s = f"| fitted ({self.current_fit})"
@@ -307,6 +330,67 @@ class BaseClustering:
                 return _segment(
                     data, self.cluster_centers, half_window_size, factor, crit
                 )
+=======
+            s = '| unfitted'
+        else:
+            s = '| fitted (raw)'
+        s = f' n = {str(self.n_clusters)} cluster centers ' + s
+        return(f'{self.__class__.__name__} | {s}')
+
+    @verbose
+    def fit(self, raw: mne.io.RawArray, *args, **kwargs):
+        _validate_type(raw, (BaseRaw), 'raw', 'Raw')
+        cluster_centers, GEV, _ =  self._do_fit(raw, *args, **kwargs)
+        self.cluster_centers = cluster_centers
+        self.GEV = GEV
+        self.current_fit = True
+        self.info = raw.info
+        return()
+
+    @verbose
+    def _do_fit(self, raw: mne.io.RawArray):
+        return()
+    
+    @verbose
+    def transform(self, raw: mne.io.RawArray) -> np.ndarray:
+        data = raw.get_data()
+        stack = np.vstack([self.cluster_centers, data.T])
+        corr = np.corrcoef(stack)[:self.n_clusters, self.n_clusters:]
+        distances = np.max(np.abs(corr), axis=0)
+        return(distances)
+
+    @verbose
+    def predict(self, raw: mne.io.RawArray,
+                reject_by_annotation: bool = True,
+                half_window_size: int = 3, factor: int = 10,
+                crit: float = 10e-6,
+                verbose: str = None) -> np.ndarray:
+        """[summary]
+
+        Args:
+            raw (mne.io.RawArray): [description]
+            reject_by_annotation (bool, optional): [description]. Defaults to True.
+            half_window_size (int, optional): [description]. Defaults to 3.
+            factor (int, optional): [description]. Defaults to 10.
+            crit (float, optional): [description]. Defaults to 10e-6.
+            verbose (str, optional): [description]. Defaults to None.
+
+        Raises:
+            ValueError: [description]
+
+        Returns:
+            np.ndarray: [description]
+        """
+        if self.current_fit is False:
+            raise ValueError('mod_Kmeans is not fitted.')
+
+        data = raw.get_data()
+        if reject_by_annotation:
+            onsets, _ends = _annotations_starts_stops(raw, ['BAD'])
+            if len(onsets) == 0:
+                return(_segment(data, self.cluster_centers,
+                               half_window_size, factor, crit))
+>>>>>>> parent of 146fe28... Add support for Epochs and Evoked
 
             onsets = onsets.tolist()
             onsets.append(data.shape[-1] - 1)
@@ -319,13 +403,23 @@ class BaseClustering:
                     onset - end >= 2 * half_window_size + 1
                 ):  # small segments can't be smoothed
                     sample = data[:, end:onset]
+<<<<<<< HEAD
                     segmentation[end:onset] = _segment(
                         sample, self.cluster_centers, half_window_size, factor, crit
                     )
             return segmentation
+=======
+                    segmentation[end:onset] = _segment(sample,
+                                                       self.cluster_centers,
+                                                       half_window_size, factor,
+                                                       crit)
+            return(segmentation)
+
+>>>>>>> parent of 146fe28... Add support for Epochs and Evoked
         else:
             return _segment(data, self.cluster_centers, half_window_size, factor, crit)
 
+<<<<<<< HEAD
     def plot_cluster_centers(self) -> matplotlib.figure.Figure:
         """Plot cluster centers as topomaps.
 
@@ -333,8 +427,26 @@ class BaseClustering:
         ----------
         fig :  matplotlib.figure.Figure
             The figure.
+=======
+    def plot_cluster_centers(self, info: mne.Info = None) -> Tuple[matplotlib.figure.Figure,
+                                                                   matplotlib.axes.Axes]:
+        """[summary]
+
+        Args:
+            info (mne.Info): [description]
+
+        Raises:
+            ValueError: [description]
+
+        Returns:
+            Tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]: [description]
+>>>>>>> parent of 146fe28... Add support for Epochs and Evoked
         """
-        self._check_fit()
+
+        if self.current_fit is False:
+            raise ValueError('mod_Kmeans is not fitted.')
+        if not info:
+            info = self.info
         fig, axs = plt.subplots(1, self.n_clusters)
         for c, center in enumerate(self.cluster_centers):
             mne.viz.plot_topomap(center, info, axes=axs[c], show=False)
@@ -343,6 +455,7 @@ class BaseClustering:
         return (fig, axs)
 
     def reorder(self, order: list):
+<<<<<<< HEAD
         """Reorder cluster centers.Operate in place.
         Parameters
         ----------
@@ -357,11 +470,16 @@ class BaseClustering:
         self._check_fit()
         if (np.sort(order) != np.arange(0, self.n_clusters, 1)).any():
             raise ValueError("Order contains unexpected values")
+=======
+        if (np.sort(order) != np.arange(0,self.n_clusters, 1)).any():
+            raise ValueError('Order contains unexpected values')
+>>>>>>> parent of 146fe28... Add support for Epochs and Evoked
         else:
             self.cluster_centers = self.cluster_centers[order]
         return self
 
     def smart_reorder(self):
+<<<<<<< HEAD
         """ Automaticaly reorder cluster centers.Operate in place.
 
         Returns
@@ -370,6 +488,10 @@ class BaseClustering:
             The modfied instance.
         """
         self._check_fit()
+=======
+        if self.current_fit is False:
+            raise ValueError('mod_Kmeans is not fitted.')
+>>>>>>> parent of 146fe28... Add support for Epochs and Evoked
         info = self.info
         centers = self.cluster_centers
 
@@ -593,6 +715,7 @@ class BaseClustering:
 
 
 class ModKMeans(BaseClustering):
+<<<<<<< HEAD
     """Modified K-Means Clustering algorithm.
 
     Parameters
@@ -634,6 +757,14 @@ class ModKMeans(BaseClustering):
         *args,
         **kwargs,
     ):
+=======
+    def __init__(self,
+                 random_state: Union[float, np.random.RandomState] = None,
+                 n_init: int = 100,
+                 max_iter: int = 300,
+                 tol: float = 1e-6,
+                 *args,  **kwargs):
+>>>>>>> parent of 146fe28... Add support for Epochs and Evoked
         super().__init__(*args, **kwargs)
         self.random_state = random_state
         self.n_init = n_init
@@ -641,6 +772,7 @@ class ModKMeans(BaseClustering):
         self.tol = tol
         self.labels = None
 
+<<<<<<< HEAD
     @verbose
     def _run_mod_kmeans(
         self, data: numpy.ndarray, verbose=None
@@ -654,6 +786,15 @@ class ModKMeans(BaseClustering):
             thresh=self.tol,
             verbose=verbose,
         )
+=======
+    def _run_mod_kmeans(self, data: np.ndarray) -> Tuple[float,
+                                                         np.ndarray,
+                                                         np.ndarray]:
+        gfp_sum_sq = np.sum(data ** 2)
+        maps = _compute_maps(data, self.n_clusters, max_iter=self.max_iter,
+                             random_state=self.random_state,
+                             thresh=self.tol, verbose=self.verbose)
+>>>>>>> parent of 146fe28... Add support for Epochs and Evoked
         activation = maps.dot(data)
         segmentation = np.argmax(np.abs(activation), axis=0)
         map_corr = _corr_vectors(data, maps[segmentation].T)
@@ -661,6 +802,7 @@ class ModKMeans(BaseClustering):
         gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
         return (gev, maps, segmentation)
 
+<<<<<<< HEAD
     @verbose
     def fit(
         self,
@@ -754,17 +896,46 @@ class ModKMeans(BaseClustering):
         n_jobs: int = 1,
         verbose=None,
     ) -> ModKMeans:
+=======
+    def _do_fit(self, raw: mne.io.RawArray, start: float = None, stop: float = None,
+            reject_by_annotation: bool = True,
+            gfp: bool = False, n_jobs: int = 1,
+            verbose=None) -> ModKMeans:
+
+        reject_by_annotation = 'omit' if reject_by_annotation else None
+        start, stop = _check_start_stop(raw, start, stop)
+        n_jobs = check_n_jobs(n_jobs)
+
+        if len(raw.info['bads']) != 0:
+            warn('Bad channels are present in the recording. '
+                 'They will still be used to compute microstate topographies. '
+                 'Consider using Raw.pick() or Raw.interpolate_bads()'
+                 ' before fitting.')
+
+        data = raw.get_data(start, stop,
+                            reject_by_annotation=reject_by_annotation)
+        if gfp is True:
+            data = _extract_gfps(data)
+
+>>>>>>> parent of 146fe28... Add support for Epochs and Evoked
         best_gev = 0
         if n_jobs == 1:
             for _ in range(self.n_init):
-                gev, maps, segmentation = self._run_mod_kmeans(data, verbose=verbose)
+                gev, maps, segmentation = self._run_mod_kmeans(data)
                 if gev > best_gev:
                     best_gev, best_maps, best_segmentation = gev, maps, segmentation
         else:
+<<<<<<< HEAD
             parallel, p_fun, _ = parallel_func(
                 self._run_mod_kmeans, total=self.n_init, n_jobs=n_jobs
             )
             runs = parallel(p_fun(data, verbose=verbose) for i in range(self.n_init))
+=======
+            parallel, p_fun, _ = parallel_func(self._run_mod_kmeans,
+                                               total=self.n_init,
+                                               n_jobs=n_jobs)
+            runs = parallel(p_fun(data) for i in range(self.n_init))
+>>>>>>> parent of 146fe28... Add support for Epochs and Evoked
             runs = np.array(runs)
             best_run = np.argmax(runs[:, 0])
             best_gev, best_maps, best_segmentation = runs[best_run]

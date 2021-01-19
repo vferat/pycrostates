@@ -30,7 +30,7 @@ Most-used classes
 .. autosummary::
    :toctree: generated/
 
-   clustering.ModKMeans
+   clustering.mod_Kmeans
    metrics.compute_metrics
    viz.plot_segmentation
 
@@ -48,7 +48,7 @@ Clustering
 .. autosummary::
    :toctree: generated/
 
-   ModKMeans
+   mod_Kmeans
 
 Vizualisation
 =============

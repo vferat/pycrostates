@@ -1,9 +1,9 @@
-from typing import Tuple
-
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import mne
 import numpy as np
+import mne
+
+from typing import Tuple
 
 
 def plot_segmentation(
