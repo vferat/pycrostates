@@ -6,5 +6,7 @@
     "python.testing.unittestEnabled": false,
     "python.testing.nosetestsEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "restructuredtext.languageServer.disabled": true,
+    "restructuredtext.confPath": "${workspaceFolder}\\docs\\source"
 }

@@ -1,1 +1,1 @@
-from .clustering import mod_Kmeans
+from .clustering import ModKMeans
