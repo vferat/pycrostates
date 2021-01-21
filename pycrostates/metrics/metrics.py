@@ -2,7 +2,7 @@ import itertools
 
 import mne
 import numpy as np
-
+from scipy import stats
 
 def compute_metrics(labels:np.ndarray, states:np.ndarray,
                     raw:mne.io.RawArray, norm_gfp:bool = True,
@@ -38,18 +38,19 @@ def compute_metrics(labels:np.ndarray, states:np.ndarray,
         labeled_tp = data.T[np.argwhere(labels == s+1)][:,0,:].T
         labeled_gfp = gfp[np.argwhere(labels == s+1)][:,0]
         stack = np.vstack([state, labeled_tp.T])
-        corr = np.corrcoef(stack)[0][1:]
+        corr = [stats.pearsonr(state, timepoint.T)[0] for timepoint in labeled_tp.T]
         abs_corr = np.abs(corr)
         gev = abs_corr *  labeled_gfp**2 / np.sum(gfp ** 2)
-        d['dist_gev'] =  gev
-        d['dist_corr'] = abs_corr
-        d['gev'] = np.sum(gev)
-        d['mean_corr'] = np.mean(abs_corr)
-        d['ev'] = np.sum(abs_corr) / len(gfp)
+
         s_segments = np.array([len(group) for s_, group in segments if s_ == s+1])
         occurence = len(s_segments) /len(good_segments)
         timecov = np.sum(s_segments) / len(np.where(labels != 0)[0])
         durs = s_segments / raw.info['sfreq']
+        
+        d['dist_gev'] =  gev
+        d['dist_corr'] = abs_corr
+        d['gev'] = np.sum(gev)
+        d['mean_corr'] = np.mean(abs_corr)
         d['timecov'] =  timecov
         d['meandurs'] = np.mean(durs)
         d['dist_durs'] = durs
@@ -60,7 +61,6 @@ def compute_metrics(labels:np.ndarray, states:np.ndarray,
         d_[f'{state_name}_dist_corr'] = abs_corr
         d_[f'{state_name}_gev'] = np.sum(gev)
         d_[f'{state_name}_mean_corr'] = np.mean(abs_corr)
-        d_[f'{state_name}_ev'] =np.sum(abs_corr) / len(gfp)
         d_[f'{state_name}_timecov'] = timecov
         d_[f'{state_name}_meandurs'] = np.mean(durs)
         d_[f'{state_name}_dist_durs'] = durs
