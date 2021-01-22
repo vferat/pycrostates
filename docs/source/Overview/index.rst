@@ -3,8 +3,4 @@
 Documentation overview
 ======================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-   readme
+.. mdinclude:: ../../../README.md

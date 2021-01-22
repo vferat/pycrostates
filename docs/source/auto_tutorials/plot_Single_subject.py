@@ -15,11 +15,6 @@ import pandas as pd
 import pycrostates
 from pycrostates.clustering import ModKMeans
 from pycrostates.metrics import compute_metrics
-# %%
-# This is the first section!
-# The `#%%` signifies to Sphinx-Gallery that this text should be rendered as
-# rST and if using one of the above IDE/plugin's, also signifies the start of a
-# 'code block'.
 
 subject = 1
 runs = [1,2,3]  # motor imagery: hands vs feet

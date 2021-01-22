@@ -23,7 +23,7 @@ Single Subject Segmentation
 
 This example demonstrates how to segment a single subject recording into microstates sequence.
 
-.. GENERATED FROM PYTHON SOURCE LINES 7-18
+.. GENERATED FROM PYTHON SOURCE LINES 7-33
 
 .. code-block:: default
 
@@ -38,33 +38,6 @@ This example demonstrates how to segment a single subject recording into microst
     import pycrostates
     from pycrostates.clustering import ModKMeans
     from pycrostates.metrics import compute_metrics
-
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    c:\users\ferat\appdata\local\continuum\miniconda3\envs\sci37\lib\importlib\_bootstrap.py:219: RuntimeWarning: numpy.ufunc size changed, may indicate binary incompatibility. Expected 192 from C header, got 216 from PyObject
-      return f(*args, **kwds)
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 19-23
-
-This is the first section!
-The `#%%` signifies to Sphinx-Gallery that this text should be rendered as
-rST and if using one of the above IDE/plugin's, also signifies the start of a
-'code block'.
-
-.. GENERATED FROM PYTHON SOURCE LINES 23-38
-
-.. code-block:: default
-
 
     subject = 1
     runs = [1,2,3]  # motor imagery: hands vs feet
@@ -90,6 +63,8 @@ rST and if using one of the above IDE/plugin's, also signifies the start of a
 
  .. code-block:: none
 
+    c:\users\ferat\appdata\local\continuum\miniconda3\envs\sci37\lib\importlib\_bootstrap.py:219: RuntimeWarning: numpy.ufunc size changed, may indicate binary incompatibility. Expected 192 from C header, got 216 from PyObject
+      return f(*args, **kwds)
     Extracting EDF parameters from C:\Users\ferat\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R01.edf...
     EDF file detected
     Setting channel info structure...
@@ -113,12 +88,12 @@ rST and if using one of the above IDE/plugin's, also signifies the start of a
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-41
+.. GENERATED FROM PYTHON SOURCE LINES 34-36
 
 Fit the modified Kmeans algorithm with the raw data. Here we use ``gfp=True`` to extract gfp peaks on fly.
 Note that, depending on your setup, you can change ``n_jobs=1`` in order to use parallel processing and speed up the process.
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-46
+.. GENERATED FROM PYTHON SOURCE LINES 36-41
 
 .. code-block:: default
 
@@ -137,19 +112,19 @@ Note that, depending on your setup, you can change ``n_jobs=1`` in order to use 
 
  .. code-block:: none
 
-      0%|                                                                                                                                                                                    |  : 0/100 [00:00<?,       ?it/s]      5%|########8                                                                                                                                                                       |  : 5/100 [00:03<01:06,    1.44it/s]     10%|#################5                                                                                                                                                             |  : 10/100 [00:04<00:59,    1.50it/s]     15%|##########################2                                                                                                                                                    |  : 15/100 [00:04<00:54,    1.56it/s]     20%|###################################                                                                                                                                            |  : 20/100 [00:05<00:49,    1.62it/s]     25%|###########################################7                                                                                                                                   |  : 25/100 [00:06<00:44,    1.69it/s]     30%|####################################################5                                                                                                                          |  : 30/100 [00:07<00:40,    1.75it/s]     35%|#############################################################2                                                                                                                 |  : 35/100 [00:08<00:35,    1.81it/s]     40%|######################################################################                                                                                                         |  : 40/100 [00:09<00:32,    1.86it/s]     45%|##############################################################################7                                                                                                |  : 45/100 [00:10<00:28,    1.93it/s]     50%|#######################################################################################5                                                                                       |  : 50/100 [00:11<00:25,    1.99it/s]     55%|################################################################################################2                                                                              |  : 55/100 [00:11<00:21,    2.07it/s]     60%|#########################################################################################################                                                                      |  : 60/100 [00:12<00:18,    2.14it/s]     65%|#################################################################################################################7                                                             |  : 65/100 [00:13<00:15,    2.19it/s]     70%|##########################################################################################################################4                                                    |  : 70/100 [00:14<00:13,    2.28it/s]     75%|###################################################################################################################################2                                           |  : 75/100 [00:14<00:10,    2.36it/s]     80%|############################################################################################################################################                                   |  : 80/100 [00:15<00:08,    2.43it/s]     85%|####################################################################################################################################################7                          |  : 85/100 [00:16<00:05,    2.52it/s]     90%|#############################################################################################################################################################5                 |  : 90/100 [00:17<00:03,    2.60it/s]     95%|######################################################################################################################################################################2        |  : 95/100 [00:17<00:01,    2.69it/s]    100%|##############################################################################################################################################################################|  : 100/100 [00:18<00:00,    2.77it/s]    100%|##############################################################################################################################################################################|  : 100/100 [00:18<00:00,    5.35it/s]
+      0%|                                                                                                                                                                                    |  : 0/100 [00:00<?,       ?it/s]      5%|########8                                                                                                                                                                       |  : 5/100 [00:03<01:11,    1.34it/s]     10%|#################5                                                                                                                                                             |  : 10/100 [00:04<01:04,    1.39it/s]     15%|##########################2                                                                                                                                                    |  : 15/100 [00:05<00:58,    1.45it/s]     20%|###################################                                                                                                                                            |  : 20/100 [00:05<00:52,    1.52it/s]     25%|###########################################7                                                                                                                                   |  : 25/100 [00:06<00:47,    1.57it/s]     30%|####################################################5                                                                                                                          |  : 30/100 [00:07<00:42,    1.64it/s]     35%|#############################################################2                                                                                                                 |  : 35/100 [00:07<00:38,    1.70it/s]     40%|######################################################################                                                                                                         |  : 40/100 [00:08<00:33,    1.77it/s]     45%|##############################################################################7                                                                                                |  : 45/100 [00:09<00:29,    1.84it/s]     50%|#######################################################################################5                                                                                       |  : 50/100 [00:09<00:26,    1.91it/s]     55%|################################################################################################2                                                                              |  : 55/100 [00:10<00:22,    1.99it/s]     60%|#########################################################################################################                                                                      |  : 60/100 [00:11<00:19,    2.05it/s]     65%|#################################################################################################################7                                                             |  : 65/100 [00:12<00:16,    2.12it/s]     70%|##########################################################################################################################4                                                    |  : 70/100 [00:13<00:13,    2.20it/s]     75%|###################################################################################################################################2                                           |  : 75/100 [00:13<00:10,    2.28it/s]     80%|############################################################################################################################################                                   |  : 80/100 [00:14<00:08,    2.36it/s]     85%|####################################################################################################################################################7                          |  : 85/100 [00:15<00:06,    2.43it/s]     90%|#############################################################################################################################################################5                 |  : 90/100 [00:15<00:03,    2.52it/s]     95%|######################################################################################################################################################################2        |  : 95/100 [00:16<00:01,    2.60it/s]    100%|##############################################################################################################################################################################|  : 100/100 [00:17<00:00,    2.69it/s]    100%|##############################################################################################################################################################################|  : 100/100 [00:17<00:00,    5.78it/s]
 
     ()
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-50
+.. GENERATED FROM PYTHON SOURCE LINES 42-45
 
 Now that our algorithm is fitted, we can visualise the cluster centers, also called Microstate maps or Microstate topographies
 using :meth:`ModK.plot_cluster_centers`. Note than this method uses the :class:`~mne.Info` object of the fitted instance to display
 the topographies.
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-52
+.. GENERATED FROM PYTHON SOURCE LINES 45-47
 
 .. code-block:: default
 
@@ -170,19 +145,19 @@ the topographies.
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x0000028CD60623C8>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x0000028CD60A4988>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x0000028CD60DD5C8>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x0000028CD6117248>],
+    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001F9C0B0A1C8>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001F9BEC54188>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001F9BEC8BE08>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001F9BECC3AC8>],
           dtype=object))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-54
+.. GENERATED FROM PYTHON SOURCE LINES 48-49
 
 Predict.
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-57
+.. GENERATED FROM PYTHON SOURCE LINES 49-52
 
 .. code-block:: default
 
@@ -204,15 +179,15 @@ Predict.
  .. code-block:: none
 
 
-    (<Figure size 1000x400 with 2 Axes>, [<matplotlib.lines.Line2D object at 0x0000028CD63D3A08>])
+    (<Figure size 1000x400 with 2 Axes>, [<matplotlib.lines.Line2D object at 0x000001F9BEF8CE88>])
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-59
+.. GENERATED FROM PYTHON SOURCE LINES 53-54
 
 Compute microstate parameters and convert results into a :class:`~pandas.DataFrame`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-61
+.. GENERATED FROM PYTHON SOURCE LINES 54-56
 
 .. code-block:: default
 
@@ -282,39 +257,39 @@ Compute microstate parameters and convert results into a :class:`~pandas.DataFra
       <tbody>
         <tr>
           <th>0</th>
-          <td>[-0.1590050036066257, -0.1309424457445233, -0....</td>
-          <td>0.574879</td>
-          <td>[2.0590772687252248e-07, 1.5873207133906916e-0...</td>
-          <td>0.109196</td>
-          <td>0.280873</td>
-          <td>[0.0875, 0.24375, 0.09375, 0.08125, 0.13125, 0...</td>
-          <td>0.119699</td>
-          <td>0.293846</td>
-          <td>[-0.5040041762983047, -0.47448534292690014, -0...</td>
-          <td>0.761762</td>
-          <td>[1.369268482410974e-06, 7.571930789232302e-07,...</td>
-          <td>0.22594</td>
-          <td>0.144429</td>
+          <td>[0.5039996517599461, 0.4744242778149985, 0.560...</td>
+          <td>0.761786</td>
+          <td>[1.369243898170386e-06, 7.569981936420706e-07,...</td>
+          <td>0.226191</td>
+          <td>0.1443</td>
           <td>[0.06875, 0.08125, 0.2125, 0.18125, 0.625, 0.3...</td>
-          <td>0.125512</td>
-          <td>0.144103</td>
-          <td>[-0.3157715734740371, -0.2177844450573803, -0....</td>
-          <td>0.55667</td>
-          <td>[8.392337227630888e-07, 3.5628321957488003e-07...</td>
-          <td>0.16672</td>
-          <td>0.34898</td>
-          <td>[0.3, 0.04375, 0.10625, 0.1125, 0.06875, 0.15,...</td>
-          <td>0.135699</td>
-          <td>0.322051</td>
-          <td>[-0.6890936173718516, -0.6976906187641585, -0....</td>
-          <td>0.609712</td>
-          <td>[6.713845316805786e-06, 4.647946495632368e-06,...</td>
-          <td>0.103278</td>
-          <td>0.225717</td>
+          <td>0.125556</td>
+          <td>0.143955</td>
+          <td>[0.6890845551879123, 0.6976801568578832, 0.562...</td>
+          <td>0.609633</td>
+          <td>[6.7136687320875335e-06, 4.647807104289774e-06...</td>
+          <td>0.103286</td>
+          <td>0.225511</td>
           <td>[0.075, 0.0375, 0.0625, 0.05625, 0.08125, 0.04...</td>
-          <td>0.117775</td>
-          <td>0.24</td>
-          <td>0.011492</td>
+          <td>0.117815</td>
+          <td>0.239754</td>
+          <td>[-0.15892452084458278, -0.13089100794603903, -...</td>
+          <td>0.574488</td>
+          <td>[2.056993330720726e-07, 1.5860738717623078e-07...</td>
+          <td>0.109297</td>
+          <td>0.281544</td>
+          <td>[0.0875, 0.24375, 0.09375, 0.08125, 0.13125, 0...</td>
+          <td>0.119717</td>
+          <td>0.29457</td>
+          <td>[0.3153965535553327, 0.21740241671246188, 0.12...</td>
+          <td>0.556627</td>
+          <td>[8.372415075174573e-07, 3.5503436170370445e-07...</td>
+          <td>0.166547</td>
+          <td>0.348645</td>
+          <td>[0.3, 0.04375, 0.10625, 0.1125, 0.06875, 0.15,...</td>
+          <td>0.135738</td>
+          <td>0.321721</td>
+          <td>0.010225</td>
         </tr>
       </tbody>
     </table>
@@ -326,7 +301,7 @@ Compute microstate parameters and convert results into a :class:`~pandas.DataFra
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  21.309 seconds)
+   **Total running time of the script:** ( 0 minutes  19.854 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_plot_Single_subject.py:

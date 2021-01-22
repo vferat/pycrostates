@@ -38,8 +38,17 @@ extensions = [
    'sphinx.ext.viewcode',
    'sphinx.ext.intersphinx',
    'nbsphinx',
-   'sphinx_gallery.gen_gallery']
+   'sphinx_gallery.gen_gallery',
+   'm2r2']
 
+
+# sphinx
+master_doc = 'index'
+
+# sphinx m2r
+source_suffix = ['.rst', '.md']
+
+# sphinx autosummary
 autosummary_generate = True
 autodoc_default_options = {'inherited-members': None}
 
@@ -67,9 +76,6 @@ templates_path = ['_templates']
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
-
-
-master_doc = 'index'
 
 # -- Options for HTML output -------------------------------------------------
 
