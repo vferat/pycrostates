@@ -1,0 +1,32 @@
+import numpy as np
+
+def _corr_vectors(A, B, axis=0):
+    """Compute pairwise correlation of multiple pairs of vectors.
+    Fast way to compute correlation of multiple pairs of vectors without
+    computing all pairs as would with corr(A,B). Borrowed from Oli at Stack
+    overflow. Note the resulting coefficients vary slightly from the ones
+    obtained from corr due differences in the order of the calculations.
+    (Differences are of a magnitude of 1e-9 to 1e-17 depending of the tested
+    data).
+    Parameters
+    ----------
+    A : ndarray, shape (n, m)
+        The first collection of vectors
+    B : ndarray, shape (n, m)
+        The second collection of vectors
+    axis : int
+        The axis that contains the elements of each vector. Defaults to 0.
+    Returns
+    -------
+    corr : ndarray, shape (m,)
+        For each pair of vectors, the correlation between them.
+    """
+    if A.shape != B.shape:
+        raise ValueError('all input arrays must have the same shape')
+    An = A - np.mean(A, axis=axis)
+    Bn = B - np.mean(B, axis=axis)
+    An /= np.linalg.norm(An, axis=axis)
+    Bn /= np.linalg.norm(Bn, axis=axis)
+    corr = np.sum(An * Bn, axis=axis)
+    corr = np.nan_to_num(corr, posinf=0, neginf=0) 
+    return corr

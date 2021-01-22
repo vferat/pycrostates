@@ -10,6 +10,7 @@ import mne
 from mne.io import concatenate_raws, read_raw_edf
 from mne.datasets import eegbci
 from mne.channels import make_standard_montage
+import pandas as pd
 
 import pycrostates
 from pycrostates.clustering import ModKMeans
@@ -44,7 +45,7 @@ ModK.fit(raw, gfp=True, n_jobs=5)
 
 # %%
 # Now that our algorithm is fitted, we can visualise the cluster centers, also called Microstate maps or Microstate topographies
-# using ``ModK.plot_cluster_centers()``. Note than this method uses the :class:`~mne.Info` object of the fitted instance to display
+# using :meth:`ModK.plot_cluster_centers`. Note than this method uses the :class:`~mne.Info` object of the fitted instance to display
 # the topographies.
 ModK.plot_cluster_centers()
 
@@ -54,5 +55,7 @@ segmentation = ModK.predict(raw, half_window_size=5, factor=10)
 pycrostates.viz.plot_segmentation(segmentation, raw)
 
 # %%
-# Compute microstate parameters.
-compute_metrics(segmentation, ModK.cluster_centers, raw, norm_gfp=True)
+# Compute microstate parameters and convert results into a :class:`~pandas.DataFrame`.
+metrics = compute_metrics(segmentation, ModK.cluster_centers, raw, norm_gfp=True)
+df = pd.DataFrame([metrics])
+df

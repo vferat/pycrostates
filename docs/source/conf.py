@@ -57,6 +57,7 @@ intersphinx_mapping = {
     'matplotlib': ('https://matplotlib.org', None),
     'mne': ('https://mne.tools/stable/', None),
     'joblib': ('https://joblib.readthedocs.io/en/latest', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.

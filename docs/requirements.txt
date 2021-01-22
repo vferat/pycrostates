@@ -2,3 +2,4 @@ sphinx
 nbsphinx
 sphinx_bootstrap_theme
 sphinx_gallery
+pandas

@@ -16,7 +16,7 @@ from mne.parallel import check_n_jobs, parallel_func
 from mne.preprocessing.ica import _check_start_stop
 from mne.utils import _validate_type, logger, verbose, warn, fill_doc
 from scipy.signal import find_peaks
-
+from ..utils import _corr_vectors
 
 def _extract_gfps(data, min_peak_dist=2):
     """ Extract Gfp peaks from input data
@@ -90,35 +90,7 @@ def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
 
     return maps
 
-@verbose
-def _corr_vectors(A, B, axis=0, verbose=None):
-    """Compute pairwise correlation of multiple pairs of vectors.
-    Fast way to compute correlation of multiple pairs of vectors without
-    computing all pairs as would with corr(A,B). Borrowed from Oli at Stack
-    overflow. Note the resulting coefficients vary slightly from the ones
-    obtained from corr due differences in the order of the calculations.
-    (Differences are of a magnitude of 1e-9 to 1e-17 depending of the tested
-    data).
-    Parameters
-    ----------
-    A : ndarray, shape (n, m)
-        The first collection of vectors
-    B : ndarray, shape (n, m)
-        The second collection of vectors
-    axis : int
-        The axis that contains the elements of each vector. Defaults to 0.
-    Returns
-    -------
-    corr : ndarray, shape (m,)
-        For each pair of vectors, the correlation between them.
-    """
-    An = A - np.mean(A, axis=axis)
-    Bn = B - np.mean(B, axis=axis)
-    An /= np.linalg.norm(An, axis=axis)
-    Bn /= np.linalg.norm(Bn, axis=axis)
-    corr = np.sum(An * Bn, axis=axis)
-    corr = np.nan_to_num(corr, posinf=0, neginf=0) 
-    return corr
+
     
 
 def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
