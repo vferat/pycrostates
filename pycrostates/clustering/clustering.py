@@ -90,7 +90,8 @@ def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
 
     return maps
 
-def _corr_vectors(A, B, axis=0):
+@verbose
+def _corr_vectors(A, B, axis=0, verbose=None):
     """Compute pairwise correlation of multiple pairs of vectors.
     Fast way to compute correlation of multiple pairs of vectors without
     computing all pairs as would with corr(A,B). Borrowed from Oli at Stack
@@ -115,7 +116,10 @@ def _corr_vectors(A, B, axis=0):
     Bn = B - np.mean(B, axis=axis)
     An /= np.linalg.norm(An, axis=axis)
     Bn /= np.linalg.norm(Bn, axis=axis)
-    return np.sum(An * Bn, axis=axis)
+    corr = np.sum(An * Bn, axis=axis)
+    corr = np.nan_to_num(corr, posinf=0, neginf=0) 
+    return corr
+    
 
 def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
     S0 = 0
@@ -554,7 +558,7 @@ class ModKMeans(BaseClustering):
         self.current_fit = current_fit
         return()
     
-    def _do_fit(self, data: np.nd.array, start: float = None, stop: float = None,
+    def _do_fit(self, data: np.ndarray, start: float = None, stop: float = None,
             reject_by_annotation: bool = True,
             gfp: bool = False, n_jobs: int = 1,
             verbose=None) -> ModKMeans:

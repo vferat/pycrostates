@@ -7,37 +7,52 @@ This example demonstrates how to segment a single subject recording into microst
 
 import os.path as op
 import mne
-from mne.datasets import sample
+from mne.io import concatenate_raws, read_raw_edf
+from mne.datasets import eegbci
+from mne.channels import make_standard_montage
 
 import pycrostates
 from pycrostates.clustering import ModKMeans
-
+from pycrostates.metrics import compute_metrics
 # %%
 # This is the first section!
 # The `#%%` signifies to Sphinx-Gallery that this text should be rendered as
 # rST and if using one of the above IDE/plugin's, also signifies the start of a
 # 'code block'.
 
-data_path = sample.data_path()
-fname_evoked = data_path + '/MEG/sample/sample_audvis-ave.fif'
+subject = 1
+runs = [1,2,3]  # motor imagery: hands vs feet
 
-evoked = mne.read_evokeds(fname_evoked, condition=0, baseline=(None, 0))
-evoked.pick('eeg')
-evoked.interpolate_bads()
-evoked.set_eeg_reference('average')
+raw_fnames = eegbci.load_data(subject, runs, update_path=True)
+raw_files = [read_raw_edf(f, preload=True) for f in raw_fnames]
+raw = concatenate_raws(raw_files)
+eegbci.standardize(raw)  # set channel names
+
+raw.rename_channels(lambda x: x.strip('.'))
+montage = make_standard_montage('standard_1005')
+raw.set_montage(montage)
+
+raw.pick('eeg')
+raw.set_eeg_reference('average')
 # %%
-# Fit.
+# Fit the modified Kmeans algorithm with the raw data. Here we use ``gfp=True`` to extract gfp peaks on fly.
+# Note that, depending on your setup, you can change ``n_jobs=1`` in order to use parallel processing and speed up the process.
 
 n_clusters = 4
 ModK = ModKMeans(n_clusters=n_clusters)
-ModK.fit(evoked)
+ModK.fit(raw, gfp=True, n_jobs=5)
 
 # %%
-# Plot.
-
+# Now that our algorithm is fitted, we can visualise the cluster centers, also called Microstate maps or Microstate topographies
+# using ``ModK.plot_cluster_centers()``. Note than this method uses the :class:`~mne.Info` object of the fitted instance to display
+# the topographies.
 ModK.plot_cluster_centers()
 
 # %%
 # Predict.
-segmentation = ModK.predict(evoked, half_window_size=5, factor=30)
-pycrostates.viz.plot_segmentation(segmentation, evoked)
+segmentation = ModK.predict(raw, half_window_size=5, factor=10)
+pycrostates.viz.plot_segmentation(segmentation, raw)
+
+# %%
+# Compute microstate parameters.
+compute_metrics(segmentation, ModK.cluster_centers, raw, norm_gfp=True)

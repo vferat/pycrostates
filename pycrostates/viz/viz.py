@@ -34,7 +34,7 @@ def plot_segmentation(labels: np.ndarray, inst: Union(BaseRaw, Evoked),
         data = inst.data
     gfp = np.std(data, axis=0)
     times = inst.times + tmin
-    n_states = np.max(labels) + 1
+    n_states = int(np.max(labels) + 1)
     if names is None:
         names = ['unlabeled']
         names.extend([f'Microstate {i+1}' for i in range(n_states - 1)])
