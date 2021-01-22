@@ -19,9 +19,9 @@ def test_ModKMeans_fit_raw():
     n_clusters = 4
     ModK = ModKMeans(n_clusters=n_clusters)
     assert ModK.n_clusters == n_clusters
-    assert ModK.current_fit is 'unfitted'
-    assert ModK.GEV is None
-    assert ModK.info is None
+    assert ModK.current_fit == 'unfitted'
+    assert ModK.GEV == None
+    assert ModK.info == None
     ModK.fit(raw, n_jobs=1)
     assert len(ModK.cluster_centers) == n_clusters
     assert ModK.current_fit == 'Raw'
@@ -36,9 +36,9 @@ def test_ModKMeans_fit_epochs():
     n_clusters = 4
     ModK = ModKMeans(n_clusters=n_clusters)
     assert ModK.n_clusters == n_clusters
-    assert ModK.current_fit is 'unfitted'
-    assert ModK.GEV is None
-    assert ModK.info is None
+    assert ModK.current_fit == 'unfitted'
+    assert ModK.GEV == None
+    assert ModK.info == None
     ModK.fit(epochs, n_jobs=1)
     assert len(ModK.cluster_centers) == n_clusters
     assert ModK.current_fit == 'Epochs'
@@ -51,9 +51,9 @@ def test_ModKMeans_fit_evoked():
     n_clusters = 4
     ModK = ModKMeans(n_clusters=n_clusters)
     assert ModK.n_clusters == n_clusters
-    assert ModK.current_fit is 'unfitted'
-    assert ModK.GEV is None
-    assert ModK.info is None
+    assert ModK.current_fit == 'unfitted'
+    assert ModK.GEV == None
+    assert ModK.info == None
     ModK.fit(evoked, n_jobs=1)
     assert len(ModK.cluster_centers) == n_clusters
     assert ModK.current_fit == 'Evoked'
