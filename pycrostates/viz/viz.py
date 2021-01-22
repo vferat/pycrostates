@@ -1,12 +1,16 @@
-from typing import Tuple
+from __future__ import annotations
+from typing import Tuple, Union
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import mne
 import numpy as np
+import mne
+from mne import Evoked
+from mne.io import BaseRaw
+from mne.utils import _validate_type, logger, verbose, warn, fill_doc
 
 
-def plot_segmentation(labels: np.ndarray, raw: mne.io.RawArray,
+def plot_segmentation(labels: np.ndarray, inst: Union(BaseRaw, Evoked),
                       names: list = None,
                       tmin: float = 0.0, tmax: float = None) -> Tuple[mpl.figure.Figure,
                                                                       mpl.axes.Axes]:
@@ -22,16 +26,19 @@ def plot_segmentation(labels: np.ndarray, raw: mne.io.RawArray,
     Returns:
         Tuple[mpl.figure.Figure, mpl.axes.Axes]: [description]
     """
-
-    raw_ = raw.copy()
-    raw_ = raw_.crop(tmin=tmin, tmax=tmax)
-    gfp = np.std(raw_.get_data(), axis=0)
-    times = raw_.times + tmin
+    _validate_type(inst, (BaseRaw, Evoked), 'inst', 'Raw or Evoked')
+    inst.crop(tmin=tmin, tmax=tmax)
+    if isinstance(inst, BaseRaw):
+        data = inst.get_data()
+    elif isinstance(inst, Evoked):
+        data = inst.data
+    gfp = np.std(data, axis=0)
+    times = inst.times + tmin
     n_states = np.max(labels) + 1
     if names is None:
         names = ['unlabeled']
         names.extend([f'Microstate {i+1}' for i in range(n_states - 1)])
-    labels = labels[(times * raw_.info['sfreq']).astype(int)]
+    labels = labels[(times * inst.info['sfreq']).astype(int)]
     cmap = plt.cm.get_cmap('plasma', n_states)
 
     fig = plt.figure(figsize=(10,4))

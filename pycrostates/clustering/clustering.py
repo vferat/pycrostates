@@ -320,7 +320,7 @@ class BaseClustering():
         self._check_fit()
         fig, axs = plt.subplots(1, self.n_clusters)
         for c, center in enumerate(self.cluster_centers):
-            mne.viz.plot_topomap(center, info, axes=axs[c], show=False)
+            mne.viz.plot_topomap(center, self.info, axes=axs[c], show=False)
         plt.axis('off')
         plt.show()
         return(fig, axs)

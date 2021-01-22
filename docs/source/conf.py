@@ -37,10 +37,17 @@ extensions = [
    'sphinx.ext.mathjax',
    'sphinx.ext.viewcode',
    'sphinx.ext.intersphinx',
-   'nbsphinx']
+   'nbsphinx',
+   'sphinx_gallery.gen_gallery']
 
 autosummary_generate = True
 autodoc_default_options = {'inherited-members': None}
+
+# sphinx_gallery_conf
+sphinx_gallery_conf = {
+     'examples_dirs': os.path.join(curdir, '..', '..', 'tutorials'),   # path to example scripts
+     'gallery_dirs': 'auto_tutorials',  # path to where to save gallery generated output
+}
 
 # intersphinx_mapping
 intersphinx_mapping = {
@@ -79,7 +86,7 @@ html_theme_options = {
     'navbar_links': [
         ("Install", "install/index"),
         ("Overview", "overview/index"),
-        ("Tutorials", "tutorials/index"),
+        ("Tutorials", "auto_tutorials/index"),
         ("API", "API/index"),
     ],
 }
@@ -87,4 +94,4 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = [ os.path.join(curdir, '..', '_static')]
