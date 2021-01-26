@@ -36,36 +36,55 @@ def compute_metrics(labels:np.ndarray, states:np.ndarray,
         state_name = states_names[s]
         d['state'] = state_name
         arg_where = np.argwhere(labels == s+1)
-        labeled_tp = data.T[arg_where][:,0,:].T
-        labeled_gfp = gfp[arg_where][:,0]
-        state_array = np.array([state]*len(arg_where)).transpose()
-        corr = _corr_vectors(state_array, labeled_tp)
-        
-        gev = (labeled_gfp * corr) ** 2 / np.sum(gfp ** 2)
-        s_segments = np.array([len(group) for s_, group in segments if s_ == s+1])
-        occurence = len(s_segments) /len(good_segments)
-        timecov = np.sum(s_segments) / len(np.where(labels != 0)[0])
-        durs = s_segments / raw.info['sfreq']
- 
-        d['dist_corr'] = corr
-        d['mean_corr'] = np.mean(np.abs(corr))    
-        d['dist_gev'] =  gev
-        d['gev'] = np.sum(gev)
-        d['timecov'] =  timecov
-        d['dist_durs'] = durs
-        d['meandurs'] = np.mean(durs)
-        d['occurences'] = occurence
-        ds.append(d)
-        
-        d_[f'{state_name}_dist_corr'] = corr
-        d_[f'{state_name}_mean_corr'] = np.mean(np.abs(corr)) 
-        d_[f'{state_name}_dist_gev'] = gev
-        d_[f'{state_name}_gev'] = np.sum(gev)
-        d_[f'{state_name}_timecov'] = timecov
-        d_[f'{state_name}_dist_durs'] = durs
-        d_[f'{state_name}_meandurs'] = np.mean(durs)
-        d_[f'{state_name}_occurences'] = occurence
-
+        if len(arg_where) != 0:
+            labeled_tp = data.T[arg_where][:,0,:].T
+            labeled_gfp = gfp[arg_where][:,0]
+            state_array = np.array([state]*len(arg_where)).transpose()
+            corr = _corr_vectors(state_array, labeled_tp)
+            
+            gev = (labeled_gfp * corr) ** 2 / np.sum(gfp ** 2)
+            s_segments = np.array([len(group) for s_, group in segments if s_ == s+1])
+            occurence = len(s_segments) /len(good_segments)
+            timecov = np.sum(s_segments) / len(np.where(labels != 0)[0])
+            durs = s_segments / raw.info['sfreq']
+    
+            d['dist_corr'] = corr
+            d['mean_corr'] = np.mean(np.abs(corr))    
+            d['dist_gev'] =  gev
+            d['gev'] = np.sum(gev)
+            d['timecov'] =  timecov
+            d['dist_durs'] = durs
+            d['meandurs'] = np.mean(durs)
+            d['occurences'] = occurence
+            ds.append(d)
+            
+            d_[f'{state_name}_dist_corr'] = corr
+            d_[f'{state_name}_mean_corr'] = np.mean(np.abs(corr)) 
+            d_[f'{state_name}_dist_gev'] = gev
+            d_[f'{state_name}_gev'] = np.sum(gev)
+            d_[f'{state_name}_timecov'] = timecov
+            d_[f'{state_name}_dist_durs'] = durs
+            d_[f'{state_name}_meandurs'] = np.mean(durs)
+            d_[f'{state_name}_occurences'] = occurence
+        else:
+            d['dist_corr'] = 0
+            d['mean_corr'] = 0  
+            d['dist_gev'] =  0
+            d['gev'] = 0
+            d['timecov'] =  0
+            d['dist_durs'] = 0
+            d['meandurs'] = 0
+            d['occurences'] = 0
+            ds.append(d)
+            
+            d_[f'{state_name}_dist_corr'] = 0
+            d_[f'{state_name}_mean_corr'] = 0 
+            d_[f'{state_name}_dist_gev'] = 0
+            d_[f'{state_name}_gev'] = 0
+            d_[f'{state_name}_timecov'] = 0
+            d_[f'{state_name}_dist_durs'] = 0
+            d_[f'{state_name}_meandurs'] = 0
+            d_[f'{state_name}_occurences'] = 0
         
     d = {}
     s_segments = [len(group) for s_, group in segments if s_ == 0]
