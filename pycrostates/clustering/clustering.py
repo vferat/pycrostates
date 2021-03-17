@@ -16,9 +16,10 @@ from mne.parallel import check_n_jobs, parallel_func
 from mne.preprocessing.ica import _check_start_stop
 from mne.utils import _validate_type, logger, verbose, warn, fill_doc
 from scipy.signal import find_peaks
+from scipy.stats import zscore
 from ..utils import _corr_vectors
 
-def _extract_gfps(data, min_peak_dist=2):
+def _extract_gfps(data, min_peak_distance=2, reject_peaks_over_z=0):
     """ Extract Gfp peaks from input data
     
     Parameters
@@ -34,9 +35,13 @@ def _extract_gfps(data, min_peak_dist=2):
 
     """
     gfp = np.std(data, axis=0)
-    peaks, _ = find_peaks(gfp, distance=min_peak_dist)
-    gfp_peaks = data[:, peaks]
-    return(gfp_peaks)
+    gfp_z = zscore(gfp)
+    peaks, _ = find_peaks(gfp_z, distance=min_peak_distance)    
+    if reject_peaks_over_z != 0:
+        data_ = data[:,peaks[np.abs(gfp_z[peaks]) <= reject_peaks_over_z]]
+    else:
+        data_ =  data[:,peaks]
+    return(data_)
 
 @verbose
 def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
@@ -155,7 +160,7 @@ class BaseClustering():
     n_clusters : int
         The number of clusters to form as well as the number of centroids to generate.
     current_fit : bool
-        Flag informing about which data type (raw or epochs) was used for the fit.
+        Flag informing about which data type (raw, epochs or evoked) was used for the fit.
     cluster_centers : :class:`numpy.ndarray`, shape ``(n_clusters, n_channels)``
             Cluster centers (i.e Microstates maps)   
     GEV : float
@@ -170,6 +175,7 @@ class BaseClustering():
         self.cluster_centers = None
         self.GEV = None
         self.info = None
+        self.names = [f'{i+1}' for i in range(n_clusters)]
 
     def __repr__(self) -> str:
         if self.current_fit is False:
@@ -185,7 +191,7 @@ class BaseClustering():
         return()  
 
     @verbose
-    def transform(self, inst: Union(BaseRaw, BaseEpochs, Evoked), verbose: str = None) -> numpy.ndarray:
+    def transform(self, inst: Union(BaseRaw, BaseEpochs, Evoked), verbose: str = None) -> np.ndarray:
         """Compute clustering and transform Instance data to cluster-distance space (absolute spatial correlation).
 
         Parameters
@@ -297,12 +303,36 @@ class BaseClustering():
         fig, axs = plt.subplots(1, self.n_clusters)
         for c, center in enumerate(self.cluster_centers):
             mne.viz.plot_topomap(center, self.info, axes=axs[c], show=False)
+            axs[c].set_title(self.names[c])   
         plt.axis('off')
         plt.show()
         return(fig, axs)
 
+    def rename_clusters(self, names:list):
+        """Name cluster centers. Operate in place.
+
+        Parameters
+        ----------
+        names : list
+            The name to give to cluster centers. 
+
+        Returns
+        ----------
+        self : self
+            The modfied instance.
+        """
+        self._check_fit()
+        if len(names) != self.n_clusters:
+            raise ValueError(f"Names must have the same length as number of states but {len(names)}"
+                               "were given for {len(self.n_clusters)} clusters.")
+        if len(set(names))!= len(names):
+             raise ValueError(f"Can't name 2 clusters with the same name.")   
+        self.names = names                    
+        return(self)
+    
     def reorder(self, order: list):
-        """Reorder cluster centers.Operate in place.
+        """Reorder cluster centers. Operate in place.
+        
         Parameters
         ----------
         order : list
@@ -316,12 +346,13 @@ class BaseClustering():
         self._check_fit()
         if (np.sort(order) != np.arange(0,self.n_clusters, 1)).any():
             raise ValueError('Order contains unexpected values')
-        else:
-            self.cluster_centers = self.cluster_centers[order]
+           
+        self.cluster_centers = self.cluster_centers[order]
+        self.names = self.names[order]
         return(self)
 
     def smart_reorder(self):
-        """ Automaticaly reorder cluster centers.Operate in place.
+        """ Automaticaly reorder cluster centers. Operate in place.
 
         Returns
         ----------
@@ -398,7 +429,7 @@ class BaseClustering():
             mat[row, column] = -1
         order = [x for _,x in sorted(zip(rows,columns))]
         order = order + [x for x in range(len(centers)) if x not in order]
-        self.cluster_centers = centers[order]
+        self.reorder(order)
         return()
 
 
@@ -415,7 +446,7 @@ class ModKMeans(BaseClustering):
     n_clusters : int
         The number of clusters to form as well as the number of centroids to generate.
     current_fit : bool
-        Flag informing about which data type (raw or epochs) was used for the fit.
+        Flag informing about which data type (raw, epochs or evoked) was used for the fit.
     cluster_centers : :class:`numpy.ndarray`, shape ``(n_clusters, n_channels)``
             Cluster centers (i.e Microstates maps)         
     GEV : float
@@ -465,7 +496,8 @@ class ModKMeans(BaseClustering):
     @verbose
     def fit(self, inst: Union(BaseRaw, BaseEpochs, Evoked), start: float = None, stop: float = None,
             reject_by_annotation: bool = True,
-            gfp: bool = False, n_jobs: int = 1,
+            gfp: bool = False, min_peak_distance: float = 10, reject_peaks_over_z: float = 0,
+            n_jobs: int = 1,
             verbose=None):
         """Segment Instance into microstate sequence.
 
@@ -474,7 +506,14 @@ class ModKMeans(BaseClustering):
         inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`, :class:`mne.Evoked`
             Instance containing data to transform to cluster-distance space (absolute spatial correlation).
         gfp : bool
-            If True, only takes gfp peaks to fit the algorithm. If False use all available data. 
+            If True, only takes gfp peaks to fit the algorithm. If False use all available data.
+        min_peak_distance : float
+            Minimum peak distance in ms for gfp peaks extraction. Only applicable if gfp = True.
+            default to 10 ms
+        reject_peaks_over_z : float
+            Rejection threshold for gfp peaks expresssed in number of standard deviation over global field power (z-score).
+            Only applicable if gfp = True
+            0 means no rejection. Default to 0.              
         %(n_jobs)s
         %(raw_tmin)s
         %(raw_tmax)s
@@ -488,6 +527,13 @@ class ModKMeans(BaseClustering):
         """
         _validate_type(inst, (BaseRaw, BaseEpochs, Evoked), 'inst', 'Raw, Epochs or Evoked')
         n_jobs = check_n_jobs(n_jobs)
+        if gfp is False:
+            if reject_peaks_over_z != 0:
+                raise ValueError('reject_peaks_over_z is set but gfp set to False')
+            if min_peak_distance != 10:
+                raise ValueError('min_peak_distance is set but gfp set to False')
+        
+        min_peak_distance = inst.info['sfreq'] * min_peak_distance * 1e-3
 
         if len(inst.info['bads']) != 0:
             warn('Bad channels are present in the recording. '
@@ -502,7 +548,7 @@ class ModKMeans(BaseClustering):
             data = inst.get_data(start, stop,
                                 reject_by_annotation=reject_by_annotation)
             if gfp is True:
-                data = _extract_gfps(data)
+                data = _extract_gfps(data, min_peak_distance=min_peak_distance, reject_peaks_over_z=reject_peaks_over_z)
                 
         elif isinstance(inst, BaseEpochs):
             current_fit = 'Epochs'
@@ -510,7 +556,7 @@ class ModKMeans(BaseClustering):
             if gfp is True:
                 epochs = list()
                 for epoch in data:
-                    epoch = _extract_gfps(epoch)
+                    epoch = _extract_gfps(epoch, min_peak_distance=min_peak_distance, reject_peaks_over_z=reject_peaks_over_z)
                     epochs.append(epoch)
                 data = np.hstack(epochs)
             data = data.reshape((data.shape[1], -1))
@@ -519,7 +565,7 @@ class ModKMeans(BaseClustering):
             current_fit = 'Evoked'
             data = inst.data
             if gfp is True:
-                data = _extract_gfps(data)
+                data = _extract_gfps(data, min_peak_distance=min_peak_distance, reject_peaks_over_z=reject_peaks_over_z)
                 
         cluster_centers, GEV, _ =  self._do_fit(data=data, start=start, stop=stop, gfp=gfp,
                                             reject_by_annotation=reject_by_annotation,
@@ -550,4 +596,3 @@ class ModKMeans(BaseClustering):
             best_gev, best_maps, best_segmentation = runs[best_run]
 
         return(best_maps, best_gev, best_segmentation)
-

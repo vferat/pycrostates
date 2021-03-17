@@ -1,1 +1,1 @@
-from .clustering import ModKMeans
+from .clustering import ModKMeans, BaseClustering
