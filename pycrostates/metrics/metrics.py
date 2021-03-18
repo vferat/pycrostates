@@ -27,7 +27,6 @@ def _compute_metrics(inst, modK,
         data = inst.get_data()
     elif isinstance(inst, Evoked):
         data = inst.data
-        
     gfp = np.std(data, axis=0)
     if norm_gfp:
         gfp = gfp / np.linalg.norm(gfp)
@@ -107,7 +106,6 @@ def compute_metrics(inst:mne.io.RawArray,
         Modified K-Means Clustering algorithm use to segment data
     norm_gfp : bool
         Either or not to normalize globalfield power.
-  
     half_window_size: int
         Number of samples used for the half windows size while smoothing labels.
         Window size = 2 * half_window_size + 1
@@ -131,6 +129,7 @@ def compute_metrics(inst:mne.io.RawArray,
             raise ValueError("All instances must be of the same type")
         if not all(i.info['sfreq'] == inst[0].info['sfreq'] for i in inst):
             raise ValueError("Not all instances have the same sampling frequency")
+        inst = [i.pick(modK.picks) for i in inst]
         if n_jobs == 1:
             ds = [_compute_metrics(i, modK,
                             norm_gfp=reject_by_annotation,

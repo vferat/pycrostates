@@ -30,3 +30,8 @@ def _corr_vectors(A, B, axis=0):
     corr = np.sum(An * Bn, axis=axis)
     corr = np.nan_to_num(corr, posinf=0, neginf=0) 
     return corr
+
+def check_ch_names(inst1,inst2,inst1_name='inst', inst2_name='inst'):
+    if inst1.info['ch_names'] != inst2.info['ch_names']:
+        raise ValueError(f'Inconsistent Channel found between {inst1_name} and  {inst2_name}')
+    return()

@@ -17,7 +17,7 @@ from mne.preprocessing.ica import _check_start_stop
 from mne.utils import _validate_type, logger, verbose, warn, fill_doc
 from scipy.signal import find_peaks
 from scipy.stats import zscore
-from ..utils import _corr_vectors
+from ..utils import _corr_vectors, check_ch_names
 
 def _extract_gfps(data, min_peak_distance=2, reject_peaks_over_z=0):
     """ Extract Gfp peaks from input data
@@ -169,14 +169,15 @@ class BaseClustering():
             :class:`Measurement info <mne.Info>` of fitted instance.
     """
 
-    def __init__(self, n_clusters: int = 4):
+    def __init__(self, n_clusters: int = 4, picks: str = 'eeg'):
         self.n_clusters = n_clusters
         self.current_fit = 'unfitted'
         self.cluster_centers = None
         self.GEV = None
         self.info = None
         self.names = [f'{i+1}' for i in range(n_clusters)]
-
+        self.picks = picks
+        
     def __repr__(self) -> str:
         if self.current_fit is False:
             s = f'| unfitted'
@@ -207,6 +208,9 @@ class BaseClustering():
         """
         self._check_fit()
         _validate_type(inst, (BaseRaw, BaseEpochs, Evoked), 'inst', 'Raw, Epochs or Evoked')
+        inst = inst.copy()
+        inst = inst.pick(self.picks)
+        check_ch_names(self, inst, inst1_name=type(self).__name__, inst2_name='inst')
         if isinstance(inst, BaseRaw):
             data = inst.get_data()
             stack = np.vstack([self.cluster_centers, data.T])
@@ -259,6 +263,9 @@ class BaseClustering():
         """
         self._check_fit()
         _validate_type(inst, (BaseRaw, Evoked), 'inst', 'Raw or Evoked')
+        inst = inst.copy()
+        inst = inst.pick(self.picks)
+        check_ch_names(self, inst, inst1_name=type(self).__name__, inst2_name='inst')
         if isinstance(inst, BaseRaw):
             data = inst.get_data()
         elif isinstance(inst, Evoked):
@@ -526,6 +533,8 @@ class ModKMeans(BaseClustering):
                 Instance data transformed in cluster-distance space (absolute spatial correlation).
         """
         _validate_type(inst, (BaseRaw, BaseEpochs, Evoked), 'inst', 'Raw, Epochs or Evoked')
+        inst = inst.copy()
+        inst = inst.pick(self.picks)
         n_jobs = check_n_jobs(n_jobs)
         if gfp is False:
             if reject_peaks_over_z != 0:
