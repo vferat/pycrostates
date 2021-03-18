@@ -6,7 +6,7 @@ import mne
 from mne.io import BaseRaw
 from mne.epochs import BaseEpochs
 from mne import Evoked
-from mne.utils import _validate_type, logger, verbose, warn, fill_doc
+from mne.utils import _validate_type, verbose, warn, fill_doc
 from mne.parallel import check_n_jobs, parallel_func
 
 from ..utils import _corr_vectors
@@ -116,7 +116,7 @@ def compute_metrics(inst:mne.io.RawArray,
         Converge criterion. Default to 10e-6.
         
     %(reject_by_annotation_raw)s
-    %(verbose)s     
+    %(verbose)s
 
     Returns
     ----------

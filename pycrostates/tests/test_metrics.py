@@ -28,7 +28,7 @@ def test_compute_metrics():
                     verbose=None)
     assert(isinstance(d,list))
     assert(isinstance(d[0],dict))
-    
+
 def test_compute_metrics_list():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     raw = raw.pick('eeg')

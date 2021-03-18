@@ -1,5 +1,4 @@
 from __future__ import annotations
-from functools import wraps
 
 from typing import Tuple, Union
 
@@ -21,7 +20,7 @@ from ..utils import _corr_vectors, check_ch_names
 
 def _extract_gfps(data, min_peak_distance=2, reject_peaks_over_z=0):
     """ Extract Gfp peaks from input data
-    
+
     Parameters
     ----------
     min_peak_dist : Required minimal horizontal distance (>= 1)
@@ -36,7 +35,7 @@ def _extract_gfps(data, min_peak_distance=2, reject_peaks_over_z=0):
     """
     gfp = np.std(data, axis=0)
     gfp_z = zscore(gfp)
-    peaks, _ = find_peaks(gfp_z, distance=min_peak_distance)    
+    peaks, _ = find_peaks(gfp_z, distance=min_peak_distance)
     if reject_peaks_over_z != 0:
         data_ = data[:,peaks[np.abs(gfp_z[peaks]) <= reject_peaks_over_z]]
     else:
@@ -153,7 +152,7 @@ class BaseClustering():
     Parameters
     ----------
     n_clusters : int
-        The number of clusters to form as well as the number of centroids to generate.  
+        The number of clusters to form as well as the number of centroids to generate.
           
     Attributes
     ----------
@@ -162,7 +161,7 @@ class BaseClustering():
     current_fit : bool
         Flag informing about which data type (raw, epochs or evoked) was used for the fit.
     cluster_centers : :class:`numpy.ndarray`, shape ``(n_clusters, n_channels)``
-            Cluster centers (i.e Microstates maps)   
+            Cluster centers (i.e Microstates maps).
     GEV : float
         If fit, the Global explained Variance explained all clusters centers.
     info : dict
@@ -189,7 +188,7 @@ class BaseClustering():
     def _check_fit(self):
         if self.current_fit is 'unfitted':
             raise ValueError(f'Algorithm must be fitted before using {self.__class__.__name__}')
-        return()  
+        return()
 
     @verbose
     def transform(self, inst: Union(BaseRaw, BaseEpochs, Evoked), verbose: str = None) -> np.ndarray:
@@ -310,7 +309,7 @@ class BaseClustering():
         fig, axs = plt.subplots(1, self.n_clusters)
         for c, center in enumerate(self.cluster_centers):
             mne.viz.plot_topomap(center, self.info, axes=axs[c], show=False)
-            axs[c].set_title(self.names[c])   
+            axs[c].set_title(self.names[c])
         plt.axis('off')
         plt.show()
         return(fig, axs)
@@ -321,7 +320,7 @@ class BaseClustering():
         Parameters
         ----------
         names : list
-            The name to give to cluster centers. 
+            The name to give to cluster centers.
 
         Returns
         ----------
@@ -343,7 +342,7 @@ class BaseClustering():
         Parameters
         ----------
         order : list
-            The new cluster centers order. 
+            The new cluster centers order.
 
         Returns
         ----------
@@ -365,7 +364,7 @@ class BaseClustering():
         ----------
         self : self
             The modfied instance.
-        """        
+        """
         self._check_fit()
         info = self.info
         centers = self.cluster_centers
@@ -460,7 +459,7 @@ class ModKMeans(BaseClustering):
         If fit, the Global explained Variance explained all clusters centers.
     info : dict
         :class:`Measurement info <mne.Info>` of fitted instance.
-    random_state : int, RandomState instance or None 
+    random_state : int, RandomState instance or None
         Determines random number generation for centroid initialization. Default=None.
     n_init : int
         Number of time the k-means algorithm will be run with different centroid seeds.
@@ -520,7 +519,7 @@ class ModKMeans(BaseClustering):
         reject_peaks_over_z : float
             Rejection threshold for gfp peaks expresssed in number of standard deviation over global field power (z-score).
             Only applicable if gfp = True
-            0 means no rejection. Default to 0.              
+            0 means no rejection. Default to 0.       
         %(n_jobs)s
         %(raw_tmin)s
         %(raw_tmax)s
@@ -578,7 +577,7 @@ class ModKMeans(BaseClustering):
                 
         cluster_centers, GEV, _ =  self._do_fit(data=data, start=start, stop=stop, gfp=gfp,
                                             reject_by_annotation=reject_by_annotation,
-                                            n_jobs=n_jobs,verbose=verbose)       
+                                            n_jobs=n_jobs,verbose=verbose)
         self.cluster_centers = cluster_centers
         self.GEV = GEV
         self.info = inst.info
