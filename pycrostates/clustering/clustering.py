@@ -355,7 +355,7 @@ class BaseClustering():
             raise ValueError('Order contains unexpected values')
            
         self.cluster_centers = self.cluster_centers[order]
-        self.names = self.names[order]
+        self.names = [self.names[o] for o in order]
         return(self)
 
     def smart_reorder(self):

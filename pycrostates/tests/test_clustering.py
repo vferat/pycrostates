@@ -26,7 +26,6 @@ def test_ModKMeans_fit_raw():
     assert len(ModK.cluster_centers) == n_clusters
     assert ModK.current_fit == 'Raw'
     assert ModK.GEV > 0
-    assert ModK.info == raw.info
 
 def test_ModKMeans_fit_epochs():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
@@ -43,7 +42,6 @@ def test_ModKMeans_fit_epochs():
     assert len(ModK.cluster_centers) == n_clusters
     assert ModK.current_fit == 'Epochs'
     assert ModK.GEV > 0
-    assert ModK.info == epochs.info
     
 def test_ModKMeans_fit_evoked():
     evoked = mne.read_evokeds(fname_evoked_testing, condition=0)
@@ -58,7 +56,6 @@ def test_ModKMeans_fit_evoked():
     assert len(ModK.cluster_centers) == n_clusters
     assert ModK.current_fit == 'Evoked'
     assert ModK.GEV > 0
-    assert ModK.info == evoked.info
 
 def test_BaseClustering_transform_raw():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
