@@ -12,7 +12,7 @@
 #
 import os
 import sys
-import sphinx_bootstrap_theme
+import pydata_sphinx_theme
 curdir = os.path.dirname(__file__)
 
 
