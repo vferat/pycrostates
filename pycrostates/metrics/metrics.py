@@ -1,12 +1,11 @@
 import itertools
 
 import numpy as np
-from scipy import stats
 import mne
 from mne.io import BaseRaw
 from mne.epochs import BaseEpochs
 from mne import Evoked
-from mne.utils import _validate_type, verbose, warn, fill_doc
+from mne.utils import _validate_type, verbose, fill_doc
 from mne.parallel import check_n_jobs, parallel_func
 
 from ..utils import _corr_vectors

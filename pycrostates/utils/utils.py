@@ -28,7 +28,7 @@ def _corr_vectors(A, B, axis=0):
     An /= np.linalg.norm(An, axis=axis)
     Bn /= np.linalg.norm(Bn, axis=axis)
     corr = np.sum(An * Bn, axis=axis)
-    corr = np.nan_to_num(corr, posinf=0, neginf=0) 
+    corr = np.nan_to_num(corr, posinf=0, neginf=0)
     return corr
 
 def check_ch_names(inst1,inst2,inst1_name='inst', inst2_name='inst'):

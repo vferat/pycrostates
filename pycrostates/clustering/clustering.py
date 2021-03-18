@@ -95,8 +95,6 @@ def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
     return maps
 
 
-    
-
 def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
     S0 = 0
     states = (states.T / np.std(states, axis=1)).T
@@ -167,7 +165,6 @@ class BaseClustering():
     info : dict
             :class:`Measurement info <mne.Info>` of fitted instance.
     """
-
     def __init__(self, n_clusters: int = 4, picks: str = 'eeg'):
         self.n_clusters = n_clusters
         self.current_fit = 'unfitted'
@@ -179,14 +176,14 @@ class BaseClustering():
         
     def __repr__(self) -> str:
         if self.current_fit is False:
-            s = f'| unfitted'
+            s = '| unfitted'
         else:
             s = f'| fitted ({self.current_fit})'
         s = f' n = {str(self.n_clusters)} cluster centers ' + s
         return(f'{self.__class__.__name__} | {s}')
 
     def _check_fit(self):
-        if self.current_fit is 'unfitted':
+        if self.current_fit == 'unfitted':
             raise ValueError(f'Algorithm must be fitted before using {self.__class__.__name__}')
         return()
 
@@ -235,7 +232,7 @@ class BaseClustering():
                 reject_by_annotation: bool = True,
                 half_window_size: int = 3, factor: int = 0,
                 crit: float = 10e-6,
-                verbose: str = None) -> numpy.ndarray:
+                verbose: str = None) -> np.ndarray:
         """Predict Microstates labels using competitive fitting.
 
         Parameters
@@ -332,7 +329,7 @@ class BaseClustering():
             raise ValueError(f"Names must have the same length as number of states but {len(names)}"
                                "were given for {len(self.n_clusters)} clusters.")
         if len(set(names))!= len(names):
-             raise ValueError(f"Can't name 2 clusters with the same name.")   
+             raise ValueError("Can't name 2 clusters with the same name.")   
         self.names = names                    
         return(self)
     
@@ -358,7 +355,7 @@ class BaseClustering():
         return(self)
 
     def smart_reorder(self):
-        """ Automaticaly reorder cluster centers. Operate in place.
+        """Automaticaly reorder cluster centers. Operate in place.
 
         Returns
         ----------
@@ -485,9 +482,9 @@ class ModKMeans(BaseClustering):
         self.labels = None
 
     @verbose
-    def _run_mod_kmeans(self, data: numpy.ndarray, verbose=None) -> Tuple[float,
-                                                         numpy.ndarray,
-                                                         numpy.ndarray]:
+    def _run_mod_kmeans(self, data: np.ndarray, verbose=None) -> Tuple[float,
+                                                         np.ndarray,
+                                                         np.ndarray]:
         gfp_sum_sq = np.sum(data ** 2)
         maps = _compute_maps(data, self.n_clusters, max_iter=self.max_iter,
                              random_state=self.random_state,

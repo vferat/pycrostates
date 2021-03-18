@@ -4,10 +4,9 @@ from typing import Tuple, Union
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-import mne
 from mne import Evoked
 from mne.io import BaseRaw
-from mne.utils import _validate_type, verbose, warn, fill_doc
+from mne.utils import _validate_type, warn, fill_doc
 
 
 def plot_segmentation(labels: np.ndarray, inst: Union(BaseRaw, Evoked),

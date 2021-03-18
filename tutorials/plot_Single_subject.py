@@ -5,7 +5,6 @@ Single Subject Segmentation
 This example demonstrates how to segment a single subject recording into microstates sequence.
 """
 
-import os.path as op
 from mne.io import concatenate_raws, read_raw_edf
 from mne.datasets import eegbci
 from mne.channels import make_standard_montage
@@ -52,4 +51,4 @@ pycrostates.viz.plot_segmentation(segmentation, raw)
 # Compute microstate parameters and convert results into a :class:`~pandas.DataFrame`.
 metrics = compute_metrics(raw, ModK.cluster_centers, norm_gfp=True,  half_window_size=5, factor=10)
 df = pd.DataFrame([metrics])
-df
+print(df)
