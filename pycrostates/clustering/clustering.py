@@ -129,21 +129,9 @@ def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
             S0 = Su
 
     labels = labels_all + 1
-    # set first segment to unlabeled
-    i = 0
-    first_label = labels[i]
-    while labels[i] == first_label and i < len(labels) - 1:
-        labels[i] = 0
-        i += 1
-    # set last segment to unlabeled
-    i = len(labels) - 1
-    last_label = labels[i]
-    while labels[i] == last_label and i > 0:
-        labels[i] = 0
-        i -= 1
     return(labels)
 
-@fill_doc 
+@fill_doc
 class BaseClustering():
     u"""Base Class for Microstate Clustering algorithm.
 
@@ -151,7 +139,7 @@ class BaseClustering():
     ----------
     n_clusters : int
         The number of clusters to form as well as the number of centroids to generate.
-          
+
     Attributes
     ----------
     n_clusters : int
@@ -262,12 +250,16 @@ class BaseClustering():
         inst = inst.copy()
         inst = inst.pick(self.picks)
         check_ch_names(self, inst, inst1_name=type(self).__name__, inst2_name='inst')
+        if isinstance(inst, Evoked):
+            data = inst.data
+            return(_segment(data,
+                        self.cluster_centers,
+                        half_window_size, factor,
+                        crit)) 
+
         if isinstance(inst, BaseRaw):
             data = inst.get_data()
-        elif isinstance(inst, Evoked):
-            data = inst.data
-            reject_by_annotation = False
-            
+
         if reject_by_annotation:
             onsets, _ends = _annotations_starts_stops(inst, ['BAD'])
             if len(onsets) == 0:
@@ -283,16 +275,42 @@ class BaseClustering():
             for onset, end in zip(onsets, ends):
                 if onset - end >= 2 * half_window_size + 1:  # small segments can't be smoothed
                     sample = data[:, end:onset]
-                    segmentation[end:onset] = _segment(sample,
-                                                    self.cluster_centers,
-                                                    half_window_size, factor,
-                                                    crit)
+                    labels =  _segment(sample,
+                                        self.cluster_centers,
+                                        half_window_size, factor,
+                                        crit)
+                    # set first segment to unlabeled
+                    i = 0
+                    first_label = labels[i]
+                    while labels[i] == first_label and i < len(labels) - 1:
+                        labels[i] = 0
+                        i += 1
+                    # set last segment to unlabeled
+                    i = len(labels) - 1
+                    last_label = labels[i]
+                    while labels[i] == last_label and i > 0:
+                        labels[i] = 0
+                        i -= 1
+                    segmentation[end:onset] = labels
             return(segmentation)
         else:
-            return(_segment(data,
-                            self.cluster_centers,
-                            half_window_size, factor,
-                            crit))       
+            segmentation = _segment(data,
+                                self.cluster_centers,
+                                half_window_size, factor,
+                                crit)
+             # set first segment to unlabeled
+            i = 0
+            first_label = segmentation[i]
+            while segmentation[i] == first_label and i < len(segmentation) - 1:
+                segmentation[i] = 0
+                i += 1
+            # set last segment to unlabeled
+            i = len(segmentation) - 1
+            last_label = segmentation[i]
+            while segmentation[i] == last_label and i > 0:
+                segmentation[i] = 0
+                i -= 1
+            return(segmentation)
 
     def plot_cluster_centers(self) -> matplotlib.figure.Figure:
         """Plot cluster centers as topomaps.
@@ -330,7 +348,7 @@ class BaseClustering():
                                "were given for {len(self.n_clusters)} clusters.")
         if len(set(names))!= len(names):
              raise ValueError("Can't name 2 clusters with the same name.")
-        self.names = names                    
+        self.names = names
         return(self)
     
     def reorder(self, order: list):
@@ -442,7 +460,7 @@ class ModKMeans(BaseClustering):
     Parameters
     ----------
     n_clusters : int
-        The number of clusters to form as well as the number of centroids to generate.  
+        The number of clusters to form as well as the number of centroids to generate.
           
     Attributes
     ----------
@@ -516,7 +534,7 @@ class ModKMeans(BaseClustering):
         reject_peaks_over_z : float
             Rejection threshold for gfp peaks expresssed in number of standard deviation over global field power (z-score).
             Only applicable if gfp = True
-            0 means no rejection. Default to 0.  
+            0 means no rejection. Default to 0.
         %(n_jobs)s
         %(raw_tmin)s
         %(raw_tmax)s

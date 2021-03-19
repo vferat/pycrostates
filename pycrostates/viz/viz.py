@@ -14,7 +14,7 @@ def plot_segmentation(labels: np.ndarray, inst: Union(BaseRaw, Evoked),
                       tmin: float = 0.0, tmax: float = None) -> Tuple[mpl.figure.Figure,
                                                                       mpl.axes.Axes]:
     """Modified K-Means Clustering algorithm.
-    
+
     Parameters
     ----------
     labels (np.ndarray): [description]

@@ -63,7 +63,6 @@ def _compute_metrics(inst, modK,
             d[f'{state_name}_dist_durs'] = 0
             d[f'{state_name}_meandurs'] = 0
             d[f'{state_name}_occurences'] = 0
-            
     d['unlabeled'] =  len(np.argwhere(labels == 0)) / len(gfp)
     d['segmentation'] = labels
     return(d)
