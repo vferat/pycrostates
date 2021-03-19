@@ -49,6 +49,6 @@ pycrostates.viz.plot_segmentation(segmentation, raw)
 
 # %%
 # Compute microstate parameters and convert results into a :class:`~pandas.DataFrame`.
-metrics = compute_metrics(raw, ModK.cluster_centers, norm_gfp=True,  half_window_size=5, factor=10)
+metrics = compute_metrics(raw, ModK, norm_gfp=True,  half_window_size=5, factor=10)
 df = pd.DataFrame([metrics])
 print(df)
