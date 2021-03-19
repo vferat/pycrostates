@@ -7,13 +7,8 @@ Welcome to pycrostates's documentation!
 =======================================
 
 .. toctree::
-   :maxdepth: 4
-   :caption: Contents:
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   :hidden:
+   Overview<overview/index>
+   Install<install/index>
+   Tutorials<auto_tutorials/index>
+   API Reference<API/index>
