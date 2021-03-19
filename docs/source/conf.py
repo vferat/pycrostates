@@ -91,6 +91,12 @@ html_theme_options = {
             "url": "https://github.com/vferat/pycrostates",
             "icon": "fab fa-github-square",
         }],
+    'navbar_links': [
+        ("Install", "install/index"),
+        ("Overview", "overview/index"),
+        ("Tutorials", "auto_tutorials/index"),
+        ("API", "API/index"),
+    ],
    "external_links": [
       {"name": "mne", "url": "https://mne.tools/stable/index.html"}],
 
