@@ -85,21 +85,16 @@ exclude_patterns = []
 html_theme = 'pydata_sphinx_theme'
 
 html_theme_options = {
-    'navbar_title': ' ',  # we replace this with an image
-    'source_link_position': "nav",  # default
-    'bootswatch_theme': "flatly",  # yeti paper lumen
-    'navbar_sidebarrel': False,  # Render the next/prev links in navbar?
-    'navbar_pagenav': False,
-    'navbar_class': "navbar",
-    'bootstrap_version': "3",  # default
-    'navbar_links': [
-        ("Install", "install/index"),
-        ("Overview", "overview/index"),
-        ("Tutorials", "auto_tutorials/index"),
-        ("API", "API/index"),
-    ],
-}
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/vferat/pycrostates",
+            "icon": "fab fa-github-square",
+        }],
+   "external_links": [
+      {"name": "mne", "url": "https://mne.tools/stable/index.html"}],
 
+}
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
