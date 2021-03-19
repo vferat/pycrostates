@@ -39,16 +39,17 @@ extensions = [
    'sphinx.ext.intersphinx',
    'nbsphinx',
    'sphinx_gallery.gen_gallery',
-   'm2r2']
+   'recommonmark']
 
 
 # sphinx
 master_doc = 'index'
 
 # sphinx m2r
-source_suffix = ['.rst', '.md']
+#source_suffix = ['.rst', '.md']
 
 # sphinx autosummary
+# autodoc / autosummary
 autosummary_generate = True
 autodoc_default_options = {'inherited-members': None}
 
@@ -98,7 +99,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = [ os.path.abspath(os.path.join(curdir, '..', '_static'))]
+html_static_path = [ os.path.abspath(os.path.join(curdir, '_static'))]
 
 # -- Auto-convert markdown pages to demo --------------------------------------
 import recommonmark

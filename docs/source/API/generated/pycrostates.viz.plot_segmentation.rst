@@ -1,4 +1,4 @@
-﻿pycrostates.viz.plot\_segmentation
+pycrostates.viz.plot\_segmentation
 ==================================
 
 .. currentmodule:: pycrostates.viz

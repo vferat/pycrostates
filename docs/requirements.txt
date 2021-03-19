@@ -5,3 +5,4 @@ sphinx_gallery
 pandas
 m2r2
 recommonmark
+pillow

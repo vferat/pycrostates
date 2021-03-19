@@ -215,6 +215,7 @@ class BaseClustering():
             distances = np.max(np.abs(corr), axis=0)
         return(distances)
 
+    @fill_doc
     @verbose
     def predict(self,  inst: Union(BaseRaw, Evoked),
                 reject_by_annotation: bool = True,

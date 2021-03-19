@@ -81,18 +81,18 @@ def compute_metrics(inst:mne.io.RawArray,
 
     Compute the following micorstates metrics:
     'dist_corr': Distribution of correlations
-                    Correlation values of each time point assigned to a given state.
+                 Correlation values of each time point assigned to a given state.
     'mean_corr': Mean correlation
-                    Mean correlation value of each time point assigned to a given state.
+                Mean correlation value of each time point assigned to a given state.
     'dist_gev': Distribution of global explained variances
                 Global explained variance values of each time point assigned to a given state.
     'gev':  Global explained variance
             Total explained variance expressed by a given state. It is the sum of global explained
             variance values of each time point assigned to a given state.
     'timecov': Time coverage
-                The proportion of time during which a given state is active. This metric is expressed in percentage (%%).
+               The proportion of time during which a given state is active. This metric is expressed in percentage (%%).
     'dist_durs': Distribution of durations.
-                Duration of each segments assigned to a given state. Each value is expressed in seconds (s).
+                 Duration of each segments assigned to a given state. Each value is expressed in seconds (s).
     'meandurs': Mean duration
                 Mean temporal duration segments assigned to a given state. This metric is expressed in seconds (s).
     'occurences' : Occurences

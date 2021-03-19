@@ -1,4 +1,4 @@
-﻿pycrostates.clustering.ModKMeans
+pycrostates.clustering.ModKMeans
 ================================
 
 .. currentmodule:: pycrostates.clustering
@@ -17,6 +17,7 @@
       ~ModKMeans.fit
       ~ModKMeans.plot_cluster_centers
       ~ModKMeans.predict
+      ~ModKMeans.rename_clusters
       ~ModKMeans.reorder
       ~ModKMeans.smart_reorder
       ~ModKMeans.transform
