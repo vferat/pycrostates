@@ -4,3 +4,4 @@ pydata-sphinx-theme
 sphinx_gallery
 pandas
 m2r2
+recommonmark
