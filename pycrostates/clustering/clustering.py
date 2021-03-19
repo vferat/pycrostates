@@ -146,7 +146,7 @@ def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
 @fill_doc 
 class BaseClustering():
     u"""Base Class for Microstate Clustering algorithm.
-    
+
     Parameters
     ----------
     n_clusters : int
@@ -189,7 +189,7 @@ class BaseClustering():
 
     @verbose
     def transform(self, inst: Union(BaseRaw, BaseEpochs, Evoked), verbose: str = None) -> np.ndarray:
-        """Compute clustering and transform Instance data to cluster-distance space (absolute spatial correlation).
+        """Compute clustering and transform Instance data to cluster-distance space.
 
         Parameters
         ----------
@@ -296,7 +296,7 @@ class BaseClustering():
 
     def plot_cluster_centers(self) -> matplotlib.figure.Figure:
         """Plot cluster centers as topomaps.
-        
+
         Returns
         ----------
         fig :  matplotlib.figure.Figure
@@ -329,7 +329,7 @@ class BaseClustering():
             raise ValueError(f"Names must have the same length as number of states but {len(names)}"
                                "were given for {len(self.n_clusters)} clusters.")
         if len(set(names))!= len(names):
-             raise ValueError("Can't name 2 clusters with the same name.")   
+             raise ValueError("Can't name 2 clusters with the same name.")
         self.names = names                    
         return(self)
     
@@ -372,13 +372,13 @@ class BaseClustering():
          0.27723199,  0.04632557, -0.1383458 ,  0.36954792,  0.33889126,
          0.1425386 , -0.05140216, -0.07532628,  0.32313928,  0.21629226,
          0.11352515],
-       [-0.15034466, -0.08511373, -0.19531161, -0.24267313, -0.16871454,
+        [-0.15034466, -0.08511373, -0.19531161, -0.24267313, -0.16871454,
         -0.04761393,  0.02482456, -0.26414511, -0.15066143,  0.04628036,
         -0.1973625 , -0.24065874, -0.08569745,  0.1729162 ,  0.22345117,
         -0.17553494,  0.00688743,  0.25853483, -0.09196588, -0.09478585,
          0.09460047,  0.32742083,  0.4325027 ,  0.09535141,  0.1959104 ,
          0.31190313],
-       [ 0.29388541,  0.2886461 ,  0.27804376,  0.22674127,  0.21938115,
+        [0.29388541,  0.2886461 ,  0.27804376,  0.22674127,  0.21938115,
          0.21720292,  0.25153101,  0.12125869,  0.10996983,  0.10638135,
          0.11575272, -0.01388831, -0.04507772, -0.03708886,  0.08203929,
         -0.14818182, -0.20299531, -0.16658826, -0.09488949, -0.23512102,
@@ -408,13 +408,13 @@ class BaseClustering():
             warn("Not enought common electrodes with built-in template to automaticalv reorder maps. "
                  "Order hasn't been changed.")
             return()
-        
+
         common_names_template = [ch_names_template.index(name) for name in common_ch_names]
         common_names_centers = [ch_names_centers.index(name) for name in common_ch_names]
 
         reduc_template = template[:, common_names_template]
         reduc_centers = centers[:, common_names_centers]
-          
+
         mat = np.corrcoef(reduc_template,reduc_centers)[:len(reduc_template), -len(reduc_centers):]
         mat = np.abs(mat)
         mat_ = mat.copy()
@@ -516,7 +516,7 @@ class ModKMeans(BaseClustering):
         reject_peaks_over_z : float
             Rejection threshold for gfp peaks expresssed in number of standard deviation over global field power (z-score).
             Only applicable if gfp = True
-            0 means no rejection. Default to 0.       
+            0 means no rejection. Default to 0.  
         %(n_jobs)s
         %(raw_tmin)s
         %(raw_tmax)s

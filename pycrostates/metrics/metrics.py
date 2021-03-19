@@ -5,7 +5,7 @@ import mne
 from mne.io import BaseRaw
 from mne.epochs import BaseEpochs
 from mne import Evoked
-from mne.utils import _validate_type, verbose, fill_doc
+from mne.utils import _validate_type, verbose
 from mne.parallel import check_n_jobs, parallel_func
 
 from ..utils import _corr_vectors
@@ -21,7 +21,7 @@ def _compute_metrics(inst, modK,
                      verbose=None):
     labels = modK.predict(inst, half_window_size=half_window_size,
                          factor=factor, crit=crit, verbose=verbose)
-    
+
     if isinstance(inst, BaseRaw):
         data = inst.get_data()
     elif isinstance(inst, Evoked):
@@ -47,7 +47,7 @@ def _compute_metrics(inst, modK,
             durs = s_segments / inst.info['sfreq']
 
             d[f'{state_name}_dist_corr'] = corr
-            d[f'{state_name}_mean_corr'] = np.mean(np.abs(corr)) 
+            d[f'{state_name}_mean_corr'] = np.mean(np.abs(corr))
             d[f'{state_name}_dist_gev'] = gev
             d[f'{state_name}_gev'] = np.sum(gev)
             d[f'{state_name}_timecov'] = timecov
@@ -56,7 +56,7 @@ def _compute_metrics(inst, modK,
             d[f'{state_name}_occurences'] = occurence
         else:
             d[f'{state_name}_dist_corr'] = 0
-            d[f'{state_name}_mean_corr'] = 0 
+            d[f'{state_name}_mean_corr'] = 0
             d[f'{state_name}_dist_gev'] = 0
             d[f'{state_name}_gev'] = 0
             d[f'{state_name}_timecov'] = 0
@@ -79,23 +79,25 @@ def compute_metrics(inst:mne.io.RawArray,
                     n_jobs: int = 1,
                     verbose: str = None) -> dict:
     """Compute microstate metrics.
-        'dist_corr': Distribution of correlations
-                     Correlation values of each time point assigned to a given state.
-        'mean_corr': Mean correlation
-                     Mean correlation value of each time point assigned to a given state.
-        'dist_gev': Distribution of global explained variances
-                    Global explained variance values of each time point assigned to a given state. 
-        'gev':  Global explained variance
-                Total explained variance expressed by a given state. It is the sum of global explained
-                variance values of each time point assigned to a given state. 
-        'timecov': Time coverage
-                    The proportion of time during which a given state is active. This metric is expressed in percentage (%%).
-        'dist_durs': Distribution of durations.
-                    Duration of each segments assigned to a given state. Each value is expressed in seconds (s).
-        'meandurs': Mean duration
-                   Mean temporal duration segments assigned to a given state. This metric is expressed in seconds (s).
-        'occurences' : Occurences
-                   Mean number of segment assigned to a given state per second. This metrics is expressed in segment per second ( . / s)
+
+    Compute the following micorstates metrics:
+    'dist_corr': Distribution of correlations
+                    Correlation values of each time point assigned to a given state.
+    'mean_corr': Mean correlation
+                    Mean correlation value of each time point assigned to a given state.
+    'dist_gev': Distribution of global explained variances
+                Global explained variance values of each time point assigned to a given state.
+    'gev':  Global explained variance
+            Total explained variance expressed by a given state. It is the sum of global explained
+            variance values of each time point assigned to a given state.
+    'timecov': Time coverage
+                The proportion of time during which a given state is active. This metric is expressed in percentage (%%).
+    'dist_durs': Distribution of durations.
+                Duration of each segments assigned to a given state. Each value is expressed in seconds (s).
+    'meandurs': Mean duration
+                Mean temporal duration segments assigned to a given state. This metric is expressed in seconds (s).
+    'occurences' : Occurences
+                Mean number of segment assigned to a given state per second. This metrics is expressed in segment per second ( . / s).
 
     Parameters
     ----------

@@ -47,7 +47,7 @@ def test_compute_metrics_list():
                     verbose=None)
     assert(isinstance(d,list))
     assert(len(d) == 2)
-    
+ 
 def test_compute_metrics_list_parallel():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     raw = raw.pick('eeg')
