@@ -23,13 +23,11 @@ Single Subject Segmentation
 
 This example demonstrates how to segment a single subject recording into microstates sequence.
 
-.. GENERATED FROM PYTHON SOURCE LINES 7-33
+.. GENERATED FROM PYTHON SOURCE LINES 7-31
 
 .. code-block:: default
 
 
-    import os.path as op
-    import mne
     from mne.io import concatenate_raws, read_raw_edf
     from mne.datasets import eegbci
     from mne.channels import make_standard_montage
@@ -63,19 +61,25 @@ This example demonstrates how to segment a single subject recording into microst
 
  .. code-block:: none
 
-    c:\users\ferat\appdata\local\continuum\miniconda3\envs\sci37\lib\importlib\_bootstrap.py:219: RuntimeWarning: numpy.ufunc size changed, may indicate binary incompatibility. Expected 192 from C header, got 216 from PyObject
+    d:\python\lib\importlib\_bootstrap.py:219: RuntimeWarning: numpy.ufunc size changed, may indicate binary incompatibility. Expected 192 from C header, got 216 from PyObject
       return f(*args, **kwds)
-    Extracting EDF parameters from C:\Users\ferat\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R01.edf...
+    Downloading https://physionet.org/files/eegmmidb/1.0.0/S001/S001R01.edf (1.2 MB)
+      0%|                                                                                                                                                                       | Downloading : 0.00/1.22M [00:00<?,        ?B/s]     20%|################################4                                                                                                                                  | Downloading : 248k/1.22M [00:00<00:01,     962kB/s]     25%|########################################8                                                                                                                          | Downloading : 312k/1.22M [00:00<00:01,     923kB/s]     48%|##############################################################################4                                                                                    | Downloading : 600k/1.22M [00:00<00:00,     951kB/s]     69%|###############################################################################################################9                                                   | Downloading : 856k/1.22M [00:00<00:00,     995kB/s]     89%|################################################################################################################################################5                 | Downloading : 1.09M/1.22M [00:00<00:00,    1.03MB/s]    100%|##################################################################################################################################################################| Downloading : 1.22M/1.22M [00:00<00:00,    1.88MB/s]
+    Downloading https://physionet.org/files/eegmmidb/1.0.0/S001/S001R02.edf (1.2 MB)
+      0%|                                                                                                                                                                       | Downloading : 0.00/1.22M [00:00<?,        ?B/s]      4%|#######2                                                                                                                                                          | Downloading : 56.0k/1.22M [00:00<00:02,     459kB/s]      8%|#############6                                                                                                                                                     | Downloading : 104k/1.22M [00:00<00:02,     456kB/s]     17%|############################2                                                                                                                                      | Downloading : 216k/1.22M [00:00<00:02,     455kB/s]     25%|########################################8                                                                                                                          | Downloading : 312k/1.22M [00:00<00:02,     477kB/s]     40%|#################################################################9                                                                                                 | Downloading : 504k/1.22M [00:00<00:01,     484kB/s]    100%|##################################################################################################################################################################| Downloading : 1.22M/1.22M [00:00<00:00,     507kB/s]    100%|##################################################################################################################################################################| Downloading : 1.22M/1.22M [00:00<00:00,    1.33MB/s]
+    Downloading https://physionet.org/files/eegmmidb/1.0.0/S001/S001R03.edf (2.5 MB)
+      0%|                                                                                                                                                                       | Downloading : 0.00/2.48M [00:00<?,        ?B/s]      2%|###5                                                                                                                                                              | Downloading : 56.0k/2.48M [00:00<00:05,     459kB/s]      4%|######6                                                                                                                                                            | Downloading : 104k/2.48M [00:00<00:05,     454kB/s]      9%|#############8                                                                                                                                                     | Downloading : 216k/2.48M [00:00<00:05,     466kB/s]     14%|######################1                                                                                                                                            | Downloading : 344k/2.48M [00:00<00:04,     477kB/s]     20%|################################3                                                                                                                                  | Downloading : 504k/2.48M [00:00<00:04,     489kB/s]     29%|##############################################7                                                                                                                    | Downloading : 728k/2.48M [00:00<00:03,     509kB/s]     36%|###########################################################1                                                                                                       | Downloading : 920k/2.48M [00:00<00:03,     534kB/s]     51%|###################################################################################2                                                                              | Downloading : 1.27M/2.48M [00:00<00:02,     561kB/s]     62%|###################################################################################################6                                                              | Downloading : 1.52M/2.48M [00:00<00:01,     583kB/s]     67%|###########################################################################################################8                                                      | Downloading : 1.65M/2.48M [00:01<00:01,     601kB/s]     72%|####################################################################################################################                                              | Downloading : 1.77M/2.48M [00:01<00:01,     628kB/s]     77%|############################################################################################################################1                                     | Downloading : 1.90M/2.48M [00:01<00:00,     639kB/s]     94%|########################################################################################################################################################7         | Downloading : 2.34M/2.48M [00:01<00:00,     667kB/s]     99%|################################################################################################################################################################9 | Downloading : 2.46M/2.48M [00:01<00:00,     687kB/s]    100%|##################################################################################################################################################################| Downloading : 2.48M/2.48M [00:01<00:00,    1.80MB/s]
+    Extracting EDF parameters from C:\Users\Victor\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R01.edf...
     EDF file detected
     Setting channel info structure...
     Creating raw.info structure...
     Reading 0 ... 9759  =      0.000 ...    60.994 secs...
-    Extracting EDF parameters from C:\Users\ferat\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R02.edf...
+    Extracting EDF parameters from C:\Users\Victor\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R02.edf...
     EDF file detected
     Setting channel info structure...
     Creating raw.info structure...
     Reading 0 ... 9759  =      0.000 ...    60.994 secs...
-    Extracting EDF parameters from C:\Users\ferat\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R03.edf...
+    Extracting EDF parameters from C:\Users\Victor\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R03.edf...
     EDF file detected
     Setting channel info structure...
     Creating raw.info structure...
@@ -88,12 +92,12 @@ This example demonstrates how to segment a single subject recording into microst
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-36
+.. GENERATED FROM PYTHON SOURCE LINES 32-34
 
 Fit the modified Kmeans algorithm with the raw data. Here we use ``gfp=True`` to extract gfp peaks on fly.
 Note that, depending on your setup, you can change ``n_jobs=1`` in order to use parallel processing and speed up the process.
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-41
+.. GENERATED FROM PYTHON SOURCE LINES 34-39
 
 .. code-block:: default
 
@@ -112,19 +116,19 @@ Note that, depending on your setup, you can change ``n_jobs=1`` in order to use 
 
  .. code-block:: none
 
-      0%|                                                                                                                                                                                    |  : 0/100 [00:00<?,       ?it/s]      5%|########8                                                                                                                                                                       |  : 5/100 [00:03<01:11,    1.34it/s]     10%|#################5                                                                                                                                                             |  : 10/100 [00:04<01:04,    1.39it/s]     15%|##########################2                                                                                                                                                    |  : 15/100 [00:05<00:58,    1.45it/s]     20%|###################################                                                                                                                                            |  : 20/100 [00:05<00:52,    1.52it/s]     25%|###########################################7                                                                                                                                   |  : 25/100 [00:06<00:47,    1.57it/s]     30%|####################################################5                                                                                                                          |  : 30/100 [00:07<00:42,    1.64it/s]     35%|#############################################################2                                                                                                                 |  : 35/100 [00:07<00:38,    1.70it/s]     40%|######################################################################                                                                                                         |  : 40/100 [00:08<00:33,    1.77it/s]     45%|##############################################################################7                                                                                                |  : 45/100 [00:09<00:29,    1.84it/s]     50%|#######################################################################################5                                                                                       |  : 50/100 [00:09<00:26,    1.91it/s]     55%|################################################################################################2                                                                              |  : 55/100 [00:10<00:22,    1.99it/s]     60%|#########################################################################################################                                                                      |  : 60/100 [00:11<00:19,    2.05it/s]     65%|#################################################################################################################7                                                             |  : 65/100 [00:12<00:16,    2.12it/s]     70%|##########################################################################################################################4                                                    |  : 70/100 [00:13<00:13,    2.20it/s]     75%|###################################################################################################################################2                                           |  : 75/100 [00:13<00:10,    2.28it/s]     80%|############################################################################################################################################                                   |  : 80/100 [00:14<00:08,    2.36it/s]     85%|####################################################################################################################################################7                          |  : 85/100 [00:15<00:06,    2.43it/s]     90%|#############################################################################################################################################################5                 |  : 90/100 [00:15<00:03,    2.52it/s]     95%|######################################################################################################################################################################2        |  : 95/100 [00:16<00:01,    2.60it/s]    100%|##############################################################################################################################################################################|  : 100/100 [00:17<00:00,    2.69it/s]    100%|##############################################################################################################################################################################|  : 100/100 [00:17<00:00,    5.78it/s]
+      0%|                                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]      5%|########9                                                                                                                                                                          |  : 5/100 [00:03<01:03,    1.49it/s]     10%|#################8                                                                                                                                                                |  : 10/100 [00:04<00:58,    1.53it/s]     15%|##########################7                                                                                                                                                       |  : 15/100 [00:06<00:53,    1.58it/s]     20%|###################################6                                                                                                                                              |  : 20/100 [00:08<00:49,    1.61it/s]     25%|############################################5                                                                                                                                     |  : 25/100 [00:08<00:44,    1.67it/s]     30%|#####################################################4                                                                                                                            |  : 30/100 [00:09<00:40,    1.74it/s]     35%|##############################################################3                                                                                                                   |  : 35/100 [00:11<00:36,    1.77it/s]     40%|#######################################################################2                                                                                                          |  : 40/100 [00:12<00:32,    1.83it/s]     45%|################################################################################1                                                                                                 |  : 45/100 [00:13<00:29,    1.88it/s]     50%|#########################################################################################                                                                                         |  : 50/100 [00:14<00:25,    1.95it/s]     55%|#################################################################################################9                                                                                |  : 55/100 [00:15<00:22,    2.00it/s]     60%|##########################################################################################################8                                                                       |  : 60/100 [00:16<00:19,    2.05it/s]     65%|###################################################################################################################7                                                              |  : 65/100 [00:18<00:16,    2.09it/s]     70%|############################################################################################################################6                                                     |  : 70/100 [00:19<00:13,    2.14it/s]     75%|#####################################################################################################################################5                                            |  : 75/100 [00:20<00:11,    2.21it/s]     80%|##############################################################################################################################################4                                   |  : 80/100 [00:22<00:08,    2.25it/s]     85%|#######################################################################################################################################################2                          |  : 85/100 [00:23<00:06,    2.31it/s]     90%|################################################################################################################################################################2                 |  : 90/100 [00:25<00:04,    2.31it/s]     95%|#########################################################################################################################################################################1        |  : 95/100 [00:26<00:02,    2.34it/s]    100%|#################################################################################################################################################################################|  : 100/100 [00:28<00:00,    2.39it/s]    100%|#################################################################################################################################################################################|  : 100/100 [00:28<00:00,    3.55it/s]
 
     ()
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-45
+.. GENERATED FROM PYTHON SOURCE LINES 40-43
 
 Now that our algorithm is fitted, we can visualise the cluster centers, also called Microstate maps or Microstate topographies
 using :meth:`ModK.plot_cluster_centers`. Note than this method uses the :class:`~mne.Info` object of the fitted instance to display
 the topographies.
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-47
+.. GENERATED FROM PYTHON SOURCE LINES 43-45
 
 .. code-block:: default
 
@@ -134,7 +138,7 @@ the topographies.
 
 
 .. image:: /auto_tutorials/images/sphx_glr_plot_Single_subject_001.png
-    :alt: plot Single subject
+    :alt: 1, 2, 3, 4
     :class: sphx-glr-single-img
 
 
@@ -145,19 +149,19 @@ the topographies.
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001F9C0B0A1C8>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001F9BEC54188>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001F9BEC8BE08>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001F9BECC3AC8>],
+    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x00000259E99BF588>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x00000259EB1F5908>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x00000259EB22CA20>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x00000259EB261B38>],
           dtype=object))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-49
+.. GENERATED FROM PYTHON SOURCE LINES 46-47
 
 Predict.
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-52
+.. GENERATED FROM PYTHON SOURCE LINES 47-50
 
 .. code-block:: default
 
@@ -179,129 +183,40 @@ Predict.
  .. code-block:: none
 
 
-    (<Figure size 1000x400 with 2 Axes>, [<matplotlib.lines.Line2D object at 0x000001F9BEF8CE88>])
+    (<Figure size 1000x400 with 2 Axes>, [<matplotlib.lines.Line2D object at 0x00000259EB50E5F8>])
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-54
+.. GENERATED FROM PYTHON SOURCE LINES 51-52
 
 Compute microstate parameters and convert results into a :class:`~pandas.DataFrame`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-56
+.. GENERATED FROM PYTHON SOURCE LINES 52-54
 
 .. code-block:: default
 
-    metrics = compute_metrics(segmentation, ModK.cluster_centers, raw, norm_gfp=True)
+    metrics = compute_metrics(raw, ModK, norm_gfp=True,  half_window_size=5, factor=10)
     df = pd.DataFrame([metrics])
-    df
+    print(df)
 
 
 
+.. rst-class:: sphx-glr-script-out
 
-.. raw:: html
+ Out:
 
-    <div class="output_subarea output_html rendered_html output_result">
-    <div>
-    <style scoped>
-        .dataframe tbody tr th:only-of-type {
-            vertical-align: middle;
-        }
+ .. code-block:: none
 
-        .dataframe tbody tr th {
-            vertical-align: top;
-        }
+                                                       0
+    0  {'1_dist_corr': [0.6890845559846752, 0.6976801...
 
-        .dataframe thead th {
-            text-align: right;
-        }
-    </style>
-    <table border="1" class="dataframe">
-      <thead>
-        <tr style="text-align: right;">
-          <th></th>
-          <th>state_1_dist_corr</th>
-          <th>state_1_mean_corr</th>
-          <th>state_1_dist_gev</th>
-          <th>state_1_gev</th>
-          <th>state_1_timecov</th>
-          <th>state_1_dist_durs</th>
-          <th>state_1_meandurs</th>
-          <th>state_1_occurences</th>
-          <th>state_2_dist_corr</th>
-          <th>state_2_mean_corr</th>
-          <th>state_2_dist_gev</th>
-          <th>state_2_gev</th>
-          <th>state_2_timecov</th>
-          <th>state_2_dist_durs</th>
-          <th>state_2_meandurs</th>
-          <th>state_2_occurences</th>
-          <th>state_3_dist_corr</th>
-          <th>state_3_mean_corr</th>
-          <th>state_3_dist_gev</th>
-          <th>state_3_gev</th>
-          <th>state_3_timecov</th>
-          <th>state_3_dist_durs</th>
-          <th>state_3_meandurs</th>
-          <th>state_3_occurences</th>
-          <th>state_4_dist_corr</th>
-          <th>state_4_mean_corr</th>
-          <th>state_4_dist_gev</th>
-          <th>state_4_gev</th>
-          <th>state_4_timecov</th>
-          <th>state_4_dist_durs</th>
-          <th>state_4_meandurs</th>
-          <th>state_4_occurences</th>
-          <th>unlabeled_timecov</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th>0</th>
-          <td>[0.5039996517599461, 0.4744242778149985, 0.560...</td>
-          <td>0.761786</td>
-          <td>[1.369243898170386e-06, 7.569981936420706e-07,...</td>
-          <td>0.226191</td>
-          <td>0.1443</td>
-          <td>[0.06875, 0.08125, 0.2125, 0.18125, 0.625, 0.3...</td>
-          <td>0.125556</td>
-          <td>0.143955</td>
-          <td>[0.6890845551879123, 0.6976801568578832, 0.562...</td>
-          <td>0.609633</td>
-          <td>[6.7136687320875335e-06, 4.647807104289774e-06...</td>
-          <td>0.103286</td>
-          <td>0.225511</td>
-          <td>[0.075, 0.0375, 0.0625, 0.05625, 0.08125, 0.04...</td>
-          <td>0.117815</td>
-          <td>0.239754</td>
-          <td>[-0.15892452084458278, -0.13089100794603903, -...</td>
-          <td>0.574488</td>
-          <td>[2.056993330720726e-07, 1.5860738717623078e-07...</td>
-          <td>0.109297</td>
-          <td>0.281544</td>
-          <td>[0.0875, 0.24375, 0.09375, 0.08125, 0.13125, 0...</td>
-          <td>0.119717</td>
-          <td>0.29457</td>
-          <td>[0.3153965535553327, 0.21740241671246188, 0.12...</td>
-          <td>0.556627</td>
-          <td>[8.372415075174573e-07, 3.5503436170370445e-07...</td>
-          <td>0.166547</td>
-          <td>0.348645</td>
-          <td>[0.3, 0.04375, 0.10625, 0.1125, 0.06875, 0.15,...</td>
-          <td>0.135738</td>
-          <td>0.321721</td>
-          <td>0.010225</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-    </div>
-    <br />
-    <br />
+
+
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  19.854 seconds)
+   **Total running time of the script:** ( 0 minutes  37.632 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_plot_Single_subject.py:

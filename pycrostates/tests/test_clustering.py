@@ -42,7 +42,7 @@ def test_ModKMeans_fit_epochs():
     assert len(ModK.cluster_centers) == n_clusters
     assert ModK.current_fit == 'Epochs'
     assert ModK.GEV > 0
-    
+
 def test_ModKMeans_fit_evoked():
     evoked = mne.read_evokeds(fname_evoked_testing, condition=0)
     evoked = evoked.pick('eeg')

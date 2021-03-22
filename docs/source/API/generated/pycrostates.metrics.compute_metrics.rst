@@ -1,4 +1,4 @@
-﻿pycrostates.metrics.compute\_metrics
+pycrostates.metrics.compute\_metrics
 ====================================
 
 .. currentmodule:: pycrostates.metrics

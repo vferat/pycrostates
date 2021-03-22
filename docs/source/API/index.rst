@@ -21,63 +21,9 @@ This is the reference for classes (``CamelCase`` names) and functions
    :no-inherited-members:
 
 
+.. toctree::
+    :maxdepth: 2
 
-Most-used classes
-=================
-
-.. currentmodule:: pycrostates
-
-.. autosummary::
-   :toctree: generated/
-
-   clustering.ModKMeans
-   metrics.compute_metrics
-   viz.plot_segmentation
-
-Clustering
-==========
-
-:py:mod:`pycrostates.clustering`:
-
-.. currentmodule:: pycrostates.clustering
-
-.. automodule:: pycrostates.clustering
-   :no-members:
-   :no-inherited-members:
-
-.. autosummary::
-   :toctree: generated/
-
-   ModKMeans
-
-Vizualisation
-=============
-
-:py:mod:`pycrostates.viz`:
-
-.. currentmodule:: pycrostates.viz
-
-.. automodule:: pycrostates.viz
-   :no-members:
-   :no-inherited-members:
-
-.. autosummary::
-   :toctree: generated/
-
-   plot_segmentation
-
-Metrics
-=============
-
-:py:mod:`pycrostates.metrics`:
-
-.. currentmodule:: pycrostates.metrics
-
-.. automodule:: pycrostates.metrics
-   :no-members:
-   :no-inherited-members:
-
-.. autosummary::
-   :toctree: generated/
-
-   compute_metrics
+    most_used_classes
+    viz
+    metrics

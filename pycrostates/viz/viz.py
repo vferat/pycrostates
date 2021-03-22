@@ -6,21 +6,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mne import Evoked
 from mne.io import BaseRaw
-from mne.utils import _validate_type, warn, fill_doc
+from mne.utils import _validate_type
 
 
 def plot_segmentation(labels: np.ndarray, inst: Union(BaseRaw, Evoked),
                       names: list = None,
                       tmin: float = 0.0, tmax: float = None) -> Tuple[mpl.figure.Figure,
                                                                       mpl.axes.Axes]:
-    """[summary]
+    """Modified K-Means Clustering algorithm.
 
-    Args:
-        labels (np.ndarray): [description]
-        raw (mne.io.RawArray): [description]
-        names (list, optional): [description]. Defaults to None.
-        tmin (float, optional): [description]. Defaults to 0.0.
-        tmax (float, optional): [description]. Defaults to None.
+    Parameters
+    ----------
+    labels (np.ndarray): [description]
+    names (list, optional): [description]. Defaults to None.
+    tmin (float, optional): [description]. Defaults to 0.0.
+    tmax (float, optional): [description]. Defaults to None.
 
     Returns:
         Tuple[mpl.figure.Figure, mpl.axes.Axes]: [description]
