@@ -12,18 +12,15 @@
 #
 import os
 import sys
-import sphinx_bootstrap_theme
+import pydata_sphinx_theme
 curdir = os.path.dirname(__file__)
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'pycrostates'
-copyright = '2020, Victor Férat'
+copyright = '2021, Victor Férat'
 author = 'Victor Férat'
-
-
-
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,10 +37,27 @@ extensions = [
    'sphinx.ext.mathjax',
    'sphinx.ext.viewcode',
    'sphinx.ext.intersphinx',
-   'nbsphinx']
+   'nbsphinx',
+   'sphinx_gallery.gen_gallery',
+   'recommonmark']
 
+
+# sphinx
+master_doc = 'index'
+
+# sphinx m2r
+#source_suffix = ['.rst', '.md']
+
+# sphinx autosummary
+# autodoc / autosummary
 autosummary_generate = True
 autodoc_default_options = {'inherited-members': None}
+
+# sphinx_gallery_conf
+sphinx_gallery_conf = {
+     'examples_dirs': os.path.abspath(os.path.join(curdir, '..', '..', 'tutorials')),   # path to example scripts
+     'gallery_dirs': 'auto_tutorials',  # path to where to save gallery generated output
+}
 
 # intersphinx_mapping
 intersphinx_mapping = {
@@ -53,6 +67,7 @@ intersphinx_mapping = {
     'matplotlib': ('https://matplotlib.org', None),
     'mne': ('https://mne.tools/stable/', None),
     'joblib': ('https://joblib.readthedocs.io/en/latest', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -63,31 +78,33 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'bootstrap'
+html_theme = 'pydata_sphinx_theme'
 
 html_theme_options = {
-    'navbar_title': ' ',  # we replace this with an image
-    'source_link_position': "nav",  # default
-    'bootswatch_theme': "flatly",  # yeti paper lumen
-    'navbar_sidebarrel': False,  # Render the next/prev links in navbar?
-    'navbar_pagenav': False,
-    'navbar_class': "navbar",
-    'bootstrap_version': "3",  # default
-    'navbar_links': [
-        ("Install", "install/index"),
-        ("Overview", "overview/index"),
-        ("Tutorials", "tutorials/index"),
-        ("API", "API/index"),
-    ],
-}
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/vferat/pycrostates",
+            "icon": "fab fa-github-square",
+        }],
+    "external_links": [
+       {"name": "mne", "url": "https://mne.tools/stable/index.html"}],
 
+}
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = [ os.path.abspath(os.path.join(curdir, '_static'))]
+
+# -- Auto-convert markdown pages to demo --------------------------------------
+import recommonmark
+from recommonmark.transform import AutoStructify
+
+
+def setup(app):
+    app.add_transform(AutoStructify)

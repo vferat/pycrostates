@@ -1,3 +1,0 @@
-Overview
-======
-.. include:: ../../../README.md
