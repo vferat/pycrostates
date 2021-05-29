@@ -15,11 +15,10 @@ from pycrostates.clustering import ModKMeans
 from pycrostates.metrics import compute_metrics
 
 subject = 1
-runs = [1,2,3]  # motor imagery: hands vs feet
+runs = [1]  # motor imagery: hands vs feet
 
-raw_fnames = eegbci.load_data(subject, runs, update_path=True)
-raw_files = [read_raw_edf(f, preload=True) for f in raw_fnames]
-raw = concatenate_raws(raw_files)
+raw_fnames = eegbci.load_data(subject, runs, update_path=True)[0]
+raw = read_raw_edf(raw_fnames, preload=True)
 eegbci.standardize(raw)  # set channel names
 
 raw.rename_channels(lambda x: x.strip('.'))
@@ -33,8 +32,8 @@ raw.set_eeg_reference('average')
 # Note that, depending on your setup, you can change ``n_jobs=1`` in order to use parallel processing and speed up the process.
 
 n_clusters = 4
-ModK = ModKMeans(n_clusters=n_clusters)
-ModK.fit(raw, gfp=True, n_jobs=5)
+ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
+ModK.fit(raw, n_jobs=5)
 
 # %%
 # Now that our algorithm is fitted, we can visualise the cluster centers, also called Microstate maps or Microstate topographies
@@ -42,6 +41,11 @@ ModK.fit(raw, gfp=True, n_jobs=5)
 # the topographies.
 ModK.plot_cluster_centers()
 
+# %%
+# We can reorder the clusters centers using :meth:`ModK.reorder` and rename then using :meth:`ModK.rename`
+ModK.reorder([1,2,0,3])
+ModK.rename(['A', 'B', 'C', 'D'])
+ModK.plot_cluster_centers()
 # %%
 # Predict.
 segmentation = ModK.predict(raw, half_window_size=5, factor=10)
