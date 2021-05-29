@@ -39,7 +39,7 @@ def test_ModKMeans_randomstate():
     ModK_2 = ModKMeans(n_clusters=n_clusters, random_state=1)
     ModK_2.fit(raw, n_jobs=1)
     assert (ModK_1.cluster_centers == ModK_2.cluster_centers).all()
-    
+  
 def test_ModKMeans_get_cluster_centers_as_raw():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     raw = raw.pick('eeg')
@@ -49,7 +49,23 @@ def test_ModKMeans_get_cluster_centers_as_raw():
     ModK.fit(raw, n_jobs=1)
     raw_clusters = ModK.get_cluster_centers_as_raw()
     assert (raw_clusters.get_data().T == ModK.cluster_centers).all()
-         
+
+
+def test_ModKMeans_invert_polarity():
+    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+    raw = raw.pick('eeg')
+    raw = raw.crop(0, 10)
+    n_clusters = 4
+    ModK = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK.fit(raw, n_jobs=1)
+    before = ModK.cluster_centers.copy()
+    ModK.invert_polarity([True,True,False,False])
+    after = ModK.cluster_centers
+    assert (before[0] == - after[0]).all()
+    assert (before[1] == - after[1]).all()
+    assert (before[2] ==  after[2]).all()
+    assert (before[3] ==  after[3]).all()
+     
 def test_ModKMeans_fit_epochs():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     events = mne.make_fixed_length_events(raw, 1)

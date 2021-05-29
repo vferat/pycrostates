@@ -46,6 +46,10 @@ ModK.plot_cluster_centers()
 ModK.reorder([3,2,0,1])
 ModK.rename_clusters(['A', 'B', 'C', 'D'])
 ModK.plot_cluster_centers()
+
+# We can also invert maps polarity thanks to :meth:`ModK.invert_polarity`
+ModK.invert_polarity([False, False, True, True])
+ModK.plot_cluster_centers()
 # %%
 # Compute microstate parameters and convert results into a :class:`~pandas.DataFrame`.
 metrics = compute_metrics(raw, ModK, norm_gfp=True,  half_window_size=5, factor=10)
