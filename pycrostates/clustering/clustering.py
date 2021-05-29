@@ -206,7 +206,12 @@ class BaseClustering(ContainsMixin):
             s = f'| fitted ({self.current_fit})'
         s = f' n = {str(self.n_clusters)} cluster centers ' + s
         return(f'{self.__class__.__name__} | {s}')
-
+    
+    def get_cluster_centers(self):
+        self._check_fit()
+        cluster_centers = self.cluster_centers.copy()
+        return(cluster_centers)
+    
     def get_cluster_centers_as_raw(self):
         self._check_fit()
         cluster_centers_raw = mne.io.RawArray(data=self.cluster_centers.T, info=self.info)
