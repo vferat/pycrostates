@@ -3,4 +3,3 @@ scipy
 mne
 joblib
 matplotlib
-pickle
