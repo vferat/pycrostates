@@ -48,14 +48,17 @@ def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
                   random_state=None, verbose=None):
     if not isinstance(random_state, np.random.RandomState):
         random_state = np.random.RandomState(random_state)
-    n_channels, n_samples = data.shape
 
+    # handle zeros maps
+    # zero map can be due to non data in the recording, it's unlikly that all channels recorded the same value at the same time (=0 due to avergare reference)
+    data = data[:, np.linalg.norm(data.T, axis=1) !=0]
+    n_channels, n_samples = data.shape
     # Cache this value for later
     data_sum_sq = np.sum(data ** 2)
-
     # Select random timepoints for our initial topographic maps
     init_times = random_state.choice(n_samples, size=n_states, replace=False)
     maps = data[:, init_times].T
+    norm = np.linalg.norm(maps, axis=1, keepdims=True)
     maps /= np.linalg.norm(maps, axis=1, keepdims=True)  # Normalize the maps
 
     prev_residual = np.inf
@@ -69,7 +72,7 @@ def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
         for state in range(n_states):
             idx = (segmentation == state)
             if np.sum(idx) == 0:
-                logger.info('Some microstates are never activated')
+                #logger.info('Some microstates are never activated')
                 maps[state] = 0
                 continue
             # Find largest eigenvector
@@ -209,6 +212,14 @@ class BaseClustering(ContainsMixin):
         cluster_centers_raw = mne.io.RawArray(data=self.cluster_centers.T, info=self.info)
         return(cluster_centers_raw)
 
+    def invert_polarity(self, invert):
+        self._check_fit()
+        cluster_centers = self.cluster_centers
+        for c,cluster in enumerate(cluster_centers):
+            if invert[c]:
+                cluster_centers[c] = - cluster
+        self.cluster_centers = cluster_centers
+    
     def get_param(self, deep=True):
         return({'n_clusters': self.n_clusters, 
                 'picks': self.picks})
@@ -590,8 +601,8 @@ class ModKMeans(BaseClustering):
                                   max_iter=self.max_iter,
                                   random_state=init,
                                   tol=self.tol, verbose=verbose) for init in inits)
-            runs = np.array(runs)
-            best_run = np.argmax(runs[:, 0])
+            gevs = [run[0] for run in runs]
+            best_run = np.argmax(gevs)
             best_gev, best_maps, best_segmentation = runs[best_run]
             logger.info(f'Selecting run with highest GEV = {best_gev}%.')
         return(best_maps, best_gev, best_segmentation)

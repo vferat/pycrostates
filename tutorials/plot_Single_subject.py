@@ -5,7 +5,7 @@ Single Subject Segmentation
 This example demonstrates how to segment a single subject recording into microstates sequence.
 """
 
-from mne.io import concatenate_raws, read_raw_edf
+from mne.io import read_raw_edf
 from mne.datasets import eegbci
 from mne.channels import make_standard_montage
 import pandas as pd
@@ -43,14 +43,9 @@ ModK.plot_cluster_centers()
 
 # %%
 # We can reorder the clusters centers using :meth:`ModK.reorder` and rename then using :meth:`ModK.rename`
-ModK.reorder([1,2,0,3])
-ModK.rename(['A', 'B', 'C', 'D'])
+ModK.reorder([3,2,0,1])
+ModK.rename_clusters(['A', 'B', 'C', 'D'])
 ModK.plot_cluster_centers()
-# %%
-# Predict.
-segmentation = ModK.predict(raw, half_window_size=5, factor=10)
-pycrostates.viz.plot_segmentation(segmentation, raw)
-
 # %%
 # Compute microstate parameters and convert results into a :class:`~pandas.DataFrame`.
 metrics = compute_metrics(raw, ModK, norm_gfp=True,  half_window_size=5, factor=10)
