@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import deepcopy
 
 from typing import Tuple, Union
 
@@ -211,6 +212,9 @@ class BaseClustering(ContainsMixin):
         self._check_fit()
         cluster_centers = self.cluster_centers.copy()
         return(cluster_centers)
+    
+    def copy(self):
+        return deepcopy(self)
     
     def get_cluster_centers_as_raw(self):
         self._check_fit()
