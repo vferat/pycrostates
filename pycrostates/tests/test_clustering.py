@@ -65,6 +65,19 @@ def test_ModKMeans_invert_polarity():
     assert (before[1] == - after[1]).all()
     assert (before[2] ==  after[2]).all()
     assert (before[3] ==  after[3]).all()
+
+def test_ModKMeans_to_pickle():
+    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+    raw = raw.pick('eeg')
+    raw = raw.crop(0, 10)
+    n_clusters = 4
+    ModK = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK.fit(raw, n_jobs=1)
+    ModK.to_pickle('file.pkl')
+    import pickle
+    with open('file.pkl', 'rb') as f:
+        modk_load = pickle.load(f)
+    assert (modk_load.cluster_centers == ModK.cluster_centers).all()
      
 def test_ModKMeans_fit_epochs():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)

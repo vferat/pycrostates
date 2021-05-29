@@ -2,6 +2,7 @@ from __future__ import annotations
 from copy import deepcopy
 
 from typing import Tuple, Union
+import pickle
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -216,6 +217,10 @@ class BaseClustering(ContainsMixin):
     def copy(self):
         return deepcopy(self)
     
+    def to_pickle(self, filename):
+        with open(filename, 'wb') as handle:
+            pickle.dump(self, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            
     def get_cluster_centers_as_raw(self):
         self._check_fit()
         cluster_centers_raw = mne.io.RawArray(data=self.cluster_centers.T, info=self.info)
