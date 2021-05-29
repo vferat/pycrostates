@@ -7,18 +7,21 @@ import matplotlib.pyplot as plt
 import mne
 import numpy as np
 import scipy
+from scipy.signal import find_peaks
+
 from mne.annotations import _annotations_starts_stops
 from mne.io import BaseRaw
 from mne.epochs import BaseEpochs
 from mne import Evoked
 from mne.parallel import check_n_jobs, parallel_func
 from mne.preprocessing.ica import _check_start_stop
-from mne.utils import _validate_type, logger, verbose, warn, fill_doc
-from scipy.signal import find_peaks
-from scipy.stats import zscore
+from mne.utils import _validate_type, logger, verbose, warn, fill_doc, check_random_state
+from mne.channels.channels import ContainsMixin
+from mne.io.pick import _picks_to_idx, pick_info
+                       
 from ..utils import _corr_vectors, check_ch_names
 
-def _extract_gfps(data, min_peak_distance=2, reject_peaks_over_z=0):
+def _extract_gfps(data, min_peak_distance=2):
     """ Extract Gfp peaks from input data
 
     Parameters
@@ -33,17 +36,15 @@ def _extract_gfps(data, min_peak_distance=2, reject_peaks_over_z=0):
                 in CSR format to avoid an un-necessary copy.
 
     """
+    if not min_peak_distance >= 1:
+        raise(ValueError('min_peak_dist must be >= 1.'))
     gfp = np.std(data, axis=0)
-    gfp_z = zscore(gfp)
-    peaks, _ = find_peaks(gfp_z, distance=min_peak_distance)
-    if reject_peaks_over_z != 0:
-        data_ = data[:,peaks[np.abs(gfp_z[peaks]) <= reject_peaks_over_z]]
-    else:
-        data_ =  data[:,peaks]
+    peaks, _ = find_peaks(gfp, distance=min_peak_distance)
+    data_ =  data[:,peaks]
     return(data_)
 
 @verbose
-def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
+def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
                   random_state=None, verbose=None):
     if not isinstance(random_state, np.random.RandomState):
         random_state = np.random.RandomState(random_state)
@@ -84,7 +85,7 @@ def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
         residual /= float(n_samples * (n_channels - 1))
 
         # Have we converged?
-        if (prev_residual - residual) < (thresh * residual):
+        if (prev_residual - residual) < (tol * residual):
             # logger.info('Converged at %d iterations.' % iteration)
             break
 
@@ -93,6 +94,23 @@ def _compute_maps(data, n_states=4, max_iter=1000, thresh=1e-6,
         logger.info('Modified K-means algorithm failed to converge.')
 
     return maps
+
+@verbose
+def _run_mod_kmeans(data: np.ndarray, n_clusters=4, 
+                    max_iter=100, random_state=None,
+                    tol = 1e-6, verbose=None) -> Tuple[float,
+                                                        np.ndarray,
+                                                        np.ndarray]:
+    gfp_sum_sq = np.sum(data ** 2)
+    maps = _compute_maps(data, n_clusters, max_iter=max_iter,
+                            random_state=random_state,
+                            tol=tol, verbose=verbose)
+    activation = maps.dot(data)
+    segmentation = np.argmax(np.abs(activation), axis=0)
+    map_corr = _corr_vectors(data, maps[segmentation].T)
+    # Compare across iterations using global explained variance (GEV)
+    gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
+    return(gev, maps, segmentation)
 
 
 def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
@@ -105,34 +123,53 @@ def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
     rmat = np.tile(np.arange(0, Nu), (Nt, 1)).T
 
     labels_all = np.argmax(np.abs(np.dot(states, data)), axis=0)
-
-    w = np.zeros((Nu, Nt))
-    w[(rmat == labels_all)] = 1
-    e = np.sum(Vvar - np.sum(np.dot(w.T, states).T *
-                             data, axis=0) ** 2 / (Nt * (Ne - 1)))
-
-    window = np.ones((1, 2*half_window_size+1))
-    while True:
-        Nb = scipy.signal.convolve2d(w, window, mode='same')
-        x = (np.tile(Vvar, (Nu, 1)) - (np.dot(states, data))**2) / \
-            (2 * e * (Ne - 1)) - factor * Nb
-        dlt = np.argmin(x, axis=0)
-
-        labels_all = dlt
+    
+    if factor != 0:
         w = np.zeros((Nu, Nt))
         w[(rmat == labels_all)] = 1
-        Su = np.sum(Vvar - np.sum(np.dot(w.T, states).T *
-                                  data, axis=0) ** 2) / (Nt * (Ne - 1))
-        if np.abs(Su - S0) <= np.abs(crit * Su):
-            break
-        else:
-            S0 = Su
+        e = np.sum(Vvar - np.sum(np.dot(w.T, states).T *
+                                data, axis=0) ** 2 / (Nt * (Ne - 1)))
+
+        window = np.ones((1, 2*half_window_size+1))
+        while True:
+            Nb = scipy.signal.convolve2d(w, window, mode='same')
+            x = (np.tile(Vvar, (Nu, 1)) - (np.dot(states, data))**2) / \
+                (2 * e * (Ne - 1)) - factor * Nb
+            dlt = np.argmin(x, axis=0)
+
+            labels_all = dlt
+            w = np.zeros((Nu, Nt))
+            w[(rmat == labels_all)] = 1
+            Su = np.sum(Vvar - np.sum(np.dot(w.T, states).T *
+                                    data, axis=0) ** 2) / (Nt * (Ne - 1))
+            if np.abs(Su - S0) <= np.abs(crit * Su):
+                break
+            else:
+                S0 = Su
 
     labels = labels_all + 1
     return(labels)
 
+def _rejected_first_last_semgents(segmentation):
+     # set first segment to unlabeled
+    i = 0
+    first_label = segmentation[i]
+    if  first_label != 0:
+        while segmentation[i] == first_label and i < len(segmentation) - 1:
+            segmentation[i] = 0
+            i += 1
+    # set last segment to unlabeled
+    i = len(segmentation) - 1
+    last_label = segmentation[i]
+    if  last_label != 0:
+        while segmentation[i] == last_label and i > 0:
+            segmentation[i] = 0
+            i -= 1
+    return(segmentation)
+
+
 @fill_doc
-class BaseClustering():
+class BaseClustering(ContainsMixin):
     u"""Base Class for Microstate Clustering algorithm.
 
     Parameters
@@ -148,94 +185,128 @@ class BaseClustering():
         Flag informing about which data type (raw, epochs or evoked) was used for the fit.
     cluster_centers : :class:`numpy.ndarray`, shape ``(n_clusters, n_channels)``
             Cluster centers (i.e Microstates maps).
-    GEV : float
-        If fit, the Global explained Variance explained all clusters centers.
     info : dict
             :class:`Measurement info <mne.Info>` of fitted instance.
     """
     def __init__(self, n_clusters: int = 4, picks: str = 'eeg'):
         self.n_clusters = n_clusters
-        self.current_fit = 'unfitted'
-        self.cluster_centers = None
-        self.GEV = None
-        self.info = None
-        self.names = [f'{i+1}' for i in range(n_clusters)]
         self.picks = picks
         
+        self.current_fit = 'unfitted'
+        self.names = [f'{i+1}' for i in range(n_clusters)]
+        self.info = None
+        
     def __repr__(self) -> str:
-        if self.current_fit is False:
+        if self.current_fit is 'unfitted':
             s = '| unfitted'
         else:
             s = f'| fitted ({self.current_fit})'
         s = f' n = {str(self.n_clusters)} cluster centers ' + s
         return(f'{self.__class__.__name__} | {s}')
 
+    def get_param(self, deep=True):
+        return({'n_clusters': self.n_clusters, 
+                'picks': self.picks})
+    
+    def set_params(self, **parameters):
+        for parameter, value in parameters.items():
+            setattr(self, parameter, value)
+        return self
+        
     def _check_fit(self):
         if self.current_fit == 'unfitted':
             raise ValueError(f'Algorithm must be fitted before using {self.__class__.__name__}')
         return()
 
     @verbose
-    def transform(self, inst: Union(BaseRaw, BaseEpochs, Evoked), verbose: str = None) -> np.ndarray:
-        """Compute clustering and transform Instance data to cluster-distance space.
+    def _predict_raw(self, raw, picks, reject_by_annotation, half_window_size, factor, crit, rejected_first_last_semgents,verbose=None):
+        data = raw.get_data(picks=picks)
+        if not reject_by_annotation:
+            segmentation = _segment(data,
+                                self.cluster_centers,
+                                half_window_size, factor,
+                                crit)        
+        else:
+            onsets, _ends = _annotations_starts_stops(raw, ['BAD'])
+            if len(onsets) == 0:
+                segmentation = _segment(data,
+                                        self.cluster_centers,
+                                         half_window_size, factor,
+                                         crit)
+            else:
+                onsets = onsets.tolist()
+                onsets.append(data.shape[-1] - 1)
+                _ends = _ends.tolist()
+                ends = [0]
+                ends.extend(_ends)
+                
+                segmentation = np.zeros(data.shape[-1])
+                for onset, end in zip(onsets, ends):
+                    if onset - end >= 2 * half_window_size + 1:  # small segments can't be smoothed
+                        sample = data[:, end:onset]
+                        labels =  _segment(sample,
+                                            self.cluster_centers,
+                                            half_window_size, factor,
+                                            crit)
+                        if rejected_first_last_semgents:
+                            labels = _rejected_first_last_semgents(labels)
+                        segmentation[end:onset] = labels
+                        
+        if rejected_first_last_semgents:
+            segmentation = _rejected_first_last_semgents(segmentation)
+        return(segmentation)
+    
+    @verbose
+    def _predict_epochs(self, epochs, picks, half_window_size, factor, crit, rejected_first_last_semgents, verbose=None):
+        data = epochs.get_data(picks=picks)
+        segmentations = list()
+        for epoch in data:
+            segmentation =  _segment(epoch,
+                                self.cluster_centers,
+                                half_window_size, factor,
+                                crit)
+            if rejected_first_last_semgents:
+                segmentation = _rejected_first_last_semgents(segmentation)
+            segmentations.append(segmentation)
 
-        Parameters
-        ----------
-        inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`, :class:`mne.Evoked`
-            Instance containing data to transform to cluster-distance space (absolute spatial correlation).
-        %(verbose)s
-
-        Returns
-        ----------
-        distances : :class:`numpy.ndarray`
-                Instance data transformed in cluster-distance space (absolute spatial correlation).
-        """
-        self._check_fit()
-        _validate_type(inst, (BaseRaw, BaseEpochs, Evoked), 'inst', 'Raw, Epochs or Evoked')
-        inst = inst.copy()
-        inst = inst.pick(self.picks)
-        check_ch_names(self, inst, inst1_name=type(self).__name__, inst2_name='inst')
-        if isinstance(inst, BaseRaw):
-            data = inst.get_data()
-            stack = np.vstack([self.cluster_centers, data.T])
-            corr = np.corrcoef(stack)[:self.n_clusters, self.n_clusters:]
-            distances = np.max(np.abs(corr), axis=0)
-        elif isinstance(inst, BaseEpochs):
-            data = inst.get_data()
-            shape = data.shape
-            reshape_data = data.reshape((data.shape[1], -1))
-            stack = np.vstack([self.cluster_centers, reshape_data.T])
-            corr = np.corrcoef(stack)[:self.n_clusters, self.n_clusters:]
-            distances = np.max(np.abs(corr), axis=0)
-            distances = distances.reshape((shape[0], -1))
-        elif isinstance(inst, Evoked):
-            data = inst.data
-            stack = np.vstack([self.cluster_centers, data.T])
-            corr = np.corrcoef(stack)[:self.n_clusters, self.n_clusters:]
-            distances = np.max(np.abs(corr), axis=0)
-        return(distances)
-
+        segmentations = np.array(segmentations)
+        return(segmentations)
+    
+    
+    @verbose
+    def _predict_evoked(self, evoked, picks, half_window_size, factor, crit, rejected_first_last_semgents,verbose=None):
+        data = evoked.data[picks,:]
+        segmentation = _segment(data, self.cluster_centers, half_window_size, factor, crit)
+        if rejected_first_last_semgents:
+            segmentation = _rejected_first_last_semgents(segmentation)
+        return(segmentation) 
+        
     @fill_doc
     @verbose
-    def predict(self,  inst: Union(BaseRaw, Evoked),
+    def predict(self,  inst: Union (BaseRaw, BaseEpochs, Evoked),
                 reject_by_annotation: bool = True,
-                half_window_size: int = 3, factor: int = 0,
+                factor: int = 0,
+                half_window_size: int = 3, 
                 crit: float = 10e-6,
+                rejected_first_last_semgents: bool = True,
                 verbose: str = None) -> np.ndarray:
         """Predict Microstates labels using competitive fitting.
 
         Parameters
         ----------
-        inst : :class:`mne.io.BaseRaw`, :class:`mne.Evoked`
+        inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`, :class:`mne.Evoked`
             Instance containing data to predict.
-        half_window_size: int
-            Number of samples used for the half windows size while smoothing labels.
-            Window size = 2 * half_window_size + 1
         factor: int
             Factor used for label smoothing. 0 means no smoothing.
             Defaults to 0.
+        half_window_size: int
+            Number of samples used for the half windows size while smoothing labels.
+            Has no ffect if factor = 0.
+            Window size = 2 * half_window_size + 1
         crit: float
             Converge criterion. Default to 10e-6.
+        rejected_first_last_semgents: bool
+            If True, set first and last segments to unlabeled.
         %(reject_by_annotation_raw)s
         %(verbose)s
 
@@ -247,71 +318,40 @@ class BaseClustering():
                 0 is used for unlabeled time points.
         """
         self._check_fit()
-        _validate_type(inst, (BaseRaw, Evoked), 'inst', 'Raw or Evoked')
+        _validate_type(inst, (BaseRaw, BaseEpochs, Evoked), 'inst', 'Raw, Epochs or Evoked')
         inst = inst.copy()
-        inst = inst.pick(self.picks)
+        picks = _picks_to_idx(inst.info, self.picks,
+                        exclude=[], allow_empty=False)
+        inst = inst.pick(picks)
+        
         check_ch_names(self, inst, inst1_name=type(self).__name__, inst2_name='inst')
-        if isinstance(inst, Evoked):
-            data = inst.data
-            return(_segment(data,
-                        self.cluster_centers,
-                        half_window_size, factor,
-                        crit)) 
-
+        if factor == 0:
+            logger.info('Segmenting data without smoothing')
+        if factor != 0:
+            logger.info(f'Segmenting data with factor {factor} and effective smoothing window size : {(2*half_window_size+1) / inst.info["sfreq"]} (ms)')
+            
         if isinstance(inst, BaseRaw):
-            data = inst.get_data()
+            segmentation = self._predict_raw(raw=inst, picks=picks, reject_by_annotation=reject_by_annotation,
+                                                half_window_size=half_window_size,
+                                                factor=factor, crit=crit,
+                                                rejected_first_last_semgents=rejected_first_last_semgents,
+                                                verbose=verbose)
+            
+        if isinstance(inst, BaseEpochs):
+            segmentation = self._predict_epochs(epochs=inst, picks=picks,
+                                                half_window_size=half_window_size,
+                                                factor=factor, crit=crit,
+                                                rejected_first_last_semgents=rejected_first_last_semgents,
+                                                verbose=verbose)
+        if isinstance(inst, Evoked):
+            segmentation = self._predict_evoked(evoked=inst, picks=picks,
+                                                half_window_size=half_window_size,
+                                                factor=factor, crit=crit,
+                                                rejected_first_last_semgents=rejected_first_last_semgents,
+                                                verbose=verbose)
+  
+        return(segmentation)
 
-        if reject_by_annotation:
-            onsets, _ends = _annotations_starts_stops(inst, ['BAD'])
-            if len(onsets) == 0:
-                return(_segment(data, self.cluster_centers,
-                            half_window_size, factor, crit))
-
-            onsets = onsets.tolist()
-            onsets.append(data.shape[-1] - 1)
-            _ends = _ends.tolist()
-            ends = [0]
-            ends.extend(_ends)
-            segmentation = np.zeros(data.shape[-1])
-            for onset, end in zip(onsets, ends):
-                if onset - end >= 2 * half_window_size + 1:  # small segments can't be smoothed
-                    sample = data[:, end:onset]
-                    labels =  _segment(sample,
-                                        self.cluster_centers,
-                                        half_window_size, factor,
-                                        crit)
-                    # set first segment to unlabeled
-                    i = 0
-                    first_label = labels[i]
-                    while labels[i] == first_label and i < len(labels) - 1:
-                        labels[i] = 0
-                        i += 1
-                    # set last segment to unlabeled
-                    i = len(labels) - 1
-                    last_label = labels[i]
-                    while labels[i] == last_label and i > 0:
-                        labels[i] = 0
-                        i -= 1
-                    segmentation[end:onset] = labels
-            return(segmentation)
-        else:
-            segmentation = _segment(data,
-                                self.cluster_centers,
-                                half_window_size, factor,
-                                crit)
-             # set first segment to unlabeled
-            i = 0
-            first_label = segmentation[i]
-            while segmentation[i] == first_label and i < len(segmentation) - 1:
-                segmentation[i] = 0
-                i += 1
-            # set last segment to unlabeled
-            i = len(segmentation) - 1
-            last_label = segmentation[i]
-            while segmentation[i] == last_label and i > 0:
-                segmentation[i] = 0
-                i -= 1
-            return(segmentation)
 
     def plot_cluster_centers(self) -> matplotlib.figure.Figure:
         """Plot cluster centers as topomaps.
@@ -454,7 +494,7 @@ class BaseClustering():
         self.reorder(order)
         return()
 
-
+    
 class ModKMeans(BaseClustering):
     """Modified K-Means Clustering algorithm.
     
@@ -494,31 +534,66 @@ class ModKMeans(BaseClustering):
                  tol: float = 1e-6,
                  *args,  **kwargs):
         super().__init__(*args, **kwargs)
-        self.random_state = random_state
         self.n_init = n_init
         self.max_iter = max_iter
         self.tol = tol
-        self.labels = None
+        self.random_state = check_random_state(random_state)
 
-    @verbose
-    def _run_mod_kmeans(self, data: np.ndarray, verbose=None) -> Tuple[float,
-                                                         np.ndarray,
-                                                         np.ndarray]:
-        gfp_sum_sq = np.sum(data ** 2)
-        maps = _compute_maps(data, self.n_clusters, max_iter=self.max_iter,
-                             random_state=self.random_state,
-                             thresh=self.tol, verbose=verbose)
-        activation = maps.dot(data)
-        segmentation = np.argmax(np.abs(activation), axis=0)
-        map_corr = _corr_vectors(data, maps[segmentation].T)
-        # Compare across iterations using global explained variance (GEV)
-        gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
-        return(gev, maps, segmentation)
+    def _prepare_fit_raw(self, raw, picks, start, stop, reject_by_annotation, min_peak_distance):
+        reject_by_annotation = 'omit' if reject_by_annotation else None
+        start, stop = _check_start_stop(raw, start, stop)
+        data = raw.get_data(picks=picks, start=start, stop=stop,
+                            reject_by_annotation=reject_by_annotation)
+        if min_peak_distance != 0:
+                data = _extract_gfps(data, min_peak_distance=min_peak_distance)
+        return(data)
+    
+    def _prepare_fit_epochs(self, epochs, picks, min_peak_distance):
+        data = epochs.get_data(picks=picks)
+        if min_peak_distance != 0:
+            peaks = list()
+            for epoch in data:
+                epoch_peaks = _extract_gfps(epoch, min_peak_distance=min_peak_distance)
+                peaks.append(epoch_peaks)
+            data = np.hstack(peaks)
+        data = data.reshape((data.shape[1], -1))
+        return(data)
+
+    def _prepare_fit_evoked(self, evoked, picks, min_peak_distance):
+        data = evoked.data[picks, :]
+        if min_peak_distance != 0:
+            data = _extract_gfps(data, min_peak_distance=min_peak_distance)
+        return(data)
+        
+    def _fit_data(self, data: np.ndarray,  n_jobs: int = 1, verbose=None) -> ModKMeans:
+        logger.info(f'Running Kmeans for {self.n_clusters} clusters centers with {self.n_init} random initialisations.')
+        inits = self.random_state.randint(low=0, high=100000, size=(self.n_init))
+        if n_jobs == 1:
+            best_gev = 0
+            for init in inits:
+                gev, maps, segmentation = _run_mod_kmeans(data, n_clusters=self.n_clusters,
+                                                          max_iter=self.max_iter,
+                                                          random_state=init,
+                                                          tol=self.tol, verbose=verbose)
+                if gev > best_gev:
+                    best_gev, best_maps, best_segmentation = gev, maps, segmentation
+        else:
+            parallel, p_fun, _ = parallel_func(_run_mod_kmeans,
+                                               total=self.n_init,
+                                               n_jobs=n_jobs)
+            runs = parallel(p_fun(data, n_clusters=self.n_clusters,
+                                  max_iter=self.max_iter,
+                                  random_state=init,
+                                  tol=self.tol, verbose=verbose) for init in inits)
+            runs = np.array(runs)
+            best_run = np.argmax(runs[:, 0])
+            best_gev, best_maps, best_segmentation = runs[best_run]
+            logger.info(f'Selecting run with highest GEV = {best_gev}%.')
+        return(best_maps, best_gev, best_segmentation)
 
     @verbose
     def fit(self, inst: Union(BaseRaw, BaseEpochs, Evoked), start: float = None, stop: float = None,
-            reject_by_annotation: bool = True,
-            gfp: bool = False, min_peak_distance: float = 10, reject_peaks_over_z: float = 0,
+            reject_by_annotation: bool = True, min_peak_distance: float = 0,
             n_jobs: int = 1,
             verbose=None):
         """Segment Instance into microstate sequence.
@@ -527,96 +602,52 @@ class ModKMeans(BaseClustering):
         ----------
         inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`, :class:`mne.Evoked`
             Instance containing data to transform to cluster-distance space (absolute spatial correlation).
-        gfp : bool
-            If True, only takes gfp peaks to fit the algorithm. If False use all available data.
-        min_peak_distance : float
-            Minimum peak distance in ms for gfp peaks extraction. Only applicable if gfp = True.
-            default to 10 ms
-        reject_peaks_over_z : float
-            Rejection threshold for gfp peaks expresssed in number of standard deviation over global field power (z-score).
-            Only applicable if gfp = True
-            0 means no rejection. Default to 0.
+        min_peak_distance : int
+            Minimum peak distance in samples for gfp peaks extraction. If min_peak_distance = 0 the entire dataset is used instead ( no gfp extraction).
+            Default to 0.
         %(n_jobs)s
         %(raw_tmin)s
         %(raw_tmax)s
         %(reject_by_annotation_raw)s
         %(verbose)s
 
-        Returns
-        ----------
-        distances : :class:`numpy.ndarray`
-                Instance data transformed in cluster-distance space (absolute spatial correlation).
         """
         _validate_type(inst, (BaseRaw, BaseEpochs, Evoked), 'inst', 'Raw, Epochs or Evoked')
-        inst = inst.copy()
-        inst = inst.pick(self.picks)
         n_jobs = check_n_jobs(n_jobs)
-        if gfp is False:
-            if reject_peaks_over_z != 0:
-                raise ValueError('reject_peaks_over_z is set but gfp set to False')
-            if min_peak_distance != 10:
-                raise ValueError('min_peak_distance is set but gfp set to False')
         
-        min_peak_distance = inst.info['sfreq'] * min_peak_distance * 1e-3
-
         if len(inst.info['bads']) != 0:
             warn('Bad channels are present in the recording. '
                  'They will still be used to compute microstate topographies. '
                  'Consider using instance.pick() or instance.interpolate_bads()'
                  ' before fitting.')
             
+        inst = inst.copy()
+        picks = _picks_to_idx(inst.info, self.picks,
+                              exclude=[], allow_empty=False)
+
         if isinstance(inst, BaseRaw):
+            data = self._prepare_fit_raw(inst, picks, start, stop, reject_by_annotation, min_peak_distance)
             current_fit = 'Raw'
-            reject_by_annotation = 'omit' if reject_by_annotation else None
-            start, stop = _check_start_stop(inst, start, stop)
-            data = inst.get_data(start, stop,
-                                reject_by_annotation=reject_by_annotation)
-            if gfp is True:
-                data = _extract_gfps(data, min_peak_distance=min_peak_distance, reject_peaks_over_z=reject_peaks_over_z)
-                
+    
         elif isinstance(inst, BaseEpochs):
+            data = self._prepare_fit_epochs(inst, picks, min_peak_distance)
             current_fit = 'Epochs'
-            data = inst.get_data()
-            if gfp is True:
-                epochs = list()
-                for epoch in data:
-                    epoch = _extract_gfps(epoch, min_peak_distance=min_peak_distance, reject_peaks_over_z=reject_peaks_over_z)
-                    epochs.append(epoch)
-                data = np.hstack(epochs)
-            data = data.reshape((data.shape[1], -1))
 
         if isinstance(inst, Evoked):
+            data = self._prepare_fit_evoked(inst, picks, min_peak_distance)
             current_fit = 'Evoked'
-            data = inst.data
-            if gfp is True:
-                data = _extract_gfps(data, min_peak_distance=min_peak_distance, reject_peaks_over_z=reject_peaks_over_z)
-                
-        cluster_centers, GEV, _ =  self._do_fit(data=data, start=start, stop=stop, gfp=gfp,
-                                            reject_by_annotation=reject_by_annotation,
-                                            n_jobs=n_jobs,verbose=verbose)
-        self.cluster_centers = cluster_centers
-        self.GEV = GEV
-        self.info = inst.info
-        self.current_fit = current_fit
-        return()
-    
-    def _do_fit(self, data: np.ndarray, start: float = None, stop: float = None,
-            reject_by_annotation: bool = True,
-            gfp: bool = False, n_jobs: int = 1,
-            verbose=None) -> ModKMeans:
-        best_gev = 0
-        if n_jobs == 1:
-            for _ in range(self.n_init):
-                gev, maps, segmentation = self._run_mod_kmeans(data, verbose=verbose)
-                if gev > best_gev:
-                    best_gev, best_maps, best_segmentation = gev, maps, segmentation
+        
+        if min_peak_distance == 0:
+            logger.info(f'Fitting modified Kmeans with {current_fit} data (no gfp peaks extraction)')
         else:
-            parallel, p_fun, _ = parallel_func(self._run_mod_kmeans,
-                                               total=self.n_init,
-                                               n_jobs=n_jobs)
-            runs = parallel(p_fun(data, verbose=verbose) for i in range(self.n_init))
-            runs = np.array(runs)
-            best_run = np.argmax(runs[:, 0])
-            best_gev, best_maps, best_segmentation = runs[best_run]
-
-        return(best_maps, best_gev, best_segmentation)
+            min_peak_distance_ms = inst.info['sfreq'] * min_peak_distance * 1e-3
+            logger.info(f'Fitting modified Kmeans with {current_fit} data by selecting Gfp peaks with minimum distance of {min_peak_distance_ms}ms ({min_peak_distance} samples)')
+            
+        cluster_centers, GEV, labels =  self._fit_data(data=data, n_jobs=n_jobs, verbose=verbose)
+        
+        self.cluster_centers = cluster_centers
+        self.current_fit = current_fit
+        self.info = pick_info(inst.info, picks)
+        self.GEV = GEV
+        self.labels = labels
+        return()

@@ -14,7 +14,6 @@ from ..clustering import BaseClustering
 @verbose
 def _compute_metrics(inst, modK,
                      norm_gfp,
-                     reject_by_annotation,
                      half_window_size,
                      factor,
                      crit,

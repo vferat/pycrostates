@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "D:\\Python\\envs\\sci37\\python.exe",
+    "python.pythonPath": "C:\\Users\\ferat\\AppData\\Local\\Continuum\\miniconda3\\envs\\sci37\\python.exe",
     "python.testing.pytestArgs": [
         "."
     ],

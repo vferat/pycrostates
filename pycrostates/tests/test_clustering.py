@@ -20,13 +20,27 @@ def test_ModKMeans_fit_raw():
     ModK = ModKMeans(n_clusters=n_clusters)
     assert ModK.n_clusters == n_clusters
     assert ModK.current_fit == 'unfitted'
-    assert ModK.GEV == None
-    assert ModK.info == None
     ModK.fit(raw, n_jobs=1)
-    assert len(ModK.cluster_centers) == n_clusters
+    assert ModK.cluster_centers.shape == (n_clusters, len(raw.info['ch_names']))
     assert ModK.current_fit == 'Raw'
     assert ModK.GEV > 0
 
+    raw.info['bads'] == [raw.info['ch_names'][0]]
+    ModK.fit(raw, n_jobs=1)
+    assert ModK.cluster_centers.shape == (n_clusters, len(raw.info['ch_names']))
+
+def test_ModKMeans_randomstate():
+    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+    raw = raw.pick('eeg')
+    raw = raw.crop(0, 10)
+    n_clusters = 4
+    ModK_1 = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK_1.fit(raw, n_jobs=1)
+    ModK_2 = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK_2.fit(raw, n_jobs=1)
+    assert (ModK_1.cluster_centers == ModK_2.cluster_centers).all()
+    
+      
 def test_ModKMeans_fit_epochs():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     events = mne.make_fixed_length_events(raw, 1)
@@ -36,13 +50,15 @@ def test_ModKMeans_fit_epochs():
     ModK = ModKMeans(n_clusters=n_clusters)
     assert ModK.n_clusters == n_clusters
     assert ModK.current_fit == 'unfitted'
-    assert ModK.GEV == None
-    assert ModK.info == None
     ModK.fit(epochs, n_jobs=1)
-    assert len(ModK.cluster_centers) == n_clusters
+    assert ModK.cluster_centers.shape == (n_clusters, len(epochs.info['ch_names']))
     assert ModK.current_fit == 'Epochs'
     assert ModK.GEV > 0
 
+    epochs.info['bads'] == [epochs.info['ch_names'][0]]
+    ModK.fit(epochs, n_jobs=1)
+    assert ModK.cluster_centers.shape == (n_clusters, len(epochs.info['ch_names']))
+    
 def test_ModKMeans_fit_evoked():
     evoked = mne.read_evokeds(fname_evoked_testing, condition=0)
     evoked = evoked.pick('eeg')
@@ -50,48 +66,14 @@ def test_ModKMeans_fit_evoked():
     ModK = ModKMeans(n_clusters=n_clusters)
     assert ModK.n_clusters == n_clusters
     assert ModK.current_fit == 'unfitted'
-    assert ModK.GEV == None
-    assert ModK.info == None
     ModK.fit(evoked, n_jobs=1)
-    assert len(ModK.cluster_centers) == n_clusters
+    assert ModK.cluster_centers.shape == (n_clusters, len(evoked.info['ch_names']))
     assert ModK.current_fit == 'Evoked'
     assert ModK.GEV > 0
 
-def test_BaseClustering_transform_raw():
-    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
-    raw = raw.pick('eeg')
-    raw = raw.filter(0, 40)
-    raw = raw.crop(0, 10)
-    n_clusters = 4
-    ModK = ModKMeans(n_clusters=n_clusters)
-    ModK.fit(raw, n_jobs=1)
-    distances = ModK.transform(raw)
-    assert len(distances) == raw.get_data().shape[-1]
-    assert (distances > 0).all()
-    
-
-def test_BaseClustering_transform_epochs():
-    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
-    events = mne.make_fixed_length_events(raw, 1)
-    epochs = mne.epochs.Epochs(raw, events, preload=True)
-    epochs = epochs.pick('eeg')
-    n_clusters = 4
-    ModK = ModKMeans(n_clusters=n_clusters)
-    ModK.fit(epochs)
-    distances = ModK.transform(epochs)
-    assert distances.shape[0] == epochs.get_data().shape[0]
-    assert distances[0].shape[0] == epochs.get_data()[0].shape[-1]
-    assert (distances > 0).all()
- 
-def test_BaseClustering_transform_evoked():
-    evoked = mne.read_evokeds(fname_evoked_testing, condition=0)
-    evoked = evoked.pick('eeg')
-    n_clusters = 4
-    ModK = ModKMeans(n_clusters=n_clusters)
-    ModK.fit(evoked)
-    distances = ModK.transform(evoked)
-    assert distances.shape[0] == evoked.data.shape[-1]
-    assert (distances > 0).all()
+    evoked.info['bads'] == [evoked.info['ch_names'][0]]
+    ModK.fit(evoked, n_jobs=1)
+    assert ModK.cluster_centers.shape == (n_clusters, len(evoked.info['ch_names']))
     
 def test_BaseClustering_predict_raw():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
@@ -104,7 +86,8 @@ def test_BaseClustering_predict_raw():
     segmentation = ModK.predict(raw)
     assert len(segmentation) == raw.get_data().shape[-1]
     assert np.isin(segmentation, np.arange(0,n_clusters+1)).all()
-    
+ 
+        
 def test_BaseClustering_predict_evoked():
     evoked = mne.read_evokeds(fname_evoked_testing, condition=0)
     evoked = evoked.pick('eeg')
