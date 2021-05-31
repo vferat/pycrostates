@@ -10,12 +10,11 @@ from mne.datasets import eegbci
 from mne.channels import make_standard_montage
 import pandas as pd
 
-import pycrostates
 from pycrostates.clustering import ModKMeans
 from pycrostates.metrics import compute_metrics
 
 subject = 1
-runs = [1]  # motor imagery: hands vs feet
+runs = [1]
 
 raw_fnames = eegbci.load_data(subject, runs, update_path=True)[0]
 raw = read_raw_edf(raw_fnames, preload=True)
