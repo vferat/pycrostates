@@ -1,1 +1,1 @@
-from .viz import plot_segmentation
+from .viz import plot_cluster_centers, plot_segmentation

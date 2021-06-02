@@ -23,6 +23,7 @@ def _corr_vectors(A, B, axis=0):
     """
     if A.shape != B.shape:
         raise ValueError('all input arrays must have the same shape')
+    # If maps is null, divide will not trhow an error.
     np.seterr(divide='ignore', invalid='ignore')
     An = A - np.mean(A, axis=axis)
     Bn = B - np.mean(B, axis=axis)

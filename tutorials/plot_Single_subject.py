@@ -8,10 +8,8 @@ This example demonstrates how to segment a single subject recording into microst
 from mne.io import read_raw_edf
 from mne.datasets import eegbci
 from mne.channels import make_standard_montage
-import pandas as pd
 
 from pycrostates.clustering import ModKMeans
-from pycrostates.metrics import compute_metrics
 
 subject = 1
 runs = [1]
@@ -50,7 +48,11 @@ ModK.plot_cluster_centers()
 ModK.invert_polarity([False, False, True, True])
 ModK.plot_cluster_centers()
 # %%
-# Compute microstate parameters and convert results into a :class:`~pandas.DataFrame`.
-metrics = compute_metrics(raw, ModK, norm_gfp=True,  half_window_size=5, factor=10)
-df = pd.DataFrame([metrics])
-print(df)
+# 
+segmentation = ModK.predict(raw, factor=10)
+segmentation.plot()
+
+# %%
+#
+metrics = segmentation.compute_metrics()
+print(metrics)

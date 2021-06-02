@@ -1,81 +1,9 @@
 import itertools
 
 import numpy as np
-import mne
-from mne.io import BaseRaw
-from mne.epochs import BaseEpochs
-from mne import Evoked
-from mne.utils import _validate_type, verbose
-from mne.parallel import check_n_jobs, parallel_func
-
 from ..utils import _corr_vectors
-from ..clustering import BaseClustering
 
-@verbose
-def _compute_metrics(inst, modK,
-                     norm_gfp,
-                     half_window_size,
-                     factor,
-                     crit,
-                     verbose=None):
-    labels = modK.predict(inst, half_window_size=half_window_size,
-                         factor=factor, crit=crit, verbose=verbose)
-
-    if isinstance(inst, BaseRaw):
-        data = inst.get_data()
-    elif isinstance(inst, Evoked):
-        data = inst.data
-    gfp = np.std(data, axis=0)
-    if norm_gfp:
-        gfp = gfp / np.linalg.norm(gfp)
-
-    segments = [(s, list(group)) for s,group in itertools.groupby(labels)]
-    d = {}
-    for s, state in enumerate(modK.cluster_centers):
-        state_name = modK.names[s]
-        arg_where = np.argwhere(labels == s+1)
-        if len(arg_where) != 0:
-            labeled_tp = data.T[arg_where][:,0,:].T
-            labeled_gfp = gfp[arg_where][:,0]
-            state_array = np.array([state]*len(arg_where)).transpose()
-            corr = _corr_vectors(state_array, labeled_tp)
-            gev = (labeled_gfp * corr) ** 2 / np.sum(gfp ** 2)
-            s_segments = np.array([len(group) for s_, group in segments if s_ == s+1])
-            occurence = len(s_segments) /len(data) *  inst.info['sfreq']
-            timecov = np.sum(s_segments) / len(np.where(labels != 0)[0])
-            durs = s_segments / inst.info['sfreq']
-
-            d[f'{state_name}_dist_corr'] = corr
-            d[f'{state_name}_mean_corr'] = np.mean(np.abs(corr))
-            d[f'{state_name}_dist_gev'] = gev
-            d[f'{state_name}_gev'] = np.sum(gev)
-            d[f'{state_name}_timecov'] = timecov
-            d[f'{state_name}_dist_durs'] = durs
-            d[f'{state_name}_meandurs'] = np.mean(durs)
-            d[f'{state_name}_occurences'] = occurence
-        else:
-            d[f'{state_name}_dist_corr'] = 0
-            d[f'{state_name}_mean_corr'] = 0
-            d[f'{state_name}_dist_gev'] = 0
-            d[f'{state_name}_gev'] = 0
-            d[f'{state_name}_timecov'] = 0
-            d[f'{state_name}_dist_durs'] = 0
-            d[f'{state_name}_meandurs'] = 0
-            d[f'{state_name}_occurences'] = 0
-    d['unlabeled'] =  len(np.argwhere(labels == 0)) / len(gfp)
-    d['segmentation'] = labels
-    return(d)
-
-
-@verbose
-def compute_metrics(inst:mne.io.RawArray,
-                    modK:BaseClustering,
-                    norm_gfp:bool = True,
-                    reject_by_annotation: bool = True,
-                    half_window_size: int = 3, factor: int = 0,
-                    crit: float = 10e-6,
-                    n_jobs: int = 1,
-                    verbose: str = None) -> dict:
+def compute_metrics_data(segmentation, data, maps, maps_names, sfreq, norm_gfp=True):
     """Compute microstate metrics.
 
     Compute the following micorstates metrics:
@@ -122,42 +50,47 @@ def compute_metrics(inst:mne.io.RawArray,
     dict : list of dic
         Dictionaries containing microstate metrics.
     """
-    n_jobs = check_n_jobs(n_jobs)
-    if isinstance(inst, list):
-        if not all(isinstance(i, type(inst[0])) for i in inst):
-            raise ValueError("All instances must be of the same type")
-        if not all(i.info['sfreq'] == inst[0].info['sfreq'] for i in inst):
-            raise ValueError("Not all instances have the same sampling frequency")
-        inst = [i.pick(modK.picks) for i in inst]
-        if n_jobs == 1:
-            ds = [_compute_metrics(i, modK,
-                            norm_gfp=reject_by_annotation,
-                            reject_by_annotation=reject_by_annotation,
-                            half_window_size=half_window_size,
-                            factor=factor,
-                            crit=crit,
-                            verbose=verbose) for i in inst]
+    gfp = np.std(data, axis=0)
+    if norm_gfp:
+        gfp = gfp / np.linalg.norm(gfp)
+        
+    gfp = np.std(data, axis=0)
+    segments = [(s, list(group)) for s,group in itertools.groupby(segmentation)]
+    d = {}
+    for s, state in enumerate(maps):
+        state_name = maps_names[s]
+        arg_where = np.argwhere(segmentation == s+1)
+        if len(arg_where) != 0:
+            labeled_tp = data.T[arg_where][:,0,:].T
+            labeled_gfp = gfp[arg_where][:,0]
+            state_array = np.array([state]*len(arg_where)).transpose()
+            
+            corr = _corr_vectors(state_array, labeled_tp)
+            d[f'{state_name}_dist_corr'] = corr
+            d[f'{state_name}_mean_corr'] = np.mean(np.abs(corr))
+            
+            gev = (labeled_gfp * corr) ** 2 / np.sum(gfp ** 2)
+            d[f'{state_name}_dist_gev'] = gev
+            d[f'{state_name}_gev'] = np.sum(gev)
+            
+            s_segments = np.array([len(group) for s_, group in segments if s_ == s+1])
+            occurence = len(s_segments) /len(segmentation) *  sfreq
+            d[f'{state_name}_occurences'] = occurence
+            
+            timecov = np.sum(s_segments) / len(np.where(segmentation != 0)[0])
+            d[f'{state_name}_timecov'] = timecov
+            
+            durs = s_segments / sfreq
+            d[f'{state_name}_dist_durs'] = durs
+            d[f'{state_name}_meandurs'] = np.mean(durs)
         else:
-            parallel, p_fun, _ = parallel_func(_compute_metrics,
-                                                    total=len(inst),
-                                                    n_jobs=n_jobs)
-            ds = parallel(p_fun(i, modK,
-                                norm_gfp=reject_by_annotation,
-                                reject_by_annotation=reject_by_annotation,
-                                half_window_size=half_window_size,
-                                factor=factor,
-                                crit=crit,
-                                verbose=verbose) for i in inst)
-        return(ds)
-    else:
-        _validate_type(inst, (BaseRaw, BaseEpochs, Evoked), 'inst', 'Raw, Epochs or Evoked')
-        d_ = _compute_metrics(inst, modK,
-                              norm_gfp=reject_by_annotation,
-                              reject_by_annotation=reject_by_annotation,
-                              half_window_size=half_window_size,
-                              factor=factor,
-                              crit=crit,
-                              verbose=verbose)
-        return([d_])
-    
-
+            d[f'{state_name}_dist_corr'] = 0
+            d[f'{state_name}_mean_corr'] = 0
+            d[f'{state_name}_dist_gev'] = 0
+            d[f'{state_name}_gev'] = 0
+            d[f'{state_name}_timecov'] = 0
+            d[f'{state_name}_dist_durs'] = 0
+            d[f'{state_name}_meandurs'] = 0
+            d[f'{state_name}_occurences'] = 0
+    d['unlabeled'] =  len(np.argwhere(segmentation == 0)) / len(gfp)
+    return(d)

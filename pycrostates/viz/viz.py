@@ -4,12 +4,24 @@ from typing import Tuple, Union
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+import mne
 from mne import Evoked
 from mne.io import BaseRaw
 from mne.utils import _validate_type
 
-
-def plot_segmentation(labels: np.ndarray, inst: Union(BaseRaw, Evoked),
+def plot_cluster_centers(cluster_centers, info, names):
+    n_clusters = len(cluster_centers)
+    fig, axs = plt.subplots(1, n_clusters)
+    for c, center in enumerate(cluster_centers):
+        mne.viz.plot_topomap(center, info, axes=axs[c], show=False)
+        axs[c].set_title(names[c])
+    plt.axis('off')
+    plt.show()
+    return(fig, axs)
+    
+def plot_segmentation(segmentation: np.ndarray,
+                      inst: Union(BaseRaw, Evoked),
+                      cluster_centers,
                       names: list = None,
                       tmin: float = 0.0, tmax: float = None) -> Tuple[mpl.figure.Figure,
                                                                       mpl.axes.Axes]:
@@ -33,11 +45,13 @@ def plot_segmentation(labels: np.ndarray, inst: Union(BaseRaw, Evoked),
         data = inst.data
     gfp = np.std(data, axis=0)
     times = inst.times + tmin
-    n_states = int(np.max(labels) + 1)
-    if names is None:
-        names = ['unlabeled']
-        names.extend([f'Microstate {i+1}' for i in range(n_states - 1)])
-    labels = labels[(times * inst.info['sfreq']).astype(int)]
+    n_states = len(cluster_centers) + 1
+    if not names:
+        names = ['unlabeled'] + [f'Microstate {i+1}' for i in range(n_states - 1)]
+    else:
+        names = ['unlabeled'] + names
+    
+    labels = segmentation[(times * inst.info['sfreq']).astype(int)]
     cmap = plt.cm.get_cmap('plasma', n_states)
 
     fig = plt.figure(figsize=(10,4))

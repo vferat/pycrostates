@@ -1,5 +1,6 @@
 from __future__ import annotations
 from copy import deepcopy
+from pycrostates.viz import plot_cluster_centers
 
 from typing import Tuple, Union
 import pickle
@@ -22,6 +23,7 @@ from mne.channels.channels import ContainsMixin
 from mne.io.pick import _picks_to_idx, pick_info
                        
 from ..utils import _corr_vectors, check_ch_names
+from ..segmentation import RawSegmentation
 
 def _extract_gfps(data, min_peak_distance=2):
     """ Extract Gfp peaks from input data
@@ -116,7 +118,6 @@ def _run_mod_kmeans(data: np.ndarray, n_clusters=4,
     # Compare across iterations using global explained variance (GEV)
     gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
     return(gev, maps, segmentation)
-
 
 def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
     S0 = 0
@@ -284,6 +285,11 @@ class BaseClustering(ContainsMixin):
                         
         if rejected_first_last_semgents:
             segmentation = _rejected_first_last_semgents(segmentation)
+        
+        segmentation = RawSegmentation(segmentation=segmentation,
+                                       inst=raw,
+                                       cluster_centers=self.cluster_centers,
+                                       names=self.names)
         return(segmentation)
     
     @verbose
@@ -300,8 +306,11 @@ class BaseClustering(ContainsMixin):
             segmentations.append(segmentation)
 
         segmentations = np.array(segmentations)
+        segmentation = EpochsSegmentation(segmentation=segmentation,
+                                       inst=epochs,
+                                       cluster_centers=self.cluster_centers,
+                                       names=self.names)
         return(segmentations)
-    
     
     @verbose
     def _predict_evoked(self, evoked, picks, half_window_size, factor, crit, rejected_first_last_semgents,verbose=None):
@@ -382,7 +391,6 @@ class BaseClustering(ContainsMixin):
   
         return(segmentation)
 
-
     def plot_cluster_centers(self) -> matplotlib.figure.Figure:
         """Plot cluster centers as topomaps.
 
@@ -392,12 +400,7 @@ class BaseClustering(ContainsMixin):
             The figure.
         """
         self._check_fit()
-        fig, axs = plt.subplots(1, self.n_clusters)
-        for c, center in enumerate(self.cluster_centers):
-            mne.viz.plot_topomap(center, self.info, axes=axs[c], show=False)
-            axs[c].set_title(self.names[c])
-        plt.axis('off')
-        plt.show()
+        fig, axs = plot_cluster_centers(self.cluster_centers, self.info, self.names)
         return(fig, axs)
 
     def rename_clusters(self, names:list):
