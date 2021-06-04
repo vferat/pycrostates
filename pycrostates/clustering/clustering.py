@@ -682,6 +682,6 @@ class ModKMeans(BaseClustering):
         self.current_fit = current_fit
         self.info = pick_info(inst.info, picks)
         self.GEV = GEV
-        self.labels_ = labels_
+        self.labels_ = labels
         self.fitted_data_ = data
         return()
