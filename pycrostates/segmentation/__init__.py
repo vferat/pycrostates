@@ -1,1 +1,1 @@
-from .segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
+from .segmentation import (RawSegmentation, EpochsSegmentation, EvokedSegmentation)

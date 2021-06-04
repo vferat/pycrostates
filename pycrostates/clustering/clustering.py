@@ -23,7 +23,7 @@ from mne.channels.channels import ContainsMixin
 from mne.io.pick import _picks_to_idx, pick_info
                        
 from ..utils import _corr_vectors, check_ch_names
-from ..segmentation import RawSegmentation
+from ..segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation 
 
 def _extract_gfps(data, min_peak_distance=2):
     """ Extract Gfp peaks from input data
@@ -683,4 +683,5 @@ class ModKMeans(BaseClustering):
         self.info = pick_info(inst.info, picks)
         self.GEV = GEV
         self.labels = labels
+        self.fitted_data_ = data
         return()
