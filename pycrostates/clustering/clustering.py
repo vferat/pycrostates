@@ -23,7 +23,7 @@ from mne.channels.channels import ContainsMixin
 from mne.io.pick import _picks_to_idx, pick_info
                        
 from ..utils import _corr_vectors, check_ch_names
-from ..segmentation import RawSegmentation
+from ..segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
 
 def _extract_gfps(data, min_peak_distance=2):
     """ Extract Gfp peaks from input data
@@ -189,7 +189,7 @@ class BaseClustering(ContainsMixin):
         The number of clusters to form as well as the number of centroids to generate.
     current_fit : bool
         Flag informing about which data type (raw, epochs or evoked) was used for the fit.
-    cluster_centers : :class:`numpy.ndarray`, shape ``(n_clusters, n_channels)``
+    cluster_centers_ : :class:`numpy.ndarray`, shape ``(n_clusters, n_channels)``
             Cluster centers (i.e Microstates maps).
     info : dict
             :class:`Measurement info <mne.Info>` of fitted instance.
@@ -197,44 +197,14 @@ class BaseClustering(ContainsMixin):
     def __init__(self, n_clusters: int = 4, picks: str = 'eeg'):
         self.n_clusters = n_clusters
         self.picks = picks
-        
         self.current_fit = 'unfitted'
         self.names = [f'{i+1}' for i in range(n_clusters)]
         self.info = None
         
     def __repr__(self) -> str:
-        if self.current_fit is 'unfitted':
-            s = '| unfitted'
-        else:
-            s = f'| fitted ({self.current_fit})'
-        s = f' n = {str(self.n_clusters)} cluster centers ' + s
-        return(f'{self.__class__.__name__} | {s}')
-    
-    def get_cluster_centers(self):
-        self._check_fit()
-        cluster_centers = self.cluster_centers.copy()
-        return(cluster_centers)
-    
-    def copy(self):
-        return deepcopy(self)
-    
-    def to_pickle(self, filename):
-        with open(filename, 'wb') as handle:
-            pickle.dump(self, handle, protocol=pickle.HIGHEST_PROTOCOL)
-            
-    def get_cluster_centers_as_raw(self):
-        self._check_fit()
-        cluster_centers_raw = mne.io.RawArray(data=self.cluster_centers.T, info=self.info)
-        return(cluster_centers_raw)
+        s = f'{self.__class__.__name__} | n = {str(self.n_clusters)} cluster centers | {self.current_fit}'
+        return(s)
 
-    def invert_polarity(self, invert):
-        self._check_fit()
-        cluster_centers = self.cluster_centers
-        for c,cluster in enumerate(cluster_centers):
-            if invert[c]:
-                cluster_centers[c] = - cluster
-        self.cluster_centers = cluster_centers
-    
     def get_param(self, deep=True):
         return({'n_clusters': self.n_clusters, 
                 'picks': self.picks})
@@ -243,25 +213,52 @@ class BaseClustering(ContainsMixin):
         for parameter, value in parameters.items():
             setattr(self, parameter, value)
         return self
-        
+
+    def copy(self):
+        return deepcopy(self)
+    
+    def to_pickle(self, filename):
+        with open(filename, 'wb') as handle:
+            pickle.dump(self, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
     def _check_fit(self):
         if self.current_fit == 'unfitted':
             raise ValueError(f'Algorithm must be fitted before using {self.__class__.__name__}')
         return()
+
+    def get_cluster_centers(self):
+        self._check_fit()
+        cluster_centers = self.cluster_centers_.copy()
+        return(cluster_centers)
+    
+    def get_cluster_centers_as_raw(self):
+        self._check_fit()
+        cluster_centers_raw = mne.io.RawArray(data=self.cluster_centers_.T, info=self.info)
+        return(cluster_centers_raw)
+
+    def invert_polarity(self, invert):
+        self._check_fit()
+        cluster_centers = self.cluster_centers_
+        for c,cluster in enumerate(cluster_centers):
+            if invert[c]:
+                cluster_centers[c] = - cluster
+        self.cluster_centers_ = cluster_centers
+        return(self)
+
 
     @verbose
     def _predict_raw(self, raw, picks, reject_by_annotation, half_window_size, factor, crit, rejected_first_last_semgents,verbose=None):
         data = raw.get_data(picks=picks)
         if not reject_by_annotation:
             segmentation = _segment(data,
-                                self.cluster_centers,
+                                self.cluster_centers_,
                                 half_window_size, factor,
                                 crit)        
         else:
             onsets, _ends = _annotations_starts_stops(raw, ['BAD'])
             if len(onsets) == 0:
                 segmentation = _segment(data,
-                                        self.cluster_centers,
+                                        self.cluster_centers_,
                                          half_window_size, factor,
                                          crit)
             else:
@@ -276,7 +273,7 @@ class BaseClustering(ContainsMixin):
                     if onset - end >= 2 * half_window_size + 1:  # small segments can't be smoothed
                         sample = data[:, end:onset]
                         labels =  _segment(sample,
-                                            self.cluster_centers,
+                                            self.cluster_centers_,
                                             half_window_size, factor,
                                             crit)
                         if rejected_first_last_semgents:
@@ -288,7 +285,7 @@ class BaseClustering(ContainsMixin):
         
         segmentation = RawSegmentation(segmentation=segmentation,
                                        inst=raw,
-                                       cluster_centers=self.cluster_centers,
+                                       cluster_centers=self.cluster_centers_,
                                        names=self.names)
         return(segmentation)
     
@@ -298,7 +295,7 @@ class BaseClustering(ContainsMixin):
         segmentations = list()
         for epoch in data:
             segmentation =  _segment(epoch,
-                                self.cluster_centers,
+                                self.cluster_centers_,
                                 half_window_size, factor,
                                 crit)
             if rejected_first_last_semgents:
@@ -308,16 +305,21 @@ class BaseClustering(ContainsMixin):
         segmentations = np.array(segmentations)
         segmentation = EpochsSegmentation(segmentation=segmentation,
                                        inst=epochs,
-                                       cluster_centers=self.cluster_centers,
+                                       cluster_centers=self.cluster_centers_,
                                        names=self.names)
         return(segmentations)
     
     @verbose
     def _predict_evoked(self, evoked, picks, half_window_size, factor, crit, rejected_first_last_semgents,verbose=None):
         data = evoked.data[picks,:]
-        segmentation = _segment(data, self.cluster_centers, half_window_size, factor, crit)
+        segmentation = _segment(data, self.cluster_centers_, half_window_size, factor, crit)
         if rejected_first_last_semgents:
             segmentation = _rejected_first_last_semgents(segmentation)
+
+        segmentation = EvokedSegmentation(segmentation=segmentation,
+                                         inst=evoked,
+                                         cluster_centers=self.cluster_centers_,
+                                         names=self.names)
         return(segmentation) 
         
     @fill_doc
@@ -391,7 +393,7 @@ class BaseClustering(ContainsMixin):
   
         return(segmentation)
 
-    def plot_cluster_centers(self) -> matplotlib.figure.Figure:
+    def plot(self) -> matplotlib.figure.Figure:
         """Plot cluster centers as topomaps.
 
         Returns
@@ -400,7 +402,7 @@ class BaseClustering(ContainsMixin):
             The figure.
         """
         self._check_fit()
-        fig, axs = plot_cluster_centers(self.cluster_centers, self.info, self.names)
+        fig, axs = plot_cluster_centers(self.cluster_centers_, self.info, self.names)
         return(fig, axs)
 
     def rename_clusters(self, names:list):
@@ -442,7 +444,7 @@ class BaseClustering(ContainsMixin):
         if (np.sort(order) != np.arange(0,self.n_clusters, 1)).any():
             raise ValueError('Order contains unexpected values')
            
-        self.cluster_centers = self.cluster_centers[order]
+        self.cluster_centers_ = self.cluster_centers_[order]
         self.names = [self.names[o] for o in order]
         return(self)
 
@@ -456,7 +458,7 @@ class BaseClustering(ContainsMixin):
         """
         self._check_fit()
         info = self.info
-        centers = self.cluster_centers
+        centers = self.cluster_centers_
         
         template = np.array([[-0.13234463, -0.19008217, -0.01808156, -0.06665204, -0.18127315,
         -0.25741473, -0.2313206 ,  0.04239534, -0.14411298, -0.25635016,
@@ -525,9 +527,9 @@ class BaseClustering(ContainsMixin):
         order = [x for _,x in sorted(zip(rows,columns))]
         order = order + [x for x in range(len(centers)) if x not in order]
         self.reorder(order)
-        return()
+        return(self)
 
-    
+@fill_doc    
 class ModKMeans(BaseClustering):
     """Modified K-Means Clustering algorithm.
     
@@ -535,30 +537,31 @@ class ModKMeans(BaseClustering):
     ----------
     n_clusters : int
         The number of clusters to form as well as the number of centroids to generate.
-          
-    Attributes
-    ----------
-    n_clusters : int
-        The number of clusters to form as well as the number of centroids to generate.
-    current_fit : bool
-        Flag informing about which data type (raw, epochs or evoked) was used for the fit.
-    cluster_centers : :class:`numpy.ndarray`, shape ``(n_clusters, n_channels)``
-            Cluster centers (i.e Microstates maps)         
-    GEV : float
-        If fit, the Global explained Variance explained all clusters centers.
-    info : dict
-        :class:`Measurement info <mne.Info>` of fitted instance.
-    random_state : int, RandomState instance or None
-        Determines random number generation for centroid initialization. Default=None.
+    %(random_state)s
+        As estimation can be non-deterministic it can be useful to fix the
+        random state to have reproducible results.
     n_init : int
         Number of time the k-means algorithm will be run with different centroid seeds.
-        The final results will be the runs explained the most global explained variance.
+        The final result will be the run with highest global explained variance.
         Default=100
     max_iter : int
         Maximum number of iterations of the k-means algorithm for a single run.
         Default=300
     tol : float
         Relative tolerance with regards estimate residual noise in the cluster centers of two consecutive iterations to declare convergence.
+
+    Attributes
+    ----------
+    n_clusters : int
+        The number of clusters to form as well as the number of centroids to generate.
+    current_fit : bool
+        Flag informing about which data type (raw, epochs or evoked) was used for the fit.
+    cluster_centers_ : :class:`numpy.ndarray`, shape ``(n_clusters, n_channels)``
+        If fitted, cluster centers (i.e Microstates maps)     
+    info : dict
+        If fitted, :class:`Measurement info <mne.Info>` of fitted instance, else None
+    GEV_ : float
+        If fitted, the Global explained Variance explained all clusters centers.
     """
     def __init__(self,
                  random_state: Union[int, np.random.RandomState, None] = None,
@@ -678,9 +681,9 @@ class ModKMeans(BaseClustering):
             
         cluster_centers, GEV, labels =  self._fit_data(data=data, n_jobs=n_jobs, verbose=verbose)
         
-        self.cluster_centers = cluster_centers
+        self.cluster_centers_ = cluster_centers
         self.current_fit = current_fit
         self.info = pick_info(inst.info, picks)
-        self.GEV = GEV
-        self.labels = labels
+        self.GEV_ = GEV
+        self.labels_ = labels
         return()
