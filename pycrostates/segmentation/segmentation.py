@@ -60,9 +60,9 @@ class EpochsSegmentation(BaseSegmentation):
         _validate_type(self.inst, (BaseEpochs), 'inst', 'Epochs')
         
         data = self.inst.get_data()
-        if data.shape[1] != segmentation.shape[0]:
+        if data.shape[0] != self.segmentation.shape[0]:
             raise ValueError('Epochs and segmentation must have the number of epochs.')
-        if data.shape[2] != segmentation.shape[1]:
+        if data.shape[2] != self.segmentation.shape[1]:
             raise ValueError('Epochs and segmentation must have the number of samples per epoch.')
 
     def compute_metrics(self, norm_gfp=True):
@@ -82,7 +82,7 @@ class EvokedSegmentation(BaseSegmentation):
         _validate_type(self.inst, (Evoked), 'inst', 'Evoked')
         
         data = self.inst.data
-        if data.shape[1] != len(segmentation):
+        if data.shape[1] != len(self.segmentation):
             raise ValueError('Instance and segmentation must have the same number of samples.')
 
     def plot(self, tmin: float = 0.0, tmax: float = None):
