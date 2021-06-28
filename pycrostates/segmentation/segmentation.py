@@ -37,6 +37,7 @@ class RawSegmentation(BaseSegmentation):
     def plot(self, tmin: float = 0.0, tmax: float = None):
         fig, ax = plot_segmentation(segmentation=self.segmentation,
                                     inst=self.inst,
+                                    cluster_centers=self.cluster_centers,
                                     names=self.names,
                                     tmin=tmin,
                                     tmax=tmax)
@@ -85,6 +86,7 @@ class EvokedSegmentation(BaseSegmentation):
     def plot(self, tmin: float = 0.0, tmax: float = None):
         fig, ax = plot_segmentation(segmentation=self.segmentation,
                                     inst=self.inst,
+                                    cluster_centers=self.cluster_centers,
                                     names=self.names,
                                     tmin=tmin,
                                     tmax=tmax)

@@ -21,6 +21,7 @@ def plot_cluster_centers(cluster_centers, info, names):
 
 def plot_segmentation(segmentation: np.ndarray,
                       inst: Union(BaseRaw, Evoked),
+                      cluster_centers: np.ndarray,
                       names: list = None,
                       tmin: float = 0.0, tmax: float = None) -> Tuple[mpl.figure.Figure,
                                                                       mpl.axes.Axes]:
