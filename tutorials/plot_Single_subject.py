@@ -46,7 +46,7 @@ ModK.plot()
 
 # We can also invert maps polarity thanks to :meth:`ModK.invert_polarity`
 ModK.invert_polarity([False, False, True, True])
-ModK.plot_cluster_centers()
+ModK.plot()
 # %%
 #
 segmentation = ModK.predict(raw, factor=10)
