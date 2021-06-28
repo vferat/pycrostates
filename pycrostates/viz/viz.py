@@ -21,22 +21,9 @@ def plot_cluster_centers(cluster_centers, info, names):
 
 def plot_segmentation(segmentation: np.ndarray,
                       inst: Union(BaseRaw, Evoked),
-                      cluster_centers,
                       names: list = None,
                       tmin: float = 0.0, tmax: float = None) -> Tuple[mpl.figure.Figure,
                                                                       mpl.axes.Axes]:
-    """Modified K-Means Clustering algorithm.
-
-    Parameters
-    ----------
-    labels (np.ndarray): [description]
-    names (list, optional): [description]. Defaults to None.
-    tmin (float, optional): [description]. Defaults to 0.0.
-    tmax (float, optional): [description]. Defaults to None.
-
-    Returns:
-        Tuple[mpl.figure.Figure, mpl.axes.Axes]: [description]
-    """
     _validate_type(inst, (BaseRaw, Evoked), 'inst', 'Raw or Evoked')
     inst.crop(tmin=tmin, tmax=tmax)
     if isinstance(inst, BaseRaw):
@@ -50,7 +37,7 @@ def plot_segmentation(segmentation: np.ndarray,
         names = ['unlabeled'] + [f'Microstate {i+1}' for i in range(n_states - 1)]
     else:
         names = ['unlabeled'] + names
-    
+
     labels = segmentation[(times * inst.info['sfreq']).astype(int)]
     cmap = plt.cm.get_cmap('plasma', n_states)
 

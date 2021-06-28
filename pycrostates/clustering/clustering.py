@@ -20,7 +20,7 @@ from mne.preprocessing.ica import _check_start_stop
 from mne.utils import _validate_type, logger, verbose, warn, fill_doc, check_random_state
 from mne.channels.channels import ContainsMixin
 from mne.io.pick import _picks_to_idx, pick_info
-                   
+           
 from ..utils import _corr_vectors, check_ch_names
 from ..segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
 
@@ -204,7 +204,7 @@ class BaseClustering(ContainsMixin):
         return(s)
 
     def get_param(self, deep=True):
-        return({'n_clusters': self.n_clusters, 
+        return({'n_clusters': self.n_clusters,
                 'picks': self.picks})
 
     def set_params(self, **parameters):
@@ -318,7 +318,7 @@ class BaseClustering(ContainsMixin):
                                          inst=evoked,
                                          cluster_centers=self.cluster_centers_,
                                          names=self.names)
-        return(segmentation) 
+        return(segmentation)
  
     @fill_doc
     @verbose
@@ -556,7 +556,7 @@ def _prepare_fit_evoked(evoked, picks, min_peak_distance):
     return(data)
 
 
-@fill_doc    
+@fill_doc
 class ModKMeans(BaseClustering):
     """Modified K-Means Clustering algorithm.
     

@@ -40,7 +40,7 @@ def test_ModKMeans_randomstate():
     ModK_2 = ModKMeans(n_clusters=n_clusters, random_state=1)
     ModK_2.fit(raw, n_jobs=1)
     assert (ModK_1.cluster_centers_ == ModK_2.cluster_centers_).all()
-  
+
 def test_ModKMeans_get_cluster_centers_as_raw():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     raw = raw.pick('eeg')

@@ -1,4 +1,4 @@
-from mne.utils import _validate_type, logger, verbose, fill_doc
+from mne.utils import _validate_type
 from mne.io import BaseRaw
 from mne.epochs import BaseEpochs
 from mne import Evoked

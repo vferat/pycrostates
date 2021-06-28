@@ -48,7 +48,7 @@ ModK.plot()
 ModK.invert_polarity([False, False, True, True])
 ModK.plot_cluster_centers()
 # %%
-# 
+#
 segmentation = ModK.predict(raw, factor=10)
 segmentation.plot()
 

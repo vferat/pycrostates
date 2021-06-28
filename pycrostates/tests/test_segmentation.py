@@ -19,8 +19,8 @@ def test_RawSegmentation_plot():
     ModK.fit(raw, n_jobs=1)
     segmentation = ModK.predict(raw)
     segmentation.plot()
-    
-    
+
+
 def test_RawSegmentation_plot_cluster_centers():
     ModK.fit(raw, n_jobs=1)
     segmentation = ModK.predict(raw)
