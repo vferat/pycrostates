@@ -36,13 +36,13 @@ ModK.fit(raw, n_jobs=5)
 # Now that our algorithm is fitted, we can visualise the cluster centers, also called Microstate maps or Microstate topographies
 # using :meth:`ModK.plot_cluster_centers`. Note than this method uses the :class:`~mne.Info` object of the fitted instance to display
 # the topographies.
-ModK.plot_cluster_centers()
+ModK.plot()
 
 # %%
 # We can reorder the clusters centers using :meth:`ModK.reorder` and rename then using :meth:`ModK.rename`
 ModK.reorder([3,2,0,1])
 ModK.rename_clusters(['A', 'B', 'C', 'D'])
-ModK.plot_cluster_centers()
+ModK.plot()
 
 # We can also invert maps polarity thanks to :meth:`ModK.invert_polarity`
 ModK.invert_polarity([False, False, True, True])

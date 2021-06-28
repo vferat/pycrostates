@@ -6,7 +6,6 @@ from typing import Tuple, Union
 import pickle
 
 import matplotlib
-import matplotlib.pyplot as plt
 import mne
 import numpy as np
 import scipy
@@ -21,7 +20,7 @@ from mne.preprocessing.ica import _check_start_stop
 from mne.utils import _validate_type, logger, verbose, warn, fill_doc, check_random_state
 from mne.channels.channels import ContainsMixin
 from mne.io.pick import _picks_to_idx, pick_info
-                       
+                   
 from ..utils import _corr_vectors, check_ch_names
 from ..segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
 
@@ -62,7 +61,6 @@ def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
     # Select random timepoints for our initial topographic maps
     init_times = random_state.choice(n_samples, size=n_states, replace=False)
     maps = data[:, init_times].T
-    norm = np.linalg.norm(maps, axis=1, keepdims=True)
     maps /= np.linalg.norm(maps, axis=1, keepdims=True)  # Normalize the maps
 
     prev_residual = np.inf
@@ -103,7 +101,7 @@ def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
     return maps
 
 @verbose
-def _run_mod_kmeans(data: np.ndarray, n_clusters=4, 
+def _run_mod_kmeans(data: np.ndarray, n_clusters=4,
                     max_iter=100, random_state=None,
                     tol = 1e-6, verbose=None) -> Tuple[float,
                                                         np.ndarray,
@@ -208,7 +206,7 @@ class BaseClustering(ContainsMixin):
     def get_param(self, deep=True):
         return({'n_clusters': self.n_clusters, 
                 'picks': self.picks})
-    
+
     def set_params(self, **parameters):
         for parameter, value in parameters.items():
             setattr(self, parameter, value)
@@ -321,13 +319,13 @@ class BaseClustering(ContainsMixin):
                                          cluster_centers=self.cluster_centers_,
                                          names=self.names)
         return(segmentation) 
-        
+ 
     @fill_doc
     @verbose
     def predict(self,  inst: Union (BaseRaw, BaseEpochs, Evoked),
                 reject_by_annotation: bool = True,
                 factor: int = 0,
-                half_window_size: int = 3, 
+                half_window_size: int = 3,
                 crit: float = 10e-6,
                 rejected_first_last_semgents: bool = True,
                 verbose: str = None) -> np.ndarray:
@@ -429,7 +427,7 @@ class BaseClustering(ContainsMixin):
     
     def reorder(self, order: list):
         """Reorder cluster centers. Operate in place.
-        
+
         Parameters
         ----------
         order : list
@@ -449,7 +447,7 @@ class BaseClustering(ContainsMixin):
         return(self)
 
     def smart_reorder(self):
-        """Automaticaly reorder cluster centers. Operate in place.
+        """Automaticaly reorder cluster centers.
 
         Returns
         ----------
@@ -529,6 +527,35 @@ class BaseClustering(ContainsMixin):
         self.reorder(order)
         return(self)
 
+
+
+def _prepare_fit_raw(raw, picks, start, stop, reject_by_annotation, min_peak_distance):
+    reject_by_annotation = 'omit' if reject_by_annotation else None
+    start, stop = _check_start_stop(raw, start, stop)
+    data = raw.get_data(picks=picks, start=start, stop=stop,
+                        reject_by_annotation=reject_by_annotation)
+    if min_peak_distance != 0:
+            data = _extract_gfps(data, min_peak_distance=min_peak_distance)
+    return(data)
+
+def _prepare_fit_epochs(epochs, picks, min_peak_distance):
+    data = epochs.get_data(picks=picks)
+    if min_peak_distance != 0:
+        peaks = list()
+        for epoch in data:
+            epoch_peaks = _extract_gfps(epoch, min_peak_distance=min_peak_distance)
+            peaks.append(epoch_peaks)
+        data = np.hstack(peaks)
+    data = data.reshape((data.shape[1], -1))
+    return(data)
+
+def _prepare_fit_evoked(evoked, picks, min_peak_distance):
+    data = evoked.data[picks, :]
+    if min_peak_distance != 0:
+        data = _extract_gfps(data, min_peak_distance=min_peak_distance)
+    return(data)
+
+
 @fill_doc    
 class ModKMeans(BaseClustering):
     """Modified K-Means Clustering algorithm.
@@ -557,7 +584,7 @@ class ModKMeans(BaseClustering):
     current_fit : bool
         Flag informing about which data type (raw, epochs or evoked) was used for the fit.
     cluster_centers_ : :class:`numpy.ndarray`, shape ``(n_clusters, n_channels)``
-        If fitted, cluster centers (i.e Microstates maps)     
+        If fitted, cluster centers (i.e Microstates maps)
     info : dict
         If fitted, :class:`Measurement info <mne.Info>` of fitted instance, else None
     GEV_ : float
@@ -575,31 +602,6 @@ class ModKMeans(BaseClustering):
         self.tol = tol
         self.random_state = check_random_state(random_state)
 
-    def _prepare_fit_raw(self, raw, picks, start, stop, reject_by_annotation, min_peak_distance):
-        reject_by_annotation = 'omit' if reject_by_annotation else None
-        start, stop = _check_start_stop(raw, start, stop)
-        data = raw.get_data(picks=picks, start=start, stop=stop,
-                            reject_by_annotation=reject_by_annotation)
-        if min_peak_distance != 0:
-                data = _extract_gfps(data, min_peak_distance=min_peak_distance)
-        return(data)
-    
-    def _prepare_fit_epochs(self, epochs, picks, min_peak_distance):
-        data = epochs.get_data(picks=picks)
-        if min_peak_distance != 0:
-            peaks = list()
-            for epoch in data:
-                epoch_peaks = _extract_gfps(epoch, min_peak_distance=min_peak_distance)
-                peaks.append(epoch_peaks)
-            data = np.hstack(peaks)
-        data = data.reshape((data.shape[1], -1))
-        return(data)
-
-    def _prepare_fit_evoked(self, evoked, picks, min_peak_distance):
-        data = evoked.data[picks, :]
-        if min_peak_distance != 0:
-            data = _extract_gfps(data, min_peak_distance=min_peak_distance)
-        return(data)
         
     def _fit_data(self, data: np.ndarray,  n_jobs: int = 1, verbose=None) -> ModKMeans:
         logger.info(f'Running Kmeans for {self.n_clusters} clusters centers with {self.n_init} random initialisations.')
@@ -662,15 +664,15 @@ class ModKMeans(BaseClustering):
                               exclude=[], allow_empty=False)
 
         if isinstance(inst, BaseRaw):
-            data = self._prepare_fit_raw(inst, picks, start, stop, reject_by_annotation, min_peak_distance)
+            data = _prepare_fit_raw(inst, picks, start, stop, reject_by_annotation, min_peak_distance)
             current_fit = 'Raw'
     
         elif isinstance(inst, BaseEpochs):
-            data = self._prepare_fit_epochs(inst, picks, min_peak_distance)
+            data = _prepare_fit_epochs(inst, picks, min_peak_distance)
             current_fit = 'Epochs'
 
         if isinstance(inst, Evoked):
-            data = self._prepare_fit_evoked(inst, picks, min_peak_distance)
+            data = _prepare_fit_evoked(inst, picks, min_peak_distance)
             current_fit = 'Evoked'
         
         if min_peak_distance == 0:

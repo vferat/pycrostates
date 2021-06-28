@@ -1,6 +1,4 @@
-from mne.io.base import TimeMixin
-from pycrostates import segmentation
-from mne.utils import _validate_type, logger, verbose, warn, fill_doc, check_random_state
+from mne.utils import _validate_type, logger, verbose, fill_doc,
 from mne.io import BaseRaw
 from mne.epochs import BaseEpochs
 from mne import Evoked
@@ -11,7 +9,7 @@ from ..viz import plot_cluster_centers, plot_segmentation
 class BaseSegmentation():
     def __init__(self, segmentation, inst, cluster_centers, names=None):
         self.segmentation = segmentation
-        self.inst = inst        
+        self.inst = inst
         self.cluster_centers = cluster_centers
 
         if names:
@@ -21,7 +19,7 @@ class BaseSegmentation():
                 raise ValueError('Clsuter_centers and cluster_centers_names must have the same length')
         else:
             self.names = [f'{c+1}' for c in range(len(cluster_centers))]
-        
+    
     def plot_cluster_centers(self):
         fig, axs = plot_cluster_centers(self.cluster_centers, self.inst.info, self.names)
         return(fig, axs)

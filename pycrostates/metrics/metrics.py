@@ -41,7 +41,7 @@ def compute_metrics_data(segmentation, data, maps, maps_names, sfreq, norm_gfp=T
         Defaults to 0.
     crit: float
         Converge criterion. Default to 10e-6.
-        
+
     %(reject_by_annotation_raw)s
     %(verbose)s
 

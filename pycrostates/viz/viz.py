@@ -18,7 +18,7 @@ def plot_cluster_centers(cluster_centers, info, names):
     plt.axis('off')
     plt.show()
     return(fig, axs)
-    
+
 def plot_segmentation(segmentation: np.ndarray,
                       inst: Union(BaseRaw, Evoked),
                       cluster_centers,
