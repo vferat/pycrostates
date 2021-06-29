@@ -1,5 +1,5 @@
 """
-Single Subject Segmentation
+Single Subject Segmentation with resampling
 ===========================
 
 This example demonstrates how to segment a single subject recording into microstates sequence.
