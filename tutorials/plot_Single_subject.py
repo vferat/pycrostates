@@ -25,7 +25,7 @@ raw.set_montage(montage)
 raw.pick('eeg')
 raw.set_eeg_reference('average')
 # %%
-# Fit the modified Kmeans algorithm with the raw data. Here we use ``gfp=True`` to extract gfp peaks on fly.
+# Fit the modified Kmeans algorithm with the raw data.
 # Note that, depending on your setup, you can change ``n_jobs=1`` in order to use parallel processing and speed up the process.
 
 n_clusters = 4
@@ -34,7 +34,7 @@ ModK.fit(raw, n_jobs=5)
 
 # %%
 # Now that our algorithm is fitted, we can visualise the cluster centers, also called Microstate maps or Microstate topographies
-# using :meth:`ModK.plot_cluster_centers`. Note than this method uses the :class:`~mne.Info` object of the fitted instance to display
+# using :meth:`ModK.plot`. Note than this method uses the :class:`~mne.Info` object of the fitted instance to display
 # the topographies.
 ModK.plot()
 
@@ -44,6 +44,7 @@ ModK.reorder([3,2,0,1])
 ModK.rename_clusters(['A', 'B', 'C', 'D'])
 ModK.plot()
 
+# %%
 # We can also invert maps polarity thanks to :meth:`ModK.invert_polarity`
 ModK.invert_polarity([False, False, True, True])
 ModK.plot()
