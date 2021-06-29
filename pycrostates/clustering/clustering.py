@@ -9,7 +9,6 @@ import matplotlib
 import mne
 import numpy as np
 import scipy
-from scipy.signal import find_peaks
 
 from mne.annotations import _annotations_starts_stops
 from mne.io import BaseRaw
@@ -23,28 +22,7 @@ from mne.io.pick import _picks_to_idx, pick_info
            
 from ..utils import _corr_vectors, check_ch_names
 from ..segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
-
-def _extract_gfps(data, min_peak_distance=2):
-    """ Extract Gfp peaks from input data
-
-    Parameters
-    ----------
-    min_peak_dist : Required minimal horizontal distance (>= 1)
-                    in samples between neighbouring peaks.
-                    Smaller peaks are removed first until the
-                    condition is fulfilled for all remaining peaks.
-                    Default to 2.
-    X : array-like, shape [n_channels, n_samples]
-                The data to extrat Gfp peaks, row by row. scipy.sparse matrices should be
-                in CSR format to avoid an un-necessary copy.
-
-    """
-    if not min_peak_distance >= 1:
-        raise(ValueError('min_peak_dist must be >= 1.'))
-    gfp = np.std(data, axis=0)
-    peaks, _ = find_peaks(gfp, distance=min_peak_distance)
-    data_ =  data[:,peaks]
-    return(data_)
+from ..preprocessing import _extract_gfps
 
 @verbose
 def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
