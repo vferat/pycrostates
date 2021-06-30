@@ -30,10 +30,11 @@ from pycrostates.preprocessing import extract_gfp_peaks
 gfp_peaks = extract_gfp_peaks(raw, min_peak_distance=3)
 gfp_peaks
 # %%
-# then fit the gfp peaks to the modified Kmeans algorithm.
+# then fit the gfp peaks to the modified Kmeans algorithm. Make sure not to change the default parameter min_peak_distance=0
+# to avoid performing GFP extraction on your already extracted gfp peaks.
 n_clusters = 4
-ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
-ModK.fit(gfp_peaks, n_jobs=5)
+ModK = ModKMeans(n_clusters=n_clusters, min_peak_distance=0, random_state=42)
+ModK.fit(gfp_peaks, n_jobs=5, )
 ModK.plot()
 
 # %%

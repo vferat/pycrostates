@@ -150,7 +150,7 @@ def _rejected_first_last_semgents(segmentation):
 
 
 @fill_doc
-class BaseClustering(ContainsMixin):
+class BaseClustering():
     u"""Base Class for Microstate Clustering algorithm.
 
     Parameters

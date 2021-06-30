@@ -7,3 +7,5 @@ Most-used classes
    :toctree: generated/
 
    clustering.ModKMeans
+   segmentation.RawSegmentation
+   segmentation.EpochsSegmentation

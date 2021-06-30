@@ -25,5 +25,8 @@ This is the reference for classes (``CamelCase`` names) and functions
     :maxdepth: 2
 
     most_used_classes
-    viz
+    clustering
+    preprocessing
+    segmentation
     metrics
+    viz
