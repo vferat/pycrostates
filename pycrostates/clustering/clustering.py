@@ -17,7 +17,7 @@ from mne.parallel import check_n_jobs, parallel_func
 from mne.preprocessing.ica import _check_start_stop
 from mne.utils import _validate_type, logger, verbose, warn, fill_doc, check_random_state
 from mne.io.pick import _picks_to_idx, pick_info
-       
+ 
 from ..utils import _corr_vectors, check_ch_names
 from ..segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
 from ..preprocessing import _extract_gfps
