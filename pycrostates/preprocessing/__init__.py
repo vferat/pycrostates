@@ -1,1 +1,1 @@
-from .preprocessing import _extract_gfps, resample
+from .preprocessing import _extract_gfps, resample, extract_gfp_peaks

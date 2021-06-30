@@ -3,7 +3,6 @@ from copy import deepcopy
 from pycrostates.viz import plot_cluster_centers
 
 from typing import Tuple, Union
-import pickle
 
 import matplotlib
 import mne
@@ -192,10 +191,6 @@ class BaseClustering(ContainsMixin):
 
     def copy(self):
         return deepcopy(self)
-    
-    def to_pickle(self, filename):
-        with open(filename, 'wb') as handle:
-            pickle.dump(self, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def _check_fit(self):
         if self.current_fit == 'unfitted':
@@ -305,7 +300,7 @@ class BaseClustering(ContainsMixin):
                 factor: int = 0,
                 half_window_size: int = 3,
                 crit: float = 10e-6,
-                rejected_first_last_semgents: bool = True,
+                rejected_first_last_segments: bool = True,
                 verbose: str = None) -> np.ndarray:
         """Predict Microstates labels using competitive fitting.
 
@@ -322,8 +317,9 @@ class BaseClustering(ContainsMixin):
             Window size = 2 * half_window_size + 1
         crit: float
             Converge criterion. Default to 10e-6.
-        rejected_first_last_semgents: bool
+        rejected_first_last_segments: bool
             If True, set first and last segments to unlabeled.
+            Default to True.
         %(reject_by_annotation_raw)s
         %(verbose)s
 
@@ -351,20 +347,20 @@ class BaseClustering(ContainsMixin):
             segmentation = self._predict_raw(raw=inst, picks=picks, reject_by_annotation=reject_by_annotation,
                                                 half_window_size=half_window_size,
                                                 factor=factor, crit=crit,
-                                                rejected_first_last_semgents=rejected_first_last_semgents,
+                                                rejected_first_last_semgents=rejected_first_last_segments,
                                                 verbose=verbose)
             
         if isinstance(inst, BaseEpochs):
             segmentation = self._predict_epochs(epochs=inst, picks=picks,
                                                 half_window_size=half_window_size,
                                                 factor=factor, crit=crit,
-                                                rejected_first_last_semgents=rejected_first_last_semgents,
+                                                rejected_first_last_semgents=rejected_first_last_segments,
                                                 verbose=verbose)
         if isinstance(inst, Evoked):
             segmentation = self._predict_evoked(evoked=inst, picks=picks,
                                                 half_window_size=half_window_size,
                                                 factor=factor, crit=crit,
-                                                rejected_first_last_semgents=rejected_first_last_semgents,
+                                                rejected_first_last_semgents=rejected_first_last_segments,
                                                 verbose=verbose)
   
         return(segmentation)
@@ -583,7 +579,7 @@ class ModKMeans(BaseClustering):
         
     def _fit_data(self, data: np.ndarray,  n_jobs: int = 1, verbose=None) -> ModKMeans:
         logger.info(f'Running Kmeans for {self.n_clusters} clusters centers with {self.n_init} random initialisations.')
-        inits = self.random_state.randint(low=0, high=100000, size=(self.n_init))
+        inits = self.random_state.randint(low=0, high=100*self.n_init, size=(self.n_init))
         if n_jobs == 1:
             best_gev = 0
             for init in inits:

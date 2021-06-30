@@ -24,11 +24,17 @@ raw.set_montage(montage)
 
 raw.pick('eeg')
 raw.set_eeg_reference('average')
-# %%
-# Resample Raw insance into 10 epochs of 500 samples
-from pycrostates.preprocessing import resample
 
-resamples = resample(raw, n_epochs=10, n_samples=5000, random_state=40)
+# %%
+# This step is optional. We can extract GfP peaks before doing resampling.
+from pycrostates.preprocessing import extract_gfp_peaks
+raw = extract_gfp_peaks(raw, min_peak_distance=3)
+raw
+
+# %%
+# Resample raw instance into 10 epochs of 150 samples
+from pycrostates.preprocessing import resample
+resamples = resample(raw, n_epochs=10, n_samples=150, random_state=40)
 # %%
 # Compute Kmeans clustering on each sample independently
 n_clusters = 4
@@ -44,7 +50,6 @@ for sample in resamples:
 # %%
 # Then compute Kmeans clustering on the concatenated results
 from mne import concatenate_raws
-
 concat_raw = concatenate_raws(resample_centers)
 ModK.fit(concat_raw, n_jobs=5)
 ModK.plot()

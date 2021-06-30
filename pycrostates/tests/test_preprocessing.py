@@ -1,4 +1,6 @@
 import os.path as op
+from pycrostates.preprocessing.preprocessing import extract_gfp_peaks
+from mne.io.array.array import RawArray
 
 import numpy as np
 import mne
@@ -6,7 +8,7 @@ from mne.datasets import testing
 
 from pycrostates.clustering import ModKMeans
 from pycrostates.segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
-from pycrostates.preprocessing import resample
+from pycrostates.preprocessing import resample, extract_gfp_peaks
 
 data_path = testing.data_path()
 fname_raw_testing = op.join(data_path, 'MEG', 'sample',
@@ -41,8 +43,6 @@ def test_resample_raw_samples_coverage():
     r = resample(raw, n_samples=500, coverage=0.8, replace=False)
     assert r[0].n_times == 500
     
-
-
 def test_resample_raw_noreplace_error():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     raw = raw.pick('eeg')
@@ -50,3 +50,17 @@ def test_resample_raw_noreplace_error():
         resample(raw, 1000, 5000, replace=False)
     except Exception as e:
         assert isinstance(e, ValueError)
+
+def test_extract_gfp_raw():
+    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+    raw = raw.pick('eeg')
+    raw_peaks = extract_gfp_peaks(raw, min_peak_distance=4)
+    assert isinstance(raw_peaks, RawArray)
+        
+def test_extract_gfp_epochs():
+    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+    events = mne.make_fixed_length_events(raw, 1)
+    epochs = mne.epochs.Epochs(raw, events, preload=True)
+    epochs = epochs.pick('eeg')
+    raw_peaks = extract_gfp_peaks(epochs, min_peak_distance=4)
+    assert isinstance(raw_peaks, RawArray)
