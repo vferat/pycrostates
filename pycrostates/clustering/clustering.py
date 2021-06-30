@@ -262,22 +262,22 @@ class BaseClustering():
     @verbose
     def _predict_epochs(self, epochs, picks, half_window_size, factor, crit, rejected_first_last_semgents, verbose=None):
         data = epochs.get_data(picks=picks)
-        segmentations = list()
+        segments = list()
         for epoch in data:
-            segmentation =  _segment(epoch,
+            segment =  _segment(epoch,
                                 self.cluster_centers_,
                                 half_window_size, factor,
                                 crit)
             if rejected_first_last_semgents:
-                segmentation = _rejected_first_last_semgents(segmentation)
-            segmentations.append(segmentation)
+                segment = _rejected_first_last_semgents(segment)
+            segments.append(segment)
 
-        segmentations = np.array(segmentations)
-        segmentation = EpochsSegmentation(segmentation=segmentation,
+        segments = np.array(segments)
+        segmentation = EpochsSegmentation(segmentation=segments,
                                        inst=epochs,
                                        cluster_centers=self.cluster_centers_,
                                        names=self.names)
-        return(segmentations)
+        return(segmentation)
     
     @verbose
     def _predict_evoked(self, evoked, picks, half_window_size, factor, crit, rejected_first_last_semgents,verbose=None):
