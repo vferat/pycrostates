@@ -6,7 +6,9 @@ member-warnings: false
 
 pep257:
   disable:
+    - D202
     - D203
+    - D205
     - D212
     - D213
     - D214
