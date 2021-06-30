@@ -1,5 +1,5 @@
 Segmentation
-========
+============
 
 :py:mod:`pycrostates.segmentation`:
 

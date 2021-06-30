@@ -4,7 +4,7 @@ from scipy.signal import find_peaks
 import mne
 from mne.io import BaseRaw
 from mne.epochs import BaseEpochs
-from mne.utils import _validate_type, logger, verbose, warn, fill_doc, check_random_state
+from mne.utils import _validate_type, logger, verbose, fill_doc, check_random_state
 from mne.preprocessing.ica import _check_start_stop
 
 

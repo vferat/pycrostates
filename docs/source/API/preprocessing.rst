@@ -1,5 +1,5 @@
 Preprocessing
-========
+=============
 
 :py:mod:`pycrostates.preprocessing`:
 

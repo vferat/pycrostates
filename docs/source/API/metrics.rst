@@ -12,4 +12,3 @@ Metrics
 .. autosummary::
    :toctree: generated/
 
-   compute_metrics
