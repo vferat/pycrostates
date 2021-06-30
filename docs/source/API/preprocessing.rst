@@ -3,9 +3,9 @@ Preprocessing
 
 :py:mod:`pycrostates.preprocessing`:
 
-.. currentmodule:: preprocessing.metrics
+.. currentmodule:: pycrostates.preprocessing
 
-.. automodule:: preprocessing.metrics
+.. automodule:: pycrostates.preprocessing
    :no-members:
    :no-inherited-members:
 
