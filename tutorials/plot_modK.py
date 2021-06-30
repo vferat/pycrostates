@@ -1,6 +1,6 @@
 """
 The ModKmeans object
-===========================
+====================
 
 This tutorial introduces the :class:`pycrostates.clustering.ModKMeans` structure in detail.
 """

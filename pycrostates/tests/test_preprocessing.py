@@ -1,13 +1,8 @@
 import os.path as op
-from pycrostates.preprocessing.preprocessing import extract_gfp_peaks
-from mne.io.array.array import RawArray
 
-import numpy as np
 import mne
+from mne.io.array.array import RawArray
 from mne.datasets import testing
-
-from pycrostates.clustering import ModKMeans
-from pycrostates.segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
 from pycrostates.preprocessing import resample, extract_gfp_peaks
 
 data_path = testing.data_path()
@@ -22,7 +17,7 @@ def test_resample_raw_replace():
     r = resample(raw, 10, 5000)
     assert len(r) == 10
     assert r[0].n_times == 5000
-    
+
     
 def test_resample_raw_noreplace():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)

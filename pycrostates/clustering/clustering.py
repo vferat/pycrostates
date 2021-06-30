@@ -16,9 +16,8 @@ from mne import Evoked
 from mne.parallel import check_n_jobs, parallel_func
 from mne.preprocessing.ica import _check_start_stop
 from mne.utils import _validate_type, logger, verbose, warn, fill_doc, check_random_state
-from mne.channels.channels import ContainsMixin
 from mne.io.pick import _picks_to_idx, pick_info
-           
+       
 from ..utils import _corr_vectors, check_ch_names
 from ..segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
 from ..preprocessing import _extract_gfps
@@ -224,7 +223,7 @@ class BaseClustering():
             segmentation = _segment(data,
                                 self.cluster_centers_,
                                 half_window_size, factor,
-                                crit)        
+                                crit)
         else:
             onsets, _ends = _annotations_starts_stops(raw, ['BAD'])
             if len(onsets) == 0:

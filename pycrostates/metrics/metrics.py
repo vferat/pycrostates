@@ -53,7 +53,7 @@ def compute_metrics_data(segmentation, data, maps, maps_names, sfreq, norm_gfp=T
     gfp = np.std(data, axis=0)
     if norm_gfp:
         gfp = gfp / np.linalg.norm(gfp)
-        
+
     gfp = np.std(data, axis=0)
     segments = [(s, list(group)) for s,group in itertools.groupby(segmentation)]
     d = {}

@@ -124,7 +124,7 @@ def resample(inst, n_epochs:int=None, n_samples:int=None, coverage:float=None, r
     raw : list of :class:`mne.io.BaseRaw`
         Raw objects each containing resampled data ( n_epochs raws of n_samples samples).
     """    
-    
+
     _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
     random_state = check_random_state(random_state)
     

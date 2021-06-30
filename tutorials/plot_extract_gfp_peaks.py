@@ -1,6 +1,6 @@
 """
 Global field power peaks extraction
-===========================
+===================================
 
 This example demonstrates how to extract global field power (gfp) peaks.
 """

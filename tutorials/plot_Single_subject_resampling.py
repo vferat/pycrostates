@@ -1,6 +1,6 @@
 """
 Single Subject Segmentation with resampling
-===========================
+===========================================
 
 This example demonstrates how to segment a single subject recording into microstates sequence.
 """
@@ -45,7 +45,6 @@ for sample in resamples:
     ModK.fit(sample, n_jobs=5)
     cluster_centers = ModK.get_cluster_centers_as_raw()
     resample_centers.append(cluster_centers)
-    
 
 # %%
 # Then compute Kmeans clustering on the concatenated results
