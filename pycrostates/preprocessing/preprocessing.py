@@ -23,7 +23,7 @@ def _extract_gfps(data, min_peak_distance=2):
                 in CSR format to avoid an un-necessary copy.
 
     """
-    if not min_peak_distance >= 1:
+    if min_peak_distance < 1:
         raise(ValueError('min_peak_dist must be >= 1.'))
     gfp = np.std(data, axis=0)
     peaks, _ = find_peaks(gfp, distance=min_peak_distance)
@@ -39,7 +39,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_b
 
     .. warning:: The temporal dimension of the output :class:`mne.io.Raw` object has been destroyed.
                  This object is a convinient container for gfp peaks and should not be used for standart MEEG analysis.
-                 
+           
     Parameters
     ----------
     inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`, :class:`mne.Evoked`
@@ -78,17 +78,22 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_b
             epoch_peaks = _extract_gfps(epoch, min_peak_distance=min_peak_distance)
             peaks.append(epoch_peaks)
         peaks = np.hstack(peaks)
-    logger.info(f'{peaks.shape[1]} gfp peaks extracted out of {data.shape[1]} samples ({(peaks.shape[1] /data.shape[1] * 100):.2f}% of the original data)')
+    logger.info(f'{peaks.shape[1]} gfp peaks extracted out of {data.shape[1]} samples'
+                f'({(peaks.shape[1] /data.shape[1] * 100):.2f}% of the original data)')
     raw_peaks = mne.io.RawArray(data=peaks, info=inst.info, verbose=False)
     return(raw_peaks)
 
 
 @fill_doc
 @verbose
-def resample(inst, n_epochs:int=None, n_samples:int=None, coverage:float=None, replace:bool=True, start=None, stop=None, reject_by_annotation=None, random_state=None, verbose=None):
+def resample(inst, n_epochs:int=None, n_samples:int=None, coverage:float=None,
+             replace:bool=True, start=None, stop=None, reject_by_annotation=None,
+             random_state=None, verbose=None):
     """ Resample recording into epochs of random samples.
 
-    This function resample :class:`mne.epochs.Epochs`or :class:`mne.io.Raw` object into n_epochs :class:`mne.io.Raw` each containing n_samples random samples of the originial recording.
+    This function resample :class:`mne.epochs.Epochs`or :class:`mne.io.Raw` object 
+    into n_epochs :class:`mne.io.Raw` each containing n_samples random samples of
+    the originial recording.
 
     .. warning:: The temporal dimension of the output :class:`mne.io.Raw` objects has been destroyed.
                  These objects should not be used for standart MEEG analysis.
@@ -156,8 +161,9 @@ def resample(inst, n_epochs:int=None, n_samples:int=None, coverage:float=None, r
         n_samples = int((n_times * coverage) / n_epochs)
 
     if replace is False:
-         if n_epochs * n_samples > n_times:
-            raise(ValueError(f'''Can't draw {n_epochs} epochs of {n_samples} samples = {n_epochs * n_samples} samples without replacement: instance contains only {n_times} samples'''))
+        if n_epochs * n_samples > n_times:
+            raise(ValueError(f'''Can't draw {n_epochs} epochs of {n_samples} samples = {n_epochs * n_samples}'''
+                             f'''samples without replacement: instance contains only {n_times} samples'''))
         
     logger.info(f'Resampling instance into {n_epochs} epochs of {n_samples} covering {coverage *100:2f}% of the data')
     

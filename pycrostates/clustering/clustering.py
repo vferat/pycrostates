@@ -17,7 +17,7 @@ from mne.parallel import check_n_jobs, parallel_func
 from mne.preprocessing.ica import _check_start_stop
 from mne.utils import _validate_type, logger, verbose, warn, fill_doc, check_random_state
 from mne.io.pick import _picks_to_idx, pick_info
- 
+
 from ..utils import _corr_vectors, check_ch_names
 from ..segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
 from ..preprocessing import _extract_gfps
@@ -131,7 +131,7 @@ def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
     return(labels)
 
 def _rejected_first_last_semgents(segmentation):
-     # set first segment to unlabeled
+    # set first segment to unlabeled
     i = 0
     first_label = segmentation[i]
     if  first_label != 0:
@@ -179,7 +179,7 @@ class BaseClustering():
         s = f'{self.__class__.__name__} | n = {str(self.n_clusters)} cluster centers | {self.current_fit}'
         return(s)
 
-    def get_param(self, deep=True):
+    def get_param(self):
         return({'n_clusters': self.n_clusters,
                 'picks': self.picks})
 
@@ -394,7 +394,7 @@ class BaseClustering():
             raise ValueError(f"Names must have the same length as number of states but {len(names)}"
                                "were given for {len(self.n_clusters)} clusters.")
         if len(set(names))!= len(names):
-             raise ValueError("Can't name 2 clusters with the same name.")
+            raise ValueError("Can't name 2 clusters with the same name.")
         self.names = names
         return(self)
     
@@ -508,7 +508,7 @@ def _prepare_fit_raw(raw, picks, start, stop, reject_by_annotation, min_peak_dis
     data = raw.get_data(picks=picks, start=start, stop=stop,
                         reject_by_annotation=reject_by_annotation)
     if min_peak_distance != 0:
-            data = _extract_gfps(data, min_peak_distance=min_peak_distance)
+        data = _extract_gfps(data, min_peak_distance=min_peak_distance)
     return(data)
 
 def _prepare_fit_epochs(epochs, picks, min_peak_distance):
@@ -652,7 +652,9 @@ class ModKMeans(BaseClustering):
             logger.info(f'Fitting modified Kmeans with {current_fit} data (no gfp peaks extraction)')
         else:
             min_peak_distance_ms = inst.info['sfreq'] * min_peak_distance * 1e-3
-            logger.info(f'Fitting modified Kmeans with {current_fit} data by selecting Gfp peaks with minimum distance of {min_peak_distance_ms}ms ({min_peak_distance} samples)')
+            logger.info(f'Fitting modified Kmeans with {current_fit} data by selecting Gfp'
+                        f'peaks with minimum distance of {min_peak_distance_ms}ms'
+                        f'({min_peak_distance} samples)')
             
         cluster_centers, GEV, labels =  self._fit_data(data=data, n_jobs=n_jobs, verbose=verbose)
         

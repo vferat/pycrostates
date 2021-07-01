@@ -83,7 +83,7 @@ def test_ModKMeans_fit_epochs():
     epochs.info['bads'] = [epochs.info['ch_names'][0]]
     ModK.fit(epochs, n_jobs=1)
     assert ModK.cluster_centers_.shape == (n_clusters, len(epochs.info['ch_names']))
-    
+
 def test_ModKMeans_fit_evoked():
     evoked = mne.read_evokeds(fname_evoked_testing, condition=0)
     evoked = evoked.pick('eeg')

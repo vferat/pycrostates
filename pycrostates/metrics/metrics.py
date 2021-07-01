@@ -64,7 +64,7 @@ def compute_metrics_data(segmentation, data, maps, maps_names, sfreq, norm_gfp=T
             labeled_tp = data.T[arg_where][:,0,:].T
             labeled_gfp = gfp[arg_where][:,0]
             state_array = np.array([state]*len(arg_where)).transpose()
-            
+
             corr = _corr_vectors(state_array, labeled_tp)
             d[f'{state_name}_dist_corr'] = corr
             d[f'{state_name}_mean_corr'] = np.mean(np.abs(corr))

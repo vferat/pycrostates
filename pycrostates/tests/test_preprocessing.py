@@ -18,7 +18,7 @@ def test_resample_raw_replace():
     assert len(r) == 10
     assert r[0].n_times == 5000
 
-    
+
 def test_resample_raw_noreplace():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     raw = raw.pick('eeg')
