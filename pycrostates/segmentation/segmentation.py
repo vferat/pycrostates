@@ -29,7 +29,7 @@ class RawSegmentation(BaseSegmentation):
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
         _validate_type(self.inst, (BaseRaw), 'inst', 'Raw')
-        
+
         data = self.inst.get_data()
         if data.shape[1] != len(self.segmentation):
             raise ValueError('Instance and segmentation must have the same number of samples.')

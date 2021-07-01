@@ -68,7 +68,7 @@ def compute_metrics_data(segmentation, data, maps, maps_names, sfreq, norm_gfp=T
             corr = _corr_vectors(state_array, labeled_tp)
             d[f'{state_name}_dist_corr'] = corr
             d[f'{state_name}_mean_corr'] = np.mean(np.abs(corr))
-            
+
             gev = (labeled_gfp * corr) ** 2 / np.sum(gfp ** 2)
             d[f'{state_name}_dist_gev'] = gev
             d[f'{state_name}_gev'] = np.sum(gev)

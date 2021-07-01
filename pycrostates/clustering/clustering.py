@@ -103,7 +103,7 @@ def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
     rmat = np.tile(np.arange(0, Nu), (Nt, 1)).T
 
     labels_all = np.argmax(np.abs(np.dot(states, data)), axis=0)
-    
+
     if factor != 0:
         w = np.zeros((Nu, Nt))
         w[(rmat == labels_all)] = 1
@@ -124,8 +124,7 @@ def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
                                     data, axis=0) ** 2) / (Nt * (Ne - 1))
             if np.abs(Su - S0) <= np.abs(crit * Su):
                 break
-            else:
-                S0 = Su
+            S0 = Su
 
     labels = labels_all + 1
     return(labels)

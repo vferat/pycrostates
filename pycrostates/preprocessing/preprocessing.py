@@ -9,7 +9,7 @@ from mne.preprocessing.ica import _check_start_stop
 
 
 def _extract_gfps(data, min_peak_distance=2):
-    """ Extract Gfp peaks from input data
+    """Extract Gfp peaks from input data
 
     Parameters
     ----------
@@ -21,7 +21,6 @@ def _extract_gfps(data, min_peak_distance=2):
     X : array-like, shape [n_channels, n_samples]
                 The data to extrat Gfp peaks, row by row. scipy.sparse matrices should be
                 in CSR format to avoid an un-necessary copy.
-
     """
     if min_peak_distance < 1:
         raise(ValueError('min_peak_dist must be >= 1.'))
@@ -33,13 +32,13 @@ def _extract_gfps(data, min_peak_distance=2):
 @fill_doc
 @verbose
 def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_by_annotation=None, verbose=None):
-    """ Perform GFP peaks extraction
+    """Perform GFP peaks extraction
 
     This function extracts global field power peaks on :class:`mne.epochs.Epochs`or :class:`mne.io.Raw` obejct.
 
     .. warning:: The temporal dimension of the output :class:`mne.io.Raw` object has been destroyed.
                  This object is a convinient container for gfp peaks and should not be used for standart MEEG analysis.
-           
+ 
     Parameters
     ----------
     inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`, :class:`mne.Evoked`
@@ -60,9 +59,8 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_b
     raw : :class:`mne.io.BaseRaw`
         The Raw instance containing extracted gfp peaks
     """
-
     _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
-    if not min_peak_distance >= 1:
+    if min_peak_distance < 1:
         raise(ValueError('min_peak_dist must be >= 1.'))
     if isinstance(inst, BaseRaw):
         reject_by_annotation = 'omit' if reject_by_annotation else None
@@ -89,7 +87,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_b
 def resample(inst, n_epochs:int=None, n_samples:int=None, coverage:float=None,
              replace:bool=True, start=None, stop=None, reject_by_annotation=None,
              random_state=None, verbose=None):
-    """ Resample recording into epochs of random samples.
+    """Resample recording into epochs of random samples.
 
     This function resample :class:`mne.epochs.Epochs`or :class:`mne.io.Raw` object 
     into n_epochs :class:`mne.io.Raw` each containing n_samples random samples of
@@ -97,7 +95,7 @@ def resample(inst, n_epochs:int=None, n_samples:int=None, coverage:float=None,
 
     .. warning:: The temporal dimension of the output :class:`mne.io.Raw` objects has been destroyed.
                  These objects should not be used for standart MEEG analysis.
-                 
+         
     Parameters
     ----------
     inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`, :class:`mne.Evoked`
@@ -128,8 +126,7 @@ def resample(inst, n_epochs:int=None, n_samples:int=None, coverage:float=None,
     -------
     raw : list of :class:`mne.io.BaseRaw`
         Raw objects each containing resampled data ( n_epochs raws of n_samples samples).
-    """    
-
+    """
     _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
     random_state = check_random_state(random_state)
     
