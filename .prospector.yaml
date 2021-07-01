@@ -25,3 +25,7 @@ pep257:
     - D415
     - D416
     - D417
+
+pylint:
+  disable:
+    - too-many-arguments
