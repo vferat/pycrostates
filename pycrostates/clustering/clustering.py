@@ -656,10 +656,10 @@ class ModKMeans(BaseClustering):
                         f'({min_peak_distance} samples)')
             
         cluster_centers, GEV, labels =  self._fit_data(data=data, n_jobs=n_jobs, verbose=verbose)
-        
         self.cluster_centers_ = cluster_centers
         self.current_fit = current_fit
         self.info = pick_info(inst.info, picks)
         self.GEV_ = GEV
+        self.fitted_data_ = data
         self.labels_ = labels
         return()
