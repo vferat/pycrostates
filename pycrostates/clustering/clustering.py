@@ -1,4 +1,5 @@
 from __future__ import annotations
+import itertools
 from copy import deepcopy
 from pycrostates.viz import plot_cluster_centers
 
@@ -129,7 +130,8 @@ def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
     labels = labels_all + 1
     return(labels)
 
-def _rejected_first_last_semgents(segmentation):
+
+def _rejected_first_last_segments(segmentation):
     # set first segment to unlabeled
     i = 0
     first_label = segmentation[i]
@@ -146,6 +148,32 @@ def _rejected_first_last_semgents(segmentation):
             i -= 1
     return(segmentation)
 
+def _reject_small_segments(segmentation, data, min_segment_lenght):
+    new_segmentation = segmentation.copy()
+    segments = [list(group) for s,group in itertools.groupby(new_segmentation)]
+    current_idx = 0
+    for i,segment in enumerate(segments):
+        if i != 0 and i != len(segments)-1:
+            if len(segment) <= min_segment_lenght and segment[0] != 0:
+                left_idx = current_idx 
+                right_idx = current_idx + len(segment)
+                new_segment = new_segmentation[left_idx:right_idx]
+
+                while len(new_segment) != 0:
+                    left_corr = np.abs(_corr_vectors(data[:,left_idx - 1].T, data[:,left_idx].T,))
+                    right_corr = np.abs(_corr_vectors(data[:,right_idx + 1].T, data[:,right_idx].T))
+
+                    if left_corr < right_corr:
+                        new_segmentation[right_idx-1] = new_segmentation[right_idx]
+                        right_idx -= 1
+                        new_segment = new_segment[:-1]
+                    else:
+                        new_segmentation[left_idx] = new_segmentation[left_idx - 1]
+                        left_idx += 1
+                    new_segment = new_segmentation[left_idx:right_idx]
+        current_idx += len(segment)
+    return(new_segmentation)
+                
 
 @fill_doc
 class BaseClustering():
@@ -216,7 +244,7 @@ class BaseClustering():
 
 
     @verbose
-    def _predict_raw(self, raw, picks, reject_by_annotation, half_window_size, factor, crit, rejected_first_last_semgents,verbose=None):
+    def _predict_raw(self, raw, picks, reject_by_annotation, half_window_size, factor, crit, min_segment_lenght, rejected_first_last_segments, verbose=None):
         data = raw.get_data(picks=picks)
         if not reject_by_annotation:
             segmentation = _segment(data,
@@ -245,12 +273,15 @@ class BaseClustering():
                                             self.cluster_centers_,
                                             half_window_size, factor,
                                             crit)
-                        if rejected_first_last_semgents:
-                            labels = _rejected_first_last_semgents(labels)
+                        if rejected_first_last_segments:
+                            labels = _rejected_first_last_segments(labels)
                         segmentation[end:onset] = labels
-                        
-        if rejected_first_last_semgents:
-            segmentation = _rejected_first_last_semgents(segmentation)
+        
+        if min_segment_lenght > 0:
+            segmentation = _reject_small_segments(segmentation, data, min_segment_lenght)
+        if rejected_first_last_segments:
+            segmentation = _rejected_first_last_segments(segmentation)
+            
         
         segmentation = RawSegmentation(segmentation=segmentation,
                                        inst=raw,
@@ -259,7 +290,7 @@ class BaseClustering():
         return(segmentation)
     
     @verbose
-    def _predict_epochs(self, epochs, picks, half_window_size, factor, crit, rejected_first_last_semgents, verbose=None):
+    def _predict_epochs(self, epochs, picks, half_window_size, factor, crit, min_segment_lenght, rejected_first_last_segments, verbose=None):
         data = epochs.get_data(picks=picks)
         segments = list()
         for epoch in data:
@@ -267,8 +298,12 @@ class BaseClustering():
                                 self.cluster_centers_,
                                 half_window_size, factor,
                                 crit)
-            if rejected_first_last_semgents:
-                segment = _rejected_first_last_semgents(segment)
+            
+            if min_segment_lenght > 0:
+                segment = _reject_small_segments(segment, epoch, min_segment_lenght)
+            
+            if rejected_first_last_segments:
+                segment = _rejected_first_last_segments(segment)
             segments.append(segment)
 
         segments = np.array(segments)
@@ -279,11 +314,13 @@ class BaseClustering():
         return(segmentation)
     
     @verbose
-    def _predict_evoked(self, evoked, picks, half_window_size, factor, crit, rejected_first_last_semgents,verbose=None):
+    def _predict_evoked(self, evoked, picks, half_window_size, factor, crit, min_segment_lenght, rejected_first_last_segments, verbose=None):
         data = evoked.data[picks,:]
         segmentation = _segment(data, self.cluster_centers_, half_window_size, factor, crit)
-        if rejected_first_last_semgents:
-            segmentation = _rejected_first_last_semgents(segmentation)
+        if min_segment_lenght > 0:
+                segmentation = _reject_small_segments(segmentation, data, min_segment_lenght)
+        if rejected_first_last_segments:
+            segmentation = _rejected_first_last_segments(segmentation)
 
         segmentation = EvokedSegmentation(segmentation=segmentation,
                                          inst=evoked,
@@ -298,6 +335,7 @@ class BaseClustering():
                 factor: int = 0,
                 half_window_size: int = 3,
                 crit: float = 10e-6,
+                min_segment_lenght: int = 0,
                 rejected_first_last_segments: bool = True,
                 verbose: str = None) -> np.ndarray:
         """Predict Microstates labels using competitive fitting.
@@ -315,6 +353,9 @@ class BaseClustering():
             Window size = 2 * half_window_size + 1
         crit: float
             Converge criterion. Default to 10e-6.
+        min_segment_lenght: int
+            Minimum segment length (in samples). If a segment is shorter than this value,
+            it will be recursively reasigned to neighbouring segments based on absolute spatial correlation.
         rejected_first_last_segments: bool
             If True, set first and last segments to unlabeled.
             Default to True.
@@ -340,25 +381,32 @@ class BaseClustering():
             logger.info('Segmenting data without smoothing')
         if factor != 0:
             logger.info(f'Segmenting data with factor {factor} and effective smoothing window size : {(2*half_window_size+1) / inst.info["sfreq"]} (ms)')
-            
+        if min_segment_lenght > 0:
+            logger.info(f'Rejecting segments shorter than {min_segment_lenght / inst.info["sfreq"]} (ms)')
+        if rejected_first_last_segments:
+            logger.info(f'Rejecting first and last segment')
+
         if isinstance(inst, BaseRaw):
             segmentation = self._predict_raw(raw=inst, picks=picks, reject_by_annotation=reject_by_annotation,
                                                 half_window_size=half_window_size,
                                                 factor=factor, crit=crit,
-                                                rejected_first_last_semgents=rejected_first_last_segments,
+                                                min_segment_lenght=min_segment_lenght,
+                                                rejected_first_last_segments=rejected_first_last_segments,
                                                 verbose=verbose)
             
         if isinstance(inst, BaseEpochs):
             segmentation = self._predict_epochs(epochs=inst, picks=picks,
                                                 half_window_size=half_window_size,
                                                 factor=factor, crit=crit,
-                                                rejected_first_last_semgents=rejected_first_last_segments,
+                                                min_segment_lenght=min_segment_lenght,
+                                                rejected_first_last_segments=rejected_first_last_segments,
                                                 verbose=verbose)
         if isinstance(inst, Evoked):
             segmentation = self._predict_evoked(evoked=inst, picks=picks,
                                                 half_window_size=half_window_size,
                                                 factor=factor, crit=crit,
-                                                rejected_first_last_semgents=rejected_first_last_segments,
+                                                min_segment_lenght=min_segment_lenght,
+                                                rejected_first_last_segments=rejected_first_last_segments,
                                                 verbose=verbose)
   
         return(segmentation)
