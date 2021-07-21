@@ -150,28 +150,34 @@ def _rejected_first_last_segments(segmentation):
 
 def _reject_small_segments(segmentation, data, min_segment_lenght):
     new_segmentation = segmentation.copy()
-    segments = [list(group) for s,group in itertools.groupby(new_segmentation)]
-    current_idx = 0
-    for i,segment in enumerate(segments):
-        if i != 0 and i != len(segments)-1:
-            if len(segment) <= min_segment_lenght and segment[0] != 0:
-                left_idx = current_idx 
-                right_idx = current_idx + len(segment)
-                new_segment = new_segmentation[left_idx:right_idx]
-
-                while len(new_segment) != 0:
-                    left_corr = np.abs(_corr_vectors(data[:,left_idx - 1].T, data[:,left_idx].T,))
-                    right_corr = np.abs(_corr_vectors(data[:,right_idx + 1].T, data[:,right_idx].T))
-
-                    if left_corr < right_corr:
-                        new_segmentation[right_idx-1] = new_segmentation[right_idx]
-                        right_idx -= 1
-                        new_segment = new_segment[:-1]
-                    else:
-                        new_segmentation[left_idx] = new_segmentation[left_idx - 1]
-                        left_idx += 1
+    small_segment = True
+    while small_segment:
+        segments = [list(group) for _,group in itertools.groupby(new_segmentation)]
+        current_idx = 0
+        for i,segment in enumerate(segments):
+            if i != 0 and i != len(segments)-1:
+                if len(segment) <= min_segment_lenght and segment[0] != 0:
+                    small_segment = True
+                    left_idx = current_idx 
+                    right_idx = current_idx + len(segment)
                     new_segment = new_segmentation[left_idx:right_idx]
-        current_idx += len(segment)
+
+                    while len(new_segment) != 0:
+                        left_corr = np.abs(_corr_vectors(data[:,left_idx - 1].T, data[:,left_idx].T,))
+                        right_corr = np.abs(_corr_vectors(data[:,right_idx + 1].T, data[:,right_idx].T))
+
+                        if left_corr < right_corr:
+                            new_segmentation[right_idx-1] = new_segmentation[right_idx]
+                            right_idx -= 1
+                            new_segment = new_segment[:-1]
+                        else:
+                            new_segmentation[left_idx] = new_segmentation[left_idx - 1]
+                            left_idx += 1
+                        new_segment = new_segmentation[left_idx:right_idx]
+                    break
+                else:
+                    small_segment = False
+            current_idx += len(segment)
     return(new_segmentation)
                 
 
