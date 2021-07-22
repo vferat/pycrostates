@@ -572,7 +572,9 @@ def _prepare_fit_epochs(epochs, picks, min_peak_distance):
             epoch_peaks = _extract_gfps(epoch, min_peak_distance=min_peak_distance)
             peaks.append(epoch_peaks)
         data = np.hstack(peaks)
-    data = data.reshape((data.shape[1], -1))
+    else:
+        data = np.swapaxes(data,0,1)
+        data = data.reshape(data.shape[0], -1)
     return(data)
 
 def _prepare_fit_evoked(evoked, picks, min_peak_distance):
