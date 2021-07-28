@@ -314,9 +314,9 @@ class BaseClustering():
 
         segments = np.array(segments)
         segmentation = EpochsSegmentation(segmentation=segments,
-                                       inst=epochs,
-                                       cluster_centers=self.cluster_centers_,
-                                       names=self.names)
+                                          inst=epochs,
+                                          cluster_centers=self.cluster_centers_,
+                                          names=self.names)
         return(segmentation)
     
     @verbose
