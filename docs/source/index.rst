@@ -1,7 +1,7 @@
 Pycrostates
 ===========
 
-   overview
+.. include:: overview.rst
 
 .. toctree::
    :hidden:

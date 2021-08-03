@@ -1,1 +1,0 @@
-Pycrostates is an open-source Python package for analyzing EEG microstates developed to work with [MNE-python](https://mne.tools/stable/index.html).

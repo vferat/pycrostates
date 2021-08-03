@@ -7,17 +7,22 @@
 # Pycrostates
 ---
 
-An open-source Python package for analyzing EEG microstates developed to work with [MNE-python](https://mne.tools/stable/index.html)
-
+An open-source Python package for analyzing EEG microstates developed to work with [MNE-python](https://mne.tools/stable/index.html).
 
 ## Documentation
 
-The documentation including tutorials and exemple can be found [here](https://pycrostates.readthedocs.io/en/master)
+The documentation including tutorials and exemple can be found [here](https://pycrostates.readthedocs.io/en/master).
 
 ## Installation
 
-Installation instructions can be found [here](https://pycrostates.readthedocs.io/en/master/install.html)
+Installation instructions can be found [here](https://pycrostates.readthedocs.io/en/master/install.html).
 
-[![Functional Brain Mapping Lab logo](./img/FBMLAB_logo.png)](https://www.unige.ch/medecine/neuf/en/research/grecherche/christoph-michel/)
-
-[![UNIGE logo](./img/FBMLAB_logo.png)](https://www.unige.ch/en/university/presentation/)
+---
+<p float="left">
+    <a href="https://www.unige.ch/medecine/neuf/en/researc/grecherche/christoph-michel/">
+        <img src="./docs//_static/img/FBMLAB_logo.png" width="200" />
+    </a>
+    <a href="https://www.unige.ch/en/university/presentation/">
+        <img src="./docs/_static/img/UNIGE_logo.png" width="300" />
+    </a>
+</p>

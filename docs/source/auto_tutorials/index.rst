@@ -12,14 +12,14 @@ Below is a gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to segment a single subject recording into microstates sequence.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to extract global field power (gfp) peaks.">
 
 .. only:: html
 
- .. figure:: /auto_tutorials/images/thumb/sphx_glr_plot_Single_subject_thumb.png
-     :alt: Single Subject Segmentation
+ .. figure:: /auto_tutorials/images/thumb/sphx_glr_plot_extract_gfp_peaks_thumb.png
+     :alt: Global field power peaks extraction
 
-     :ref:`sphx_glr_auto_tutorials_plot_Single_subject.py`
+     :ref:`sphx_glr_auto_tutorials_plot_extract_gfp_peaks.py`
 
 .. raw:: html
 
@@ -29,7 +29,49 @@ Below is a gallery of examples
 .. toctree::
    :hidden:
 
-   /auto_tutorials/plot_Single_subject
+   /auto_tutorials/plot_extract_gfp_peaks
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This tutorial introduces the pycrostates.clustering.ModKMeans structure in detail.">
+
+.. only:: html
+
+ .. figure:: /auto_tutorials/images/thumb/sphx_glr_plot_modK_thumb.png
+     :alt: The ModKmeans object
+
+     :ref:`sphx_glr_auto_tutorials_plot_modK.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorials/plot_modK
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to segment a single subject recording into microstates sequence.">
+
+.. only:: html
+
+ .. figure:: /auto_tutorials/images/thumb/sphx_glr_plot_Single_subject_resampling_thumb.png
+     :alt: Single Subject Segmentation with resampling
+
+     :ref:`sphx_glr_auto_tutorials_plot_Single_subject_resampling.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorials/plot_Single_subject_resampling
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>
