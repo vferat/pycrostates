@@ -34,7 +34,7 @@ def _extract_gfps(data, min_peak_distance=2):
 def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_by_annotation=None, verbose=None):
     """Perform GFP peaks extraction
 
-    This function extracts global field power peaks on :class:`mne.epochs.Epochs`or :class:`mne.io.Raw` obejct.
+    Extract global field power peaks from :class:`mne.epochs.Epochs`or :class:`mne.io.Raw`.
 
     .. warning:: The temporal dimension of the output :class:`mne.io.Raw` object has been destroyed.
                  This object is a convinient container for gfp peaks and should not be used for standart MEEG analysis.
@@ -89,7 +89,7 @@ def resample(inst, n_epochs:int=None, n_samples:int=None, coverage:float=None,
              random_state=None, verbose=None):
     """Resample recording into epochs of random samples.
 
-    This function resample :class:`mne.epochs.Epochs`or :class:`mne.io.Raw` object 
+    Resample :class:`mne.io.Raw` or :class:`mne.epochs.Epochs` 
     into n_epochs :class:`mne.io.Raw` each containing n_samples random samples of
     the originial recording.
 
@@ -98,7 +98,7 @@ def resample(inst, n_epochs:int=None, n_samples:int=None, coverage:float=None,
          
     Parameters
     ----------
-    inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`, :class:`mne.Evoked`
+    inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`
         Instance from which to extract gfp peaks.
     n_epochs : int
         Number of epoch to draw.

@@ -5,13 +5,11 @@ import mne
 from mne.datasets import testing
 
 from pycrostates.clustering import ModKMeans
-from pycrostates.segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
+from pycrostates.segmentation import RawSegmentation, EpochsSegmentation
 
 data_path = testing.data_path()
 fname_raw_testing = op.join(data_path, 'MEG', 'sample',
                             'sample_audvis_trunc_raw.fif')
-fname_evoked_testing = op.join(data_path, 'MEG', 'sample',
-                               'sample_audvis-ave.fif')
 
 def test_ModKMeans_fit_raw():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
@@ -88,22 +86,6 @@ def test_ModKMeans_fit_epochs():
     epochs.info['bads'] = [epochs.info['ch_names'][0]]
     ModK.fit(epochs, n_jobs=1)
     assert ModK.cluster_centers_.shape == (n_clusters, len(epochs.info['ch_names']))
-
-def test_ModKMeans_fit_evoked():
-    evoked = mne.read_evokeds(fname_evoked_testing, condition=0)
-    evoked = evoked.pick('eeg')
-    n_clusters = 4
-    ModK = ModKMeans(n_clusters=n_clusters)
-    assert ModK.n_clusters == n_clusters
-    assert ModK.current_fit == 'unfitted'
-    ModK.fit(evoked, n_jobs=1)
-    assert ModK.cluster_centers_.shape == (n_clusters, len(evoked.info['ch_names']))
-    assert ModK.current_fit == 'Evoked'
-    assert ModK.GEV_ > 0
-
-    evoked.info['bads'] = [evoked.info['ch_names'][0]]
-    ModK.fit(evoked, n_jobs=1)
-    assert ModK.cluster_centers_.shape == (n_clusters, len(evoked.info['ch_names']))
     
 def test_BaseClustering_predict_raw():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
@@ -130,15 +112,6 @@ def test_BaseClustering_predict_epochs():
     ModK.fit(epochs, n_jobs=1)
     segmentation = ModK.predict(epochs)
     assert isinstance(segmentation, EpochsSegmentation)
-
-def test_BaseClustering_predict_evoked():
-    evoked = mne.read_evokeds(fname_evoked_testing, condition=0)
-    evoked = evoked.pick('eeg')
-    n_clusters = 4
-    ModK = ModKMeans(n_clusters=n_clusters)
-    ModK.fit(evoked)
-    segmentation = ModK.predict(evoked)
-    assert isinstance(segmentation, EvokedSegmentation)
     
 def test_BaseClustering_reorder():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)

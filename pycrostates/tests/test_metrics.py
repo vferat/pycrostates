@@ -5,7 +5,6 @@ import mne
 from mne.datasets import testing
 
 from pycrostates.clustering import ModKMeans
-from pycrostates.segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
 from pycrostates.metrics import silhouette
 
 data_path = testing.data_path()

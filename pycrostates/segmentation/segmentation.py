@@ -1,7 +1,6 @@
 from mne.utils import _validate_type
 from mne.io import BaseRaw
 from mne.epochs import BaseEpochs
-from mne import Evoked
 
 from ..metrics import compute_metrics_data
 from ..viz import plot_cluster_centers, plot_segmentation
@@ -16,7 +15,7 @@ class BaseSegmentation():
             if len(self.cluster_centers) == len(names):
                 self.names = names
             else:
-                raise ValueError('Clsuter_centers and cluster_centers_names must have the same length')
+                raise ValueError('Cluster_centers and cluster_centers_names must have the same length')
         else:
             self.names = [f'{c+1}' for c in range(len(cluster_centers))]
 
@@ -68,33 +67,6 @@ class EpochsSegmentation(BaseSegmentation):
         data = data.reshape(data.shape[0], -1)
         d = compute_metrics_data(self.segmentation,
                                 data,
-                                self.cluster_centers,
-                                self.maps_names,
-                                self.inst.info['sfreq'],
-                                norm_gfp=norm_gfp)
-        return(d)
-    
-class EvokedSegmentation(BaseSegmentation):
-    def __init__(self, *args,  **kwargs):
-        super().__init__(*args, **kwargs)
-        _validate_type(self.inst, (Evoked), 'inst', 'Evoked')
-        
-        data = self.inst.data
-        if data.shape[1] != len(self.segmentation):
-            raise ValueError('Instance and segmentation must have the same number of samples.')
-
-    def plot(self, tmin: float = 0.0, tmax: float = None):
-        fig, ax = plot_segmentation(segmentation=self.segmentation,
-                                    inst=self.inst,
-                                    cluster_centers=self.cluster_centers,
-                                    names=self.names,
-                                    tmin=tmin,
-                                    tmax=tmax)
-        return(fig, ax)
-    
-    def compute_metrics(self, norm_gfp=True):
-        d = compute_metrics_data(self.segmentation,
-                                self.data(),
                                 self.cluster_centers,
                                 self.maps_names,
                                 self.inst.info['sfreq'],

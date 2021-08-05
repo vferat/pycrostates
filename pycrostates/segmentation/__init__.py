@@ -1,3 +1,3 @@
-from .segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
+from .segmentation import RawSegmentation, EpochsSegmentation, 
 
-__all__ = ('RawSegmentation', 'EpochsSegmentation', 'EvokedSegmentation')
+__all__ = ('RawSegmentation', 'EpochsSegmentation')

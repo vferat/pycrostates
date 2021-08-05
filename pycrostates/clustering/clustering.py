@@ -318,25 +318,10 @@ class BaseClustering():
                                           cluster_centers=self.cluster_centers_,
                                           names=self.names)
         return(segmentation)
-    
-    @verbose
-    def _predict_evoked(self, evoked, picks, half_window_size, factor, crit, min_segment_lenght, rejected_first_last_segments, verbose=None):
-        data = evoked.data[picks,:]
-        segmentation = _segment(data, self.cluster_centers_, half_window_size, factor, crit)
-        if min_segment_lenght > 0:
-                segmentation = _reject_small_segments(segmentation, data, min_segment_lenght)
-        if rejected_first_last_segments:
-            segmentation = _rejected_first_last_segments(segmentation)
-
-        segmentation = EvokedSegmentation(segmentation=segmentation,
-                                         inst=evoked,
-                                         cluster_centers=self.cluster_centers_,
-                                         names=self.names)
-        return(segmentation)
  
     @fill_doc
     @verbose
-    def predict(self,  inst: Union (BaseRaw, BaseEpochs, Evoked),
+    def predict(self,  inst: Union (BaseRaw, BaseEpochs),
                 reject_by_annotation: bool = True,
                 factor: int = 0,
                 half_window_size: int = 3,
@@ -348,7 +333,7 @@ class BaseClustering():
 
         Parameters
         ----------
-        inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`, :class:`mne.Evoked`
+        inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`
             Instance containing data to predict.
         factor: int
             Factor used for label smoothing. 0 means no smoothing.
@@ -376,7 +361,7 @@ class BaseClustering():
                 0 is used for unlabeled time points.
         """
         self._check_fit()
-        _validate_type(inst, (BaseRaw, BaseEpochs, Evoked), 'inst', 'Raw, Epochs or Evoked')
+        _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
         inst = inst.copy()
         picks = _picks_to_idx(inst.info, self.picks,
                         exclude=[], allow_empty=False)
@@ -407,14 +392,6 @@ class BaseClustering():
                                                 min_segment_lenght=min_segment_lenght,
                                                 rejected_first_last_segments=rejected_first_last_segments,
                                                 verbose=verbose)
-        if isinstance(inst, Evoked):
-            segmentation = self._predict_evoked(evoked=inst, picks=picks,
-                                                half_window_size=half_window_size,
-                                                factor=factor, crit=crit,
-                                                min_segment_lenght=min_segment_lenght,
-                                                rejected_first_last_segments=rejected_first_last_segments,
-                                                verbose=verbose)
-  
         return(segmentation)
 
     def plot(self) -> matplotlib.figure.Figure:
@@ -577,13 +554,6 @@ def _prepare_fit_epochs(epochs, picks, min_peak_distance):
         data = data.reshape(data.shape[0], -1)
     return(data)
 
-def _prepare_fit_evoked(evoked, picks, min_peak_distance):
-    data = evoked.data[picks, :]
-    if min_peak_distance != 0:
-        data = _extract_gfps(data, min_peak_distance=min_peak_distance)
-    return(data)
-
-
 @fill_doc
 class ModKMeans(BaseClustering):
     """Modified K-Means Clustering algorithm.
@@ -658,7 +628,7 @@ class ModKMeans(BaseClustering):
         return(best_maps, best_gev, best_segmentation)
 
     @verbose
-    def fit(self, inst: Union(BaseRaw, BaseEpochs, Evoked), start: float = None, stop: float = None,
+    def fit(self, inst: Union(BaseRaw, BaseEpochs), start: float = None, stop: float = None,
             reject_by_annotation: bool = True, min_peak_distance: float = 0,
             n_jobs: int = 1,
             verbose=None):
@@ -666,7 +636,7 @@ class ModKMeans(BaseClustering):
 
         Parameters
         ----------
-        inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`, :class:`mne.Evoked`
+        inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`
             Instance containing data to transform to cluster-distance space (absolute spatial correlation).
         min_peak_distance : int
             Minimum peak distance in samples for gfp peaks extraction. If min_peak_distance = 0 the entire dataset is used instead ( no gfp extraction).
@@ -678,7 +648,7 @@ class ModKMeans(BaseClustering):
         %(verbose)s
 
         """
-        _validate_type(inst, (BaseRaw, BaseEpochs, Evoked), 'inst', 'Raw, Epochs or Evoked')
+        _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
         n_jobs = check_n_jobs(n_jobs)
         
         if len(inst.info['bads']) != 0:
@@ -698,10 +668,6 @@ class ModKMeans(BaseClustering):
         elif isinstance(inst, BaseEpochs):
             data = _prepare_fit_epochs(inst, picks, min_peak_distance)
             current_fit = 'Epochs'
-
-        if isinstance(inst, Evoked):
-            data = _prepare_fit_evoked(inst, picks, min_peak_distance)
-            current_fit = 'Evoked'
         
         if min_peak_distance == 0:
             logger.info(f'Fitting modified Kmeans with {current_fit} data (no gfp peaks extraction)')
