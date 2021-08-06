@@ -9,6 +9,32 @@ Gallery
 
 Below is a gallery of examples
 
+.. raw:: html
+
+    <div class="sphx-glr-clear"></div>
+
+
+
+.. _sphx_glr_auto_tutorials_backfitting:
+
+Backfitting & Segmentation
+==========================
+
+Backfitting and segmentation tutorials
+
+.. raw:: html
+
+    <div class="sphx-glr-clear"></div>
+
+
+
+.. _sphx_glr_auto_tutorials_clustering:
+
+Clustering
+==========
+
+Clustering tutorials
+
 
 .. raw:: html
 
@@ -16,10 +42,10 @@ Below is a gallery of examples
 
 .. only:: html
 
- .. figure:: /auto_tutorials/images/thumb/sphx_glr_plot_extract_gfp_peaks_thumb.png
+ .. figure:: /auto_tutorials/clustering/images/thumb/sphx_glr_plot_extract_gfp_peaks_thumb.png
      :alt: Global field power peaks extraction
 
-     :ref:`sphx_glr_auto_tutorials_plot_extract_gfp_peaks.py`
+     :ref:`sphx_glr_auto_tutorials_clustering_plot_extract_gfp_peaks.py`
 
 .. raw:: html
 
@@ -29,7 +55,7 @@ Below is a gallery of examples
 .. toctree::
    :hidden:
 
-   /auto_tutorials/plot_extract_gfp_peaks
+   /auto_tutorials/clustering/plot_extract_gfp_peaks
 
 .. raw:: html
 
@@ -37,10 +63,10 @@ Below is a gallery of examples
 
 .. only:: html
 
- .. figure:: /auto_tutorials/images/thumb/sphx_glr_plot_modK_thumb.png
+ .. figure:: /auto_tutorials/clustering/images/thumb/sphx_glr_plot_modK_thumb.png
      :alt: The ModKmeans object
 
-     :ref:`sphx_glr_auto_tutorials_plot_modK.py`
+     :ref:`sphx_glr_auto_tutorials_clustering_plot_modK.py`
 
 .. raw:: html
 
@@ -50,7 +76,7 @@ Below is a gallery of examples
 .. toctree::
    :hidden:
 
-   /auto_tutorials/plot_modK
+   /auto_tutorials/clustering/plot_modK
 
 .. raw:: html
 
@@ -58,10 +84,10 @@ Below is a gallery of examples
 
 .. only:: html
 
- .. figure:: /auto_tutorials/images/thumb/sphx_glr_plot_Single_subject_resampling_thumb.png
+ .. figure:: /auto_tutorials/clustering/images/thumb/sphx_glr_plot_Single_subject_resampling_thumb.png
      :alt: Single Subject Segmentation with resampling
 
-     :ref:`sphx_glr_auto_tutorials_plot_Single_subject_resampling.py`
+     :ref:`sphx_glr_auto_tutorials_clustering_plot_Single_subject_resampling.py`
 
 .. raw:: html
 
@@ -71,7 +97,20 @@ Below is a gallery of examples
 .. toctree::
    :hidden:
 
-   /auto_tutorials/plot_Single_subject_resampling
+   /auto_tutorials/clustering/plot_Single_subject_resampling
+.. raw:: html
+
+    <div class="sphx-glr-clear"></div>
+
+
+
+.. _sphx_glr_auto_tutorials_group_level_analysis:
+
+Group Level Analysis
+====================
+
+group level analysis tutorials
+
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

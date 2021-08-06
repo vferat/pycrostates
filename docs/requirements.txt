@@ -6,3 +6,4 @@ pandas
 m2r2
 recommonmark
 pillow
+numpydoc

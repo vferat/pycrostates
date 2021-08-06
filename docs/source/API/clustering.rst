@@ -3,7 +3,7 @@ Clustering
 
 :py:mod:`pycrostates.clustering`:
 
-.. currentmodule:: clustering.metrics
+.. currentmodule:: pycrostates.clustering
 
 .. automodule:: pycrostates.clustering
    :no-members:

@@ -28,4 +28,5 @@ This is the reference for classes (``CamelCase`` names) and functions
     clustering
     preprocessing
     segmentation
+    metrics
     viz

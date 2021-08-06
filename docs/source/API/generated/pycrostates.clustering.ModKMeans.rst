@@ -4,31 +4,10 @@
 .. currentmodule:: pycrostates.clustering
 
 .. autoclass:: ModKMeans
+   :special-members: __contains__,__getitem__,__iter__,__len__,__add__,__sub__,__mul__,__div__,__neg__,__hash__
+   :members:
 
-   
-   .. automethod:: __init__
+.. _sphx_glr_backreferences_pycrostates.clustering.ModKMeans:
 
-   
-   .. rubric:: Methods
-
-   .. autosummary::
-   
-      ~ModKMeans.__init__
-      ~ModKMeans.copy
-      ~ModKMeans.fit
-      ~ModKMeans.get_cluster_centers
-      ~ModKMeans.get_cluster_centers_as_raw
-      ~ModKMeans.get_param
-      ~ModKMeans.invert_polarity
-      ~ModKMeans.plot
-      ~ModKMeans.predict
-      ~ModKMeans.rename_clusters
-      ~ModKMeans.reorder
-      ~ModKMeans.set_params
-      ~ModKMeans.smart_reorder
-   
-   
-
-   
-   
-   
+.. minigallery:: pycrostates.clustering.ModKMeans
+    :add-heading:

@@ -1,3 +1,6 @@
+Overview
+========
+
 An open-source Python package for analyzing EEG microstates developed to work with `MNE-python <https://mne.tools/stable/index.html>`_.
 
 .. image:: _static/img/FBMLAB_logo.png

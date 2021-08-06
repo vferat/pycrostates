@@ -20,7 +20,7 @@ from mne.utils import _validate_type, logger, verbose, warn, fill_doc, check_ran
 from mne.io.pick import _picks_to_idx, pick_info
 
 from ..utils import _corr_vectors, check_ch_names
-from ..segmentation import RawSegmentation, EpochsSegmentation, EvokedSegmentation
+from ..segmentation import RawSegmentation, EpochsSegmentation
 from ..preprocessing import _extract_gfps
 
 @verbose

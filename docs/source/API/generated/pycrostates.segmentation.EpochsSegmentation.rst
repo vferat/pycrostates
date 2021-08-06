@@ -4,21 +4,10 @@
 .. currentmodule:: pycrostates.segmentation
 
 .. autoclass:: EpochsSegmentation
+   :special-members: __contains__,__getitem__,__iter__,__len__,__add__,__sub__,__mul__,__div__,__neg__,__hash__
+   :members:
 
-   
-   .. automethod:: __init__
+.. _sphx_glr_backreferences_pycrostates.segmentation.EpochsSegmentation:
 
-   
-   .. rubric:: Methods
-
-   .. autosummary::
-   
-      ~EpochsSegmentation.__init__
-      ~EpochsSegmentation.compute_metrics
-      ~EpochsSegmentation.plot_cluster_centers
-   
-   
-
-   
-   
-   
+.. minigallery:: pycrostates.segmentation.EpochsSegmentation
+    :add-heading:
