@@ -15,19 +15,6 @@ Below is a gallery of examples
 
 
 
-.. _sphx_glr_auto_tutorials_backfitting:
-
-Backfitting & Segmentation
-==========================
-
-Backfitting and segmentation tutorials
-
-.. raw:: html
-
-    <div class="sphx-glr-clear"></div>
-
-
-
 .. _sphx_glr_auto_tutorials_clustering:
 
 Clustering
@@ -98,6 +85,19 @@ Clustering tutorials
    :hidden:
 
    /auto_tutorials/clustering/plot_Single_subject_resampling
+.. raw:: html
+
+    <div class="sphx-glr-clear"></div>
+
+
+
+.. _sphx_glr_auto_tutorials_backfitting:
+
+Backfitting & Segmentation
+==========================
+
+Backfitting and segmentation tutorials
+
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

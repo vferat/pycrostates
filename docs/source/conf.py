@@ -13,6 +13,8 @@
 import os
 import sys
 import pydata_sphinx_theme
+from sphinx_gallery.sorting import ExplicitOrder
+
 curdir = os.path.dirname(__file__)
 
 
@@ -66,6 +68,9 @@ autodoc_default_options = {'inherited-members': None}
 sphinx_gallery_conf = {
      'examples_dirs': os.path.abspath(os.path.join(curdir, '..', '..', 'tutorials')),   # path to example scripts
      'gallery_dirs': 'auto_tutorials',  # path to where to save gallery generated output
+     'subsection_order': ExplicitOrder(['../../tutorials/clustering',
+                                       '../../tutorials/backfitting',
+                                       '../../tutorials/group_level_analysis']),
      'reference_url': {
          # The module you locally document uses None
         'pycrostates': None,
@@ -85,6 +90,7 @@ intersphinx_mapping = {
     'mne': ('https://mne.tools/stable/', None),
     'joblib': ('https://joblib.readthedocs.io/en/latest', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+    'sklearn': ('https://scikit-learn.org/stable/', None)
 }
 
 # Add any paths that contain templates here, relative to this directory.
