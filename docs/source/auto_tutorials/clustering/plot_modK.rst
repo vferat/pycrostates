@@ -115,8 +115,8 @@ Note that, depending on your setup, you can change ``n_jobs=1`` in order to use 
 
     Fitting modified Kmeans with Raw data by selecting Gfppeaks with minimum distance of 0.32ms(2 samples)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                                                                                                                                                                                     |  : 0/100 [00:00<?,       ?it/s]      1%|#7                                                                                                                                                                               |  : 1/100 [00:00<00:24,    4.08it/s]      5%|########8                                                                                                                                                                        |  : 5/100 [00:03<00:26,    3.65it/s]     10%|#################6                                                                                                                                                              |  : 10/100 [00:03<00:23,    3.82it/s]     15%|##########################4                                                                                                                                                     |  : 15/100 [00:03<00:21,    4.01it/s]     20%|###################################2                                                                                                                                            |  : 20/100 [00:03<00:19,    4.21it/s]     25%|############################################                                                                                                                                    |  : 25/100 [00:03<00:17,    4.40it/s]     30%|####################################################8                                                                                                                           |  : 30/100 [00:04<00:15,    4.61it/s]     40%|######################################################################4                                                                                                         |  : 40/100 [00:04<00:12,    4.83it/s]     60%|#########################################################################################################6                                                                      |  : 60/100 [00:04<00:07,    5.06it/s]     80%|############################################################################################################################################8                                   |  : 80/100 [00:05<00:03,    5.30it/s]    100%|###############################################################################################################################################################################|  : 100/100 [00:05<00:00,    5.53it/s]    100%|###############################################################################################################################################################################|  : 100/100 [00:05<00:00,   17.76it/s]
-    Selecting run with highest GEV = 0.6871907944811648%.
+      0%|                            |  : 0/100 [00:00<?,       ?it/s]      5%|#2                      |  : 5/100 [00:00<00:01,   76.93it/s]     15%|###4                   |  : 15/100 [00:00<00:01,   76.69it/s]     35%|########               |  : 35/100 [00:00<00:00,   75.29it/s]     55%|############6          |  : 55/100 [00:01<00:00,   72.85it/s]     75%|#################2     |  : 75/100 [00:01<00:00,   69.40it/s]     95%|#####################8 |  : 95/100 [00:02<00:00,   67.24it/s]    100%|######################|  : 100/100 [00:02<00:00,   49.36it/s]
+    Selecting run with highest GEV = 0.687190794481165%.
 
     ()
 
@@ -149,10 +149,10 @@ the topographies.
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DB939E4860>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DB928C74E0>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DB939CE128>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DB938E8240>],
+    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB48EE688>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB5DDFA08>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB5E0E488>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB5E5BE48>],
           dtype=object))
 
 
@@ -323,10 +323,10 @@ Clusters centers can be reordered using :meth:`ModK.reorder`:
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DB93F760B8>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DB940DD320>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DB9410B8D0>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DB9413DE80>],
+    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB64E66C8>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB66A64C8>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB66DC608>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB6714808>],
           dtype=object))
 
 
@@ -357,10 +357,10 @@ and renamed using :meth:`ModK.rename`:
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DB93F79E48>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DB943A2198>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DB943D4748>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DB94404CF8>],
+    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB6732208>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB6981548>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB69B9688>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB69F2888>],
           dtype=object))
 
 
@@ -392,10 +392,10 @@ this has not effect during backfitting as polarities are ignored.
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DB949F8CC0>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DB94A2AFD0>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DB94BA35C0>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DB94BD5B70>],
+    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB6AAEC08>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB6B28948>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB717EA88>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB71B7C88>],
           dtype=object))
 
 
@@ -432,14 +432,14 @@ Should have little impact for raw, but can be important when working with epochs
     Segmenting data with factor 10 and effective smoothing window size : 0.38125 (ms)
     Rejecting first and last segment
 
-    (<Figure size 1000x400 with 2 Axes>, [<matplotlib.lines.Line2D object at 0x000001DB957F3F28>])
+    (<Figure size 1000x400 with 2 Axes>, [<matplotlib.lines.Line2D object at 0x000001DAB7DCD888>])
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.781 seconds)
+   **Total running time of the script:** ( 0 minutes  3.213 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_clustering_plot_modK.py:

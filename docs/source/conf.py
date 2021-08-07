@@ -126,7 +126,7 @@ def append_attr_meth_examples(app, what, name, obj, options, lines):
     # Eventually this could perhaps live in SG.
     if what in ('attribute', 'method'):
         size = os.path.getsize(os.path.join(
-            os.path.dirname(__file__), 'generated', '%s.examples' % (name,)))
+            os.path.dirname(__file__), 'generated', 'backreferences', '%s.examples' % (name,)))
         if size > 0:
             lines += """
 .. _sphx_glr_backreferences_{1}:
