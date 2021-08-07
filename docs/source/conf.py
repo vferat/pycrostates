@@ -49,18 +49,9 @@ extensions = [
 master_doc = 'index'
 
 # pygments style
-pygments_style = 'sphinx'
+pygments_style = 'default'
 
-# numpy doc
-numpydoc_class_members_toctree = False
-numpydoc_attributes_as_param_list = True
-numpydoc_xref_param_type = True
-
-# sphinx m2r
-#source_suffix = ['.rst', '.md']
-
-# sphinx autosummary
-# autodoc / autosummary
+# autosummary
 autosummary_generate = True
 autodoc_default_options = {'inherited-members': None}
 
@@ -139,6 +130,11 @@ def append_attr_meth_examples(app, what, name, obj, options, lines):
 .. rubric:: Examples using ``{0}``:
 .. minigallery:: {1}
 """.format(name.split('.')[-1], name).split('\n')
+
+# numpy doc
+numpydoc_class_members_toctree = False
+numpydoc_attributes_as_param_list = False
+numpydoc_xref_param_type = True
 
 # -- Auto-convert markdown pages to demo --------------------------------------
 from recommonmark.transform import AutoStructify
