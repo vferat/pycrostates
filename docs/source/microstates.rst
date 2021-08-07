@@ -6,12 +6,9 @@ Microstates
 What is EEG microstates ?
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-EEG microstates is a  method for characterizing multichannel electroencephalography (EEG). 
-This method involves the examination of electrical microstates in the brain, 
-which are defined as successive short time periods during which the configuratio
-of the scalp potential field remains semi-stable, suggesting quasi-simultaneity of activity among the nodes of large-scale networks
-A few prototypic microstates, which occur in a repetitive sequence across time, can be reliably identified across participants. 
-Researchers have proposed that these microstates represent the basic building blocks of the chain of spontaneous conscious mental processes, and that their occurrence and temporal dynamics determine the quality of mentation. Several studies have further demonstrated that disturbances of mental processes associated with neurological and psychiatric conditions manifest as changes in the temporal dynamics of specific microstates. Combined EEG-fMRI studies and EEG source imaging studies have indicated that EEG microstates are closely associated with resting-state networks as identified using fMRI. The scale-free properties of the time series of EEG microstates explain why similar networks can be observed at such different time scales. The present review will provide an overview of these EEG microstates, available methods for analysis, the functional interpretations of findings regarding these microstates, and their behavioral and clinical correlates.
+Microstates analysis is a method allowing investigation of spatiotemporal characteristics of EEG recordings. 
+It consists in breaking down the multichannel EEG signal into a succession of quasi-stable state, each state being
+characterized by a spatial distribution of its scalp potentials also called microstate map or microstate topography.
 
 .. sidebar:: Looking for more information?
 
@@ -19,9 +16,26 @@ Researchers have proposed that these microstates represent the basic building bl
 
 How to compute EEG microstates ?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+This decomposition is based on two consecutive steps: the clustering which allows to define topographies that best represent the studied data
+and the backfitting than consist on assigning each timepoint of one or several EEG recordings to the previously extracted topographies.
+
+The methods relies on assigning timepoints to the most similar microstate map, that is why it is important to define how distance between two topographies is computed.
+For microstate analysis, it is the inverse of the absolute value of the spatial correlation that is used as a measure of distance to carry out all computations.
+The absolute value is used in order to ignore topography polarities of the topographies, as state can oscillate in a given configuration (i.e topography).
+
+Pycrostates implements a conveniente class :class:`pycrostates.clustering.ModKMeans` 
+allowing to perform clustering through the :meth:`pycrostates.clustering.ModKMeans.fit` method
+and backfitting throught the :meth:`pycrostates.clustering.ModKMeans.predict` method.
+It also implements other methods to facilitate the analysis and display of results.
 
 How to choose the number of clusters ?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+How many maps should I use for my analysis? 4, 5, 7 or 12? This question comes up many times in the scientific debate.
+While some software lets the user choose a predefined number, others rely on metacriterion calculations to choose that number for you.
+Pycrostates will not calculate this number for you, as there is currently no reliable method to determine it. 
+However, it offers several metrics to assess the clustering quality that could gives indications on which number of clusters is the most appropriate.
+These measures are grouped together in the  :mod:`pycrostates.metrics` module.
 
 
 The canonical maps
