@@ -11,4 +11,9 @@ Metrics
 
 .. autosummary::
    :toctree: generated/
+   
+   silhouette
+   davies_bouldin
+   calinski_harabasz
+   dunn
 

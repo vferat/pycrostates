@@ -1,3 +1,3 @@
-from .metrics import compute_metrics_data, silhouette, davies_bouldin, calinski_harabasz, dunn
+from .metrics import silhouette, davies_bouldin, calinski_harabasz, dunn
 
-__all__ = ('compute_metrics_data', 'silhouette', 'davies_bouldin', 'dunn', 'calinski_harabasz')
+__all__ = ('silhouette', 'davies_bouldin', 'dunn', 'calinski_harabasz')

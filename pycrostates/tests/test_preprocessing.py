@@ -8,8 +8,6 @@ from pycrostates.preprocessing import resample, extract_gfp_peaks
 data_path = testing.data_path()
 fname_raw_testing = op.join(data_path, 'MEG', 'sample',
                             'sample_audvis_trunc_raw.fif')
-fname_evoked_testing = op.join(data_path, 'MEG', 'sample',
-                               'sample_audvis-ave.fif')
 
 def test_resample_raw_replace():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)

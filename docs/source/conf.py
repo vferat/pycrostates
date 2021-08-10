@@ -17,13 +17,11 @@ from sphinx_gallery.sorting import ExplicitOrder
 
 curdir = os.path.dirname(__file__)
 
-
 # -- Project information -----------------------------------------------------
 
 project = 'pycrostates'
 copyright = '2021, Victor Férat'
 author = 'Victor Férat'
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -51,9 +49,29 @@ master_doc = 'index'
 # pygments style
 pygments_style = 'default'
 
+# A list of ignored prefixes for module index sorting.
+modindex_common_prefix = ['pycrostates.']
+
 # autosummary
 autosummary_generate = True
 autodoc_default_options = {'inherited-members': None}
+
+# intersphinx_mapping
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'numpy': ('https://numpy.org/devdocs', None),
+    'scipy': ('https://scipy.github.io/devdocs', None),
+    'matplotlib': ('https://matplotlib.org', None),
+    'mne': ('https://mne.tools/stable/', None),
+    'joblib': ('https://joblib.readthedocs.io/en/latest', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+    'sklearn': ('https://scikit-learn.org/stable/', None)
+}
+
+# numpy doc
+numpydoc_class_members_toctree = False
+numpydoc_attributes_as_param_list = True
+numpydoc_xref_param_type = True
 
 # sphinx_gallery_conf
 sphinx_gallery_conf = {
@@ -67,21 +85,9 @@ sphinx_gallery_conf = {
         'pycrostates': None,
      },
      'backreferences_dir'  : 'generated/backreferences',
-     'doc_module': ('pycrostates',)
+     'doc_module': ('pycrostates',),
 
 
-}
-
-# intersphinx_mapping
-intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
-    'numpy': ('https://numpy.org/devdocs', None),
-    'scipy': ('https://scipy.github.io/devdocs', None),
-    'matplotlib': ('https://matplotlib.org', None),
-    'mne': ('https://mne.tools/stable/', None),
-    'joblib': ('https://joblib.readthedocs.io/en/latest', None),
-    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
-    'sklearn': ('https://scikit-learn.org/stable/', None)
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -131,10 +137,7 @@ def append_attr_meth_examples(app, what, name, obj, options, lines):
 .. minigallery:: {1}
 """.format(name.split('.')[-1], name).split('\n')
 
-# numpy doc
-numpydoc_class_members_toctree = False
-numpydoc_attributes_as_param_list = False
-numpydoc_xref_param_type = True
+
 
 # -- Auto-convert markdown pages to demo --------------------------------------
 from recommonmark.transform import AutoStructify

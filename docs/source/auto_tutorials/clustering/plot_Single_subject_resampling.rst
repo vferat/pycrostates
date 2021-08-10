@@ -58,7 +58,7 @@ This example demonstrates how to segment a single subject recording into microst
 
  .. code-block:: none
 
-    Extracting EDF parameters from C:\Users\Victor\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R01.edf...
+    Extracting EDF parameters from C:\Users\ferat\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R01.edf...
     EDF file detected
     Setting channel info structure...
     Creating raw.info structure...
@@ -67,9 +67,72 @@ This example demonstrates how to segment a single subject recording into microst
     Applying average reference.
     Applying a custom EEG reference.
 
-    <RawEDF | S001R01.edf, 64 x 9760 (61.0 s), ~4.9 MB, data loaded>
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
 
 
+    <table class="table table-hover">
+        <tr>
+            <th>Measurement date</th>
+            <td>August 12, 2009  16:15:00 GMT</td>
+        
+        </tr>
+        <tr>
+            <th>Experimenter</th>
+    <td>Unknown</td>
+        </tr>
+            <th>Participant</th>
+    <td>Unknown</td>
+        </tr>
+        <tr>
+            <th>Digitized points</th>
+            <td>67 points</td>
+        </tr>
+        <tr>
+            <th>Good channels</th>
+            <td>0 magnetometer, 0 gradiometer,
+                and 64 EEG channels</td>
+        </tr>
+        <tr>
+            <th>Bad channels</th>
+            <td></td>
+        
+        </tr>
+        <tr>
+            <th>EOG channels</th>
+            <td>Not available</td>
+        </tr>
+        <tr>
+            <th>ECG channels</th>
+            <td>Not available</td>
+        <tr>
+            <th>Sampling frequency</th>
+            <td>160.00 Hz</td>
+        </tr>
+        <tr>
+            <th>Highpass</th>
+            <td>0.00 Hz</td>
+        </tr>
+         <tr>
+            <th>Lowpass</th>
+            <td>80.00 Hz</td>
+        </tr>
+
+        <tr>
+            <th>Filenames</th>
+            <td>S001R01.edf</td>
+        </tr>
+        <tr>
+            <th>Duration</th>
+            <td>00:01:00 (HH:MM:SS)</td>
+        </tr>
+    </table>
+
+    </div>
+    <br />
+    <br />
 
 .. GENERATED FROM PYTHON SOURCE LINES 29-30
 
@@ -153,70 +216,70 @@ Compute Kmeans clustering on each sample independently
 
     Fitting modified Kmeans with Raw data (no gfp peaks extraction)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]     35%|########               |  : 35/100 [00:00<00:00, 1346.98it/s]     75%|#################2     |  : 75/100 [00:00<00:00, 1366.99it/s]    100%|######################|  : 100/100 [00:00<00:00, 2083.95it/s]
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]     15%|########################3                                                                                                                                         |  : 15/100 [00:00<00:00,  789.32it/s]     35%|########################################################7                                                                                                         |  : 35/100 [00:00<00:00,  796.13it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:00<00:00,  807.58it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:00<00:00, 1315.77it/s]
     Selecting run with highest GEV = 0.5701889117803374%.
     Creating RawArray with float64 data, n_channels=64, n_times=4
         Range : 0 ... 3 =      0.000 ...     0.019 secs
     Ready.
     Fitting modified Kmeans with Raw data (no gfp peaks extraction)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]     35%|########               |  : 35/100 [00:00<00:00, 1460.73it/s]     75%|#################2     |  : 75/100 [00:00<00:00, 1477.96it/s]    100%|######################|  : 100/100 [00:00<00:00, 2175.77it/s]
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]     15%|########################3                                                                                                                                         |  : 15/100 [00:00<00:00,  937.27it/s]     35%|########################################################7                                                                                                         |  : 35/100 [00:00<00:00,  944.66it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:00<00:00,  957.01it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:00<00:00, 1505.60it/s]
     Selecting run with highest GEV = 0.5708661103709326%.
     Creating RawArray with float64 data, n_channels=64, n_times=4
         Range : 0 ... 3 =      0.000 ...     0.019 secs
     Ready.
     Fitting modified Kmeans with Raw data (no gfp peaks extraction)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]     35%|########               |  : 35/100 [00:00<00:00, 1346.10it/s]     75%|#################2     |  : 75/100 [00:00<00:00, 1361.49it/s]    100%|######################|  : 100/100 [00:00<00:00, 1999.94it/s]
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]     15%|########################3                                                                                                                                         |  : 15/100 [00:00<00:00,  882.17it/s]     35%|########################################################7                                                                                                         |  : 35/100 [00:00<00:00,  881.53it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:00<00:00,  889.74it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:00<00:00, 1282.01it/s]
     Selecting run with highest GEV = 0.569301995794834%.
     Creating RawArray with float64 data, n_channels=64, n_times=4
         Range : 0 ... 3 =      0.000 ...     0.019 secs
     Ready.
     Fitting modified Kmeans with Raw data (no gfp peaks extraction)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]     15%|###4                   |  : 15/100 [00:00<00:00,  937.48it/s]     35%|########               |  : 35/100 [00:00<00:00,  947.10it/s]     75%|#################2     |  : 75/100 [00:00<00:00,  959.87it/s]    100%|######################|  : 100/100 [00:00<00:00, 1562.44it/s]
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]     15%|########################3                                                                                                                                         |  : 15/100 [00:00<00:00,  750.00it/s]     35%|########################################################7                                                                                                         |  : 35/100 [00:00<00:00,  762.39it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:00<00:00,  779.83it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:00<00:00, 1492.55it/s]
     Selecting run with highest GEV = 0.5437923533317937%.
     Creating RawArray with float64 data, n_channels=64, n_times=4
         Range : 0 ... 3 =      0.000 ...     0.019 secs
     Ready.
     Fitting modified Kmeans with Raw data (no gfp peaks extraction)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]     15%|###4                   |  : 15/100 [00:00<00:00,  882.14it/s]     75%|#################2     |  : 75/100 [00:00<00:00,  902.73it/s]    100%|######################|  : 100/100 [00:00<00:00, 1818.10it/s]
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]     15%|########################3                                                                                                                                         |  : 15/100 [00:00<00:00,  789.49it/s]     35%|########################################################7                                                                                                         |  : 35/100 [00:00<00:00,  793.14it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:00<00:00,  800.63it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:00<00:00, 1204.80it/s]
     Selecting run with highest GEV = 0.5995407388399374%.
     Creating RawArray with float64 data, n_channels=64, n_times=4
         Range : 0 ... 3 =      0.000 ...     0.019 secs
     Ready.
     Fitting modified Kmeans with Raw data (no gfp peaks extraction)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]     35%|########               |  : 35/100 [00:00<00:00, 1345.93it/s]     75%|#################2     |  : 75/100 [00:00<00:00, 1352.12it/s]    100%|######################|  : 100/100 [00:00<00:00, 1851.70it/s]
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]     35%|########################################################7                                                                                                         |  : 35/100 [00:00<00:00, 1018.13it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:00<00:00, 1015.91it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:00<00:00, 1326.64it/s]
     Selecting run with highest GEV = 0.5591831516326542%.
     Creating RawArray with float64 data, n_channels=64, n_times=4
         Range : 0 ... 3 =      0.000 ...     0.019 secs
     Ready.
     Fitting modified Kmeans with Raw data (no gfp peaks extraction)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]     35%|########               |  : 35/100 [00:00<00:00, 1249.87it/s]     75%|#################2     |  : 75/100 [00:00<00:00, 1261.71it/s]    100%|######################|  : 100/100 [00:00<00:00, 1818.06it/s]
-    Selecting run with highest GEV = 0.5859598249378358%.
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]     15%|########################3                                                                                                                                         |  : 15/100 [00:00<00:00,  789.37it/s]     35%|########################################################7                                                                                                         |  : 35/100 [00:00<00:00,  793.03it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:00<00:00,  807.80it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:00<00:00, 1351.37it/s]
+    Selecting run with highest GEV = 0.5859598249378356%.
     Creating RawArray with float64 data, n_channels=64, n_times=4
         Range : 0 ... 3 =      0.000 ...     0.019 secs
     Ready.
     Fitting modified Kmeans with Raw data (no gfp peaks extraction)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]     35%|########               |  : 35/100 [00:00<00:00, 1521.50it/s]     75%|#################2     |  : 75/100 [00:00<00:00, 1531.09it/s]    100%|######################|  : 100/100 [00:00<00:00, 2173.88it/s]
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]     15%|########################3                                                                                                                                         |  : 15/100 [00:00<00:00,  937.30it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:00<00:00,  947.68it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:00<00:00, 1492.49it/s]
     Selecting run with highest GEV = 0.6125000828482083%.
     Creating RawArray with float64 data, n_channels=64, n_times=4
         Range : 0 ... 3 =      0.000 ...     0.019 secs
     Ready.
     Fitting modified Kmeans with Raw data (no gfp peaks extraction)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]     35%|########               |  : 35/100 [00:00<00:00, 1591.02it/s]     75%|#################2     |  : 75/100 [00:00<00:00, 1594.64it/s]    100%|######################|  : 100/100 [00:00<00:00, 2173.98it/s]
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]     15%|########################3                                                                                                                                         |  : 15/100 [00:00<00:00,  937.50it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:00<00:00,  947.12it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:00<00:00, 1492.52it/s]
     Selecting run with highest GEV = 0.5913763205039173%.
     Creating RawArray with float64 data, n_channels=64, n_times=4
         Range : 0 ... 3 =      0.000 ...     0.019 secs
     Ready.
     Fitting modified Kmeans with Raw data (no gfp peaks extraction)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]     35%|########               |  : 35/100 [00:00<00:00, 1296.12it/s]     75%|#################2     |  : 75/100 [00:00<00:00, 1304.28it/s]    100%|######################|  : 100/100 [00:00<00:00, 1851.81it/s]
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]     15%|########################3                                                                                                                                         |  : 15/100 [00:00<00:00,  882.31it/s]     35%|########################################################7                                                                                                         |  : 35/100 [00:00<00:00,  889.50it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:00<00:00,  903.53it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:00<00:00, 1492.50it/s]
     Selecting run with highest GEV = 0.6025925895095914%.
     Creating RawArray with float64 data, n_channels=64, n_times=4
         Range : 0 ... 3 =      0.000 ...     0.019 secs
@@ -252,21 +315,20 @@ Then compute Kmeans clustering on the concatenated results
 
     Fitting modified Kmeans with Raw data (no gfp peaks extraction)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]     35%|########               |  : 35/100 [00:00<00:00, 1666.45it/s]     75%|#################2     |  : 75/100 [00:00<00:00, 1691.12it/s]    100%|######################|  : 100/100 [00:00<00:00, 2563.83it/s]
-    Selecting run with highest GEV = 0.9084760384571735%.
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]     35%|########################################################7                                                                                                         |  : 35/100 [00:00<00:00, 1590.97it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:00<00:00, 1607.41it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:00<00:00, 2380.95it/s]
+    Selecting run with highest GEV = 0.9084760384571737%.
 
-    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB5F95B08>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB5EAE508>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB7E416C8>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB6ADA248>],
-          dtype=object))
+    (<Figure size 640x480 with 4 Axes>, array([<AxesSubplot:title={'center':'1'}>,
+           <AxesSubplot:title={'center':'2'}>,
+           <AxesSubplot:title={'center':'3'}>,
+           <AxesSubplot:title={'center':'4'}>], dtype=object))
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.275 seconds)
+   **Total running time of the script:** ( 0 minutes  1.742 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_clustering_plot_Single_subject_resampling.py:

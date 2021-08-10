@@ -56,7 +56,7 @@ This example demonstrates how to extract global field power (gfp) peaks.
 
  .. code-block:: none
 
-    Extracting EDF parameters from C:\Users\Victor\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R01.edf...
+    Extracting EDF parameters from C:\Users\ferat\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R01.edf...
     EDF file detected
     Setting channel info structure...
     Creating raw.info structure...
@@ -65,9 +65,72 @@ This example demonstrates how to extract global field power (gfp) peaks.
     Applying average reference.
     Applying a custom EEG reference.
 
-    <RawEDF | S001R01.edf, 64 x 9760 (61.0 s), ~4.9 MB, data loaded>
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
 
 
+    <table class="table table-hover">
+        <tr>
+            <th>Measurement date</th>
+            <td>August 12, 2009  16:15:00 GMT</td>
+        
+        </tr>
+        <tr>
+            <th>Experimenter</th>
+    <td>Unknown</td>
+        </tr>
+            <th>Participant</th>
+    <td>Unknown</td>
+        </tr>
+        <tr>
+            <th>Digitized points</th>
+            <td>67 points</td>
+        </tr>
+        <tr>
+            <th>Good channels</th>
+            <td>0 magnetometer, 0 gradiometer,
+                and 64 EEG channels</td>
+        </tr>
+        <tr>
+            <th>Bad channels</th>
+            <td></td>
+        
+        </tr>
+        <tr>
+            <th>EOG channels</th>
+            <td>Not available</td>
+        </tr>
+        <tr>
+            <th>ECG channels</th>
+            <td>Not available</td>
+        <tr>
+            <th>Sampling frequency</th>
+            <td>160.00 Hz</td>
+        </tr>
+        <tr>
+            <th>Highpass</th>
+            <td>0.00 Hz</td>
+        </tr>
+         <tr>
+            <th>Lowpass</th>
+            <td>80.00 Hz</td>
+        </tr>
+
+        <tr>
+            <th>Filenames</th>
+            <td>S001R01.edf</td>
+        </tr>
+        <tr>
+            <th>Duration</th>
+            <td>00:01:00 (HH:MM:SS)</td>
+        </tr>
+    </table>
+
+    </div>
+    <br />
+    <br />
 
 .. GENERATED FROM PYTHON SOURCE LINES 27-29
 
@@ -127,14 +190,13 @@ to avoid performing GFP extraction on your already extracted gfp peaks.
 
     Fitting modified Kmeans with Raw data (no gfp peaks extraction)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]      5%|#2                      |  : 5/100 [00:03<01:06,    1.43it/s]     10%|##3                    |  : 10/100 [00:03<01:00,    1.50it/s]     15%|###4                   |  : 15/100 [00:03<00:53,    1.58it/s]     20%|####6                  |  : 20/100 [00:03<00:48,    1.66it/s]     25%|#####7                 |  : 25/100 [00:03<00:43,    1.74it/s]     35%|########               |  : 35/100 [00:03<00:35,    1.83it/s]     55%|############6          |  : 55/100 [00:04<00:23,    1.92it/s]     75%|#################2     |  : 75/100 [00:04<00:12,    2.02it/s]     95%|#####################8 |  : 95/100 [00:04<00:02,    2.13it/s]    100%|######################|  : 100/100 [00:04<00:00,   20.91it/s]
-    Selecting run with highest GEV = 0.6958127753558347%.
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]      5%|########1                                                                                                                                                          |  : 5/100 [00:02<00:56,    1.68it/s]     10%|################2                                                                                                                                                 |  : 10/100 [00:03<00:51,    1.76it/s]     15%|########################3                                                                                                                                         |  : 15/100 [00:03<00:45,    1.85it/s]     20%|################################4                                                                                                                                 |  : 20/100 [00:03<00:41,    1.94it/s]     25%|########################################5                                                                                                                         |  : 25/100 [00:03<00:36,    2.04it/s]     30%|################################################6                                                                                                                 |  : 30/100 [00:03<00:32,    2.14it/s]     40%|################################################################8                                                                                                 |  : 40/100 [00:03<00:26,    2.25it/s]     60%|#################################################################################################2                                                                |  : 60/100 [00:04<00:16,    2.37it/s]     80%|#################################################################################################################################6                                |  : 80/100 [00:04<00:08,    2.48it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:04<00:00,    2.61it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:04<00:00,   20.02it/s]
+    Selecting run with highest GEV = 0.6958127753558345%.
 
-    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB5E194C8>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB5E6C188>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB5EA3788>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB5EDB448>],
-          dtype=object))
+    (<Figure size 640x480 with 4 Axes>, array([<AxesSubplot:title={'center':'1'}>,
+           <AxesSubplot:title={'center':'2'}>,
+           <AxesSubplot:title={'center':'3'}>,
+           <AxesSubplot:title={'center':'4'}>], dtype=object))
 
 
 
@@ -165,21 +227,20 @@ or directly extract gfp peaks during the fitting using the min_peak_distance par
 
     Fitting modified Kmeans with Raw data by selecting Gfppeaks with minimum distance of 0.48ms(3 samples)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]      5%|#2                      |  : 5/100 [00:00<00:01,   71.41it/s]     15%|###4                   |  : 15/100 [00:00<00:01,   71.05it/s]     35%|########               |  : 35/100 [00:00<00:00,   72.28it/s]     75%|#################2     |  : 75/100 [00:00<00:00,   72.08it/s]    100%|######################|  : 100/100 [00:00<00:00,  100.50it/s]
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]      5%|########1                                                                                                                                                          |  : 5/100 [00:00<00:01,   64.48it/s]     15%|########################3                                                                                                                                         |  : 15/100 [00:00<00:01,   64.06it/s]     35%|########################################################7                                                                                                         |  : 35/100 [00:00<00:00,   65.00it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:01<00:00,   64.93it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:01<00:00,   90.64it/s]
     Selecting run with highest GEV = 0.6958127753558344%.
 
-    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB6643B08>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB666D548>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB6195188>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB61C9DC8>],
-          dtype=object))
+    (<Figure size 640x480 with 4 Axes>, array([<AxesSubplot:title={'center':'1'}>,
+           <AxesSubplot:title={'center':'2'}>,
+           <AxesSubplot:title={'center':'3'}>,
+           <AxesSubplot:title={'center':'4'}>], dtype=object))
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.751 seconds)
+   **Total running time of the script:** ( 0 minutes  8.211 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_clustering_plot_extract_gfp_peaks.py:

@@ -7,120 +7,53 @@ from sklearn.metrics.cluster._unsupervised import check_number_of_labels
 from sklearn.preprocessing import LabelEncoder
 from ..utils import _corr_vectors
 
-def compute_metrics_data(segmentation, data, maps, maps_names, sfreq, norm_gfp=True):
-    """Compute microstate metrics.
 
-    Compute the following micorstates metrics:
-    'dist_corr': Distribution of correlations
-                 Correlation values of each time point assigned to a given state.
-    'mean_corr': Mean correlation
-                Mean correlation value of each time point assigned to a given state.
-    'dist_gev': Distribution of global explained variances
-                Global explained variance values of each time point assigned to a given state.
-    'gev':  Global explained variance
-            Total explained variance expressed by a given state. It is the sum of global explained
-            variance values of each time point assigned to a given state.
-    'timecov': Time coverage
-               The proportion of time during which a given state is active. This metric is expressed in percentage (%%).
-    'dist_durs': Distribution of durations.
-                 Duration of each segments assigned to a given state. Each value is expressed in seconds (s).
-    'meandurs': Mean duration
-                Mean temporal duration segments assigned to a given state. This metric is expressed in seconds (s).
-    'occurences' : Occurences
-                Mean number of segment assigned to a given state per second. This metrics is expressed in segment per second ( . / s).
-
-    Parameters
-    ----------
-    inst : :class:`mne.io.BaseRaw`, :class:`mne.Evoked`, list
-        Instance or list of instances containing data to predict.
-    modK : :class:`BaseClustering`
-        Modified K-Means Clustering algorithm use to segment data
-    norm_gfp : bool
-        Either or not to normalize globalfield power.
-    half_window_size: int
-        Number of samples used for the half windows size while smoothing labels.
-        Window size = 2 * half_window_size + 1
-    factor: int
-        Factor used for label smoothing. 0 means no smoothing.
-        Defaults to 0.
-    crit: float
-        Converge criterion. Default to 10e-6.
-
-    %(reject_by_annotation_raw)s
-    %(verbose)s
-
-    Returns
-    ----------
-    dict : list of dic
-        Dictionaries containing microstate metrics.
-    """
-    gfp = np.std(data, axis=0)
-    if norm_gfp:
-        gfp = gfp / np.linalg.norm(gfp)
-
-    gfp = np.std(data, axis=0)
-    segments = [(s, list(group)) for s,group in itertools.groupby(segmentation)]
-    d = {}
-    for s, state in enumerate(maps):
-        state_name = maps_names[s]
-        arg_where = np.argwhere(segmentation == s+1)
-        if len(arg_where) != 0:
-            labeled_tp = data.T[arg_where][:,0,:].T
-            labeled_gfp = gfp[arg_where][:,0]
-            state_array = np.array([state]*len(arg_where)).transpose()
-
-            corr = _corr_vectors(state_array, labeled_tp)
-            d[f'{state_name}_dist_corr'] = corr
-            d[f'{state_name}_mean_corr'] = np.mean(np.abs(corr))
-
-            gev = (labeled_gfp * corr) ** 2 / np.sum(gfp ** 2)
-            d[f'{state_name}_dist_gev'] = gev
-            d[f'{state_name}_gev'] = np.sum(gev)
-            
-            s_segments = np.array([len(group) for s_, group in segments if s_ == s+1])
-            occurence = len(s_segments) /len(segmentation) *  sfreq
-            d[f'{state_name}_occurences'] = occurence
-            
-            timecov = np.sum(s_segments) / len(np.where(segmentation != 0)[0])
-            d[f'{state_name}_timecov'] = timecov
-            
-            durs = s_segments / sfreq
-            d[f'{state_name}_dist_durs'] = durs
-            d[f'{state_name}_meandurs'] = np.mean(durs)
-        else:
-            d[f'{state_name}_dist_corr'] = 0
-            d[f'{state_name}_mean_corr'] = 0
-            d[f'{state_name}_dist_gev'] = 0
-            d[f'{state_name}_gev'] = 0
-            d[f'{state_name}_timecov'] = 0
-            d[f'{state_name}_dist_durs'] = 0
-            d[f'{state_name}_meandurs'] = 0
-            d[f'{state_name}_occurences'] = 0
-    d['unlabeled'] =  len(np.argwhere(segmentation == 0)) / len(gfp)
-    return(d)
-
-
-def distance_matrix(X, Y=None):
+def _distance_matrix(X, Y=None):
     distances = np.abs(1 / np.corrcoef(X, Y)) - 1
     distances = np.nan_to_num(distances, copy=False, nan=10e300, posinf=10e300, neginf=-10e300)
     return(distances)
 
 def silhouette(modK): #lower the best
+    """Compute the mean Silhouette Coefficient of a fitted clustering algorithm.
+    This function is a proxy function for :func:`sklearn.metrics.silhouette_score` that applies directly to a
+    fitted :class:´pycrostate.clustering.BaseClustering´. It uses the absolute spatial correlation for distance
+    computations.
+
+    Parameters
+    ----------
+    BaseClustering : :class:`pycrostate.clustering.BaseClustering`
+            Fitted clustering algorithm from which to compute score.
+
+    Returns
+    -------
+    silhouette : float
+        Mean Silhouette Coefficient.
+        
+    Notes
+    -----
+    For more details regarding the implementation, please refere to :func:`sklearn.metrics.silhouette_score`.
+    This proxy function uses metric="precomputed" with the absolute spatial correlation for distance
+    computations.
+        
+    References
+    ----------
+    .. [1] `Peter J. Rousseeuw (1987). "Silhouettes: a Graphical Aid to the
+       Interpretation and Validation of Cluster Analysis". Computational
+       and Applied Mathematics 20: 53-65.
+       <https://doi.org/10.1016/0377-0427(87)90125-7>`_
+    """
     modK._check_fit()
     data = modK.fitted_data_
     labels = modK.labels_
     keep = np.linalg.norm(data.T, axis=1) != 0
     data = data[:, keep]
     labels = labels[keep]
-    distances = distance_matrix(data.T)
+    distances = _distance_matrix(data.T)
     silhouette = silhouette_score(distances, labels, metric='precomputed')
     return(silhouette)
 
 
 def _davies_bouldin_score(X, labels):
-    """Computes the Davies-Bouldin score.
-    https://github.com/scikit-learn/scikit-learn/blob/2beed5584/sklearn/metrics/cluster/_unsupervised.py#L303
-    """
     X, labels = check_X_y(X, labels)
     le = LabelEncoder()
     labels = le.fit_transform(labels)
@@ -134,10 +67,10 @@ def _davies_bouldin_score(X, labels):
         cluster_k = _safe_indexing(X, labels == k)
         centroid = cluster_k.mean(axis=0)
         centroids[k] = centroid
-        intra_dists[k] = np.average(distance_matrix(
+        intra_dists[k] = np.average(_distance_matrix(
             cluster_k, [centroid]))
 
-    centroid_distances = distance_matrix(centroids)
+    centroid_distances = _distance_matrix(centroids)
 
     if np.allclose(intra_dists, 0) or np.allclose(centroid_distances, 0):
         return 0.0
@@ -148,6 +81,35 @@ def _davies_bouldin_score(X, labels):
     return np.mean(scores)
 
 def davies_bouldin(modK): # lower the best
+    """"Computes the Davies-Bouldin score.
+    This function is a proxy function for :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a
+    fitted :class:´pycrostate.clustering.BaseClustering´. It uses the absolute spatial correlation for distance
+    computations.
+
+    Parameters
+    ----------
+    BaseClustering : :class:`pycrostate.clustering.BaseClustering`
+            Fitted clustering algorithm from which to compute score.
+
+    Returns
+    -------
+    score : float
+        The resulting Davies-Bouldin score.
+        
+    Notes
+    -----
+    For more details regarding the implementation, please refere to :func:`sklearn.metrics.davies_bouldin_score`.
+    This function was modified in order to use the absolute spatial correlation for distance
+    computations instead of euclidean distance.
+        
+    References
+    ----------
+    .. [1] Davies, David L.; Bouldin, Donald W. (1979).
+       `"A Cluster Separation Measure"
+       <https://doi.org/10.1109/TPAMI.1979.4766909>`__.
+       IEEE Transactions on Pattern Analysis and Machine Intelligence.
+       PAMI-1 (2): 224-227
+    """
     modK._check_fit()
     data = modK.fitted_data_
     labels = modK.labels_
@@ -158,7 +120,31 @@ def davies_bouldin(modK): # lower the best
     return(davies_bouldin_score)
 
 
-def calinski_harabasz(modK): # lower the best
+def calinski_harabasz(modK): # lower the better
+    """"Compute the Calinski and Harabasz score.
+    This function is a proxy function for :func:`sklearn.metrics.calinski_harabasz_score` that applies directly to a
+    fitted :class:´pycrostate.clustering.BaseClustering´.
+
+    Parameters
+    ----------
+    BaseClustering : :class:´pycrostate.clustering.BaseClustering´
+            Fitted clustering algorithm from which to compute score.
+
+    Returns
+    -------
+    score : float
+        The resulting Davies-Bouldin score.
+        
+    Notes
+    -----
+    For more details regarding the implementation, please refere to :func:`sklearn.metrics.calinski_harabasz_score`.
+        
+    References
+    ----------
+    .. [1] `T. Calinski and J. Harabasz, 1974. "A dendrite method for cluster
+       analysis". Communications in Statistics
+       <https://doi.org/10.1080/03610927408827101>`_
+    """
     modK._check_fit()
     data = modK.fitted_data_
     labels = modK.labels_
@@ -178,10 +164,10 @@ def _big_delta_fast(ci, distances):
     values = distances[np.where(ci)][:, np.where(ci)]            
     return np.max(values)
 
-def _dunn_score(X, labels): #lower the best
-    """ Dunn index - FAST (using sklearn pairwise euclidean_distance function)
-    https://github.com/jqmviegas/jqm_cvi
-    
+def _dunn_score(X, labels): #lower the better
+    # based on https://github.com/jqmviegas/jqm_cvi
+    """"Compute the Dunn index.
+
     Parameters
     ----------
     X : np.array
@@ -189,7 +175,7 @@ def _dunn_score(X, labels): #lower the best
     labels: np.array
         np.array([N]) labels of all points
     """
-    distances = distance_matrix(X)
+    distances = _distance_matrix(X)
     ks = np.sort(np.unique(labels))
     
     deltas = np.ones([len(ks), len(ks)])*1000000
@@ -206,7 +192,30 @@ def _dunn_score(X, labels): #lower the best
     di = np.min(deltas)/np.max(big_deltas)
     return di
 
-def dunn(modK):
+def dunn(modK): #lower the better
+    """"Compute the Dunn index score.
+
+
+    Parameters
+    ----------
+    BaseClustering : :class:´pycrostate.clustering.BaseClustering´
+            Fitted clustering algorithm from which to compute score.
+
+    Returns
+    -------
+    score : float
+        The resulting Davies-Bouldin score.
+        
+    Notes
+    -----
+    This function uses the absolute spatial correlation for distance.
+        
+    References
+    ----------
+    .. [1] ` J. C. Dunn†, 1974. "Well-Separated Clusters and Optimal Fuzzy Partitions".
+        Journal of Cybernetics
+       <https://doi.org/10.1080/01969727408546059>`_
+    """
     modK._check_fit()
     data = modK.fitted_data_
     labels = modK.labels_

@@ -57,7 +57,7 @@ This tutorial introduces the :class:`pycrostates.clustering.ModKMeans` structure
 
  .. code-block:: none
 
-    Extracting EDF parameters from C:\Users\Victor\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R01.edf...
+    Extracting EDF parameters from C:\Users\ferat\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R01.edf...
     EDF file detected
     Setting channel info structure...
     Creating raw.info structure...
@@ -66,9 +66,72 @@ This tutorial introduces the :class:`pycrostates.clustering.ModKMeans` structure
     Applying average reference.
     Applying a custom EEG reference.
 
-    <RawEDF | S001R01.edf, 64 x 9760 (61.0 s), ~4.9 MB, data loaded>
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
 
 
+    <table class="table table-hover">
+        <tr>
+            <th>Measurement date</th>
+            <td>August 12, 2009  16:15:00 GMT</td>
+        
+        </tr>
+        <tr>
+            <th>Experimenter</th>
+    <td>Unknown</td>
+        </tr>
+            <th>Participant</th>
+    <td>Unknown</td>
+        </tr>
+        <tr>
+            <th>Digitized points</th>
+            <td>67 points</td>
+        </tr>
+        <tr>
+            <th>Good channels</th>
+            <td>0 magnetometer, 0 gradiometer,
+                and 64 EEG channels</td>
+        </tr>
+        <tr>
+            <th>Bad channels</th>
+            <td></td>
+        
+        </tr>
+        <tr>
+            <th>EOG channels</th>
+            <td>Not available</td>
+        </tr>
+        <tr>
+            <th>ECG channels</th>
+            <td>Not available</td>
+        <tr>
+            <th>Sampling frequency</th>
+            <td>160.00 Hz</td>
+        </tr>
+        <tr>
+            <th>Highpass</th>
+            <td>0.00 Hz</td>
+        </tr>
+         <tr>
+            <th>Lowpass</th>
+            <td>80.00 Hz</td>
+        </tr>
+
+        <tr>
+            <th>Filenames</th>
+            <td>S001R01.edf</td>
+        </tr>
+        <tr>
+            <th>Duration</th>
+            <td>00:01:00 (HH:MM:SS)</td>
+        </tr>
+    </table>
+
+    </div>
+    <br />
+    <br />
 
 .. GENERATED FROM PYTHON SOURCE LINES 28-31
 
@@ -115,8 +178,8 @@ Note that, depending on your setup, you can change ``n_jobs=1`` in order to use 
 
     Fitting modified Kmeans with Raw data by selecting Gfppeaks with minimum distance of 0.32ms(2 samples)
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                            |  : 0/100 [00:00<?,       ?it/s]      5%|#2                      |  : 5/100 [00:00<00:01,   76.93it/s]     15%|###4                   |  : 15/100 [00:00<00:01,   76.69it/s]     35%|########               |  : 35/100 [00:00<00:00,   75.29it/s]     55%|############6          |  : 55/100 [00:01<00:00,   72.85it/s]     75%|#################2     |  : 75/100 [00:01<00:00,   69.40it/s]     95%|#####################8 |  : 95/100 [00:02<00:00,   67.24it/s]    100%|######################|  : 100/100 [00:02<00:00,   49.36it/s]
-    Selecting run with highest GEV = 0.687190794481165%.
+      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]      5%|########1                                                                                                                                                          |  : 5/100 [00:00<00:02,   41.67it/s]     15%|########################3                                                                                                                                         |  : 15/100 [00:00<00:02,   41.98it/s]     35%|########################################################7                                                                                                         |  : 35/100 [00:00<00:01,   41.52it/s]     55%|#########################################################################################1                                                                        |  : 55/100 [00:01<00:01,   40.25it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:02<00:00,   40.13it/s]     95%|#########################################################################################################################################################9        |  : 95/100 [00:02<00:00,   40.23it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:02<00:00,   37.13it/s]
+    Selecting run with highest GEV = 0.6871907944811648%.
 
     ()
 
@@ -149,11 +212,10 @@ the topographies.
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB48EE688>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB5DDFA08>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB5E0E488>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB5E5BE48>],
-          dtype=object))
+    (<Figure size 640x480 with 4 Axes>, array([<AxesSubplot:title={'center':'1'}>,
+           <AxesSubplot:title={'center':'2'}>,
+           <AxesSubplot:title={'center':'3'}>,
+           <AxesSubplot:title={'center':'4'}>], dtype=object))
 
 
 
@@ -293,7 +355,7 @@ or as a :class:`mne.io.Raw` object:
         Range : 0 ... 3 =      0.000 ...     0.019 secs
     Ready.
 
-    <RawArray | 64 x 4 (0.0 s), ~93 kB, data loaded>
+    <RawArray | 64 x 4 (0.0 s), ~92 kB, data loaded>
 
 
 
@@ -323,11 +385,10 @@ Clusters centers can be reordered using :meth:`ModK.reorder`:
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB64E66C8>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB66A64C8>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB66DC608>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB6714808>],
-          dtype=object))
+    (<Figure size 640x480 with 4 Axes>, array([<AxesSubplot:title={'center':'4'}>,
+           <AxesSubplot:title={'center':'1'}>,
+           <AxesSubplot:title={'center':'3'}>,
+           <AxesSubplot:title={'center':'2'}>], dtype=object))
 
 
 
@@ -357,11 +418,10 @@ and renamed using :meth:`ModK.rename`:
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB6732208>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB6981548>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB69B9688>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB69F2888>],
-          dtype=object))
+    (<Figure size 640x480 with 4 Axes>, array([<AxesSubplot:title={'center':'A'}>,
+           <AxesSubplot:title={'center':'B'}>,
+           <AxesSubplot:title={'center':'C'}>,
+           <AxesSubplot:title={'center':'D'}>], dtype=object))
 
 
 
@@ -392,11 +452,10 @@ this has not effect during backfitting as polarities are ignored.
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB6AAEC08>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB6B28948>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB717EA88>,
-           <matplotlib.axes._subplots.AxesSubplot object at 0x000001DAB71B7C88>],
-          dtype=object))
+    (<Figure size 640x480 with 4 Axes>, array([<AxesSubplot:title={'center':'A'}>,
+           <AxesSubplot:title={'center':'B'}>,
+           <AxesSubplot:title={'center':'C'}>,
+           <AxesSubplot:title={'center':'D'}>], dtype=object))
 
 
 
@@ -432,14 +491,14 @@ Should have little impact for raw, but can be important when working with epochs
     Segmenting data with factor 10 and effective smoothing window size : 0.38125 (ms)
     Rejecting first and last segment
 
-    (<Figure size 1000x400 with 2 Axes>, [<matplotlib.lines.Line2D object at 0x000001DAB7DCD888>])
+    (<Figure size 1000x400 with 2 Axes>, [<matplotlib.lines.Line2D object at 0x0000022C6A8572C8>])
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.213 seconds)
+   **Total running time of the script:** ( 0 minutes  4.388 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_clustering_plot_modK.py:
