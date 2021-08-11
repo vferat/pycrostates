@@ -34,9 +34,9 @@ def silhouette(modK): #lower the better
 
     References
     ----------
-    .. [1] `Peter J. Rousseeuw (1987). "Silhouettes: a Graphical Aid to the
-       Interpretation and Validation of Cluster Analysis". Computational
-       and Applied Mathematics 20: 53-65.
+    .. [1] `Peter J. Rousseeuw (1987). 
+       "Silhouettes: a Graphical Aid to the Interpretation and Validation of Cluster Analysis".
+       Computational and Applied Mathematics 20: 53-65.
        <https://doi.org/10.1016/0377-0427(87)90125-7>`_
     """
     modK._check_fit()
@@ -78,7 +78,7 @@ def _davies_bouldin_score(X, labels):
     return np.mean(scores)
 
 def davies_bouldin(modK): # lower the better
-    """"Computes the Davies-Bouldin score.
+    """Computes the Davies-Bouldin score.
     This function is a proxy function for :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a
     fitted :class:´pycrostate.clustering.BaseClustering´. It uses the absolute spatial correlation for distance
     computations.
@@ -101,11 +101,11 @@ def davies_bouldin(modK): # lower the better
 
     References
     ----------
-    .. [1] Davies, David L.; Bouldin, Donald W. (1979).
-       `"A Cluster Separation Measure"
-       <https://doi.org/10.1109/TPAMI.1979.4766909>`__.
+    .. [1] `Davies, David L.; Bouldin, Donald W (1979).
+       "A Cluster Separation Measure"
        IEEE Transactions on Pattern Analysis and Machine Intelligence.
-       PAMI-1 (2): 224-227
+       PAMI-1 (2): 224-227.
+       <https://doi.org/10.1109/TPAMI.1979.4766909>`_
     """
     modK._check_fit()
     data = modK.fitted_data_
@@ -118,7 +118,7 @@ def davies_bouldin(modK): # lower the better
 
 
 def calinski_harabasz(modK): # lower the better
-    """"Compute the Calinski and Harabasz score.
+    """Compute the Calinski and Harabasz score.
     This function is a proxy function for :func:`sklearn.metrics.calinski_harabasz_score` that applies directly to a
     fitted :class:´pycrostate.clustering.BaseClustering´.
 
@@ -138,8 +138,9 @@ def calinski_harabasz(modK): # lower the better
 
     References
     ----------
-    .. [1] `T. Calinski and J. Harabasz, 1974. "A dendrite method for cluster
-       analysis". Communications in Statistics
+    .. [1] `T. Calinski and J. Harabasz (1974).
+       "A dendrite method for cluster analysis".
+       Communications in Statistics.
        <https://doi.org/10.1080/03610927408827101>`_
     """
     modK._check_fit()
@@ -163,7 +164,7 @@ def _big_delta_fast(ci, distances):
 
 def _dunn_score(X, labels): #lower the better
     # based on https://github.com/jqmviegas/jqm_cvi
-    """"Compute the Dunn index.
+    """Compute the Dunn index.
 
     Parameters
     ----------
@@ -190,7 +191,7 @@ def _dunn_score(X, labels): #lower the better
     return di
 
 def dunn(modK): #lower the better
-    """"Compute the Dunn index score.
+    """Compute the Dunn index score.
 
 
     Parameters
@@ -209,8 +210,9 @@ def dunn(modK): #lower the better
         
     References
     ----------
-    .. [1] ` J. C. Dunn†, 1974. "Well-Separated Clusters and Optimal Fuzzy Partitions".
-        Journal of Cybernetics
+    .. [1] `J. C. Dunn (1974).
+       "Well-Separated Clusters and Optimal Fuzzy Partitions".
+       Journal of Cybernetics.
        <https://doi.org/10.1080/01969727408546059>`_
     """
     modK._check_fit()
