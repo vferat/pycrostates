@@ -548,26 +548,17 @@ class BaseClustering():
         self.reorder(order)
         return(self)
 
-def _prepare_fit_raw(raw, picks, start, stop, reject_by_annotation, min_peak_distance):
+def _prepare_fit_raw(raw, picks, start, stop, reject_by_annotation):
     reject_by_annotation = 'omit' if reject_by_annotation else None
     start, stop = _check_start_stop(raw, start, stop)
     data = raw.get_data(picks=picks, start=start, stop=stop,
                         reject_by_annotation=reject_by_annotation)
-    if min_peak_distance != 0:
-        data = _extract_gfps(data, min_peak_distance=min_peak_distance)
     return(data)
 
-def _prepare_fit_epochs(epochs, picks, min_peak_distance):
+def _prepare_fit_epochs(epochs, picks):
     data = epochs.get_data(picks=picks)
-    if min_peak_distance != 0:
-        peaks = list()
-        for epoch in data:
-            epoch_peaks = _extract_gfps(epoch, min_peak_distance=min_peak_distance)
-            peaks.append(epoch_peaks)
-        data = np.hstack(peaks)
-    else:
-        data = np.swapaxes(data,0,1)
-        data = data.reshape(data.shape[0], -1)
+    data = np.swapaxes(data,0,1)
+    data = data.reshape(data.shape[0], -1)
     return(data)
 
 @fill_doc
@@ -644,7 +635,7 @@ class ModKMeans(BaseClustering):
 
     @verbose
     def fit(self, inst, start=None, stop=None,
-            reject_by_annotation=True, min_peak_distance=0,
+            reject_by_annotation=True,
             n_jobs=1,
             verbose=None):
         """Segment Instance into microstate sequence.
@@ -653,9 +644,6 @@ class ModKMeans(BaseClustering):
         ----------
         inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`
             Instance containing data to transform to cluster-distance space (absolute spatial correlation).
-        min_peak_distance : int
-            Minimum peak distance in samples for gfp peaks extraction. If min_peak_distance = 0 the entire dataset is used instead ( no gfp extraction).
-            Default to 0.
         reject_by_annotation : bool
             Whether to reject by annotation. If True (default), segments annotated with description starting with ‘bad’ are omitted.
             If False,no rejection is done.
@@ -679,20 +667,14 @@ class ModKMeans(BaseClustering):
                               exclude=[], allow_empty=False)
 
         if isinstance(inst, BaseRaw):
-            data = _prepare_fit_raw(inst, picks, start, stop, reject_by_annotation, min_peak_distance)
+            data = _prepare_fit_raw(inst, picks, start, stop, reject_by_annotation)
             current_fit = 'Raw'
 
         elif isinstance(inst, BaseEpochs):
-            data = _prepare_fit_epochs(inst, picks, min_peak_distance)
+            data = _prepare_fit_epochs(inst, picks)
             current_fit = 'Epochs'
 
-        if min_peak_distance == 0:
-            logger.info(f'Fitting modified Kmeans with {current_fit} data (no gfp peaks extraction)')
-        else:
-            min_peak_distance_ms = inst.info['sfreq'] * min_peak_distance * 1e-3
-            logger.info(f'Fitting modified Kmeans with {current_fit} data by selecting Gfp'
-                        f'peaks with minimum distance of {min_peak_distance_ms}ms'
-                        f'({min_peak_distance} samples)')
+        logger.info(f'Fitting modified Kmeans with {current_fit} data')
 
         cluster_centers, GEV, labels =  self._fit_data(data=data, n_jobs=n_jobs, verbose=verbose)
         self.cluster_centers_ = cluster_centers

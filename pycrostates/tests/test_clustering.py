@@ -105,10 +105,6 @@ def test_ModKMeans_fit_epochs():
     assert ModK.GEV_ > 0
 
     epochs.info['bads'] = [epochs.info['ch_names'][0]]
-    ModK.fit(epochs, n_jobs=1, min_peak_distance=3)
-    assert ModK.cluster_centers_.shape == (n_clusters, len(epochs.info['ch_names']))
-
-    epochs.info['bads'] = [epochs.info['ch_names'][0]]
     ModK.fit(epochs, n_jobs=1)
     assert ModK.cluster_centers_.shape == (n_clusters, len(epochs.info['ch_names']))
 
@@ -116,12 +112,6 @@ def test_ModKMeans_fit_n_jobs():
     ModK = ModKMeans(n_clusters=n_clusters)
     ModK.fit(raw, n_jobs=2)
     assert ModK.current_fit == 'Raw'
-
-def test_ModKMeans_fit_min_peak_distance():
-    ModK = ModKMeans(n_clusters=n_clusters)
-    ModK.fit(raw,
-             min_peak_distance=3)
-    assert ModK.fitted_data_.shape[-1] <= raw.get_data().shape[-1] / 3
 
 def test_ModKMeans_fit_start_stop():
     ModK = ModKMeans(n_clusters=n_clusters)
