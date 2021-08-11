@@ -29,7 +29,7 @@ raw.set_eeg_reference('average')
 # We must first fit our clustering algorithm (in our case the modified Kmeans) with some data.
 n_clusters = 4
 ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
-ModK.fit(raw, n_jobs=5, min_peak_distance=0)
+ModK.fit(raw, n_jobs=5)
 ModK.plot()
 # %%
 # We can then compute several clustering performance score on the fitted instance.
@@ -52,7 +52,7 @@ calinski_harabasz_scores = list()
 dunn_scores = list()
 for k in K:
     ModK = ModKMeans(n_clusters=k, random_state=42)
-    ModK.fit(raw, n_jobs=5, min_peak_distance=0)
+    ModK.fit(raw, n_jobs=5)
     
     silhouette_score = silhouette(ModK)
     silhouette_scores.append(silhouette_score)

@@ -24,22 +24,8 @@ raw.set_montage(montage)
 raw.pick('eeg')
 raw.set_eeg_reference('average')
 # %%
-# Gfp peaks extraction can be done in two ways: the first one using the :func:`~pycrostates.preprocessing.extract_gfp_peaks`.
-# Note that this function also works for :class:`mne.epochs.Epochs` but will alwas return a :class:`mne.io.Raw` obejct.
+# Gfp peaks extraction can be done using the :func:`~pycrostates.preprocessing.extract_gfp_peaks`.
+# Note that this function also works for :class:`mne.epochs.Epochs` but will alwas return a :class:`mne.io.Raw` object.
 from pycrostates.preprocessing import extract_gfp_peaks
 gfp_peaks = extract_gfp_peaks(raw, min_peak_distance=3)
 gfp_peaks
-# %%
-# then fit the gfp peaks to the modified Kmeans algorithm. Make sure not to change the default parameter min_peak_distance=0
-# to avoid performing GFP extraction on your already extracted gfp peaks.
-n_clusters = 4
-ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
-ModK.fit(gfp_peaks, n_jobs=5, min_peak_distance=0)
-ModK.plot()
-
-# %%
-# or directly extract gfp peaks during the fitting using the min_peak_distance parameter of :meth:`ModK.fit`.
-n_clusters = 4
-ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
-ModK.fit(raw, min_peak_distance=3, n_jobs=5)
-ModK.plot()
