@@ -136,7 +136,7 @@ class RawSegmentation(BaseSegmentation):
                                     tmin=tmin,
                                     tmax=tmax)
         return(fig, ax)
-    
+
     def compute_metrics(self, norm_gfp=True):
         d = compute_metrics_data(self.segmentation,
                                 self.inst.get_data(),

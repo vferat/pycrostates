@@ -286,7 +286,7 @@ class BaseClustering():
                 _ends = _ends.tolist()
                 ends = [0]
                 ends.extend(_ends)
-                
+
                 segmentation = np.zeros(data.shape[-1])
                 for onset, end in zip(onsets, ends):
                     if onset - end >= 2 * half_window_size + 1:  # small segments can't be smoothed

@@ -139,7 +139,7 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
     if isinstance(inst, BaseEpochs):
         data = inst.get_data()
         data = np.hstack(data)
-        
+
     n_times = data.shape[1]
     
     if len([x for x in [n_epochs, n_samples, coverage] if x is None]) >= 2:

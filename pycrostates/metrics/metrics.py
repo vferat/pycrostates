@@ -92,7 +92,7 @@ def davies_bouldin(modK): # lower the better
     -------
     score : float
         The resulting Davies-Bouldin score.
- 
+
     Notes
     -----
     For more details regarding the implementation, please refere to :func:`sklearn.metrics.davies_bouldin_score`.
