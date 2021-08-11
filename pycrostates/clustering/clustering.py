@@ -18,7 +18,7 @@ from mne.preprocessing.ica import _check_start_stop
 from mne.utils import _validate_type, logger, verbose, warn, fill_doc, check_random_state
 from mne.io.pick import _picks_to_idx, pick_info
 
-from ..utils import _corr_vectors, check_ch_names
+from ..utils import _corr_vectors, _check_ch_names, _reject_by_annotation
 from ..segmentation import RawSegmentation, EpochsSegmentation
 from ..preprocessing import _extract_gfps
 
@@ -181,12 +181,20 @@ def _reject_small_segments(segmentation, data, min_segment_lenght):
 
 @fill_doc
 class BaseClustering():
-    u"""Base Class for Microstate Clustering algorithm.
+    u"""Base Class for Microstate Clustering algorithms.
 
     Parameters
     ----------
     n_clusters : int
         The number of clusters to form as well as the number of centroids to generate.
+    picks : str | list | slice | None
+        Channels to include. Slices and lists of integers will be interpreted as channel indices.
+        In lists, channel type strings (e.g., ['meg', 'eeg']) will pick channels of those types,
+        channel name strings (e.g., ['MEG0111', 'MEG2623'] will pick the given channels.
+        Can also be the string values “all” to pick all channels, or “data” to pick data channels.
+        None will pick all channels.
+        Note that channels in info['bads'] will be included if their names or indices are explicitly provided.
+        Default to 'eeg'.
 
     Attributes
     ----------
@@ -198,8 +206,10 @@ class BaseClustering():
             Cluster centers (i.e Microstates maps).
     info : dict
             :class:`Measurement info <mne.Info>` of fitted instance.
+    picks : str | list | slice | None
+            picks.
     """
-    def __init__(self, n_clusters: int = 4, picks: str = 'eeg'):
+    def __init__(self, n_clusters=4, picks='eeg'):
         self.n_clusters = n_clusters
         self.picks = picks
         self.current_fit = 'unfitted'
@@ -328,14 +338,14 @@ class BaseClustering():
  
     @fill_doc
     @verbose
-    def predict(self,  inst: Union (BaseRaw, BaseEpochs),
-                reject_by_annotation: bool = True,
-                factor: int = 0,
-                half_window_size: int = 3,
-                crit: float = 10e-6,
-                min_segment_lenght: int = 0,
-                rejected_first_last_segments: bool = True,
-                verbose: str = None) -> np.ndarray:
+    def predict(self,  inst,
+                reject_by_annotation=True,
+                factor=0,
+                half_window_size=3,
+                crit=10e-6,
+                min_segment_lenght=0,
+                rejected_first_last_segments=True,
+                verbose=None):
         """Predict Microstates labels using competitive fitting.
 
         Parameters
@@ -357,7 +367,9 @@ class BaseClustering():
         rejected_first_last_segments: bool
             If True, set first and last segments to unlabeled.
             Default to True.
-        %(reject_by_annotation_raw)s
+        reject_by_annotation : bool
+            Whether to reject by annotation. If True (default), segments annotated with description starting with ‘bad’ are omitted.
+            If False,no rejection is done.
         %(verbose)s
 
         Returns
@@ -374,7 +386,7 @@ class BaseClustering():
                         exclude=[], allow_empty=False)
         inst = inst.pick(picks)
         
-        check_ch_names(self, inst, inst1_name=type(self).__name__, inst2_name='inst')
+        _check_ch_names(self, inst, inst1_name=type(self).__name__, inst2_name='inst')
         if factor == 0:
             logger.info('Segmenting data without smoothing')
         if factor != 0:
@@ -648,16 +660,19 @@ class ModKMeans(BaseClustering):
         min_peak_distance : int
             Minimum peak distance in samples for gfp peaks extraction. If min_peak_distance = 0 the entire dataset is used instead ( no gfp extraction).
             Default to 0.
+        reject_by_annotation : bool
+            Whether to reject by annotation. If True (default), segments annotated with description starting with ‘bad’ are omitted.
+            If False,no rejection is done.
         %(n_jobs)s
         %(raw_tmin)s
         %(raw_tmax)s
-        %(reject_by_annotation_raw)s
         %(verbose)s
 
         """
         _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
+        reject_by_annotation = _reject_by_annotation(reject_by_annotation)
         n_jobs = check_n_jobs(n_jobs)
-        
+
         if len(inst.info['bads']) != 0:
             warn('Bad channels are present in the recording. '
                  'They will still be used to compute microstate topographies. '

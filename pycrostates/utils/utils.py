@@ -34,7 +34,16 @@ def _corr_vectors(A, B, axis=0):
     np.seterr(divide='warn', invalid='warn')
     return corr
 
-def check_ch_names(inst1,inst2,inst1_name='inst', inst2_name='inst'):
+def _check_ch_names(inst1,inst2,inst1_name='inst', inst2_name='inst'):
     if inst1.info['ch_names'] != inst2.info['ch_names']:
         raise ValueError(f'Inconsistent Channel found between {inst1_name} and  {inst2_name}')
     return()
+
+def _reject_by_annotation(reject_by_annotation):
+    if reject_by_annotation is False:
+        reject_by_annotation = None
+    elif reject_by_annotation is True:
+        reject_by_annotation = 'omit'
+    else:
+        raise ValueError('reject_by_annotation must be a boolean.')
+    return(reject_by_annotation)
