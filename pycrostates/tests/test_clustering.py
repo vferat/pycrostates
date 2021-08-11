@@ -1,4 +1,5 @@
 import os.path as op
+import itertools
 
 import numpy as np
 import mne
@@ -152,7 +153,11 @@ def test_BaseClustering_predict_raw():
     n_clusters = 4
     ModK = ModKMeans(n_clusters=n_clusters)
     ModK.fit(raw, n_jobs=1)
-    segmentation = ModK.predict(raw)
+    segmentation = ModK.predict(raw,
+                                factor=0,
+                                rejected_first_last_segments=False,
+                                min_segment_lenght=0,
+                                reject_by_annotation=False)
     assert isinstance(segmentation, RawSegmentation)
 
 def test_BaseClustering_predict_epochs():
@@ -165,6 +170,62 @@ def test_BaseClustering_predict_epochs():
     epochs = epochs.pick('eeg')
     n_clusters = 4
     ModK = ModKMeans(n_clusters=n_clusters)
-    ModK.fit(epochs, n_jobs=1)
-    segmentation = ModK.predict(epochs)
+    ModK.fit(epochs)
+    segmentation = ModK.predict(epochs,
+                                factor=0,
+                                rejected_first_last_segments=False,
+                                min_segment_lenght=0,
+                                reject_by_annotation=False)
     assert isinstance(segmentation, EpochsSegmentation)
+    
+def test_BaseClustering_predict_raw_rejected_first_last_segments():
+    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+    raw = raw.pick('eeg')
+    raw = raw.filter(0, 40)
+    raw = raw.crop(0, 10)
+    n_clusters = 4
+    ModK = ModKMeans(n_clusters=n_clusters)
+    ModK.fit(raw, n_jobs=1)
+    segmentation = ModK.predict(raw, rejected_first_last_segments=True)
+    assert segmentation.segmentation[0] == 0
+    assert segmentation.segmentation[-1] == 0
+
+def test_BaseClustering_predict_raw_rejected_first_last_segments():
+    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+    raw = raw.pick('eeg')
+    raw = raw.filter(0, 40)
+    raw = raw.crop(0, 10)
+    events = mne.make_fixed_length_events(raw, 1)
+    epochs = mne.epochs.Epochs(raw, events, preload=True)
+    epochs = epochs.pick('eeg')
+    n_clusters = 4
+    ModK = ModKMeans(n_clusters=n_clusters)
+    ModK.fit(epochs, n_jobs=1)
+    segmentation = ModK.predict(epochs, rejected_first_last_segments=True)
+    for epoch_seg in segmentation.segmentation:
+        assert epoch_seg[0] == 0
+        assert epoch_seg[-1] == 0
+
+def test_BaseClustering_predict_raw_min_segment_lenght():
+    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+    raw = raw.pick('eeg')
+    raw = raw.filter(0, 40)
+    raw = raw.crop(0, 10)
+    n_clusters = 4
+    ModK = ModKMeans(n_clusters=n_clusters)
+    ModK.fit(raw, n_jobs=1)
+    segmentation = ModK.predict(raw, min_segment_lenght=3)
+    segment_lengths = [len(list(group)) for _,group in itertools.groupby(segmentation.segmentation)][1:-2]
+    assert np.all(np.array(segment_lengths) > 3)
+
+def test_BaseClustering_predict_raw_smoothing():
+    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+    raw = raw.pick('eeg')
+    raw = raw.filter(0, 40)
+    raw = raw.crop(0, 10)
+    n_clusters = 4
+    ModK = ModKMeans(n_clusters=n_clusters)
+    ModK.fit(raw, n_jobs=1)
+    segmentation = ModK.predict(raw, factor=10)
+    assert isinstance(segmentation, RawSegmentation)
+    
