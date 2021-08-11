@@ -129,7 +129,7 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
     """
     _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
     random_state = check_random_state(random_state)
-    
+
     if isinstance(inst, BaseRaw):
         reject_by_annotation = 'omit' if reject_by_annotation else None
         start, stop = _check_start_stop(inst, start, stop)

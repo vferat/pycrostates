@@ -81,10 +81,10 @@ def compute_metrics_data(segmentation, data, maps, maps_names, sfreq, norm_gfp=T
             s_segments = np.array([len(group) for s_, group in segments if s_ == s+1])
             occurence = len(s_segments) /len(segmentation) *  sfreq
             d[f'{state_name}_occurences'] = occurence
-            
+
             timecov = np.sum(s_segments) / len(np.where(segmentation != 0)[0])
             d[f'{state_name}_timecov'] = timecov
-            
+
             durs = s_segments / sfreq
             d[f'{state_name}_dist_durs'] = durs
             d[f'{state_name}_meandurs'] = np.mean(durs)

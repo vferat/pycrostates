@@ -31,7 +31,7 @@ def silhouette(modK): #lower the better
     For more details regarding the implementation, please refere to :func:`sklearn.metrics.silhouette_score`.
     This proxy function uses metric="precomputed" with the absolute spatial correlation for distance
     computations.
-        
+
     References
     ----------
     .. [1] `Peter J. Rousseeuw (1987). "Silhouettes: a Graphical Aid to the
@@ -158,7 +158,7 @@ def _delta_fast(ck, cl, distances):
     return np.min(values)
 
 def _big_delta_fast(ci, distances):
-    values = distances[np.where(ci)][:, np.where(ci)]     
+    values = distances[np.where(ci)][:, np.where(ci)]
     return np.max(values)
 
 def _dunn_score(X, labels): #lower the better

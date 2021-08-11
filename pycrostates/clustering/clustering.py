@@ -158,7 +158,7 @@ def _reject_small_segments(segmentation, data, min_segment_lenght):
             if i not in [0,len(segments)-1]:
                 if len(segment) <= min_segment_lenght and segment[0] != 0:
                     small_segment = True
-                    left_idx = current_idx 
+                    left_idx = current_idx
                     right_idx = current_idx + len(segment)
                     new_segment = new_segmentation[left_idx:right_idx]
 
@@ -215,14 +215,14 @@ class BaseClustering():
         self.current_fit = 'unfitted'
         self.names = [f'{i+1}' for i in range(n_clusters)]
         self.info = None
-        
+
     def __repr__(self) -> str:
         s = f'{self.__class__.__name__} | n = {str(self.n_clusters)} cluster centers | {self.current_fit}'
         return(s)
 
     def copy(self):
         """Return a copy of the instance.
-        """  
+        """
         return deepcopy(self)
 
     def _check_fit(self):
@@ -608,10 +608,10 @@ class ModKMeans(BaseClustering):
         If fitted, the Global explained Variance explained all clusters centers.
     """
     def __init__(self,
-                 random_state: Union[int, np.random.RandomState, None] = None,
-                 n_init: int = 100,
-                 max_iter: int = 300,
-                 tol: float = 1e-6,
+                 random_state=None,
+                 n_init=100,
+                 max_iter=300,
+                 tol=1e-6,
                  *args,  **kwargs):
         super().__init__(*args, **kwargs)
         self.n_init = n_init
@@ -647,9 +647,9 @@ class ModKMeans(BaseClustering):
         return(best_maps, best_gev, best_segmentation)
 
     @verbose
-    def fit(self, inst: Union(BaseRaw, BaseEpochs), start: float = None, stop: float = None,
-            reject_by_annotation: bool = True, min_peak_distance: float = 0,
-            n_jobs: int = 1,
+    def fit(self, inst, start=None, stop=None,
+            reject_by_annotation=True, min_peak_distance=0,
+            n_jobs=1,
             verbose=None):
         """Segment Instance into microstate sequence.
 
