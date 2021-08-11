@@ -3,7 +3,7 @@ import itertools
 from copy import deepcopy
 from pycrostates.viz import plot_cluster_centers
 
-from typing import Tuple, Union
+from typing import Tuple
 
 import matplotlib
 import mne
@@ -236,7 +236,7 @@ class BaseClustering():
         self._check_fit()
         cluster_centers = self.cluster_centers_.copy()
         return(cluster_centers)
-    
+
     def get_cluster_centers_as_raw(self):
         """Get cluster centers as a :class:`mne.io.Raw`
         """
@@ -246,17 +246,16 @@ class BaseClustering():
 
     def invert_polarity(self, invert):
         """Invert map polarities.
-            This method is for visualisation purpose only
-            and has no impact on further processing as map polarities are ignored.
-            Operates in place
-
+           This method is for visualisation purpose only
+           and has no impact on further processing as map polarities are ignored.
+           Operates in place
 
         Parameters
         ----------
         invert : list of bool
             List of bool of length n_clusters.
             True will invert map polarity, while False will have no effect.
-        """        
+        """
         self._check_fit()
         cluster_centers = self.cluster_centers_
         for c,cluster in enumerate(cluster_centers):

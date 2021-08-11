@@ -22,11 +22,11 @@ def test_silouhette():
 def test_davies_bouldin():
     score = davies_bouldin(ModK)
     assert isinstance(score, float)
-    
+
 def test_calinski_harabasz():
     score = calinski_harabasz(ModK)
     assert isinstance(score, float)
-    
+
 def test_dunn():
     score = dunn(ModK)
     assert isinstance(score, float)

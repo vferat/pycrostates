@@ -135,7 +135,7 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
         start, stop = _check_start_stop(inst, start, stop)
         data = inst.get_data(start=start, stop=stop,
                              reject_by_annotation=reject_by_annotation)
-            
+
     if isinstance(inst, BaseEpochs):
         data = inst.get_data()
         data = np.hstack(data)

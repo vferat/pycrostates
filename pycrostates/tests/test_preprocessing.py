@@ -49,7 +49,7 @@ def test_extract_gfp_raw():
     raw = raw.pick('eeg')
     raw_peaks = extract_gfp_peaks(raw, min_peak_distance=4)
     assert isinstance(raw_peaks, RawArray)
-        
+
 def test_extract_gfp_epochs():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     events = mne.make_fixed_length_events(raw, 1)

@@ -92,7 +92,7 @@ def davies_bouldin(modK): # lower the better
     -------
     score : float
         The resulting Davies-Bouldin score.
-        
+ 
     Notes
     -----
     For more details regarding the implementation, please refere to :func:`sklearn.metrics.davies_bouldin_score`.
@@ -135,7 +135,7 @@ def calinski_harabasz(modK): # lower the better
     Notes
     -----
     For more details regarding the implementation, please refere to :func:`sklearn.metrics.calinski_harabasz_score`.
-        
+
     References
     ----------
     .. [1] `T. Calinski and J. Harabasz, 1974. "A dendrite method for cluster
