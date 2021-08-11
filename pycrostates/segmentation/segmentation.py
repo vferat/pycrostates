@@ -159,11 +159,13 @@ class EpochsSegmentation(BaseSegmentation):
 
     def compute_metrics(self, norm_gfp=True):
         data = self.inst.get_data()
+        data = np.swapaxes(data,0,1)
         data = data.reshape(data.shape[0], -1)
-        d = compute_metrics_data(self.segmentation,
+        segmentation = self.segmentation.reshape(-1)
+        d = compute_metrics_data(segmentation,
                                 data,
                                 self.cluster_centers,
-                                self.maps_names,
+                                self.names,
                                 self.inst.info['sfreq'],
                                 norm_gfp=norm_gfp)
         return(d)

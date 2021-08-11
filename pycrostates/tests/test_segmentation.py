@@ -20,15 +20,35 @@ def test_RawSegmentation_plot():
     segmentation = ModK.predict(raw)
     segmentation.plot()
 
-
 def test_RawSegmentation_plot_cluster_centers():
     ModK.fit(raw, n_jobs=1)
     segmentation = ModK.predict(raw)
     segmentation.plot_cluster_centers()
 
-
 def test_RawSegmentation_compute_metrics():
     ModK.fit(raw, n_jobs=1)
     segmentation = ModK.predict(raw)
+    d = segmentation.compute_metrics(norm_gfp=False)
+    assert isinstance(d,dict)
+
+def test_RawSegmentation_compute_metrics_norm_gfp():
+    ModK.fit(raw, n_jobs=1)
+    segmentation = ModK.predict(raw)
     d = segmentation.compute_metrics(norm_gfp=True)
+    assert isinstance(d,dict)
+
+def test_EpochsSegmentation_plot_cluster_centers():
+    events = mne.make_fixed_length_events(raw, 1)
+    epochs = mne.epochs.Epochs(raw, events, preload=True)
+    ModK.fit(epochs, n_jobs=1)
+    segmentation = ModK.predict(epochs)
+    segmentation.plot_cluster_centers()
+
+def test_EpochsSegmentation_compute_metrics():
+    events = mne.make_fixed_length_events(raw, 1)
+    epochs = mne.epochs.Epochs(raw, events, preload=True)
+    epochs = epochs.pick('eeg')
+    ModK.fit(epochs, n_jobs=1)
+    segmentation = ModK.predict(epochs)
+    d = segmentation.compute_metrics(norm_gfp=False)
     assert isinstance(d,dict)

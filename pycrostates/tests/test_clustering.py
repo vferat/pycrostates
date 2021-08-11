@@ -1,5 +1,6 @@
 import os.path as op
 import itertools
+from pycrostates.tests.test_metrics import ModK
 
 import numpy as np
 import mne
@@ -23,6 +24,31 @@ def test_ModKMeans_randomstate():
     ModK_2.fit(raw, n_jobs=1)
     assert (ModK_1.cluster_centers_ == ModK_2.cluster_centers_).all()
 
+def test_ModKMeans_copy():
+    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+    raw = raw.pick('eeg')
+    raw = raw.crop(0, 10)
+    n_clusters = 4
+    ModK_1 = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK_2 = ModK_1.copy()
+    ModK_1.n_clusters = 12
+    assert ModK_2.n_clusters == 4
+
+def test_ModKMeans_repr():
+    n_clusters = 4
+    ModK = ModKMeans(n_clusters=n_clusters, random_state=1)
+    assert isinstance(ModK.__repr__(), str)
+    
+def test_ModKMeans_get_cluster_centers():
+    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+    raw = raw.pick('eeg')
+    raw = raw.crop(0, 10)
+    n_clusters = 4
+    ModK = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK.fit(raw, n_jobs=1)
+    raw_clusters = ModK.get_cluster_centers()
+    assert (raw_clusters == ModK.cluster_centers_).all()
+    
 def test_ModKMeans_get_cluster_centers_as_raw():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     raw = raw.pick('eeg')
@@ -32,6 +58,17 @@ def test_ModKMeans_get_cluster_centers_as_raw():
     ModK.fit(raw, n_jobs=1)
     raw_clusters = ModK.get_cluster_centers_as_raw()
     assert (raw_clusters.get_data().T == ModK.cluster_centers_).all()
+
+def test_ModKMeans_rename_clusters():
+    names = ['a', 'b', 'c', 'd']
+    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+    raw = raw.pick('eeg')
+    raw = raw.crop(0, 10)
+    n_clusters = 4
+    ModK = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK.fit(raw, n_jobs=1)
+    ModK.rename_clusters(names)
+    assert np.all(ModK.names == names)
 
 def test_ModKMeans_invert_polarity():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
