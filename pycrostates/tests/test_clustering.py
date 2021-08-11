@@ -41,7 +41,7 @@ def test_ModKMeans_get_cluster_centers():
     ModK.fit(raw, n_jobs=1)
     raw_clusters = ModK.get_cluster_centers()
     assert (raw_clusters == ModK.cluster_centers_).all()
-    
+
 def test_ModKMeans_get_cluster_centers_as_raw():
     ModK = ModKMeans(n_clusters=n_clusters, random_state=1)
     ModK.fit(raw, n_jobs=1)

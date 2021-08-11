@@ -141,19 +141,19 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
         data = np.hstack(data)
 
     n_times = data.shape[1]
-    
+
     if len([x for x in [n_epochs, n_samples, coverage] if x is None]) >= 2:
         raise(ValueError('At least two of the [n_epochs, n_samples, coverage] must be defined'))
-       
+
     if coverage is not None:
         if  coverage <= 0:
             raise(ValueError('Coverage must be strictly positive'))
     else:
         coverage = (n_epochs * n_samples) / n_times
-        
+
     if n_epochs is None:
         n_epochs = int((n_times * coverage) / n_samples)
-        
+
     if n_samples is None:
         n_samples = int((n_times * coverage) / n_epochs)
 
@@ -161,9 +161,8 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
         if n_epochs * n_samples > n_times:
             raise(ValueError(f'''Can't draw {n_epochs} epochs of {n_samples} samples = {n_epochs * n_samples}'''
                              f'''samples without replacement: instance contains only {n_times} samples'''))
-        
+
     logger.info(f'Resampling instance into {n_epochs} epochs of {n_samples} covering {coverage *100:2f}% of the data')
-    
 
     if replace:
         indices = random_state.randint(0, n_samples, size=(n_epochs, n_samples))
@@ -172,7 +171,7 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
         random_state.shuffle(indices)
         indices = indices[:n_epochs*n_samples]
         indices = indices.reshape((n_epochs, n_samples))
-        
+
     data = data[:,indices]
     data = np.swapaxes(data,0,1)
     resamples = list()
@@ -181,5 +180,3 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
         resamples.append(raw)
     return(resamples)
  
-        
-    

@@ -298,19 +298,19 @@ class BaseClustering():
                         if rejected_first_last_segments:
                             labels = _rejected_first_last_segments(labels)
                         segmentation[end:onset] = labels
-        
+
         if min_segment_lenght > 0:
             segmentation = _reject_small_segments(segmentation, data, min_segment_lenght)
         if rejected_first_last_segments:
             segmentation = _rejected_first_last_segments(segmentation)
-            
-        
+
+
         segmentation = RawSegmentation(segmentation=segmentation,
                                        inst=raw,
                                        cluster_centers=self.cluster_centers_,
                                        names=self.names)
         return(segmentation)
-    
+
     @verbose
     def _predict_epochs(self, epochs, picks, half_window_size, factor, crit, min_segment_lenght, rejected_first_last_segments, verbose=None):
         data = epochs.get_data(picks=picks)
@@ -320,10 +320,10 @@ class BaseClustering():
                                 self.cluster_centers_,
                                 half_window_size, factor,
                                 crit)
-            
+
             if min_segment_lenght > 0:
                 segment = _reject_small_segments(segment, epoch, min_segment_lenght)
-            
+
             if rejected_first_last_segments:
                 segment = _rejected_first_last_segments(segment)
             segments.append(segment)
@@ -334,7 +334,7 @@ class BaseClustering():
                                           cluster_centers=self.cluster_centers_,
                                           names=self.names)
         return(segmentation)
- 
+
     @fill_doc
     @verbose
     def predict(self,  inst,
@@ -384,7 +384,7 @@ class BaseClustering():
         picks = _picks_to_idx(inst.info, self.picks,
                         exclude=[], allow_empty=False)
         inst = inst.pick(picks)
-        
+
         _check_ch_names(self, inst, inst1_name=type(self).__name__, inst2_name='inst')
         if factor == 0:
             logger.info('Segmenting data without smoothing')
@@ -402,7 +402,7 @@ class BaseClustering():
                                                 min_segment_lenght=min_segment_lenght,
                                                 rejected_first_last_segments=rejected_first_last_segments,
                                                 verbose=verbose)
-            
+
         if isinstance(inst, BaseEpochs):
             segmentation = self._predict_epochs(epochs=inst, picks=picks,
                                                 half_window_size=half_window_size,
@@ -445,7 +445,7 @@ class BaseClustering():
             raise ValueError("Can't name 2 clusters with the same name.")
         self.names = names
         return(self)
-    
+
     def reorder(self, order: list):
         """Reorder cluster centers. Operate in place.
 
@@ -478,7 +478,7 @@ class BaseClustering():
         self._check_fit()
         info = self.info
         centers = self.cluster_centers_
-        
+
         template = np.array([[-0.13234463, -0.19008217, -0.01808156, -0.06665204, -0.18127315,
         -0.25741473, -0.2313206 ,  0.04239534, -0.14411298, -0.25635016,
          0.1831745 ,  0.17520883, -0.06034687, -0.21948988, -0.2057277 ,
@@ -516,7 +516,7 @@ class BaseClustering():
         ch_names_template = [name.lower() for name in ch_names_template]
         ch_names_centers = [name.lower() for name in info['ch_names']]
         common_ch_names = list(set(ch_names_centers).intersection(ch_names_template))
-        
+
         if len (common_ch_names) <= 10:
             warn("Not enought common electrodes with built-in template to automaticalv reorder maps. "
                  "Order hasn't been changed.")
@@ -548,8 +548,6 @@ class BaseClustering():
         self.reorder(order)
         return(self)
 
-
-
 def _prepare_fit_raw(raw, picks, start, stop, reject_by_annotation, min_peak_distance):
     reject_by_annotation = 'omit' if reject_by_annotation else None
     start, stop = _check_start_stop(raw, start, stop)
@@ -575,7 +573,7 @@ def _prepare_fit_epochs(epochs, picks, min_peak_distance):
 @fill_doc
 class ModKMeans(BaseClustering):
     """Modified K-Means Clustering algorithm.
-    
+
     Parameters
     ----------
     n_clusters : int
@@ -617,8 +615,7 @@ class ModKMeans(BaseClustering):
         self.max_iter = max_iter
         self.tol = tol
         self.random_state = check_random_state(random_state)
-
-        
+   
     def _fit_data(self, data: np.ndarray,  n_jobs: int = 1, verbose=None) -> ModKMeans:
         logger.info(f'Running Kmeans for {self.n_clusters} clusters centers with {self.n_init} random initialisations.')
         inits = self.random_state.randint(low=0, high=100*self.n_init, size=(self.n_init))
@@ -666,7 +663,6 @@ class ModKMeans(BaseClustering):
         %(raw_tmin)s
         %(raw_tmax)s
         %(verbose)s
-
         """
         _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
         reject_by_annotation = _reject_by_annotation(reject_by_annotation)
@@ -677,7 +673,7 @@ class ModKMeans(BaseClustering):
                  'They will still be used to compute microstate topographies. '
                  'Consider using instance.pick() or instance.interpolate_bads()'
                  ' before fitting.')
-            
+
         inst = inst.copy()
         picks = _picks_to_idx(inst.info, self.picks,
                               exclude=[], allow_empty=False)
@@ -685,11 +681,11 @@ class ModKMeans(BaseClustering):
         if isinstance(inst, BaseRaw):
             data = _prepare_fit_raw(inst, picks, start, stop, reject_by_annotation, min_peak_distance)
             current_fit = 'Raw'
-    
+
         elif isinstance(inst, BaseEpochs):
             data = _prepare_fit_epochs(inst, picks, min_peak_distance)
             current_fit = 'Epochs'
-        
+
         if min_peak_distance == 0:
             logger.info(f'Fitting modified Kmeans with {current_fit} data (no gfp peaks extraction)')
         else:
@@ -697,7 +693,7 @@ class ModKMeans(BaseClustering):
             logger.info(f'Fitting modified Kmeans with {current_fit} data by selecting Gfp'
                         f'peaks with minimum distance of {min_peak_distance_ms}ms'
                         f'({min_peak_distance} samples)')
-            
+
         cluster_centers, GEV, labels =  self._fit_data(data=data, n_jobs=n_jobs, verbose=verbose)
         self.cluster_centers_ = cluster_centers
         self.current_fit = current_fit

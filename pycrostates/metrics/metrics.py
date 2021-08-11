@@ -98,7 +98,7 @@ def davies_bouldin(modK): # lower the better
     For more details regarding the implementation, please refere to :func:`sklearn.metrics.davies_bouldin_score`.
     This function was modified in order to use the absolute spatial correlation for distance
     computations instead of euclidean distance.
-        
+
     References
     ----------
     .. [1] Davies, David L.; Bouldin, Donald W. (1979).

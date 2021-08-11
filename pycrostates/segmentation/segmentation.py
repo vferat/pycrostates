@@ -150,7 +150,7 @@ class EpochsSegmentation(BaseSegmentation):
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
         _validate_type(self.inst, (BaseEpochs), 'inst', 'Epochs')
-        
+
         data = self.inst.get_data()
         if data.shape[0] != self.segmentation.shape[0]:
             raise ValueError('Epochs and segmentation must have the number of epochs.')
