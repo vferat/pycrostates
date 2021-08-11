@@ -85,6 +85,27 @@ Clustering tutorials
    :hidden:
 
    /auto_tutorials/clustering/plot_Single_subject_resampling
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to evaluate the quality of the clustering and gives an indication of how...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorials/clustering/images/thumb/sphx_glr_plot_find_best_number_of_clusters_thumb.png
+     :alt: Clustering performance evaluation
+
+     :ref:`sphx_glr_auto_tutorials_clustering_plot_find_best_number_of_clusters.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorials/clustering/plot_find_best_number_of_clusters
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

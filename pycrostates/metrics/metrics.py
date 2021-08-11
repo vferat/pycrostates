@@ -13,7 +13,7 @@ def _distance_matrix(X, Y=None):
     distances = np.nan_to_num(distances, copy=False, nan=10e300, posinf=10e300, neginf=-10e300)
     return(distances)
 
-def silhouette(modK): #lower the best
+def silhouette(modK): #lower the better
     """Compute the mean Silhouette Coefficient of a fitted clustering algorithm.
     This function is a proxy function for :func:`sklearn.metrics.silhouette_score` that applies directly to a
     fitted :class:´pycrostate.clustering.BaseClustering´. It uses the absolute spatial correlation for distance
@@ -80,7 +80,7 @@ def _davies_bouldin_score(X, labels):
     scores = np.max(combined_intra_dists / centroid_distances, axis=1)
     return np.mean(scores)
 
-def davies_bouldin(modK): # lower the best
+def davies_bouldin(modK): # lower the better
     """"Computes the Davies-Bouldin score.
     This function is a proxy function for :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a
     fitted :class:´pycrostate.clustering.BaseClustering´. It uses the absolute spatial correlation for distance
