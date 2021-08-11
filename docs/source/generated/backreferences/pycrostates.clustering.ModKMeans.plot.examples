@@ -1,0 +1,80 @@
+
+
+Examples using ``pycrostates.clustering.ModKMeans.plot``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to extract global field power (gfp) peaks.">
+
+.. only:: html
+
+ .. figure:: /auto_tutorials/clustering/images/thumb/sphx_glr_plot_extract_gfp_peaks_thumb.png
+     :alt: Global field power peaks extraction
+
+     :ref:`sphx_glr_auto_tutorials_clustering_plot_extract_gfp_peaks.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_tutorials_clustering_plot_extract_gfp_peaks.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This tutorial introduces the pycrostates.clustering.ModKMeans structure in detail.">
+
+.. only:: html
+
+ .. figure:: /auto_tutorials/clustering/images/thumb/sphx_glr_plot_modK_thumb.png
+     :alt: The ModKmeans object
+
+     :ref:`sphx_glr_auto_tutorials_clustering_plot_modK.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_tutorials_clustering_plot_modK.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to segment a single subject recording into microstates sequence.">
+
+.. only:: html
+
+ .. figure:: /auto_tutorials/clustering/images/thumb/sphx_glr_plot_Single_subject_resampling_thumb.png
+     :alt: Single Subject Segmentation with resampling
+
+     :ref:`sphx_glr_auto_tutorials_clustering_plot_Single_subject_resampling.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_tutorials_clustering_plot_Single_subject_resampling.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to evaluate the quality of the clustering and gives an indication of how...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorials/clustering/images/thumb/sphx_glr_plot_find_best_number_of_clusters_thumb.png
+     :alt: Clustering performance evaluation
+
+     :ref:`sphx_glr_auto_tutorials_clustering_plot_find_best_number_of_clusters.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_tutorials_clustering_plot_find_best_number_of_clusters.py`
