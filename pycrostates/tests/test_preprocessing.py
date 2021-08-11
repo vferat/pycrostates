@@ -35,7 +35,7 @@ def test_resample_raw_samples_coverage():
     raw = raw.pick('eeg')
     r = resample(raw, n_samples=500, coverage=0.8, replace=False)
     assert r[0].n_times == 500
-    
+
 def test_resample_raw_noreplace_error():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     raw = raw.pick('eeg')

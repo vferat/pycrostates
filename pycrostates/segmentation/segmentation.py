@@ -77,7 +77,7 @@ def compute_metrics_data(segmentation, data, maps, maps_names, sfreq, norm_gfp=T
             gev = (labeled_gfp * corr) ** 2 / np.sum(gfp ** 2)
             d[f'{state_name}_dist_gev'] = gev
             d[f'{state_name}_gev'] = np.sum(gev)
-            
+
             s_segments = np.array([len(group) for s_, group in segments if s_ == s+1])
             occurence = len(s_segments) /len(segmentation) *  sfreq
             d[f'{state_name}_occurences'] = occurence

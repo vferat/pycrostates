@@ -81,8 +81,7 @@ def test_ModKMeans_fit_epochs():
     epochs.info['bads'] = [epochs.info['ch_names'][0]]
     ModK.fit(epochs, n_jobs=1, min_peak_distance=3)
     assert ModK.cluster_centers_.shape == (n_clusters, len(epochs.info['ch_names']))
-    
-    
+
     epochs.info['bads'] = [epochs.info['ch_names'][0]]
     ModK.fit(epochs, n_jobs=1)
     assert ModK.cluster_centers_.shape == (n_clusters, len(epochs.info['ch_names']))

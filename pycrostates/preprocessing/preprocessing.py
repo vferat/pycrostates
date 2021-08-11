@@ -38,7 +38,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_b
 
     .. warning:: The temporal dimension of the output :class:`mne.io.Raw` object has been destroyed.
                  This object is a convinient container for gfp peaks and should not be used for standart MEEG analysis.
- 
+
     Parameters
     ----------
     inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`, :class:`mne.Evoked`
@@ -84,18 +84,18 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_b
 
 @fill_doc
 @verbose
-def resample(inst, n_epochs:int=None, n_samples:int=None, coverage:float=None,
-             replace:bool=True, start=None, stop=None, reject_by_annotation=None,
+def resample(inst, n_epochs=None, n_samples=None, coverage=None,
+             replace=True, start=None, stop=None, reject_by_annotation=None,
              random_state=None, verbose=None):
     """Resample recording into epochs of random samples.
 
-    Resample :class:`mne.io.Raw` or :class:`mne.epochs.Epochs` 
+    Resample :class:`mne.io.Raw` or :class:`mne.epochs.Epochs`
     into n_epochs :class:`mne.io.Raw` each containing n_samples random samples of
     the originial recording.
 
     .. warning:: The temporal dimension of the output :class:`mne.io.Raw` objects has been destroyed.
                  These objects should not be used for standart MEEG analysis.
-         
+
     Parameters
     ----------
     inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`

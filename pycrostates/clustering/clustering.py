@@ -13,7 +13,6 @@ import scipy
 from mne.annotations import _annotations_starts_stops
 from mne.io import BaseRaw
 from mne.epochs import BaseEpochs
-from mne import Evoked
 from mne.parallel import check_n_jobs, parallel_func
 from mne.preprocessing.ica import _check_start_stop
 from mne.utils import _validate_type, logger, verbose, warn, fill_doc, check_random_state
@@ -154,8 +153,9 @@ def _reject_small_segments(segmentation, data, min_segment_lenght):
     while small_segment:
         segments = [list(group) for _,group in itertools.groupby(new_segmentation)]
         current_idx = 0
+        small_segment = False
         for i,segment in enumerate(segments):
-            if i != 0 and i != len(segments)-1:
+            if i not in [0,len(segments)-1]:
                 if len(segment) <= min_segment_lenght and segment[0] != 0:
                     small_segment = True
                     left_idx = current_idx 
@@ -175,11 +175,9 @@ def _reject_small_segments(segmentation, data, min_segment_lenght):
                             left_idx += 1
                         new_segment = new_segmentation[left_idx:right_idx]
                     break
-                else:
-                    small_segment = False
             current_idx += len(segment)
     return(new_segmentation)
-                
+
 
 @fill_doc
 class BaseClustering():
@@ -384,7 +382,7 @@ class BaseClustering():
         if min_segment_lenght > 0:
             logger.info(f'Rejecting segments shorter than {min_segment_lenght / inst.info["sfreq"]} (ms)')
         if rejected_first_last_segments:
-            logger.info(f'Rejecting first and last segment')
+            logger.info('Rejecting first and last segment')
 
         if isinstance(inst, BaseRaw):
             segmentation = self._predict_raw(raw=inst, picks=picks, reject_by_annotation=reject_by_annotation,

@@ -1,11 +1,8 @@
-import itertools
-
 import numpy as np
 from sklearn.metrics import silhouette_score, calinski_harabasz_score
 from sklearn.utils import _safe_indexing, check_X_y
 from sklearn.metrics.cluster._unsupervised import check_number_of_labels
 from sklearn.preprocessing import LabelEncoder
-from ..utils import _corr_vectors
 
 
 def _distance_matrix(X, Y=None):
@@ -28,7 +25,7 @@ def silhouette(modK): #lower the better
     -------
     silhouette : float
         Mean Silhouette Coefficient.
-        
+
     Notes
     -----
     For more details regarding the implementation, please refere to :func:`sklearn.metrics.silhouette_score`.
@@ -161,7 +158,7 @@ def _delta_fast(ck, cl, distances):
     return np.min(values)
 
 def _big_delta_fast(ci, distances):
-    values = distances[np.where(ci)][:, np.where(ci)]            
+    values = distances[np.where(ci)][:, np.where(ci)]     
     return np.max(values)
 
 def _dunn_score(X, labels): #lower the better

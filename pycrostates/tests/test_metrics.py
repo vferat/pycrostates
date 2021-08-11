@@ -1,6 +1,4 @@
 import os.path as op
-
-import numpy as np
 import mne
 from mne.datasets import testing
 
@@ -20,7 +18,7 @@ ModK.fit(raw, n_jobs=1)
 def test_silouhette():
     score = silhouette(ModK)
     assert isinstance(score, float)
-    
+
 def test_davies_bouldin():
     score = davies_bouldin(ModK)
     assert isinstance(score, float)
