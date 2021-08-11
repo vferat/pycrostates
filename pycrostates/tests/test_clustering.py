@@ -113,6 +113,15 @@ def test_ModKMeans_fit_epochs():
     ModK.fit(epochs, n_jobs=1)
     assert ModK.cluster_centers_.shape == (n_clusters, len(epochs.info['ch_names']))
 
+def test_ModKMeans_fit_n_jobs():
+    raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+    raw = raw.pick('eeg')
+    raw = raw.crop(0, 10)
+    n_clusters = 4
+    ModK = ModKMeans(n_clusters=n_clusters)
+    ModK.fit(raw, n_jobs=2)
+    assert ModK.current_fit == 'Raw'
+
 def test_ModKMeans_fit_min_peak_distance():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     raw = raw.pick('eeg')
@@ -190,7 +199,7 @@ def test_BaseClustering_predict_raw_rejected_first_last_segments():
     assert segmentation.segmentation[0] == 0
     assert segmentation.segmentation[-1] == 0
 
-def test_BaseClustering_predict_raw_rejected_first_last_segments():
+def test_BaseClustering_predict_epochs_rejected_first_last_segments():
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     raw = raw.pick('eeg')
     raw = raw.filter(0, 40)
