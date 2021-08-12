@@ -114,11 +114,6 @@ class BaseSegmentation():
         else:
             self.names = [f'{c+1}' for c in range(len(cluster_centers))]
 
-    def plot_cluster_centers(self):
-        fig, axs = plot_cluster_centers(self.cluster_centers, self.inst.info, self.names)
-        return(fig, axs)
-
-
 class RawSegmentation(BaseSegmentation):
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)

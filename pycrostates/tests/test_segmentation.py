@@ -25,16 +25,16 @@ def test_RawSegmentation_plot_cluster_centers():
     segmentation = ModK.predict(raw)
     segmentation.plot_cluster_centers()
 
-def test_RawSegmentation_compute_metrics():
+def test_RawSegmentation_compute_parameters():
     ModK.fit(raw, n_jobs=1)
     segmentation = ModK.predict(raw)
-    d = segmentation.compute_metrics(norm_gfp=False)
+    d = segmentation.compute_parameters(norm_gfp=False)
     assert isinstance(d,dict)
 
 def test_RawSegmentation_compute_metrics_norm_gfp():
     ModK.fit(raw, n_jobs=1)
     segmentation = ModK.predict(raw)
-    d = segmentation.compute_metrics(norm_gfp=True)
+    d = segmentation.compute_parameters(norm_gfp=True)
     assert isinstance(d,dict)
 
 def test_EpochsSegmentation_plot_cluster_centers():
