@@ -4,23 +4,23 @@ steps:
     versionSpec: '$(python.version)'
   displayName: 'Use Python $(python.version)'
 
-- script:
+- script: |
     python -m pip install --upgrade pip
     pip install -r requirements.txt
   displayName: 'Install dependencies'
 
-- script:
+- script: |
     python -m pip install flake8
     flake8 .
   displayName: 'Run lint tests'
 
-- script:
+- script: |
     pip install pytest pytest-azurepipelines
     pip install pytest-cov
     pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml
   displayName: 'pytest'
 
 - task: PublishCodeCoverageResults@1
-inputs:
-  codeCoverageTool: Cobertura
-  summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
