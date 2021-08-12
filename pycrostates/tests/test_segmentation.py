@@ -50,5 +50,5 @@ def test_EpochsSegmentation_compute_metrics():
     epochs = epochs.pick('eeg')
     ModK.fit(epochs, n_jobs=1)
     segmentation = ModK.predict(epochs)
-    d = segmentation.compute_metrics(norm_gfp=False)
+    d = segmentation.compute_parameters(norm_gfp=False)
     assert isinstance(d,dict)
