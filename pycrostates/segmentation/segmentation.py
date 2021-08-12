@@ -8,10 +8,10 @@ from mne.epochs import BaseEpochs
 from ..viz import plot_cluster_centers, plot_segmentation
 from ..utils import _corr_vectors
 
-def compute_metrics_data(segmentation, data, maps, maps_names, sfreq, norm_gfp=True):
-    """Compute microstate metrics.
+def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq, norm_gfp=True):
+    """Compute microstate parameters.
 
-    Compute the following micorstates metrics:
+    Compute the following micorstates parameters:
     'dist_corr': Distribution of correlations
                  Correlation values of each time point assigned to a given state.
     'mean_corr': Mean correlation
@@ -137,8 +137,8 @@ class RawSegmentation(BaseSegmentation):
                                     tmax=tmax)
         return(fig, ax)
 
-    def compute_metrics(self, norm_gfp=True):
-        d = compute_metrics_data(self.segmentation,
+    def compute_parameters(self, norm_gfp=True):
+        d = _compute_microstate_parameters(self.segmentation,
                                 self.inst.get_data(),
                                 self.cluster_centers,
                                 self.names,
@@ -157,12 +157,12 @@ class EpochsSegmentation(BaseSegmentation):
         if data.shape[2] != self.segmentation.shape[1]:
             raise ValueError('Epochs and segmentation must have the number of samples per epoch.')
 
-    def compute_metrics(self, norm_gfp=True):
+    def compute_parameters(self, norm_gfp=True):
         data = self.inst.get_data()
         data = np.swapaxes(data,0,1)
         data = data.reshape(data.shape[0], -1)
         segmentation = self.segmentation.reshape(-1)
-        d = compute_metrics_data(segmentation,
+        d = _compute_microstate_parameters(segmentation,
                                 data,
                                 self.cluster_centers,
                                 self.names,
