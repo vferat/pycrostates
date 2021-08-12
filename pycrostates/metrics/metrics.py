@@ -80,7 +80,7 @@ def _davies_bouldin_score(X, labels):
 def davies_bouldin(modK): # lower the better
     """Computes the Davies-Bouldin score.
     This function is a proxy function for :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a
-    fitted :class:´pycrostate.clustering.BaseClustering´. It uses the absolute spatial correlation for distance
+    fitted :class:`pycrostate.clustering.BaseClustering`. It uses the absolute spatial correlation for distance
     computations.
 
     Parameters
@@ -120,11 +120,11 @@ def davies_bouldin(modK): # lower the better
 def calinski_harabasz(modK): # lower the better
     """Compute the Calinski and Harabasz score.
     This function is a proxy function for :func:`sklearn.metrics.calinski_harabasz_score` that applies directly to a
-    fitted :class:´pycrostate.clustering.BaseClustering´.
+    fitted :class:`pycrostate.clustering.BaseClustering`.
 
     Parameters
     ----------
-    BaseClustering : :class:´pycrostate.clustering.BaseClustering´
+    BaseClustering : :class:`pycrostate.clustering.BaseClustering`
             Fitted clustering algorithm from which to compute score.
 
     Returns
@@ -196,7 +196,7 @@ def dunn(modK): #lower the better
 
     Parameters
     ----------
-    BaseClustering : :class:´pycrostate.clustering.BaseClustering´
+    BaseClustering : :class:`pycrostate.clustering.BaseClustering`
             Fitted clustering algorithm from which to compute score.
 
     Returns
