@@ -15,10 +15,10 @@ steps:
   displayName: 'Run lint tests'
 
 - script:
-  pip install pytest pytest-azurepipelines
-  pip install pytest-cov
-  pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml
-displayName: 'pytest'
+    pip install pytest pytest-azurepipelines
+    pip install pytest-cov
+    pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml
+  displayName: 'pytest'
 
 - task: PublishCodeCoverageResults@1
 inputs:
