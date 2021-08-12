@@ -74,14 +74,6 @@ def test_BaseClustering_reorder():
     ModK.reorder(order)
     assert (ModK.cluster_centers_ == cluster_centers[order]).all()
 
-def test_BaseClustering_smart_reorder():
-    ModK = ModKMeans(n_clusters=n_clusters)
-    ModK.fit(raw, n_jobs=1)
-    cluster_centers = ModK.cluster_centers_
-    ModK.smart_reorder()
-    assert ModK.cluster_centers_.shape == cluster_centers.shape
-    assert np.isin(ModK.cluster_centers_, cluster_centers).all()
-
 def test_ModKMeans_fit_raw():
     ModK = ModKMeans(n_clusters=n_clusters)
     assert ModK.n_clusters == n_clusters
