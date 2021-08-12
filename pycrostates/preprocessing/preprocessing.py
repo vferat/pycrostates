@@ -174,9 +174,12 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
 
     data = data[:,indices]
     data = np.swapaxes(data,0,1)
+    
+    info = inst.info.copy()
+    info['sfreq'] = -1
     resamples = list()
     for d in data:
-        raw = mne.io.RawArray(d, info=inst.info, verbose=False)
+        raw = mne.io.RawArray(d, info=info, verbose=False)
         resamples.append(raw)
     return(resamples)
  
