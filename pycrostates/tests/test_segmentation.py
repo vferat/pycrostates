@@ -15,10 +15,10 @@ raw = raw.crop(0, 10)
 n_clusters = 4
 ModK = ModKMeans(n_clusters=n_clusters)
 
-def test_RawSegmentation_plot():
-    ModK.fit(raw, n_jobs=1)
-    segmentation = ModK.predict(raw)
-    segmentation.plot()
+#def test_RawSegmentation_plot():
+#    ModK.fit(raw, n_jobs=1)
+#    segmentation = ModK.predict(raw)
+#    segmentation.plot()
 
 def test_RawSegmentation_compute_parameters():
     ModK.fit(raw, n_jobs=1)
