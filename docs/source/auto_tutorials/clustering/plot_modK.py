@@ -33,10 +33,8 @@ ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
 
 # %%
 # Most methods need the modified Kmeans to be fitted. This can be done with either :class:`mne.io.Raw`: or :class:`mne.epochs.Epcohs`: data structures:
-# Global field power peaks extraction can be perform on the fly by setting the min_peak_distance parameter != 0. If min_peak_distance parameter = 0 no extraction is done
-# and the data is used as it is.
 # Note that, depending on your setup, you can change ``n_jobs=1`` in order to use parallel processing and reduce computation time.
-ModK.fit(raw, min_peak_distance=2, n_jobs=5)
+ModK.fit(raw, n_jobs=5)
 
 # %%
 # Now that our algorithm is fitted, we can visualise the cluster centers, also called microstate maps or microstate topographies

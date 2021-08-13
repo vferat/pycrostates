@@ -5,14 +5,14 @@ Examples using ``pycrostates.preprocessing.resample``
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to segment a single subject recording into microstates sequence.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how resemple a recording.">
 
 .. only:: html
 
- .. figure:: /auto_tutorials/clustering/images/thumb/sphx_glr_plot_Single_subject_resampling_thumb.png
-     :alt: Single Subject Segmentation with resampling
+ .. figure:: /auto_tutorials/preprocessing/images/thumb/sphx_glr_plot_resampling_thumb.png
+     :alt: Resampling
 
-     :ref:`sphx_glr_auto_tutorials_clustering_plot_Single_subject_resampling.py`
+     :ref:`sphx_glr_auto_tutorials_preprocessing_plot_resampling.py`
 
 .. raw:: html
 
@@ -20,4 +20,4 @@ Examples using ``pycrostates.preprocessing.resample``
 
 .. only:: not html
 
- * :ref:`sphx_glr_auto_tutorials_clustering_plot_Single_subject_resampling.py`
+ * :ref:`sphx_glr_auto_tutorials_preprocessing_plot_resampling.py`

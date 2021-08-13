@@ -15,24 +15,24 @@ Below is a gallery of examples
 
 
 
-.. _sphx_glr_auto_tutorials_clustering:
+.. _sphx_glr_auto_tutorials_preprocessing:
 
-Clustering
-==========
+Preprocessing
+=============
 
-Clustering tutorials
+Preprocessing tutorials
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to extract global field power (gfp) peaks.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to extract global field power (gfp) peaks for an eeg recording.">
 
 .. only:: html
 
- .. figure:: /auto_tutorials/clustering/images/thumb/sphx_glr_plot_extract_gfp_peaks_thumb.png
+ .. figure:: /auto_tutorials/preprocessing/images/thumb/sphx_glr_plot_extract_gfp_peaks_thumb.png
      :alt: Global field power peaks extraction
 
-     :ref:`sphx_glr_auto_tutorials_clustering_plot_extract_gfp_peaks.py`
+     :ref:`sphx_glr_auto_tutorials_preprocessing_plot_extract_gfp_peaks.py`
 
 .. raw:: html
 
@@ -42,7 +42,41 @@ Clustering tutorials
 .. toctree::
    :hidden:
 
-   /auto_tutorials/clustering/plot_extract_gfp_peaks
+   /auto_tutorials/preprocessing/plot_extract_gfp_peaks
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how resemple a recording.">
+
+.. only:: html
+
+ .. figure:: /auto_tutorials/preprocessing/images/thumb/sphx_glr_plot_resampling_thumb.png
+     :alt: Resampling
+
+     :ref:`sphx_glr_auto_tutorials_preprocessing_plot_resampling.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorials/preprocessing/plot_resampling
+.. raw:: html
+
+    <div class="sphx-glr-clear"></div>
+
+
+
+.. _sphx_glr_auto_tutorials_clustering:
+
+Clustering
+==========
+
+Clustering tutorials
+
 
 .. raw:: html
 
@@ -64,27 +98,6 @@ Clustering tutorials
    :hidden:
 
    /auto_tutorials/clustering/plot_modK
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to segment a single subject recording into microstates sequence.">
-
-.. only:: html
-
- .. figure:: /auto_tutorials/clustering/images/thumb/sphx_glr_plot_Single_subject_resampling_thumb.png
-     :alt: Single Subject Segmentation with resampling
-
-     :ref:`sphx_glr_auto_tutorials_clustering_plot_Single_subject_resampling.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_tutorials/clustering/plot_Single_subject_resampling
 
 .. raw:: html
 

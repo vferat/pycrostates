@@ -6,7 +6,7 @@ from mne.io import BaseRaw
 from mne.epochs import BaseEpochs
 from mne.utils import _validate_type, logger, verbose, fill_doc, check_random_state
 from mne.preprocessing.ica import _check_start_stop
-
+from pycrostates.utils import _check_reject_by_annotation
 
 def _extract_gfps(data, min_peak_distance=2):
     """Extract Gfp peaks from input data
@@ -68,7 +68,8 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_b
         data = inst.get_data(start=start, stop=stop,
                              reject_by_annotation=reject_by_annotation)
         peaks = _extract_gfps(data, min_peak_distance=min_peak_distance)
-
+        logger.info(f'{peaks.shape[1]} gfp peaks extracted out of {data.shape[-1]} samples'
+            f'({(peaks.shape[1] /data.shape[-1] * 100):.2f}% of the original data)')
     if isinstance(inst, BaseEpochs):
         data = inst.get_data()
         peaks = list()
@@ -76,16 +77,19 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_b
             epoch_peaks = _extract_gfps(epoch, min_peak_distance=min_peak_distance)
             peaks.append(epoch_peaks)
         peaks = np.hstack(peaks)
-    logger.info(f'{peaks.shape[1]} gfp peaks extracted out of {data.shape[1]} samples'
-                f'({(peaks.shape[1] /data.shape[1] * 100):.2f}% of the original data)')
-    raw_peaks = mne.io.RawArray(data=peaks, info=inst.info, verbose=False)
+        logger.info(f'{peaks.shape[1]} gfp peaks extracted out of {data.shape[0] * data.shape[2]} samples'
+                    f'({(peaks.shape[1] / (data.shape[0] * data.shape[2]) * 100):.2f}% of the original data)')
+    
+    info = inst.info.copy()
+    info['sfreq'] = -1
+    raw_peaks = mne.io.RawArray(data=peaks, info=info, verbose=False)
     return(raw_peaks)
 
 
 @fill_doc
 @verbose
 def resample(inst, n_epochs=None, n_samples=None, coverage=None,
-             replace=True, start=None, stop=None, reject_by_annotation=None,
+             replace=True, start=None, stop=None, reject_by_annotation=True,
              random_state=None, verbose=None):
     """Resample recording into epochs of random samples.
 
@@ -110,9 +114,11 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
     replace: bool
         Whether or not to allow resampling with replacement.
         Default to True.
+    reject_by_annotation : bool
+        Whether to reject by annotation. If True (default), segments annotated with description starting with ‘bad’ are omitted.
+        If False,no rejection is done.
     %(raw_tmin)s
     %(raw_tmax)s
-    %(reject_by_annotation_raw)s
     %(random_state)s
         As resampling can be non-deterministic it can be useful to fix the
         random state to have reproducible results.
@@ -128,6 +134,7 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
         Raw objects each containing resampled data ( n_epochs raws of n_samples samples).
     """
     _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
+    reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
     random_state = check_random_state(random_state)
 
     if isinstance(inst, BaseRaw):
@@ -162,7 +169,7 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
             raise(ValueError(f'''Can't draw {n_epochs} epochs of {n_samples} samples = {n_epochs * n_samples}'''
                              f'''samples without replacement: instance contains only {n_times} samples'''))
 
-    logger.info(f'Resampling instance into {n_epochs} epochs of {n_samples} covering {coverage *100:2f}% of the data')
+    logger.info(f'Resampling instance into {n_epochs} epochs of {n_samples} covering {coverage *100:.2f}% of the original data')
 
     if replace:
         indices = random_state.randint(0, n_samples, size=(n_epochs, n_samples))
@@ -174,12 +181,10 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
 
     data = data[:,indices]
     data = np.swapaxes(data,0,1)
-    
-    info = inst.info.copy()
-    info['sfreq'] = -1
+
     resamples = list()
     for d in data:
-        raw = mne.io.RawArray(d, info=info, verbose=False)
+        raw = mne.io.RawArray(d, info=inst.info, verbose=False)
         resamples.append(raw)
     return(resamples)
  

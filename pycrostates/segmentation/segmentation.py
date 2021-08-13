@@ -5,7 +5,7 @@ from mne.utils import _validate_type
 from mne.io import BaseRaw
 from mne.epochs import BaseEpochs
 
-from ..viz import plot_cluster_centers, plot_segmentation
+from ..viz import plot_segmentation
 from ..utils import _corr_vectors
 
 def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq, norm_gfp=True):

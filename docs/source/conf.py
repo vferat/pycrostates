@@ -77,7 +77,8 @@ numpydoc_xref_param_type = True
 sphinx_gallery_conf = {
      'examples_dirs': os.path.abspath(os.path.join(curdir, '..', '..', 'tutorials')),   # path to example scripts
      'gallery_dirs': 'auto_tutorials',  # path to where to save gallery generated output
-     'subsection_order': ExplicitOrder(['../../tutorials/clustering',
+     'subsection_order': ExplicitOrder(['../../tutorials/preprocessing',
+                                       '../../tutorials/clustering',
                                        '../../tutorials/backfitting',
                                        '../../tutorials/group_level_analysis']),
      'reference_url': {

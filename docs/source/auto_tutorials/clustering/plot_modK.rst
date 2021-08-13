@@ -57,7 +57,7 @@ This tutorial introduces the :class:`pycrostates.clustering.ModKMeans` structure
 
  .. code-block:: none
 
-    Extracting EDF parameters from C:\Users\ferat\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R01.edf...
+    Extracting EDF parameters from C:\Users\Victor\mne_data\MNE-eegbci-data\files\eegmmidb\1.0.0\S001\S001R01.edf...
     EDF file detected
     Setting channel info structure...
     Creating raw.info structure...
@@ -66,72 +66,9 @@ This tutorial introduces the :class:`pycrostates.clustering.ModKMeans` structure
     Applying average reference.
     Applying a custom EEG reference.
 
-
-.. raw:: html
-
-    <div class="output_subarea output_html rendered_html output_result">
+    <RawEDF | S001R01.edf, 64 x 9760 (61.0 s), ~4.9 MB, data loaded>
 
 
-    <table class="table table-hover">
-        <tr>
-            <th>Measurement date</th>
-            <td>August 12, 2009  16:15:00 GMT</td>
-        
-        </tr>
-        <tr>
-            <th>Experimenter</th>
-    <td>Unknown</td>
-        </tr>
-            <th>Participant</th>
-    <td>Unknown</td>
-        </tr>
-        <tr>
-            <th>Digitized points</th>
-            <td>67 points</td>
-        </tr>
-        <tr>
-            <th>Good channels</th>
-            <td>0 magnetometer, 0 gradiometer,
-                and 64 EEG channels</td>
-        </tr>
-        <tr>
-            <th>Bad channels</th>
-            <td></td>
-        
-        </tr>
-        <tr>
-            <th>EOG channels</th>
-            <td>Not available</td>
-        </tr>
-        <tr>
-            <th>ECG channels</th>
-            <td>Not available</td>
-        <tr>
-            <th>Sampling frequency</th>
-            <td>160.00 Hz</td>
-        </tr>
-        <tr>
-            <th>Highpass</th>
-            <td>0.00 Hz</td>
-        </tr>
-         <tr>
-            <th>Lowpass</th>
-            <td>80.00 Hz</td>
-        </tr>
-
-        <tr>
-            <th>Filenames</th>
-            <td>S001R01.edf</td>
-        </tr>
-        <tr>
-            <th>Duration</th>
-            <td>00:01:00 (HH:MM:SS)</td>
-        </tr>
-    </table>
-
-    </div>
-    <br />
-    <br />
 
 .. GENERATED FROM PYTHON SOURCE LINES 28-31
 
@@ -153,18 +90,16 @@ A random_state can be defined during class definition in order to have reproduci
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-39
+.. GENERATED FROM PYTHON SOURCE LINES 35-37
 
 Most methods need the modified Kmeans to be fitted. This can be done with either :class:`mne.io.Raw`: or :class:`mne.epochs.Epcohs`: data structures:
-Global field power peaks extraction can be perform on the fly by setting the min_peak_distance parameter != 0. If min_peak_distance parameter = 0 no extraction is done
-and the data is used as it is.
 Note that, depending on your setup, you can change ``n_jobs=1`` in order to use parallel processing and reduce computation time.
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-41
+.. GENERATED FROM PYTHON SOURCE LINES 37-39
 
 .. code-block:: default
 
-    ModK.fit(raw, min_peak_distance=2, n_jobs=5)
+    ModK.fit(raw, n_jobs=5)
 
 
 
@@ -176,22 +111,22 @@ Note that, depending on your setup, you can change ``n_jobs=1`` in order to use 
 
  .. code-block:: none
 
-    Fitting modified Kmeans with Raw data by selecting Gfppeaks with minimum distance of 0.32ms(2 samples)
+    Fitting modified Kmeans with Raw data
     Running Kmeans for 4 clusters centers with 100 random initialisations.
-      0%|                                                                                                                                                                       |  : 0/100 [00:00<?,       ?it/s]      5%|########1                                                                                                                                                          |  : 5/100 [00:00<00:02,   36.01it/s]     15%|########################3                                                                                                                                         |  : 15/100 [00:00<00:02,   36.09it/s]     25%|########################################5                                                                                                                         |  : 25/100 [00:00<00:02,   35.95it/s]     35%|########################################################7                                                                                                         |  : 35/100 [00:01<00:01,   35.54it/s]     45%|########################################################################9                                                                                         |  : 45/100 [00:01<00:01,   34.53it/s]     55%|#########################################################################################1                                                                        |  : 55/100 [00:01<00:01,   33.58it/s]     65%|#########################################################################################################3                                                        |  : 65/100 [00:02<00:01,   32.37it/s]     75%|#########################################################################################################################5                                        |  : 75/100 [00:02<00:00,   32.41it/s]     85%|#########################################################################################################################################7                        |  : 85/100 [00:03<00:00,   32.53it/s]     95%|#########################################################################################################################################################9        |  : 95/100 [00:03<00:00,   32.74it/s]    100%|#################################################################################################################################################################|  : 100/100 [00:03<00:00,   30.12it/s]
-    Selecting run with highest GEV = 0.6871907944811648%.
+      0%|                                                                                                                                                   |  : 0/100 [00:00<?,       ?it/s]      5%|#######1                                                                                                                                       |  : 5/100 [00:04<01:18,    1.21it/s]     10%|##############2                                                                                                                               |  : 10/100 [00:04<01:10,    1.27it/s]     15%|#####################3                                                                                                                        |  : 15/100 [00:05<01:04,    1.33it/s]     20%|############################4                                                                                                                 |  : 20/100 [00:05<00:57,    1.38it/s]     25%|###################################5                                                                                                          |  : 25/100 [00:06<00:51,    1.45it/s]     30%|##########################################6                                                                                                   |  : 30/100 [00:06<00:46,    1.51it/s]     35%|#################################################6                                                                                            |  : 35/100 [00:07<00:41,    1.58it/s]     40%|########################################################8                                                                                     |  : 40/100 [00:07<00:36,    1.65it/s]     45%|###############################################################9                                                                              |  : 45/100 [00:08<00:31,    1.72it/s]     50%|#######################################################################                                                                       |  : 50/100 [00:08<00:27,    1.79it/s]     55%|##############################################################################1                                                               |  : 55/100 [00:09<00:24,    1.86it/s]     60%|#####################################################################################2                                                        |  : 60/100 [00:10<00:20,    1.94it/s]     65%|############################################################################################3                                                 |  : 65/100 [00:10<00:17,    2.02it/s]     70%|###################################################################################################3                                          |  : 70/100 [00:11<00:14,    2.10it/s]     75%|##########################################################################################################5                                   |  : 75/100 [00:11<00:11,    2.19it/s]     80%|#################################################################################################################6                            |  : 80/100 [00:12<00:08,    2.27it/s]     85%|########################################################################################################################7                     |  : 85/100 [00:12<00:06,    2.37it/s]     90%|###############################################################################################################################8              |  : 90/100 [00:13<00:04,    2.46it/s]     95%|######################################################################################################################################9       |  : 95/100 [00:13<00:01,    2.56it/s]    100%|#############################################################################################################################################|  : 100/100 [00:14<00:00,    2.65it/s]    100%|#############################################################################################################################################|  : 100/100 [00:14<00:00,    7.04it/s]
+    Selecting run with highest GEV = 0.6816047968052894%.
 
     ()
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-45
+.. GENERATED FROM PYTHON SOURCE LINES 40-43
 
 Now that our algorithm is fitted, we can visualise the cluster centers, also called microstate maps or microstate topographies
 using :meth:`ModK.plot`. Note than this method uses the :class:`~mne.Info` object of the fitted instance to display
 the topographies.
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-47
+.. GENERATED FROM PYTHON SOURCE LINES 43-45
 
 .. code-block:: default
 
@@ -212,18 +147,19 @@ the topographies.
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<AxesSubplot:title={'center':'1'}>,
-           <AxesSubplot:title={'center':'2'}>,
-           <AxesSubplot:title={'center':'3'}>,
-           <AxesSubplot:title={'center':'4'}>], dtype=object))
+    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x0000019E92DA9108>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x0000019E92DEA4C8>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x0000019E8FF22EC8>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x0000019E8FF5CB48>],
+          dtype=object))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-49
+.. GENERATED FROM PYTHON SOURCE LINES 46-47
 
 One can access the cluster centers as a numpy array thanks to :meth:`ModK.get_cluster_centers`:
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-51
+.. GENERATED FROM PYTHON SOURCE LINES 47-49
 
 .. code-block:: default
 
@@ -240,102 +176,102 @@ One can access the cluster centers as a numpy array thanks to :meth:`ModK.get_cl
  .. code-block:: none
 
 
-    array([[ 1.42230808e-01,  7.58011607e-02,  2.47248641e-02,
-            -2.05707630e-02, -4.60869791e-02, -5.94171386e-02,
-            -9.13476665e-02,  7.13912192e-02,  1.93248927e-02,
-            -1.82381959e-02, -5.65961143e-02, -7.41535897e-02,
-            -9.73746022e-02, -1.07908861e-01,  1.32351827e-02,
-            -1.30978470e-02, -3.94211761e-02, -6.20736438e-02,
-            -8.54994718e-02, -1.00147575e-01, -1.12558976e-01,
-             3.38212876e-01,  2.32400061e-01,  2.21203853e-01,
-             3.53319851e-01,  3.39186476e-01,  8.86806638e-02,
-             5.08705440e-02,  8.08628469e-02,  2.70048327e-01,
-             2.22976819e-01,  4.82439304e-02,  7.84712929e-02,
-             3.90280884e-02,  1.34113194e-02,  1.03043982e-02,
-            -4.05164072e-02, -1.51759328e-01,  1.79422834e-01,
-            -1.14323932e-01,  1.06676173e-01, -1.21389087e-01,
-             9.36525278e-02, -1.21394455e-01,  4.38928798e-02,
-            -1.21046042e-01, -1.99750503e-02, -3.29703381e-02,
-            -3.37803039e-02, -6.61235847e-02, -8.09894357e-02,
-            -1.04670397e-01, -1.10214908e-01, -1.18941798e-01,
-            -1.22976455e-01, -5.88502517e-02, -5.91383712e-02,
-            -9.06383465e-02, -1.25761702e-01, -1.24445758e-01,
-            -7.21939627e-02, -8.95713276e-02, -1.09024030e-01,
-            -8.23860194e-02],
-           [ 1.10276333e-01,  1.06088583e-01,  1.20664317e-01,
-             1.44098385e-01,  1.22958742e-01,  9.84200658e-02,
-             8.75422835e-02,  5.04622585e-02,  3.70535933e-02,
-             3.64960448e-02,  3.33588515e-02,  3.69158305e-02,
-             2.36860925e-02,  2.75887120e-02, -2.34381028e-02,
-            -2.57107850e-02, -4.11269621e-02, -4.94381688e-02,
-            -4.55424057e-02, -5.48078992e-02, -3.69787944e-02,
-             1.17548993e-01,  1.13087228e-01,  1.09143444e-01,
-             1.25658956e-01,  1.28290942e-01,  1.68467566e-01,
-             1.35920386e-01,  1.00772168e-01,  1.20365543e-01,
-             1.32195927e-01,  1.33498427e-01,  1.59820851e-01,
-             1.63201788e-01,  1.52040802e-01,  1.36190791e-01,
-             1.12461792e-01,  1.06364175e-01,  7.83292996e-02,
-             6.20075557e-02,  4.09707441e-02,  1.69654749e-02,
-             2.46727565e-02,  1.47251817e-02, -1.47642596e-02,
-            -4.86579908e-02, -1.11955025e-01, -1.19839002e-01,
-            -1.24612915e-01, -1.64848732e-01, -1.47561814e-01,
-            -1.63771454e-01, -1.51010683e-01, -1.39122625e-01,
-            -1.37545676e-01, -1.88968637e-01, -1.92707321e-01,
-            -2.21357511e-01, -2.02263890e-01, -2.16106537e-01,
-            -2.12540765e-01, -2.22357639e-01, -2.36622401e-01,
-            -1.94652888e-01],
-           [-1.55557945e-02, -5.78723323e-03, -9.73752068e-03,
-            -1.06293188e-02, -1.48648355e-02, -1.15948078e-02,
-            -1.60140726e-02,  3.97293353e-02,  3.75806360e-02,
-             3.38889609e-02,  3.82753366e-02,  2.60680039e-02,
-             2.90268742e-02,  3.17990660e-02,  6.99917592e-02,
-             6.24334864e-02,  6.06228006e-02,  6.32882082e-02,
-             5.94503462e-02,  6.14106749e-02,  6.26621102e-02,
-            -3.60064562e-01, -3.07230126e-01, -3.48521418e-01,
-            -2.84318156e-01, -2.74603467e-01, -1.38981151e-01,
-            -1.95337560e-01, -3.11278402e-01, -8.15727170e-02,
-            -1.22277153e-01, -7.29546156e-02, -7.16473029e-02,
-            -6.77639352e-02, -7.57583565e-02, -7.45113112e-02,
-            -9.75459132e-02, -7.16251456e-02,  5.59044035e-05,
-             2.85600866e-03,  5.25149299e-02,  4.95320959e-02,
-             6.51057964e-02,  8.42056265e-02,  7.16188590e-02,
-             7.59215358e-02,  9.89287623e-02,  9.62137721e-02,
-             9.32991677e-02,  9.91138624e-02,  9.50083852e-02,
-             9.82162043e-02,  9.35263859e-02,  9.65931504e-02,
-             1.00080390e-01,  1.19461886e-01,  1.13329101e-01,
-             1.19108978e-01,  1.18495648e-01,  1.28818086e-01,
-             1.28047713e-01,  1.29052051e-01,  1.19556398e-01,
-             1.15286579e-01],
-           [ 1.14977133e-01,  8.90744483e-02,  4.33441528e-02,
-            -2.04595105e-02, -5.74431411e-02, -1.24634094e-01,
-            -1.79710856e-01,  1.35857281e-01,  1.06779761e-01,
-             7.80537491e-02,  4.03284644e-02, -1.56527096e-02,
-            -5.95914567e-02, -1.28058523e-01,  1.38266980e-01,
-             1.14515040e-01,  1.04478514e-01,  7.41772840e-02,
-             2.58199758e-02, -1.15404639e-02, -6.20593615e-02,
-            -1.39691492e-01, -1.59172764e-01, -2.14375173e-01,
-            -3.91974767e-02, -3.80094460e-02, -8.50964981e-02,
-            -1.82091239e-01, -2.91699380e-01,  9.92056529e-02,
-             4.89985329e-02, -2.42869956e-02,  1.29270167e-03,
-            -5.07187159e-02, -9.52208881e-02, -1.11950716e-01,
-            -2.07819404e-01, -3.32927652e-01,  1.19722236e-01,
-            -2.36088878e-01,  1.32424943e-01, -1.89893592e-01,
-             1.06453978e-01, -1.88599074e-01,  1.34981424e-01,
-            -1.00849792e-01,  1.46897457e-01,  1.42015479e-01,
-             1.39469788e-01,  1.27536988e-01,  9.67846028e-02,
-             6.29632771e-02,  2.92432775e-02, -6.96102230e-03,
-            -3.32163100e-02,  1.46497307e-01,  1.50518123e-01,
-             1.15154274e-01,  4.24953814e-02,  3.82401219e-02,
-             1.49013238e-01,  1.24292699e-01,  8.22447364e-02,
-             8.48976220e-02]])
+    array([[ 7.49808656e-03,  1.54598468e-04,  5.86832905e-03,
+             6.44930343e-03,  1.13705585e-02,  8.41731447e-03,
+             1.38532852e-02, -4.51539774e-02, -3.93052339e-02,
+            -3.61211553e-02, -4.04625651e-02, -2.88231757e-02,
+            -3.16755581e-02, -3.43099001e-02, -7.02101668e-02,
+            -6.21214457e-02, -6.11880045e-02, -6.49728400e-02,
+            -6.09867462e-02, -6.23666236e-02, -6.31864760e-02,
+             3.62770977e-01,  3.10542609e-01,  3.55199640e-01,
+             2.85935256e-01,  2.76092743e-01,  1.37079986e-01,
+             1.98214332e-01,  3.18647094e-01,  7.39196166e-02,
+             1.15425387e-01,  7.14478427e-02,  6.83601107e-02,
+             6.50657112e-02,  7.43292334e-02,  7.30046032e-02,
+             9.95225727e-02,  7.52100616e-02, -6.64015283e-03,
+            -3.65282739e-03, -5.52085257e-02, -4.86789885e-02,
+            -7.75621361e-02, -9.26958889e-02, -7.34821828e-02,
+            -7.65466895e-02, -9.62056122e-02, -9.03770048e-02,
+            -8.74205199e-02, -9.34978480e-02, -9.03184460e-02,
+            -9.34491400e-02, -8.87788211e-02, -9.30017051e-02,
+            -9.74132988e-02, -1.13379416e-01, -1.06977837e-01,
+            -1.12535313e-01, -1.12345707e-01, -1.22079516e-01,
+            -1.24867497e-01, -1.26225742e-01, -1.14344522e-01,
+            -1.15810046e-01],
+           [-1.35751051e-01, -6.53168701e-02, -1.73002726e-02,
+             2.65993265e-02,  5.22076451e-02,  6.61378256e-02,
+             9.53920797e-02, -6.45424689e-02, -1.14015097e-02,
+             2.36820863e-02,  5.84944024e-02,  7.95777567e-02,
+             9.79726828e-02,  1.08077880e-01, -7.91525304e-03,
+             1.76689791e-02,  4.12601994e-02,  6.16797610e-02,
+             8.35609844e-02,  9.80416000e-02,  1.11281374e-01,
+            -3.52368327e-01, -2.45016164e-01, -2.41543721e-01,
+            -3.60337820e-01, -3.46461748e-01, -8.51098196e-02,
+            -5.31455798e-02, -9.12392911e-02, -2.58495495e-01,
+            -2.16974267e-01, -4.38650700e-02, -7.02147987e-02,
+            -3.10299439e-02, -8.37624298e-03, -3.13212841e-03,
+             4.14602685e-02,  1.69810582e-01, -1.66800598e-01,
+             1.24182866e-01, -9.45261384e-02,  1.26216044e-01,
+            -8.22385375e-02,  1.31217210e-01, -3.95380748e-02,
+             1.15810142e-01,  1.91208106e-02,  2.94644370e-02,
+             2.86366446e-02,  5.92027922e-02,  7.25181035e-02,
+             9.49726913e-02,  1.00697211e-01,  1.08467752e-01,
+             1.13072298e-01,  5.06657355e-02,  5.06665131e-02,
+             7.96616605e-02,  1.15214082e-01,  1.11385796e-01,
+             6.79379172e-02,  8.22758462e-02,  9.76557198e-02,
+             8.06934856e-02],
+           [-1.39560075e-01, -1.06592336e-01, -5.73846061e-02,
+             8.12110781e-03,  4.63766882e-02,  1.18005682e-01,
+             1.75576203e-01, -1.50409196e-01, -1.11384578e-01,
+            -8.48326225e-02, -4.77057106e-02,  1.25878261e-02,
+             5.70680696e-02,  1.25727387e-01, -1.33797355e-01,
+            -1.12071888e-01, -1.03160001e-01, -7.28849288e-02,
+            -2.51920206e-02,  1.47899966e-02,  6.52846808e-02,
+             1.33807134e-01,  1.58170047e-01,  2.16683664e-01,
+             1.65865470e-02,  1.53854925e-02,  7.10339104e-02,
+             1.79244948e-01,  3.06960915e-01, -1.29669201e-01,
+            -7.36697790e-02,  6.59939830e-03, -2.01214448e-02,
+             3.44049110e-02,  8.14316578e-02,  1.02547584e-01,
+             2.06895092e-01,  3.56204485e-01, -1.42711704e-01,
+             2.41263456e-01, -1.42915716e-01,  1.80857617e-01,
+            -1.24641611e-01,  1.98542038e-01, -1.39103441e-01,
+             1.13499671e-01, -1.33263230e-01, -1.27277801e-01,
+            -1.27964135e-01, -1.14557101e-01, -8.75981606e-02,
+            -5.14367382e-02, -1.95291164e-02,  1.94510716e-02,
+             4.94882342e-02, -1.25852070e-01, -1.33136900e-01,
+            -1.00462757e-01, -2.51000706e-02, -1.77225825e-02,
+            -1.22054881e-01, -9.82938400e-02, -5.55024081e-02,
+            -5.50355101e-02],
+           [ 1.01750620e-01,  8.80288656e-02,  1.06389379e-01,
+             1.29289428e-01,  1.10948128e-01,  9.16250221e-02,
+             9.45103454e-02,  3.76246665e-02,  1.82821096e-02,
+             1.38051360e-02,  1.22207133e-02,  2.08554012e-02,
+             1.28959576e-02,  3.20848119e-02, -3.53568949e-02,
+            -4.39542399e-02, -6.32281160e-02, -7.05996722e-02,
+            -6.07571089e-02, -6.45918714e-02, -3.62875234e-02,
+             1.11934279e-01,  1.18600859e-01,  1.16383221e-01,
+             1.24635923e-01,  1.28568498e-01,  1.75517203e-01,
+             1.48296848e-01,  1.08472492e-01,  1.27909100e-01,
+             1.29522124e-01,  1.33311103e-01,  1.57798260e-01,
+             1.63855234e-01,  1.56317232e-01,  1.44166099e-01,
+             1.28027131e-01,  1.29725776e-01,  8.33876269e-02,
+             8.27826521e-02,  4.79781574e-02,  3.76966782e-02,
+             3.08653134e-02,  3.86069216e-02, -5.69882675e-03,
+            -2.73179729e-02, -1.03862250e-01, -1.17145474e-01,
+            -1.24691527e-01, -1.69891122e-01, -1.50392873e-01,
+            -1.61810455e-01, -1.44772372e-01, -1.26045451e-01,
+            -1.19150475e-01, -1.82064461e-01, -1.90250310e-01,
+            -2.19602121e-01, -1.92122801e-01, -1.98973060e-01,
+            -2.22398310e-01, -2.28712787e-01, -2.43295646e-01,
+            -1.91695593e-01]])
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-53
+.. GENERATED FROM PYTHON SOURCE LINES 50-51
 
 or as a :class:`mne.io.Raw` object:
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-55
+.. GENERATED FROM PYTHON SOURCE LINES 51-53
 
 .. code-block:: default
 
@@ -355,15 +291,15 @@ or as a :class:`mne.io.Raw` object:
         Range : 0 ... 3 =      0.000 ...     0.019 secs
     Ready.
 
-    <RawArray | 64 x 4 (0.0 s), ~92 kB, data loaded>
+    <RawArray | 64 x 4 (0.0 s), ~93 kB, data loaded>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-57
+.. GENERATED FROM PYTHON SOURCE LINES 54-55
 
 Clusters centers can be reordered using :meth:`ModK.reorder`:
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-60
+.. GENERATED FROM PYTHON SOURCE LINES 55-58
 
 .. code-block:: default
 
@@ -385,18 +321,19 @@ Clusters centers can be reordered using :meth:`ModK.reorder`:
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<AxesSubplot:title={'center':'4'}>,
-           <AxesSubplot:title={'center':'1'}>,
-           <AxesSubplot:title={'center':'3'}>,
-           <AxesSubplot:title={'center':'2'}>], dtype=object))
+    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x0000019E9021BAC8>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x0000019E90241388>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x0000019E902793C8>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x0000019E902B45C8>],
+          dtype=object))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-62
+.. GENERATED FROM PYTHON SOURCE LINES 59-60
 
 and renamed using :meth:`ModK.rename`:
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-65
+.. GENERATED FROM PYTHON SOURCE LINES 60-63
 
 .. code-block:: default
 
@@ -418,19 +355,20 @@ and renamed using :meth:`ModK.rename`:
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<AxesSubplot:title={'center':'A'}>,
-           <AxesSubplot:title={'center':'B'}>,
-           <AxesSubplot:title={'center':'C'}>,
-           <AxesSubplot:title={'center':'D'}>], dtype=object))
+    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x0000019E9021A308>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x0000019E92F81A08>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x0000019E92FBAA48>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x0000019E92FF2C48>],
+          dtype=object))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-68
+.. GENERATED FROM PYTHON SOURCE LINES 64-66
 
 Maps polarities can be inverted thanks to :meth:`ModK.invert_polarity` method. Note that this only affects visualisation:
 this has not effect during backfitting as polarities are ignored.
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-71
+.. GENERATED FROM PYTHON SOURCE LINES 66-69
 
 .. code-block:: default
 
@@ -452,14 +390,15 @@ this has not effect during backfitting as polarities are ignored.
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 4 Axes>, array([<AxesSubplot:title={'center':'A'}>,
-           <AxesSubplot:title={'center':'B'}>,
-           <AxesSubplot:title={'center':'C'}>,
-           <AxesSubplot:title={'center':'D'}>], dtype=object))
+    (<Figure size 640x480 with 4 Axes>, array([<matplotlib.axes._subplots.AxesSubplot object at 0x0000019E8FFD17C8>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x0000019E92D91388>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x0000019E93097C88>,
+           <matplotlib.axes._subplots.AxesSubplot object at 0x0000019E90056E88>],
+          dtype=object))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-78
+.. GENERATED FROM PYTHON SOURCE LINES 70-76
 
 Finaly, the modified Kmeans can be used to predict the microstates segmentation using the :meth:`ModK.predict` method:
 By default, semgents annoated as bad will no be labeled: this behavior can be changed by changing the `reject_by_annotation` paramerts.
@@ -468,7 +407,7 @@ Smoothing can be performed on the output sequence by setting the `factor` parame
 Finaly, the `rejected_first_last_segments` parameter allows not to assign the first and last segment of each record (or each epoch) as these can be incomplete.
 Should have little impact for raw, but can be important when working with epochs.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-80
+.. GENERATED FROM PYTHON SOURCE LINES 76-78
 
 .. code-block:: default
 
@@ -491,14 +430,14 @@ Should have little impact for raw, but can be important when working with epochs
     Segmenting data with factor 10 and effective smoothing window size : 0.38125 (ms)
     Rejecting first and last segment
 
-    (<Figure size 1000x400 with 2 Axes>, [<matplotlib.lines.Line2D object at 0x00000260B94432C8>])
+    (<Figure size 1000x400 with 2 Axes>, [<matplotlib.lines.Line2D object at 0x0000019E93C119C8>])
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.936 seconds)
+   **Total running time of the script:** ( 0 minutes  15.931 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_clustering_plot_modK.py:

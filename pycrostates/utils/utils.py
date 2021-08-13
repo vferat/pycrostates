@@ -39,7 +39,7 @@ def _check_ch_names(inst1,inst2,inst1_name='inst', inst2_name='inst'):
         raise ValueError(f'Inconsistent Channel found between {inst1_name} and  {inst2_name}')
     return()
 
-def _reject_by_annotation(reject_by_annotation):
+def _check_reject_by_annotation(reject_by_annotation):
     if reject_by_annotation is False:
         reject_by_annotation = None
     elif reject_by_annotation is True:

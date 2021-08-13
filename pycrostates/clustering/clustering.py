@@ -18,7 +18,7 @@ from mne.preprocessing.ica import _check_start_stop
 from mne.utils import _validate_type, logger, verbose, warn, fill_doc, check_random_state
 from mne.io.pick import _picks_to_idx, pick_info
 
-from ..utils import _corr_vectors, _check_ch_names, _reject_by_annotation
+from ..utils import _corr_vectors, _check_ch_names, _check_reject_by_annotation
 from ..segmentation import RawSegmentation, EpochsSegmentation
 from ..preprocessing import _extract_gfps
 
@@ -572,7 +572,7 @@ class ModKMeans(BaseClustering):
         %(verbose)s
         """
         _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
-        reject_by_annotation = _reject_by_annotation(reject_by_annotation)
+        reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
         n_jobs = check_n_jobs(n_jobs)
 
         if len(inst.info['bads']) != 0:
