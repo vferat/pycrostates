@@ -1,6 +1,8 @@
 import numpy as np
 
 def _corr_vectors(A, B, axis=0):
+    # based on https://github.com/wmvanvliet/mne_microstates/blob/master/microstates.py
+    # written by Marijn van Vliet <w.m.vanvliet@gmail.com>
     """Compute pairwise correlation of multiple pairs of vectors.
     Fast way to compute correlation of multiple pairs of vectors without
     computing all pairs as would with corr(A,B). Borrowed from Oli at Stack

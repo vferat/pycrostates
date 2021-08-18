@@ -31,7 +31,7 @@ def _extract_gfps(data, min_peak_distance=2):
 
 @fill_doc
 @verbose
-def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_by_annotation=None, verbose=None):
+def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_by_annotation=True, verbose=None):
     """Perform GFP peaks extraction
 
     Extract global field power peaks from :class:`mne.epochs.Epochs`or :class:`mne.io.Raw`.
@@ -49,9 +49,11 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_b
                     Smaller peaks are removed first until the
                     condition is fulfilled for all remaining peaks.
                     Default to 2.
+    reject_by_annotation : bool
+        Whether to reject by annotation. If True (default), segments annotated with description starting with ‘bad’ are omitted.
+        If False,no rejection is done.
     %(raw_tmin)s
     %(raw_tmax)s
-    %(reject_by_annotation_raw)s
     %(verbose)s
 
     Returns
@@ -60,6 +62,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_b
         The Raw instance containing extracted gfp peaks
     """
     _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
+    reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
     if min_peak_distance < 1:
         raise(ValueError('min_peak_dist must be >= 1.'))
     if isinstance(inst, BaseRaw):

@@ -10,7 +10,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setuptools.setup(
 
-     name='pycrostate',
+     name='pycrostates',
 
      version='0.0.1a',
 

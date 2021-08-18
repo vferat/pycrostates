@@ -20,19 +20,19 @@ from mne.io.pick import _picks_to_idx, pick_info
 
 from ..utils import _corr_vectors, _check_ch_names, _check_reject_by_annotation
 from ..segmentation import RawSegmentation, EpochsSegmentation
-from ..preprocessing import _extract_gfps
 
 @verbose
 def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
                   random_state=None, verbose=None):
+    # based on https://github.com/wmvanvliet/mne_microstates/blob/master/microstates.py
+    # written by Marijn van Vliet <w.m.vanvliet@gmail.com>
+
     if not isinstance(random_state, np.random.RandomState):
         random_state = np.random.RandomState(random_state)
-
     # handle zeros maps
     # zero map can be due to non data in the recording, it's unlikly that all channels recorded the same value at the same time (=0 due to avergare reference)
     data = data[:, np.linalg.norm(data.T, axis=1) !=0]
     n_channels, n_samples = data.shape
-    # Cache this value for later
     data_sum_sq = np.sum(data ** 2)
     # Select random timepoints for our initial topographic maps
     init_times = random_state.choice(n_samples, size=n_states, replace=False)
@@ -439,8 +439,8 @@ class BaseClustering():
         """
         self._check_fit()
         if len(names) != self.n_clusters:
-            raise ValueError(f"Names must have the same length as number of states but {len(names)}"
-                               "were given for {len(self.n_clusters)} clusters.")
+            raise ValueError(f"Names must have the same length as number of states but {len(names)} "
+                             f"were given for {len(self.n_clusters)} clusters.")
         if len(set(names))!= len(names):
             raise ValueError("Can't name 2 clusters with the same name.")
         self.names = names
