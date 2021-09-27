@@ -164,12 +164,11 @@ def _reject_small_segments(segmentation, data, min_segment_lenght):
 
                     while len(new_segment) != 0:
                         left_corr = np.abs(_corr_vectors(data[:,left_idx - 1].T, data[:,left_idx].T,))
-                        right_corr = np.abs(_corr_vectors(data[:,right_idx + 1].T, data[:,right_idx].T))
+                        right_corr = np.abs(_corr_vectors(data[:,right_idx].T, data[:,right_idx - 1].T))
 
                         if left_corr < right_corr:
-                            new_segmentation[right_idx-1] = new_segmentation[right_idx]
+                            new_segmentation[right_idx - 1] = new_segmentation[right_idx]
                             right_idx -= 1
-                            new_segment = new_segment[:-1]
                         else:
                             new_segmentation[left_idx] = new_segmentation[left_idx - 1]
                             left_idx += 1
