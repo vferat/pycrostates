@@ -94,9 +94,16 @@ def _run_mod_kmeans(data: np.ndarray, n_clusters=4,
     return(gev, maps, segmentation)
 
 def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
-    S0 = 0
-    states = (states.T / np.std(states, axis=1)).T
-    data = (data.T / np.std(data, axis=1)).T
+    data = data - np.mean(data, axis=0)
+    data_std = np.std(data, axis=0)
+    data_std[data_std == 0] = 1 # std == 0 -> null map 
+    data = data / data_std 
+    
+    states = states.T
+    states = states - np.mean(states, axis=0)
+    states = states /  np.std(states, axis=0)
+    states = states.T
+    
     Ne, Nt = data.shape
     Nu = states.shape[0]
     Vvar = np.sum(data * data, axis=0)
@@ -111,6 +118,8 @@ def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
                                 data, axis=0) ** 2 / (Nt * (Ne - 1)))
 
         window = np.ones((1, 2*half_window_size+1))
+        
+        S0 = 0
         while True:
             Nb = scipy.signal.convolve2d(w, window, mode='same')
             x = (np.tile(Vvar, (Nu, 1)) - (np.dot(states, data))**2) / \
@@ -277,8 +286,8 @@ class BaseClustering():
             if len(onsets) == 0:
                 segmentation = _segment(data,
                                         self.cluster_centers_,
-                                         half_window_size, factor,
-                                         crit)
+                                        half_window_size, factor,
+                                        crit)
             else:
                 onsets = onsets.tolist()
                 onsets.append(data.shape[-1] - 1)
