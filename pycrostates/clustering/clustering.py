@@ -281,6 +281,9 @@ class BaseClustering():
                                 self.cluster_centers_,
                                 half_window_size, factor,
                                 crit)
+            if rejected_first_last_segments:
+                segmentation = _rejected_first_last_segments(segmentation)
+                
         else:
             onsets, _ends = _annotations_starts_stops(raw, ['BAD'])
             if len(onsets) == 0:
@@ -309,8 +312,6 @@ class BaseClustering():
 
         if min_segment_lenght > 0:
             segmentation = _reject_small_segments(segmentation, data, min_segment_lenght)
-        if rejected_first_last_segments:
-            segmentation = _rejected_first_last_segments(segmentation)
 
 
         segmentation = RawSegmentation(segmentation=segmentation,
