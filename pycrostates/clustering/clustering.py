@@ -291,6 +291,9 @@ class BaseClustering():
                                         self.cluster_centers_,
                                         half_window_size, factor,
                                         crit)
+                if rejected_first_last_segments:
+                    segmentation = _rejected_first_last_segments(segmentation)
+                    
             else:
                 onsets = onsets.tolist()
                 onsets.append(data.shape[-1] - 1)
