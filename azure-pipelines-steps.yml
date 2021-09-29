@@ -15,6 +15,12 @@ steps:
     pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
   displayName: 'pytest'
 
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+
 - script: |
-    bash <(curl -s https://codecov.io/bash)
+    pip install codecov
+    codecov --file coverage.xml
   displayName: 'Upload to codecov.io'
