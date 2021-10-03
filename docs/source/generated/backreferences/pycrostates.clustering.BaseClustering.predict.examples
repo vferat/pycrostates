@@ -1,0 +1,23 @@
+
+
+Examples using ``pycrostates.clustering.BaseClustering.predict``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This tutorial introduces the pycrostates.clustering.ModKMeans structure in detail.">
+
+.. only:: html
+
+ .. figure:: /auto_tutorials/clustering/images/thumb/sphx_glr_plot_modK_thumb.png
+     :alt: The ModKmeans object
+
+     :ref:`sphx_glr_auto_tutorials_clustering_plot_modK.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_tutorials_clustering_plot_modK.py`

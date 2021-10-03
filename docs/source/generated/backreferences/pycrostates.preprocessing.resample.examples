@@ -1,0 +1,23 @@
+
+
+Examples using ``pycrostates.preprocessing.resample``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how resemple a recording.">
+
+.. only:: html
+
+ .. figure:: /auto_tutorials/preprocessing/images/thumb/sphx_glr_plot_resampling_thumb.png
+     :alt: Resampling
+
+     :ref:`sphx_glr_auto_tutorials_preprocessing_plot_resampling.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_tutorials_preprocessing_plot_resampling.py`

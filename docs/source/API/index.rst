@@ -20,12 +20,13 @@ This is the reference for classes (``CamelCase`` names) and functions
    :no-members:
    :no-inherited-members:
 
-Clustering
-=================
 
-.. currentmodule:: pycrostates
+.. toctree::
+    :maxdepth: 2
 
-.. autosummary::
-   :toctree: generated/
-
-   clustering.mod_Kmeans
+    most_used_classes
+    clustering
+    preprocessing
+    segmentation
+    metrics
+    viz

@@ -12,19 +12,16 @@
 #
 import os
 import sys
-import sphinx_bootstrap_theme
-curdir = os.path.dirname(__file__)
+import pydata_sphinx_theme
+from sphinx_gallery.sorting import ExplicitOrder
 
+curdir = os.path.dirname(__file__)
 
 # -- Project information -----------------------------------------------------
 
 project = 'pycrostates'
-copyright = '2020, Victor Férat'
+copyright = '2021, Victor Férat'
 author = 'Victor Férat'
-
-
-
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -40,8 +37,22 @@ extensions = [
    'sphinx.ext.mathjax',
    'sphinx.ext.viewcode',
    'sphinx.ext.intersphinx',
-   'nbsphinx']
+   'nbsphinx',
+   'sphinx_gallery.gen_gallery',
+   'recommonmark',
+   'numpydoc']
 
+
+# sphinx
+master_doc = 'index'
+
+# pygments style
+pygments_style = 'default'
+
+# A list of ignored prefixes for module index sorting.
+modindex_common_prefix = ['pycrostates.']
+
+# autosummary
 autosummary_generate = True
 autodoc_default_options = {'inherited-members': None}
 
@@ -53,6 +64,31 @@ intersphinx_mapping = {
     'matplotlib': ('https://matplotlib.org', None),
     'mne': ('https://mne.tools/stable/', None),
     'joblib': ('https://joblib.readthedocs.io/en/latest', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+    'sklearn': ('https://scikit-learn.org/stable/', None)
+}
+
+# numpy doc
+numpydoc_class_members_toctree = False
+numpydoc_attributes_as_param_list = True
+numpydoc_xref_param_type = True
+
+# sphinx_gallery_conf
+sphinx_gallery_conf = {
+     'examples_dirs': os.path.abspath(os.path.join(curdir, '..', '..', 'tutorials')),   # path to example scripts
+     'gallery_dirs': 'auto_tutorials',  # path to where to save gallery generated output
+     'subsection_order': ExplicitOrder(['../../tutorials/preprocessing',
+                                       '../../tutorials/clustering',
+                                       '../../tutorials/backfitting',
+                                       '../../tutorials/group_level_analysis']),
+     'reference_url': {
+         # The module you locally document uses None
+        'pycrostates': None,
+     },
+     'backreferences_dir'  : 'generated/backreferences',
+     'doc_module': ('pycrostates',),
+
+
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -63,31 +99,51 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'bootstrap'
+html_theme = 'pydata_sphinx_theme'
 
 html_theme_options = {
-    'navbar_title': ' ',  # we replace this with an image
-    'source_link_position': "nav",  # default
-    'bootswatch_theme': "flatly",  # yeti paper lumen
-    'navbar_sidebarrel': False,  # Render the next/prev links in navbar?
-    'navbar_pagenav': False,
-    'navbar_class': "navbar",
-    'bootstrap_version': "3",  # default
-    'navbar_links': [
-        ("Install", "install/index"),
-        ("Overview", "overview/index"),
-        ("Tutorials", "tutorials/index"),
-        ("API", "API/index"),
-    ],
-}
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/vferat/pycrostates",
+            "icon": "fab fa-github-square",
+        }],
+    "external_links": [
+       {"name": "mne", "url": "https://mne.tools/stable/index.html"}],
 
+}
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = [ os.path.abspath(os.path.join(curdir, '../_static'))]
+
+def append_attr_meth_examples(app, what, name, obj, options, lines):
+    """Append SG examples backreferences to method and attr docstrings."""
+    # NumpyDoc nicely embeds method and attribute docstrings for us, but it
+    # does not respect the autodoc templates that would otherwise insert
+    # the .. include:: lines, so we need to do it.
+    # Eventually this could perhaps live in SG.
+    if what in ('attribute', 'method'):
+        size = os.path.getsize(os.path.join(
+            os.path.dirname(__file__), 'generated', 'backreferences', '%s.examples' % (name,)))
+        if size > 0:
+            lines += """
+.. _sphx_glr_backreferences_{1}:
+.. rubric:: Examples using ``{0}``:
+.. minigallery:: {1}
+""".format(name.split('.')[-1], name).split('\n')
+
+
+
+# -- Auto-convert markdown pages to demo --------------------------------------
+from recommonmark.transform import AutoStructify
+
+def setup(app):
+    app.connect('autodoc-process-docstring', append_attr_meth_examples)
+    app.add_transform(AutoStructify)
+

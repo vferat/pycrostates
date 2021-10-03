@@ -1,3 +1,9 @@
 sphinx
 nbsphinx
-sphinx_bootstrap_theme
+pydata-sphinx-theme
+sphinx_gallery
+pandas
+m2r2
+recommonmark
+pillow
+numpydoc

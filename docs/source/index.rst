@@ -1,19 +1,13 @@
-.. pycrostates documentation master file, created by
-   sphinx-quickstart on Fri Nov 13 18:04:04 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+Pycrostates
+===========
 
-Welcome to pycrostates's documentation!
-=======================================
+.. include:: overview.rst
 
 .. toctree::
-   :maxdepth: 4
-   :caption: Contents:
+   :hidden:
 
+   install.rst
+   microstates.rst
+   auto_tutorials/index
+   API/index
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
