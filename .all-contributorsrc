@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "vferat",
+      "name": "Victor Férat",
+      "avatar_url": "https://avatars.githubusercontent.com/u/28844486?v=4",
+      "profile": "https://vferat.github.io/about/",
+      "contributions": [
+        "test"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "pycrostates",
+  "projectOwner": "vferat",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
