@@ -39,7 +39,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://vferat.github.io/about/"><img src="https://avatars.githubusercontent.com/u/28844486?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Victor Férat</b></sub></a><br /><a href="https://github.com/vferat/pycrostates/commits?author=vferat" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://vferat.github.io/about/"><img src="https://avatars.githubusercontent.com/u/28844486?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Victor Férat</b></sub></a><br /><a href="https://github.com/vferat/pycrostates/commits?author=vferat" title="Tests">⚠️</a> <a href="https://github.com/vferat/pycrostates/commits?author=vferat" title="Code">💻</a></td>
   </tr>
 </table>
 
