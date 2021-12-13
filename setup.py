@@ -1,41 +1,67 @@
-import setuptools
-from os import path
+#!/usr/bin/env python
+
+from pathlib import Path
+from setuptools import setup, find_packages
 
 
-here = path.abspath(path.dirname(__file__))
+# Version
+version = None
+with open(Path(__file__).parent/'bsl'/'_version.py', 'r') as file:
+    for line in file:
+        line = line.strip()
+        if line.startswith('__version__'):
+            version = line.split('=')[1].strip().strip('\'')
+            break
 
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+if version is None:
+    raise RuntimeError('Could not determine version.')
+
+# Descriptions
+short_description = "A simple open source Python package for EEGmicrostate segmentation"
+long_description_file = Path(__file__).parent / 'README.md'
+with open(long_description_file, 'r') as file:
+    long_description = file.read()
+if long_description_file.suffix == '.md':
+    long_description_content_type='text/markdown'
+elif long_description_file.suffix == '.rst':
+    long_description_content_type='text/x-rst'
+else:
+    long_description_content_type='text/plain'
 
 
-setuptools.setup(
+# Dependencies
+def get_requirements(path):
+    """Get mandatory dependencies from file."""
+    install_requires = list()
+    with open(path, 'r') as file:
+        for line in file:
+            if line.startswith('#'):
+                continue
+            req = line.strip()
+            if len(line) == 0:
+                continue
+            install_requires.append(req)
 
+    return install_requires
+
+install_requires = get_requirements('requirements.txt')
+
+
+setup(
      name='pycrostates',
-
-     version='0.0.1a',
-
+     version='0.1.0',
      author="Victor Férat",
-
      author_email="victor.ferat@unige.ch",
-
      description="A simple open source Python package for EEGmicrostate segmentation",
-
      long_description=long_description,
-
-     long_description_content_type="text/markdown",
-
+     long_description_content_type=long_description_content_type,
      url=None,
-
      license="BSD-3-Clause",
-
+     platforms='any',
      python_requires='>=3.6',
-
      install_requires=["mne", "numpy", "scipy", "joblib"],
-
-     packages=setuptools.find_packages(exclude=['docs', 'tests']),
-
+     packages=find_packages(exclude=['docs', 'tests']),
      classifiers=[
-
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering',
