@@ -20,17 +20,20 @@ ModK = ModKMeans(n_clusters=n_clusters)
 #    segmentation = ModK.predict(raw)
 #    segmentation.plot()
 
+
 def test_RawSegmentation_compute_parameters():
     ModK.fit(raw, n_jobs=1)
     segmentation = ModK.predict(raw)
     d = segmentation.compute_parameters(norm_gfp=False)
     assert isinstance(d,dict)
 
+
 def test_RawSegmentation_compute_metrics_norm_gfp():
     ModK.fit(raw, n_jobs=1)
     segmentation = ModK.predict(raw)
     d = segmentation.compute_parameters(norm_gfp=True)
     assert isinstance(d,dict)
+
 
 def test_EpochsSegmentation_compute_metrics():
     events = mne.make_fixed_length_events(raw, 1)

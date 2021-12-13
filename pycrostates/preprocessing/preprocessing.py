@@ -8,6 +8,7 @@ from mne.utils import _validate_type, logger, verbose, fill_doc, check_random_st
 from mne.preprocessing.ica import _check_start_stop
 from pycrostates.utils import _check_reject_by_annotation
 
+
 def _extract_gfps(data, min_peak_distance=2):
     """Extract Gfp peaks from input data
 
@@ -27,7 +28,8 @@ def _extract_gfps(data, min_peak_distance=2):
     gfp = np.std(data, axis=0)
     peaks, _ = find_peaks(gfp, distance=min_peak_distance)
     data_ =  data[:,peaks]
-    return(data_)
+    return data_
+
 
 @fill_doc
 @verbose
@@ -82,11 +84,11 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_b
         peaks = np.hstack(peaks)
         logger.info(f'{peaks.shape[1]} gfp peaks extracted out of {data.shape[0] * data.shape[2]} samples'
                     f'({(peaks.shape[1] / (data.shape[0] * data.shape[2]) * 100):.2f}% of the original data)')
-    
+
     info = inst.info.copy()
     info['sfreq'] = -1
     raw_peaks = mne.io.RawArray(data=peaks, info=info, verbose=False)
-    return(raw_peaks)
+    return raw_peaks
 
 
 @fill_doc
@@ -189,5 +191,4 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
     for d in data:
         raw = mne.io.RawArray(d, info=inst.info, verbose=False)
         resamples.append(raw)
-    return(resamples)
- 
+    return resamples

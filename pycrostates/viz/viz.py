@@ -9,6 +9,7 @@ from mne import Evoked
 from mne.io import BaseRaw
 from mne.utils import _validate_type
 
+
 def plot_cluster_centers(cluster_centers, info, names):
     n_clusters = len(cluster_centers)
     fig, axs = plt.subplots(1, n_clusters)
@@ -19,12 +20,14 @@ def plot_cluster_centers(cluster_centers, info, names):
     plt.show()
     return(fig, axs)
 
-def plot_segmentation(segmentation: np.ndarray,
-                      inst: Union(BaseRaw, Evoked),
-                      cluster_centers: np.ndarray,
-                      names: list = None,
-                      tmin: float = 0.0, tmax: float = None) -> Tuple[mpl.figure.Figure,
-                                                                      mpl.axes.Axes]:
+
+def plot_segmentation(
+        segmentation: np.ndarray,
+        inst: Union(BaseRaw, Evoked),
+        cluster_centers: np.ndarray,
+        names: list = None,
+        tmin: float = 0.0, tmax: float = None) -> Tuple[mpl.figure.Figure,
+                                                        mpl.axes.Axes]:
     _validate_type(inst, (BaseRaw, Evoked), 'inst', 'Raw or Evoked')
     inst.crop(tmin=tmin, tmax=tmax)
     if isinstance(inst, BaseRaw):
@@ -35,7 +38,8 @@ def plot_segmentation(segmentation: np.ndarray,
     times = inst.times + tmin
     n_states = len(cluster_centers) + 1
     if not names:
-        names = ['unlabeled'] + [f'Microstate {i+1}' for i in range(n_states - 1)]
+        names = ['unlabeled'] + [f'Microstate {i+1}'
+                                 for i in range(n_states - 1)]
     else:
         names = ['unlabeled'] + names
 
@@ -61,4 +65,4 @@ def plot_segmentation(segmentation: np.ndarray,
     plt.title('Segmentation')
     plt.autoscale(tight=True)
     plt.show()
-    return(fig, ax)
+    return fig, ax
