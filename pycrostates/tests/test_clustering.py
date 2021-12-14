@@ -9,7 +9,7 @@ from pycrostates.clustering import ModKMeans
 from pycrostates.segmentation import RawSegmentation, EpochsSegmentation
 
 
-dir_ = Path(testing.data_path() / 'MEG' / 'sample')
+dir_ = Path(testing.data_path()) / 'MEG' / 'sample'
 fname_raw_testing = dir_ / 'sample_audvis_trunc_raw.fif'
 raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
 raw = raw.pick('eeg')
