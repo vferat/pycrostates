@@ -10,8 +10,6 @@ from mne.io import BaseRaw
 from mne.parallel import check_n_jobs
 from mne.utils import check_random_state
 
-from ..clustering import BaseClustering
-
 
 def _ensure_int(item, *, item_name=None):
     """
@@ -158,10 +156,10 @@ def _check_ch_names(inst1, inst2, *, inst1_name=None, inst2_name=None):
     """
     Checks that both instance have the same channel names.
     """
-    _check_type(inst1, (BaseEpochs, BaseRaw, BaseClustering))
-    _check_type(inst2, (BaseEpochs, BaseRaw, BaseClustering))
+    assert hasattr(inst1, 'ch_names')
+    assert hasattr(inst2, 'ch_names')
 
-    if inst1.info['ch_names'] != inst2.info['ch_names']:
+    if inst1.ch_names != inst2.ch_names:
         inst1_name = "" if inst1_name is None else " '%s'" % inst1_name
         inst1_type = "raw" if isinstance(inst1, BaseRaw) else "epochs"
         inst2_name = "" if inst2_name is None else " '%s'" % inst2_name
