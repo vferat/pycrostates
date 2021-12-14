@@ -4,7 +4,8 @@ from scipy.signal import find_peaks
 import mne
 from mne.io import BaseRaw
 from mne.epochs import BaseEpochs
-from mne.utils import _validate_type, logger, verbose, fill_doc, check_random_state
+from mne.utils import (_validate_type, logger, verbose, fill_doc,
+                       check_random_state)
 from mne.preprocessing.ica import _check_start_stop
 from pycrostates.utils import _check_reject_by_annotation
 
@@ -26,13 +27,14 @@ def _extract_gfps(data, min_peak_distance=2):
         raise(ValueError('min_peak_dist must be >= 1.'))
     gfp = np.std(data, axis=0)
     peaks, _ = find_peaks(gfp, distance=min_peak_distance)
-    data_ =  data[:,peaks]
+    data_ = data[:, peaks]
     return data_
 
 
 @fill_doc
 @verbose
-def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None, reject_by_annotation=True, verbose=None):
+def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
+                      reject_by_annotation=True, verbose=None):
     """Perform GFP peaks extraction.
 
     Extract global field power peaks from :class:`mne.epochs.Epochs`or
@@ -142,7 +144,8 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
 
     Notes
     -----
-    Only two of n_epochs, n_samples and coverage parameters must be defined, the non-defined one being computed during function execution.
+    Only two of n_epochs, n_samples and coverage parameters must be defined,
+    the non-defined one being computed during function execution.
 
     Returns
     -------
@@ -172,7 +175,7 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
             'defined')
 
     if coverage is not None:
-        if  coverage <= 0:
+        if coverage <= 0:
             raise ValueError('Coverage must be strictly positive')
     else:
         coverage = (n_epochs * n_samples) / n_times
@@ -203,8 +206,8 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
         indices = indices[:n_epochs*n_samples]
         indices = indices.reshape((n_epochs, n_samples))
 
-    data = data[:,indices]
-    data = np.swapaxes(data,0,1)
+    data = data[:, indices]
+    data = np.swapaxes(data, 0, 1)
 
     resamples = list()
     for d in data:

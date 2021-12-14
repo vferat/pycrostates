@@ -14,7 +14,8 @@ from mne.io import BaseRaw
 from mne.epochs import BaseEpochs
 from mne.parallel import check_n_jobs, parallel_func
 from mne.preprocessing.ica import _check_start_stop
-from mne.utils import _validate_type, logger, verbose, warn, fill_doc, check_random_state
+from mne.utils import (_validate_type, logger, verbose, warn, fill_doc,
+                       check_random_state)
 from mne.io.pick import _picks_to_idx, pick_info
 
 from ..utils import _corr_vectors, _check_ch_names, _check_reject_by_annotation
@@ -35,7 +36,7 @@ def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
     # zero map can be due to non data in the recording, it's unlikly that all
     # channels recorded the same value at the same time (=0 due to avergare
     # reference)
-    data = data[:, np.linalg.norm(data.T, axis=1) !=0]
+    data = data[:, np.linalg.norm(data.T, axis=1) != 0]
     n_channels, n_samples = data.shape
     data_sum_sq = np.sum(data ** 2)
     # Select random timepoints for our initial topographic maps
@@ -54,7 +55,7 @@ def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
         for state in range(n_states):
             idx = (segmentation == state)
             if np.sum(idx) == 0:
-                #logger.info('Some microstates are never activated')
+                # logger.info('Some microstates are never activated')
                 maps[state] = 0
                 continue
             # Find largest eigenvector
@@ -80,16 +81,15 @@ def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
 
     return maps
 
+
 @verbose
 def _run_mod_kmeans(data: np.ndarray, n_clusters=4,
                     max_iter=100, random_state=None,
-                    tol = 1e-6, verbose=None) -> Tuple[float,
-                                                        np.ndarray,
-                                                        np.ndarray]:
+                    tol=1e-6, verbose=None
+                    ) -> Tuple[float, np.ndarray, np.ndarray]:
     gfp_sum_sq = np.sum(data ** 2)
     maps = _compute_maps(data, n_clusters, max_iter=max_iter,
-                            random_state=random_state,
-                            tol=tol, verbose=verbose)
+                         random_state=random_state, tol=tol, verbose=verbose)
     activation = maps.dot(data)
     segmentation = np.argmax(np.abs(activation), axis=0)
     map_corr = _corr_vectors(data, maps[segmentation].T)
@@ -106,7 +106,7 @@ def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
 
     states = states.T
     states = states - np.mean(states, axis=0)
-    states = states /  np.std(states, axis=0)
+    states = states / np.std(states, axis=0)
     states = states.T
 
     Ne, Nt = data.shape
@@ -116,11 +116,15 @@ def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
 
     labels_all = np.argmax(np.abs(np.dot(states, data)), axis=0)
 
+    # TODO: Check parenthesis for each Vvar; doesn't look consistent.
+
     if factor != 0:
         w = np.zeros((Nu, Nt))
         w[(rmat == labels_all)] = 1
-        e = np.sum(Vvar - np.sum(np.dot(w.T, states).T *
-                                data, axis=0) ** 2 / (Nt * (Ne - 1)))
+        e = np.sum(
+            Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) ** 2 /
+            (Nt * (Ne - 1))
+            )
 
         window = np.ones((1, 2*half_window_size+1))
 
@@ -134,8 +138,9 @@ def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
             labels_all = dlt
             w = np.zeros((Nu, Nt))
             w[(rmat == labels_all)] = 1
-            Su = np.sum(Vvar - np.sum(np.dot(w.T, states).T *
-                                    data, axis=0) ** 2) / (Nt * (Ne - 1))
+            Su = np.sum(
+                Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) ** 2) / \
+                (Nt * (Ne - 1))
             if np.abs(Su - S0) <= np.abs(crit * Su):
                 break
             S0 = Su
@@ -171,7 +176,7 @@ def _reject_small_segments(segmentation, data, min_segment_lenght):
         current_idx = 0
         small_segment = False
         for i, segment in enumerate(segments):
-            if i not in [0,len(segments)-1]:
+            if i not in [0, len(segments)-1]:
                 if len(segment) <= min_segment_lenght and segment[0] != 0:
                     small_segment = True
                     left_idx = current_idx
@@ -180,9 +185,9 @@ def _reject_small_segments(segmentation, data, min_segment_lenght):
 
                     while len(new_segment) != 0:
                         left_corr = np.abs(_corr_vectors(
-                            data[:,left_idx - 1].T, data[:,left_idx].T,))
+                            data[:, left_idx - 1].T, data[:, left_idx].T,))
                         right_corr = np.abs(_corr_vectors(
-                            data[:,right_idx].T, data[:,right_idx - 1].T))
+                            data[:, right_idx].T, data[:, right_idx - 1].T))
 
                         if left_corr < right_corr:
                             new_segmentation[right_idx - 1] = \
@@ -286,7 +291,7 @@ class BaseClustering():
         """
         self._check_fit()
         cluster_centers = self.cluster_centers_
-        for c,cluster in enumerate(cluster_centers):
+        for c, cluster in enumerate(cluster_centers):
             if invert[c]:
                 cluster_centers[c] = - cluster
         self.cluster_centers_ = cluster_centers
@@ -297,10 +302,8 @@ class BaseClustering():
                      rejected_first_last_segments, verbose=None):
         data = raw.get_data(picks=picks)
         if not reject_by_annotation:
-            segmentation = _segment(data,
-                                self.cluster_centers_,
-                                half_window_size, factor,
-                                crit)
+            segmentation = _segment(data, self.cluster_centers_,
+                                    half_window_size, factor, crit)
             if rejected_first_last_segments:
                 segmentation = _rejected_first_last_segments(segmentation)
 
@@ -326,10 +329,8 @@ class BaseClustering():
                     # small segments can't be smoothed
                     if onset - end >= 2 * half_window_size + 1:
                         sample = data[:, end:onset]
-                        labels =  _segment(sample,
-                                            self.cluster_centers_,
-                                            half_window_size, factor,
-                                            crit)
+                        labels = _segment(sample, self.cluster_centers_,
+                                          half_window_size, factor, crit)
                         if rejected_first_last_segments:
                             labels = _rejected_first_last_segments(labels)
                         segmentation[end:onset] = labels
@@ -337,7 +338,6 @@ class BaseClustering():
         if min_segment_lenght > 0:
             segmentation = _reject_small_segments(
                 segmentation, data, min_segment_lenght)
-
 
         segmentation = RawSegmentation(segmentation=segmentation,
                                        inst=raw,
@@ -352,10 +352,8 @@ class BaseClustering():
         data = epochs.get_data(picks=picks)
         segments = list()
         for epoch in data:
-            segment =  _segment(epoch,
-                                self.cluster_centers_,
-                                half_window_size, factor,
-                                crit)
+            segment = _segment(epoch, self.cluster_centers_,
+                               half_window_size, factor, crit)
 
             if min_segment_lenght > 0:
                 segment = _reject_small_segments(segment, epoch,
@@ -421,7 +419,7 @@ class BaseClustering():
         _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
         inst = inst.copy()
         picks = _picks_to_idx(inst.info, self.picks,
-                        exclude=[], allow_empty=False)
+                              exclude=[], allow_empty=False)
         inst = inst.pick(picks)
 
         _check_ch_names(self, inst,
@@ -475,7 +473,7 @@ class BaseClustering():
                                         self.names)
         return fig, axs
 
-    def rename_clusters(self, names:list):
+    def rename_clusters(self, names: list):
         """
         Name cluster centers. Operate in-place.
 
@@ -497,7 +495,7 @@ class BaseClustering():
                 "Names must have the same length as number of states but "
                 f"{len(names)} were given for {len(self.n_clusters)} clusters."
                 )
-        if len(set(names))!= len(names):
+        if len(set(names)) != len(names):
             raise ValueError("Can't name 2 clusters with the same name.")
         self.names = names
 
@@ -515,11 +513,12 @@ class BaseClustering():
             The modfied instance.
         """
         self._check_fit()
-        if (np.sort(order) != np.arange(0,self.n_clusters, 1)).any():
+        if (np.sort(order) != np.arange(0, self.n_clusters, 1)).any():
             raise ValueError('Order contains unexpected values')
 
         self.cluster_centers_ = self.cluster_centers_[order]
         self.names = [self.names[o] for o in order]
+
 
 # TODO: could be merge into a single `_prepare` function/method thus removing
 # the check above on BaseRaw/BaseEpochs and the duplication for `segmentation`
@@ -530,11 +529,13 @@ def _prepare_fit_raw(raw, picks, start, stop, reject_by_annotation):
                         reject_by_annotation=reject_by_annotation)
     return data
 
+
 def _prepare_fit_epochs(epochs, picks):
     data = epochs.get_data(picks=picks)
-    data = np.swapaxes(data,0,1)
+    data = np.swapaxes(data, 0, 1)
     data = data.reshape(data.shape[0], -1)
     return data
+
 
 @fill_doc
 class ModKMeans(BaseClustering):
@@ -662,7 +663,7 @@ class ModKMeans(BaseClustering):
 
         logger.info(f'Fitting modified Kmeans with {current_fit} data')
 
-        cluster_centers, GEV, labels =  self._fit_data(data, n_jobs, verbose)
+        cluster_centers, GEV, labels = self._fit_data(data, n_jobs, verbose)
         self.cluster_centers_ = cluster_centers
         self.current_fit = current_fit
         self.info = pick_info(inst.info, picks)

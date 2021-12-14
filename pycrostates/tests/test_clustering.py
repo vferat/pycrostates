@@ -66,19 +66,19 @@ def test_ModKMeans_invert_polarity():
     ModK = ModKMeans(n_clusters=n_clusters, random_state=1)
     ModK.fit(raw, n_jobs=1)
     before = ModK.cluster_centers_.copy()
-    ModK.invert_polarity([True,True,False,False])
+    ModK.invert_polarity([True, True, False, False])
     after = ModK.cluster_centers_
     assert (before[0] == - after[0]).all()
     assert (before[1] == - after[1]).all()
-    assert (before[2] ==  after[2]).all()
-    assert (before[3] ==  after[3]).all()
+    assert (before[2] == after[2]).all()
+    assert (before[3] == after[3]).all()
 
 
 def test_BaseClustering_reorder():
     ModK = ModKMeans(n_clusters=n_clusters)
     ModK.fit(raw, n_jobs=1)
     cluster_centers = ModK.cluster_centers_
-    order = [3,2,1,0]
+    order = [3, 2, 1, 0]
     ModK.reorder(order)
     assert (ModK.cluster_centers_ == cluster_centers[order]).all()
 
@@ -127,7 +127,7 @@ def test_ModKMeans_fit_start_stop():
              start=1,
              stop=9)
     assert ModK.fitted_data_.shape[-1] == \
-        raw.get_data(start=1,stop=9).shape[-1]
+        raw.get_data(start=1, stop=9).shape[-1]
 
 
 def test_ModKMeans_fit_reject_by_annotation():

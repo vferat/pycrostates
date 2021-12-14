@@ -46,7 +46,7 @@ def plot_segmentation(
     labels = segmentation[(times * inst.info['sfreq']).astype(int)]
     cmap = plt.cm.get_cmap('plasma', n_states)
 
-    fig = plt.figure(figsize=(10,4))
+    fig = plt.figure(figsize=(10, 4))
     ax = plt.plot(times, gfp, color='black', linewidth=0.2)
     for state, color in zip(range(n_states), cmap.colors):
         w = np.where(labels[1:] == state)
@@ -54,8 +54,8 @@ def plot_segmentation(
         x = np.zeros(labels.shape)
         x[a] = 1
         x = x.astype(bool)
-        plt.fill_between(times, gfp, color=color,
-                        where=x, step=None, interpolate=False)
+        plt.fill_between(times, gfp, color=color, where=x, step=None,
+                         interpolate=False)
     norm = mpl.colors.Normalize(vmin=0, vmax=n_states)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])

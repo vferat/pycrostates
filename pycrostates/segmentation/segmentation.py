@@ -78,8 +78,8 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
         state_name = maps_names[s]
         arg_where = np.argwhere(segmentation == s+1)
         if len(arg_where) != 0:
-            labeled_tp = data.T[arg_where][:,0,:].T
-            labeled_gfp = gfp[arg_where][:,0]
+            labeled_tp = data.T[arg_where][:, 0, :].T
+            labeled_gfp = gfp[arg_where][:, 0]
             state_array = np.array([state]*len(arg_where)).transpose()
 
             corr = _corr_vectors(state_array, labeled_tp)
@@ -92,7 +92,7 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
 
             s_segments = np.array(
                 [len(group) for s_, group in segments if s_ == s + 1])
-            occurence = len(s_segments) /len(segmentation) *  sfreq
+            occurence = len(s_segments) / len(segmentation) * sfreq
             d[f'{state_name}_occurences'] = occurence
 
             timecov = np.sum(s_segments) / len(np.where(segmentation != 0)[0])
@@ -110,7 +110,7 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
             d[f'{state_name}_dist_durs'] = 0
             d[f'{state_name}_meandurs'] = 0
             d[f'{state_name}_occurences'] = 0
-    d['unlabeled'] =  len(np.argwhere(segmentation == 0)) / len(gfp)
+    d['unlabeled'] = len(np.argwhere(segmentation == 0)) / len(gfp)
     return d
 
 
@@ -152,12 +152,9 @@ class RawSegmentation(BaseSegmentation):
         return fig, ax
 
     def compute_parameters(self, norm_gfp=True):
-        d = _compute_microstate_parameters(self.segmentation,
-                                self.inst.get_data(),
-                                self.cluster_centers,
-                                self.names,
-                                self.inst.info['sfreq'],
-                                norm_gfp=norm_gfp)
+        d = _compute_microstate_parameters(
+            self.segmentation, self.inst.get_data(), self.cluster_centers,
+            self.names, self.inst.info['sfreq'], norm_gfp=norm_gfp)
         return d
 
 
@@ -177,13 +174,10 @@ class EpochsSegmentation(BaseSegmentation):
 
     def compute_parameters(self, norm_gfp=True):
         data = self.inst.get_data()
-        data = np.swapaxes(data,0,1)
+        data = np.swapaxes(data, 0, 1)
         data = data.reshape(data.shape[0], -1)
         segmentation = self.segmentation.reshape(-1)
-        d = _compute_microstate_parameters(segmentation,
-                                data,
-                                self.cluster_centers,
-                                self.names,
-                                self.inst.info['sfreq'],
-                                norm_gfp=norm_gfp)
+        d = _compute_microstate_parameters(
+            segmentation, data, self.cluster_centers, self.names,
+            self.inst.info['sfreq'], norm_gfp=norm_gfp)
         return d

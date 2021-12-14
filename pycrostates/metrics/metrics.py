@@ -12,7 +12,7 @@ def _distance_matrix(X, Y=None):
     return(distances)
 
 
-def silhouette(modK): #lower the better
+def silhouette(modK):  # lower the better
     """
     Compute the mean Silhouette Coefficient of a fitted clustering algorithm.
     This function is a proxy function for
@@ -84,7 +84,7 @@ def _davies_bouldin_score(X, labels):
     return np.mean(scores)
 
 
-def davies_bouldin(modK): # lower the better
+def davies_bouldin(modK):  # lower the better
     """Computes the Davies-Bouldin score.
 
     This function is a proxy function for
@@ -127,7 +127,7 @@ def davies_bouldin(modK): # lower the better
     return davies_bouldin_score
 
 
-def calinski_harabasz(modK): # lower the better
+def calinski_harabasz(modK):  # lower the better
     """Compute the Calinski and Harabasz score.
 
     This function is a proxy function for
@@ -177,7 +177,7 @@ def _big_delta_fast(ci, distances):
     return np.max(values)
 
 
-def _dunn_score(X, labels): #lower the better
+def _dunn_score(X, labels):  # lower the better
     # based on https://github.com/jqmviegas/jqm_cvi
     """Compute the Dunn index.
 
@@ -194,20 +194,19 @@ def _dunn_score(X, labels): #lower the better
     deltas = np.ones([len(ks), len(ks)])*1000000
     big_deltas = np.zeros([len(ks), 1])
 
-    l_range = list(range(0, len(ks)))
-
-    for k in l_range:
-        for l in (l_range[0:k]+l_range[k+1:]):
-            deltas[k, l] = _delta_fast((labels == ks[k]), (labels == ks[l]),
+    for i in range(0, len(ks)):
+        for j in range(0, len(ks)):
+            if i == j:
+                continue  # skip diagonal
+            deltas[i, j] = _delta_fast((labels == ks[i]), (labels == ks[j]),
                                        distances)
-
-        big_deltas[k] = _big_delta_fast((labels == ks[k]), distances)
+        big_deltas[i] = _big_delta_fast((labels == ks[i]), distances)
 
     di = np.min(deltas)/np.max(big_deltas)
     return di
 
 
-def dunn(modK): #lower the better
+def dunn(modK):  # lower the better
     """Compute the Dunn index score.
 
     Parameters
