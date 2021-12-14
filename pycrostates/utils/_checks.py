@@ -5,8 +5,6 @@ import operator
 from pathlib import Path
 
 import numpy as np
-from mne import BaseEpochs
-from mne.io import BaseRaw
 from mne.parallel import check_n_jobs
 from mne.utils import check_random_state
 
@@ -161,14 +159,11 @@ def _check_ch_names(inst1, inst2, *, inst1_name=None, inst2_name=None):
 
     if inst1.ch_names != inst2.ch_names:
         inst1_name = "" if inst1_name is None else " '%s'" % inst1_name
-        inst1_type = "raw" if isinstance(inst1, BaseRaw) else "epochs"
         inst2_name = "" if inst2_name is None else " '%s'" % inst2_name
-        inst2_type = "raw" if isinstance(inst2, BaseRaw) else "epochs"
-        msg = ("Instance of {inst1_type}{inst1_name} and instance of "
-               "{inst2_type}{inst2_name} do not have the same channels.")
+        msg = ("Instance{inst1_name} and instance{inst2_name} do not have "
+               "the same channels.")
         raise ValueError(
-            msg.format(inst1_type=inst1_type, inst1_name=inst1_name,
-                       inst2_type=inst2_type, inst2_name=inst2_name))
+            msg.format(inst1_name=inst1_name, inst2_name=inst2_name))
 
 
 def _check_n_jobs(n_jobs):
