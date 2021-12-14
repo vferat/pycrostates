@@ -7,6 +7,8 @@ from pathlib import Path
 import numpy as np
 from mne import BaseEpochs
 from mne.io import BaseRaw
+from mne.parallel import check_n_jobs
+from mne.utils import check_random_state
 
 
 def _ensure_int(item, *, item_name=None):
@@ -167,3 +169,16 @@ def _check_ch_names(inst1, inst2, *, inst1_name=None, inst2_name=None):
         raise ValueError(
             msg.format(inst1_type=inst1_type, inst1_name=inst1_name,
                        inst2_type=inst2_type, inst2_name=inst2_name))
+
+
+def _check_n_jobs(n_jobs):
+    """
+    Check that n_jobs is a positive integer or a negative integer for all
+    cores. CUDA is not supported.
+    """
+    return check_n_jobs(n_jobs, allow_cuda=False)
+
+
+def _check_random_state(seed):
+    """Turn seed into a numpy.random.mtrand.RandomState instance."""
+    return check_random_state(seed)
