@@ -2,6 +2,8 @@ import sys
 import logging
 from pathlib import Path
 
+import mne
+
 
 name = Path(__file__).parent.parent.name
 logger = logging.getLogger(name)
@@ -120,6 +122,28 @@ class LoggerFormatter(logging.Formatter):
             return self._formatters[logging.ERROR].format(record)
 
         return super().format(record)
+
+
+def verbose(f):
+    """
+    Set the verbose for MNE and pycrostates.
+
+    Parameters
+    ----------
+    f : callable
+        The function with a verbose argument.
+
+    Returns
+    -------
+    f : callable
+        The function.
+    """
+    def wrapper(*args, **kwargs):
+        if 'verbose' in kwargs:
+            mne.set_log_level(kwargs['verbose'])
+            set_log_level(kwargs['verbose'])
+        return f(*args, **kwargs)
+    return wrapper
 
 
 init_logger()
