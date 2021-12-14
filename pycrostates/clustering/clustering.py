@@ -202,7 +202,7 @@ def _reject_small_segments(segmentation, data, min_segment_lenght):
     return new_segmentation
 
 
-class BaseClustering():
+class BaseClustering:
     """Base Class for Microstate Clustering algorithms.
 
     Parameters
