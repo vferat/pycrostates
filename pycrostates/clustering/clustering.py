@@ -24,13 +24,17 @@ from ..segmentation import RawSegmentation, EpochsSegmentation
 @verbose
 def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
                   random_state=None, verbose=None):
-    # based on https://github.com/wmvanvliet/mne_microstates/blob/master/microstates.py
-    # written by Marijn van Vliet <w.m.vanvliet@gmail.com>
-
+    """
+    Comptues maps.
+    Based on mne_microstates by Marijn van Vliet <w.m.vanvliet@gmail.com>
+    https://github.com/wmvanvliet/mne_microstates/blob/master/microstates.py
+    """
     if not isinstance(random_state, np.random.RandomState):
         random_state = np.random.RandomState(random_state)
-    # handle zeros maps
-    # zero map can be due to non data in the recording, it's unlikly that all channels recorded the same value at the same time (=0 due to avergare reference)
+    # -- handle zeros maps --
+    # zero map can be due to non data in the recording, it's unlikly that all
+    # channels recorded the same value at the same time (=0 due to avergare
+    # reference)
     data = data[:, np.linalg.norm(data.T, axis=1) !=0]
     n_channels, n_samples = data.shape
     data_sum_sq = np.sum(data ** 2)
@@ -93,10 +97,11 @@ def _run_mod_kmeans(data: np.ndarray, n_clusters=4,
     gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
     return gev, maps, segmentation
 
+
 def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
     data = data - np.mean(data, axis=0)
     data_std = np.std(data, axis=0)
-    data_std[data_std == 0] = 1 # std == 0 -> null map
+    data_std[data_std == 0] = 1  # std == 0 -> null map
     data = data / data_std
 
     states = states.T
@@ -143,14 +148,14 @@ def _rejected_first_last_segments(segmentation):
     # set first segment to unlabeled
     i = 0
     first_label = segmentation[i]
-    if  first_label != 0:
+    if first_label != 0:
         while segmentation[i] == first_label and i < len(segmentation) - 1:
             segmentation[i] = 0
             i += 1
     # set last segment to unlabeled
     i = len(segmentation) - 1
     last_label = segmentation[i]
-    if  last_label != 0:
+    if last_label != 0:
         while segmentation[i] == last_label and i > 0:
             segmentation[i] = 0
             i -= 1
@@ -195,7 +200,7 @@ def _reject_small_segments(segmentation, data, min_segment_lenght):
 
 @fill_doc
 class BaseClustering():
-    u"""Base Class for Microstate Clustering algorithms.
+    """Base Class for Microstate Clustering algorithms.
 
     Parameters
     ----------
@@ -220,7 +225,7 @@ class BaseClustering():
     current_fit : bool
         Flag informing about which data type (raw, epochs or evoked) was used
         for the fit.
-    cluster_centers_ : :class:`numpy.ndarray`, shape ``(n_clusters, n_channels)``
+    cluster_centers_ : `~numpy.array`, shape ``(n_clusters, n_channels)``
             Cluster centers (i.e Microstates maps).
     info : dict
             :class:`Measurement info <mne.Info>` of fitted instance.
@@ -235,8 +240,8 @@ class BaseClustering():
         self.info = None
 
     def __repr__(self) -> str:
-        s = f'{self.__class__.__name__} | n = {str(self.n_clusters)} cluster centers | {self.current_fit}'
-        return s
+        s = '%s | n = %s cluster centers | %s'
+        return s % (self.__class__.__name__, self.n_clusters, self.current_fit)
 
     def copy(self):
         """
@@ -246,33 +251,37 @@ class BaseClustering():
 
     def _check_fit(self):
         if self.current_fit == 'unfitted':
-            raise ValueError(f'Algorithm must be fitted before using {self.__class__.__name__}')
+            raise ValueError(
+                'Algorithm must be fitted before using '
+                f'{self.__class__.__name__}')
 
     def get_cluster_centers(self):
-        """Get cluster centers as a :class:`numpy.ndarray`
+        """
+        Get cluster centers as a `~numpy.array`.
         """
         self._check_fit()
         cluster_centers = self.cluster_centers_.copy()
         return cluster_centers
 
     def get_cluster_centers_as_raw(self):
-        """Get cluster centers as a :class:`mne.io.Raw`
+        """
+        Get cluster centers as a :class:`~mne.io.Raw`
         """
         self._check_fit()
-        cluster_centers_raw = mne.io.RawArray(data=self.cluster_centers_.T,
-                                              info=self.info)
+        cluster_centers_raw = mne.io.RawArray(
+            self.cluster_centers_.T, self.info)
         return cluster_centers_raw
 
     def invert_polarity(self, invert):
-        """
-        Invert map polarities.
+        """Invert map polarities.
+
         This method is for visualisation purpose only and has no impact on
         further processing as map polarities are ignored. Operates in-place.
 
         Parameters
         ----------
         invert : list of bool
-            List of bool of length n_clusters.
+            List of bool of length ``n_clusters``.
             True will invert map polarity, while False will have no effect.
         """
         self._check_fit()
@@ -415,13 +424,19 @@ class BaseClustering():
                         exclude=[], allow_empty=False)
         inst = inst.pick(picks)
 
-        _check_ch_names(self, inst, inst1_name=type(self).__name__, inst2_name='inst')
+        _check_ch_names(self, inst,
+                        inst1_name=type(self).__name__,
+                        inst2_name='inst')
         if factor == 0:
             logger.info('Segmenting data without smoothing')
         if factor != 0:
-            logger.info(f'Segmenting data with factor {factor} and effective smoothing window size : {(2*half_window_size+1) / inst.info["sfreq"]} (ms)')
+            logger.info(
+                f'Segmenting data with factor {factor} and effective '
+                'smoothing window size : '
+                f'{(2*half_window_size+1) / inst.info["sfreq"]} (ms)')
         if min_segment_lenght > 0:
-            logger.info(f'Rejecting segments shorter than {min_segment_lenght / inst.info["sfreq"]} (ms)')
+            logger.info('Rejecting segments shorter than '
+                        f'{min_segment_lenght / inst.info["sfreq"]} (ms)')
         if rejected_first_last_segments:
             logger.info('Rejecting first and last segment')
 
@@ -552,7 +567,7 @@ class ModKMeans(BaseClustering):
     current_fit : bool
         Flag informing about which data type (raw, epochs or evoked) was used
         for the fit.
-    cluster_centers_ : :class:`numpy.ndarray`, shape ``(n_clusters, n_channels)``
+    cluster_centers_ : `~numpy.array`, shape ``(n_clusters, n_channels)``
         If fitted, cluster centers (i.e Microstates maps)
     info : dict
         If fitted, :class:`Measurement info <mne.Info>` of fitted instance,
@@ -592,10 +607,10 @@ class ModKMeans(BaseClustering):
             parallel, p_fun, _ = parallel_func(_run_mod_kmeans,
                                                total=self.n_init,
                                                n_jobs=n_jobs)
-            runs = parallel(p_fun(data, n_clusters=self.n_clusters,
-                                  max_iter=self.max_iter,
-                                  random_state=init,
-                                  tol=self.tol, verbose=verbose) for init in inits)
+            runs = parallel(
+                p_fun(data, n_clusters=self.n_clusters, max_iter=self.max_iter,
+                      random_state=init, tol=self.tol, verbose=verbose)
+                for init in inits)
             gevs = [run[0] for run in runs]
             best_run = np.argmax(gevs)
             best_gev, best_maps, best_segmentation = runs[best_run]
@@ -622,14 +637,15 @@ class ModKMeans(BaseClustering):
         %(verbose)s
         """
         _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
-        reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
+        reject_by_annotation = _check_reject_by_annotation(
+            reject_by_annotation)
         n_jobs = check_n_jobs(n_jobs)
 
         if len(inst.info['bads']) != 0:
             warn('Bad channels are present in the recording. '
                  'They will still be used to compute microstate topographies. '
-                 'Consider using instance.pick() or instance.interpolate_bads()'
-                 ' before fitting.')
+                 'Consider using instance.pick() or '
+                 'instance.interpolate_bads() before fitting.')
 
         inst = inst.copy()
         picks = _picks_to_idx(inst.info, self.picks,

@@ -126,7 +126,8 @@ def test_ModKMeans_fit_start_stop():
     ModK.fit(raw,
              start=1,
              stop=9)
-    assert ModK.fitted_data_.shape[-1] == raw.get_data(start=1,stop=9).shape[-1]
+    assert ModK.fitted_data_.shape[-1] == \
+        raw.get_data(start=1,stop=9).shape[-1]
 
 
 def test_ModKMeans_fit_reject_by_annotation():

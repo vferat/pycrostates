@@ -8,6 +8,7 @@ from mne.epochs import BaseEpochs
 from ..viz import plot_segmentation
 from ..utils import _corr_vectors
 
+
 def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
                                    norm_gfp=True):
     """
@@ -22,8 +23,8 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
     norm_gfp : bool
         Either or not to normalize globalfield power.
     half_window_size: int
-        Number of samples used for the half windows size while smoothing labels.
-        Window size = 2 * half_window_size + 1
+        Number of samples used for the half windows size while smoothing
+        labels. Window size = 2 * half_window_size + 1
     factor: int
         Factor used for label smoothing. 0 means no smoothing.
         Defaults to 0.
@@ -112,6 +113,7 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
     d['unlabeled'] =  len(np.argwhere(segmentation == 0)) / len(gfp)
     return d
 
+
 class BaseSegmentation():
     def __init__(self, segmentation, inst, cluster_centers, names=None):
         self.segmentation = segmentation
@@ -127,6 +129,7 @@ class BaseSegmentation():
                     'same length')
         else:
             self.names = [f'{c+1}' for c in range(len(cluster_centers))]
+
 
 class RawSegmentation(BaseSegmentation):
     def __init__(self, *args,  **kwargs):
@@ -156,6 +159,7 @@ class RawSegmentation(BaseSegmentation):
                                 self.inst.info['sfreq'],
                                 norm_gfp=norm_gfp)
         return d
+
 
 class EpochsSegmentation(BaseSegmentation):
     def __init__(self, *args,  **kwargs):

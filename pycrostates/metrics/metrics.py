@@ -11,6 +11,7 @@ def _distance_matrix(X, Y=None):
                               neginf=-10e300)
     return(distances)
 
+
 def silhouette(modK): #lower the better
     """
     Compute the mean Silhouette Coefficient of a fitted clustering algorithm.
@@ -39,7 +40,8 @@ def silhouette(modK): #lower the better
     References
     ----------
     .. [1] `Peter J. Rousseeuw (1987).
-       "Silhouettes: a Graphical Aid to the Interpretation and Validation of Cluster Analysis".
+       "Silhouettes: a Graphical Aid to the Interpretation and Validation of
+       Cluster Analysis".
        Computational and Applied Mathematics 20: 53-65.
        <https://doi.org/10.1016/0377-0427(87)90125-7>`_
     """
@@ -203,6 +205,7 @@ def _dunn_score(X, labels): #lower the better
 
     di = np.min(deltas)/np.max(big_deltas)
     return di
+
 
 def dunn(modK): #lower the better
     """Compute the Dunn index score.
