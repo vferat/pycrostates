@@ -588,7 +588,7 @@ class ModKMeans(BaseClustering):
 
     def _fit_data(self, data: np.ndarray,  n_jobs: int = 1, verbose=None):
         logger.info('Running Kmeans for %s clusters centers with %s random '
-                    'initialisations.', (self.n_clusters, self.n_init))
+                    'initialisations.', self.n_clusters, self.n_init)
         inits = self.random_state.randint(
             low=0, high=100*self.n_init, size=(self.n_init))
         if n_jobs == 1:
