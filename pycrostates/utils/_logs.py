@@ -4,26 +4,28 @@ from pathlib import Path
 
 import mne
 
+from ._checks import _check_type
+
 
 name = Path(__file__).parent.parent.name
 logger = logging.getLogger(name)
 logger.propagate = False  # don't propagate (in case of multiple imports)
 
 
-def init_logger(verbosity='INFO'):
+def init_logger(verbose='INFO'):
     """
     Initialize a logger. Assign sys.stdout as a handler of the logger.
 
     Parameters
     ----------
-    verbosity : int | str
+    verbose : int | str
         Logger verbosity.
     """
-    set_log_level(verbosity)
-    add_stream_handler(sys.stdout, verbosity)
+    set_log_level(verbose)
+    add_stream_handler(sys.stdout, verbose)
 
 
-def add_stream_handler(stream, verbosity='INFO'):
+def add_stream_handler(stream, verbose='INFO'):
     """
     Add a handler to the logger. The handler redirects the logger output to
     the stream.
@@ -31,16 +33,20 @@ def add_stream_handler(stream, verbosity='INFO'):
     Parameters
     ----------
     stream : The output stream, e.g. sys.stdout
-    verbosity : int | str
+    verbose : int | str
         Handler verbosity.
     """
     handler = logging.StreamHandler(stream)
     handler.setFormatter(LoggerFormatter())
     logger.addHandler(handler)
-    set_handler_log_level(verbosity, -1)
+
+    _check_type(verbose, (bool, str, int, None), item_name='verbose')
+    if verbose is None:
+        verbose = 'INFO'
+    set_handler_log_level(verbose, -1)
 
 
-def add_file_handler(fname, mode='a', verbosity='INFO'):
+def add_file_handler(fname, mode='a', verbose='INFO'):
     """
     Add a file handler to the logger. The handler saves the logs to file.
 
@@ -49,40 +55,50 @@ def add_file_handler(fname, mode='a', verbosity='INFO'):
     fname : str | Path
     mode : str
         Mode in which the file is openned.
-    verbosity : int | str
+    verbose : int | str
         Handler verbosity.
     """
     handler = logging.FileHandler(fname, mode)
     handler.setFormatter(LoggerFormatter())
     logger.addHandler(handler)
-    set_handler_log_level(verbosity, -1)
+
+    _check_type(verbose, (bool, str, int, None), item_name='verbose')
+    if verbose is None:
+        verbose = 'INFO'
+    set_handler_log_level(verbose, -1)
 
 
-def set_handler_log_level(verbosity, handler_id=0):
+def set_handler_log_level(verbose, handler_id=0):
     """
     Set the log level for a specific handler.
     First handler (ID 0) is always stdout, followed by user-defined handlers.
 
     Parameters
     ----------
-    verbosity : int | str
+    verbose : int | str
         Logger verbosity.
     handler_id : int
         ID of the handler among 'logger.handlers'.
     """
-    logger.handlers[handler_id].setLevel = verbosity
+    _check_type(verbose, (bool, str, int, None), item_name='verbose')
+    if verbose is None:
+        verbose = 'INFO'
+    logger.handlers[handler_id].setLevel = verbose
 
 
-def set_log_level(verbosity):
+def set_log_level(verbose):
     """
     Set the log level for the logger.
 
     Parameters
     ----------
-    verbosity : int | str
+    verbose : int | str
         Logger verbosity.
     """
-    logger.setLevel(verbosity)
+    _check_type(verbose, (bool, str, int, None), item_name='verbose')
+    if verbose is None:
+        verbose = 'INFO'
+    logger.setLevel(verbose)
 
 
 class LoggerFormatter(logging.Formatter):
