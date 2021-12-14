@@ -1,25 +1,24 @@
 import itertools
-from copy import deepcopy
-from pycrostates.viz import plot_cluster_centers
-
 from typing import Tuple
+from copy import deepcopy
 
-import matplotlib
-import mne
-import numpy as np
 import scipy
-
+import numpy as np
+from mne import BaseEpochs, pick_info
+from mne.io import BaseRaw, RawArray
+from mne.parallel import parallel_func
 from mne.annotations import _annotations_starts_stops
-from mne.io import BaseRaw
-from mne.epochs import BaseEpochs
-from mne.parallel import check_n_jobs, parallel_func
+from mne.io.pick import _picks_to_idx
 from mne.preprocessing.ica import _check_start_stop
-from mne.utils import (_validate_type, logger, verbose, warn, fill_doc,
-                       check_random_state)
-from mne.io.pick import _picks_to_idx, pick_info
 
-from ..utils import _corr_vectors, _check_ch_names, _check_reject_by_annotation
+from .. import logger
+from ..viz import plot_cluster_centers
 from ..segmentation import RawSegmentation, EpochsSegmentation
+from ..utils import _corr_vectors
+from ..utils._logs import verbose
+from ..utils._docs import fill_doc
+from ..utils._checks import (_check_type, _check_ch_names, _check_n_jobs,
+                             _check_random_state)
 
 
 @verbose
@@ -203,7 +202,6 @@ def _reject_small_segments(segmentation, data, min_segment_lenght):
     return new_segmentation
 
 
-@fill_doc
 class BaseClustering():
     """Base Class for Microstate Clustering algorithms.
 
@@ -273,8 +271,7 @@ class BaseClustering():
         Get cluster centers as a :class:`~mne.io.Raw`
         """
         self._check_fit()
-        cluster_centers_raw = mne.io.RawArray(
-            self.cluster_centers_.T, self.info)
+        cluster_centers_raw = RawArray(self.cluster_centers_.T, self.info)
         return cluster_centers_raw
 
     def invert_polarity(self, invert):
@@ -383,7 +380,7 @@ class BaseClustering():
 
         Parameters
         ----------
-        inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`
+        inst : `~mne.io.Raw`, `~mne.Epochs`
             Instance containing data to predict.
         factor: int
             Factor used for label smoothing. 0 means no smoothing.
@@ -410,13 +407,13 @@ class BaseClustering():
 
         Returns
         ----------
-        segmentation : :class:`numpy.ndarray`
+        segmentation : `~numpy.ndarray`
             Microstate sequence derivated from Instance data. Timepoints are
             labeled according to cluster centers number: 1 for the first
             center, 2 for the second ect.. 0 is used for unlabeled time points.
         """
         self._check_fit()
-        _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
+        _check_type(inst, (BaseRaw, BaseEpochs))
         inst = inst.copy()
         picks = _picks_to_idx(inst.info, self.picks,
                               exclude=[], allow_empty=False)
@@ -460,12 +457,12 @@ class BaseClustering():
                 verbose=verbose)
         return segmentation
 
-    def plot(self) -> matplotlib.figure.Figure:
+    def plot(self):
         """Plot cluster centers as topomaps.
 
         Returns
         ----------
-        fig :  matplotlib.figure.Figure
+        fig : matplotlib.figure.Figure
             The figure.
         """
         self._check_fit()
@@ -587,7 +584,7 @@ class ModKMeans(BaseClustering):
         self.n_init = n_init
         self.max_iter = max_iter
         self.tol = tol
-        self.random_state = check_random_state(random_state)
+        self.random_state = _check_random_state(random_state)
 
     def _fit_data(self, data: np.ndarray,  n_jobs: int = 1, verbose=None):
         logger.info('Running Kmeans for %s clusters centers with %s random '
@@ -625,7 +622,7 @@ class ModKMeans(BaseClustering):
 
         Parameters
         ----------
-        inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`
+        inst : `~mne.io.Raw`, `~mne.Epochs`
             Instance containing data to transform to cluster-distance space
             (absolute spatial correlation).
         reject_by_annotation : bool
@@ -637,16 +634,15 @@ class ModKMeans(BaseClustering):
         %(raw_tmax)s
         %(verbose)s
         """
-        _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
-        reject_by_annotation = _check_reject_by_annotation(
-            reject_by_annotation)
-        n_jobs = check_n_jobs(n_jobs)
+        _check_type(inst, (BaseRaw, BaseEpochs))
+        n_jobs = _check_n_jobs(n_jobs)
 
         if len(inst.info['bads']) != 0:
-            warn('Bad channels are present in the recording. '
-                 'They will still be used to compute microstate topographies. '
-                 'Consider using instance.pick() or '
-                 'instance.interpolate_bads() before fitting.')
+            logger.warning(
+                'Bad channels are present in the recording. They will still '
+                'be used to compute microstate topographies. Consider using '
+                'instance.pick() or instance.interpolate_bads() before '
+                'fitting.')
 
         inst = inst.copy()
         picks = _picks_to_idx(inst.info, self.picks,

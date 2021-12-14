@@ -1,12 +1,12 @@
 import itertools
-import numpy as np
 
-from mne.utils import _validate_type
+import numpy as np
+from mne import BaseEpochs
 from mne.io import BaseRaw
-from mne.epochs import BaseEpochs
 
 from ..viz import plot_segmentation
 from ..utils import _corr_vectors
+from ..utils._checks import _check_type
 
 
 def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
@@ -16,7 +16,7 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
 
     Parameters
     ----------
-    inst : :class:`mne.io.BaseRaw`, :class:`mne.Evoked`, list
+    inst : `~mne.io.Raw`, `~mne.Evoked`, list
         Instance or list of instances containing data to predict.
     modK : :class:`BaseClustering`
         Modified K-Means Clustering algorithm use to segment data
@@ -134,7 +134,7 @@ class BaseSegmentation():
 class RawSegmentation(BaseSegmentation):
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
-        _validate_type(self.inst, (BaseRaw), 'inst', 'Raw')
+        _check_type(self.inst, (BaseRaw, ))
 
         data = self.inst.get_data()
         if data.shape[1] != len(self.segmentation):
@@ -161,7 +161,7 @@ class RawSegmentation(BaseSegmentation):
 class EpochsSegmentation(BaseSegmentation):
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
-        _validate_type(self.inst, (BaseEpochs), 'inst', 'Epochs')
+        _check_type(self.inst, (BaseEpochs, ))
 
         data = self.inst.get_data()
         if data.shape[0] != self.segmentation.shape[0]:

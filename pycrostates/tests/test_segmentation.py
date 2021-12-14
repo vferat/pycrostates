@@ -1,19 +1,20 @@
-import os.path as op
+from pathlib import Path
 
 import mne
 from mne.datasets import testing
+
 from pycrostates.clustering import ModKMeans
 
-data_path = testing.data_path()
-fname_raw_testing = op.join(data_path, 'MEG', 'sample',
-                            'sample_audvis_trunc_raw.fif')
 
+dir_ = Path(testing.data_path() / 'MEG' / 'sample')
+fname_raw_testing = dir_ / 'sample_audvis_trunc_raw.fif'
 raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
 raw = raw.pick('eeg')
 raw = raw.filter(0, 40)
 raw = raw.crop(0, 10)
 n_clusters = 4
 ModK = ModKMeans(n_clusters=n_clusters)
+
 
 # def test_RawSegmentation_plot():
 #     ModK.fit(raw, n_jobs=1)

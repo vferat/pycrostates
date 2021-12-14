@@ -1,12 +1,15 @@
 from typing import Tuple, Union
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import numpy as np
 import mne
+import numpy as np
 from mne import Evoked
 from mne.io import BaseRaw
-from mne.utils import _validate_type
+from matlotlib import colors
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
+from matplotlib import pyplot as plt
+
+from ..utils._checks import _check_type
 
 
 def plot_cluster_centers(cluster_centers, info, names):
@@ -25,9 +28,8 @@ def plot_segmentation(
         inst: Union(BaseRaw, Evoked),
         cluster_centers: np.ndarray,
         names: list = None,
-        tmin: float = 0.0, tmax: float = None) -> Tuple[mpl.figure.Figure,
-                                                        mpl.axes.Axes]:
-    _validate_type(inst, (BaseRaw, Evoked), 'inst', 'Raw or Evoked')
+        tmin: float = 0.0, tmax: float = None) -> Tuple[Figure, Axes]:
+    _check_type(inst, (BaseRaw, Evoked))
     inst.crop(tmin=tmin, tmax=tmax)
     if isinstance(inst, BaseRaw):
         data = inst.get_data()
@@ -55,7 +57,7 @@ def plot_segmentation(
         x = x.astype(bool)
         plt.fill_between(times, gfp, color=color, where=x, step=None,
                          interpolate=False)
-    norm = mpl.colors.Normalize(vmin=0, vmax=n_states)
+    norm = colors.Normalize(vmin=0, vmax=n_states)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
     cbar = plt.colorbar(sm, ticks=[i + 0.5 for i in range(n_states)])

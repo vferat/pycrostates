@@ -1,23 +1,22 @@
-import os.path as op
 import itertools
+from pathlib import Path
 
-import numpy as np
 import mne
+import numpy as np
 from mne.datasets import testing
 
 from pycrostates.clustering import ModKMeans
 from pycrostates.segmentation import RawSegmentation, EpochsSegmentation
 
-n_clusters = 4
 
-data_path = testing.data_path()
-fname_raw_testing = op.join(data_path, 'MEG', 'sample',
-                            'sample_audvis_trunc_raw.fif')
+dir_ = Path(testing.data_path() / 'MEG' / 'sample')
+fname_raw_testing = dir_ / 'sample_audvis_trunc_raw.fif'
 raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
 raw = raw.pick('eeg')
 raw = raw.crop(0, 10)
 events = mne.make_fixed_length_events(raw, 1)
-epochs = mne.epochs.Epochs(raw, events, preload=True)
+epochs = mne.Epochs(raw, events, preload=True)
+n_clusters = 4
 
 
 def test_ModKMeans_randomstate():

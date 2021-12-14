@@ -1,15 +1,16 @@
 import numpy as np
-from sklearn.metrics import silhouette_score, calinski_harabasz_score
-from sklearn.utils import _safe_indexing, check_X_y
-from sklearn.metrics.cluster._unsupervised import check_number_of_labels
 from sklearn.preprocessing import LabelEncoder
+from sklearn.utils import _safe_indexing, check_X_y
+from sklearn.metrics import silhouette_score, calinski_harabasz_score
+from sklearn.metrics.cluster._unsupervised import check_number_of_labels
 
 
 def _distance_matrix(X, Y=None):
     distances = np.abs(1 / np.corrcoef(X, Y)) - 1
     distances = np.nan_to_num(distances, copy=False, nan=10e300, posinf=10e300,
                               neginf=-10e300)
-    return(distances)
+    # TODO: Sure about the 10e300? That's 1e301.
+    return distances
 
 
 def silhouette(modK):  # lower the better

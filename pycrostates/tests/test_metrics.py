@@ -1,4 +1,5 @@
-import os.path as op
+from pathlib import Path
+
 import mne
 from mne.datasets import testing
 
@@ -6,10 +7,9 @@ from pycrostates.clustering import ModKMeans
 from pycrostates.metrics import (silhouette, davies_bouldin, calinski_harabasz,
                                  dunn)
 
-data_path = testing.data_path()
-fname_raw_testing = op.join(data_path, 'MEG', 'sample',
-                            'sample_audvis_trunc_raw.fif')
 
+dir_ = Path(testing.data_path() / 'MEG' / 'sample')
+fname_raw_testing = dir_ / 'sample_audvis_trunc_raw.fif'
 raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
 raw = raw.pick('eeg')
 n_clusters = 4

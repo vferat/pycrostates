@@ -1,13 +1,14 @@
 import numpy as np
 from scipy.signal import find_peaks
 
-import mne
-from mne.io import BaseRaw
-from mne.epochs import BaseEpochs
-from mne.utils import (_validate_type, logger, verbose, fill_doc,
-                       check_random_state)
+from mne import BaseEpochs
+from mne.io import BaseRaw, RawArray
 from mne.preprocessing.ica import _check_start_stop
-from pycrostates.utils import _check_reject_by_annotation
+
+from .. import logger
+from ..utils._logs import verbose
+from ..utils._docs import fill_doc
+from ..utils._checks import _check_type, _check_random_state
 
 
 def _extract_gfps(data, min_peak_distance=2):
@@ -27,8 +28,7 @@ def _extract_gfps(data, min_peak_distance=2):
         raise(ValueError('min_peak_dist must be >= 1.'))
     gfp = np.std(data, axis=0)
     peaks, _ = find_peaks(gfp, distance=min_peak_distance)
-    data_ = data[:, peaks]
-    return data_
+    return data[:, peaks]
 
 
 @fill_doc
@@ -37,24 +37,22 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
                       reject_by_annotation=True, verbose=None):
     """Perform GFP peaks extraction.
 
-    Extract global field power peaks from :class:`mne.epochs.Epochs`or
-    :class:`mne.io.Raw`.
+    Extract global field power peaks from :class:`mne.Epochs` or
+    `~mne.io.Raw`.
 
-    .. warning:: The temporal dimension of the output :class:`mne.io.Raw`
+    .. warning:: The temporal dimension of the output `~mne.io.Raw`
                  object has been destroyed. This object is a convinient
                  container for GFP peaks and should not be used for standart
                  MEEG analysis.
 
     Parameters
     ----------
-    inst : :class:`mne.io.Raw`, :class:`mne.Epochs`, :class:`mne.Evoked`
-            Instance from which to extract gfp peaks.
+    inst : `~mne.io.Raw`, `~mne.Epochs`
+        Instance from which to extract GFP peaks.
     min_peak_dist : int
-                    Required minimal horizontal distance (>= 1)
-                    in samples between neighbouring peaks.
-                    Smaller peaks are removed first until the
-                    condition is fulfilled for all remaining peaks.
-                    Default to 2.
+        Required minimal horizontal distance (>= 1) in samples between
+        neighbouring peaks. Smaller peaks are removed first until the
+        is fulfilled for all remaining peaks. Default to 2.
     reject_by_annotation : bool
         Whether to reject by annotation. If True (default), segments annotated
         with description starting with ‘bad’ are omitted. If False, no
@@ -65,11 +63,10 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
 
     Returns
     -------
-    raw : :class:`mne.io.Raw`
+    raw : `~mne.io.Raw`
         The Raw instance containing extracted GFP peaks.
     """
-    _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
-    reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
+    _check_type(inst, (BaseRaw, BaseEpochs))
     if min_peak_distance < 1:
         raise(ValueError('min_peak_dist must be >= 1.'))
     if isinstance(inst, BaseRaw):
@@ -98,7 +95,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
 
     info = inst.info.copy()
     info['sfreq'] = -1
-    raw_peaks = mne.io.RawArray(data=peaks, info=info, verbose=False)
+    raw_peaks = RawArray(data=peaks, info=info, verbose=False)
     return raw_peaks
 
 
@@ -109,17 +106,17 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
              random_state=None, verbose=None):
     """Resample recording into epochs of random samples.
 
-    Resample :class:`mne.io.Raw` or :class:`mne.epochs.Epochs` into
-    ``n_epochs`` :class:`mne.io.Raw` each containing ``n_samples```
-    random samples of the originial recording.
+    Resample `~mne.io.Raw` or `~mne.epochs.Epochs` into ``n_epochs``
+    `~mne.io.Raw` each containing ``n_samples``` random samples of the
+    originial recording.
 
-    .. warning:: The temporal dimension of the output :class:`mne.io.Raw`
-                 objects has been destroyed. These objects should not be used
-                 for standart MEEG analysis.
+    .. warning:: The temporal dimension of the output `~mne.io.Raw` objects
+                 has been destroyed. These objects should not be used for
+                 standart MEEG analysis.
 
     Parameters
     ----------
-    inst : :class:`mne.io.BaseRaw`, :class:`mne.Epochs`
+    inst : `~mne.io.Raw`, `~mne.Epochs`
         Instance from which to extract GFP peaks.
     n_epochs : int
         Number of epoch to draw.
@@ -149,13 +146,12 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
 
     Returns
     -------
-    raw : list of :class:`mne.io.BaseRaw`
+    raw : list of `~mne.io.Raw`
         Raw objects each containing resampled data (n_epochs raws of n_samples
         samples).
     """
-    _validate_type(inst, (BaseRaw, BaseEpochs), 'inst', 'Raw or Epochs')
-    reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
-    random_state = check_random_state(random_state)
+    _check_type(inst, (BaseRaw, BaseEpochs))
+    random_state = _check_random_state(random_state)
 
     if isinstance(inst, BaseRaw):
         reject_by_annotation = 'omit' if reject_by_annotation else None
@@ -211,6 +207,6 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
 
     resamples = list()
     for d in data:
-        raw = mne.io.RawArray(d, info=inst.info, verbose=False)
+        raw = RawArray(d, info=inst.info, verbose=False)
         resamples.append(raw)
     return resamples

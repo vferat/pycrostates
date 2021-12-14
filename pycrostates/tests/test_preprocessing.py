@@ -1,14 +1,14 @@
-import os.path as op
+from pathlib import Path
 
 import mne
-from mne.io.array.array import RawArray
+from mne.io import RawArray
 from mne.datasets import testing
+
 from pycrostates.preprocessing import resample, extract_gfp_peaks
 
-data_path = testing.data_path()
-fname_raw_testing = op.join(data_path, 'MEG', 'sample',
-                            'sample_audvis_trunc_raw.fif')
 
+dir_ = Path(testing.data_path() / 'MEG' / 'sample')
+fname_raw_testing = dir_ / 'sample_audvis_trunc_raw.fif'
 raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
 raw = raw.pick('eeg')
 epochs = mne.make_fixed_length_epochs(raw, duration=2, preload=True)
