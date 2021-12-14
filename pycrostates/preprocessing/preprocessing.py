@@ -76,7 +76,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
                              reject_by_annotation=reject_by_annotation)
         peaks = _extract_gfps(data, min_peak_distance=min_peak_distance)
         logger.info(
-            '%s GFP peaks extracted out of %s samples (%s% of the original '
+            '%s GFP peaks extracted out of %s samples (%.2f%% of the original '
             'data).', peaks.shape[1], data.shape[-1],
             peaks.shape[1] / data.shape[-1] * 100)
     if isinstance(inst, BaseEpochs):
@@ -88,7 +88,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
             peaks.append(epoch_peaks)
         peaks = np.hstack(peaks)
         logger.info(
-            '%s GFP peaks extracted out of %s samples (%s% of the original '
+            '%s GFP peaks extracted out of %s samples (%.2f%% of the original '
             'data).', peaks.shape[1], data.shape[0] * data.shape[2],
             peaks.shape[1] / (data.shape[0] * data.shape[2]) * 100)
 
@@ -189,7 +189,7 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
                 f"instance contains only {n_times} samples.")
 
     logger.info(
-        'Resampling instance into %s epochs of %s covering %s% of the '
+        'Resampling instance into %s epochs of %s covering %.2f%% of the '
         'original data.', n_epochs, n_samples, coverage * 100)
 
     if replace:

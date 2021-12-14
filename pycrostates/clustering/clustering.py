@@ -612,7 +612,7 @@ class ModKMeans(BaseClustering):
             gevs = [run[0] for run in runs]
             best_run = np.argmax(gevs)
             best_gev, best_maps, best_segmentation = runs[best_run]
-            logger.info('Selecting run with highest GEV = %s%.', best_gev)
+            logger.info('Selecting run with highest GEV = %.2f%%.', best_gev)
         return best_maps, best_gev, best_segmentation
 
     @verbose
