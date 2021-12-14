@@ -71,7 +71,7 @@ def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
 
         # Have we converged?
         if (prev_residual - residual) < (tol * residual):
-            # logger.info('Converged at %d iterations.' % iteration)
+            # logger.info('Converged at %d iterations.', iteration)
             break
 
         prev_residual = residual
@@ -426,12 +426,12 @@ class BaseClustering:
             logger.info('Segmenting data without smoothing')
         if factor != 0:
             logger.info(
-                f'Segmenting data with factor {factor} and effective '
-                'smoothing window size : '
-                f'{(2*half_window_size+1) / inst.info["sfreq"]} (ms)')
+                'Segmenting data with factor %s and effective smoothing '
+                'window size: %s (ms)',
+                factor, (2*half_window_size+1) / inst.info["sfreq"])
         if min_segment_lenght > 0:
-            logger.info('Rejecting segments shorter than '
-                        f'{min_segment_lenght / inst.info["sfreq"]} (ms)')
+            logger.info('Rejecting segments shorter than %s (ms)',
+                        min_segment_lenght / inst.info["sfreq"])
         if rejected_first_last_segments:
             logger.info('Rejecting first and last segment')
 
@@ -612,7 +612,7 @@ class ModKMeans(BaseClustering):
             gevs = [run[0] for run in runs]
             best_run = np.argmax(gevs)
             best_gev, best_maps, best_segmentation = runs[best_run]
-            logger.info(f'Selecting run with highest GEV = {best_gev}%.')
+            logger.info('Selecting run with highest GEV = %s%.', best_gev)
         return best_maps, best_gev, best_segmentation
 
     @verbose
@@ -657,7 +657,7 @@ class ModKMeans(BaseClustering):
             data = _prepare_fit_epochs(inst, picks)
             current_fit = 'Epochs'
 
-        logger.info(f'Fitting modified Kmeans with {current_fit} data')
+        logger.info('Fitting modified Kmeans with %s data', current_fit)
 
         cluster_centers, GEV, labels = self._fit_data(data, n_jobs, verbose)
         self.cluster_centers_ = cluster_centers

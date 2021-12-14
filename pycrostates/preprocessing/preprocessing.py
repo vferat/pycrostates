@@ -76,9 +76,9 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
                              reject_by_annotation=reject_by_annotation)
         peaks = _extract_gfps(data, min_peak_distance=min_peak_distance)
         logger.info(
-            f'{peaks.shape[1]} gfp peaks extracted out of {data.shape[-1]} '
-            f'samples ({(peaks.shape[1] /data.shape[-1] * 100):.2f}% of the '
-            'original data)')
+            '%s GFP peaks extracted out of %s samples (%s% of the original '
+            'data).', peaks.shape[1], data.shape[-1],
+            peaks.shape[1] / data.shape[-1] * 100)
     if isinstance(inst, BaseEpochs):
         data = inst.get_data()
         peaks = list()
@@ -88,10 +88,9 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
             peaks.append(epoch_peaks)
         peaks = np.hstack(peaks)
         logger.info(
-            f'{peaks.shape[1]} gfp peaks extracted out of '
-            f'{data.shape[0] * data.shape[2]} samples '
-            f'({(peaks.shape[1] / (data.shape[0] * data.shape[2]) * 100):.2f}%'
-            ' of the original data)')
+            '%s GFP peaks extracted out of %s samples (%s% of the original '
+            'data).', peaks.shape[1], data.shape[0] * data.shape[2],
+            peaks.shape[1] / (data.shape[0] * data.shape[2]) * 100)
 
     info = inst.info.copy()
     info['sfreq'] = -1
@@ -190,8 +189,8 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
                 f"instance contains only {n_times} samples.")
 
     logger.info(
-        f'Resampling instance into {n_epochs} epochs of {n_samples} covering '
-        f'{coverage *100:.2f}% of the original data')
+        'Resampling instance into %s epochs of %s covering %s% of the '
+        'original data.', n_epochs, n_samples, coverage * 100)
 
     if replace:
         indices = random_state.randint(0, n_samples,
