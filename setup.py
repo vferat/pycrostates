@@ -12,9 +12,9 @@ with open(Path(__file__).parent/'pycrostates'/'_version.py', 'r') as file:
         if line.startswith('__version__'):
             version = line.split('=')[1].strip().strip('\'')
             break
-
 if version is None:
     raise RuntimeError('Could not determine version.')
+
 
 # Descriptions
 short_description = "A simple open source Python package for EEGmicrostate segmentation"
