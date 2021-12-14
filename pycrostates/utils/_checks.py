@@ -154,10 +154,9 @@ def _check_ch_names(inst1, inst2, *, inst1_name=None, inst2_name=None):
     """
     Checks that both instance have the same channel names.
     """
-    assert hasattr(inst1, 'ch_names')
-    assert hasattr(inst2, 'ch_names')
-
-    if inst1.ch_names != inst2.ch_names:
+    # TODO: Not a fan of this one; it's failing on hasttr(inst, 'ch_names')
+    # which should not be the case.
+    if inst1.info['ch_names'] != inst2.info['ch_names']:
         inst1_name = "" if inst1_name is None else " '%s'" % inst1_name
         inst2_name = "" if inst2_name is None else " '%s'" % inst2_name
         msg = ("Instance{inst1_name} and instance{inst2_name} do not have "
