@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 # Version
 version = None
-with open(Path(__file__).parent/'bsl'/'_version.py', 'r') as file:
+with open(Path(__file__).parent/'pycrostates'/'_version.py', 'r') as file:
     for line in file:
         line = line.strip()
         if line.startswith('__version__'):
