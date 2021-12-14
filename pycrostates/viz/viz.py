@@ -4,7 +4,7 @@ import mne
 import numpy as np
 from mne import Evoked
 from mne.io import BaseRaw
-from matlotlib import colors
+from matplotlib import colors
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
@@ -25,7 +25,7 @@ def plot_cluster_centers(cluster_centers, info, names):
 
 def plot_segmentation(
         segmentation: np.ndarray,
-        inst: Union(BaseRaw, Evoked),
+        inst: Union[BaseRaw, Evoked],
         cluster_centers: np.ndarray,
         names: list = None,
         tmin: float = 0.0, tmax: float = None) -> Tuple[Figure, Axes]:

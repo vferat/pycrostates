@@ -11,7 +11,8 @@ from mne.utils.docs import docdict as docdict_mne
 docdict = dict()
 
 # Documentation to inc. from MNE
-keys = []
+keys = ['random_state', 'verbose', 'reject_by_annotation_raw', 'n_jobs',
+        'raw_tmin', 'raw_tmax']
 for key in keys:
     docdict[key] = docdict_mne[key]
 
