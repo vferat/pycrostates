@@ -137,8 +137,6 @@ class LoggerFormatter(logging.Formatter):
         else:
             return self._formatters[logging.ERROR].format(record)
 
-        return super().format(record)
-
 
 def verbose(f):
     """
