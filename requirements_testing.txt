@@ -1,0 +1,7 @@
+# requirements for running tests
+pytest
+pytest-cov
+flake8
+twine
+wheel
+pooch
