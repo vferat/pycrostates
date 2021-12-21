@@ -4,7 +4,7 @@
 [![Documentation Status](https://readthedocs.org/projects/pycrostates/badge/?version=latest)](https://pycrostates.readthedocs.io/en/latest/?badge=latest)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 # Pycrostates
 ---
@@ -39,6 +39,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://vferat.github.io/about/"><img src="https://avatars.githubusercontent.com/u/28844486?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Victor Férat</b></sub></a><br /><a href="https://github.com/vferat/pycrostates/commits?author=vferat" title="Tests">⚠️</a> <a href="https://github.com/vferat/pycrostates/commits?author=vferat" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/mscheltienne"><img src="https://avatars.githubusercontent.com/u/73893616?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mathieu Scheltienne</b></sub></a><br /><a href="https://github.com/vferat/pycrostates/commits?author=mscheltienne" title="Code">💻</a></td>
   </tr>
 </table>
 
