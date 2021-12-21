@@ -1,25 +1,30 @@
 import numpy as np
-from sklearn.metrics import silhouette_score, calinski_harabasz_score
-from sklearn.utils import _safe_indexing, check_X_y
-from sklearn.metrics.cluster._unsupervised import check_number_of_labels
 from sklearn.preprocessing import LabelEncoder
+from sklearn.utils import _safe_indexing, check_X_y
+from sklearn.metrics import silhouette_score, calinski_harabasz_score
+from sklearn.metrics.cluster._unsupervised import check_number_of_labels
 
 
 def _distance_matrix(X, Y=None):
     distances = np.abs(1 / np.corrcoef(X, Y)) - 1
-    distances = np.nan_to_num(distances, copy=False, nan=10e300, posinf=10e300, neginf=-10e300)
-    return(distances)
+    distances = np.nan_to_num(distances, copy=False, nan=10e300, posinf=10e300,
+                              neginf=-10e300)
+    # TODO: Sure about the 10e300? That's 1e301.
+    return distances
 
-def silhouette(modK): #lower the better
-    """Compute the mean Silhouette Coefficient of a fitted clustering algorithm.
-    This function is a proxy function for :func:`sklearn.metrics.silhouette_score` that applies directly to a
-    fitted :class:´pycrostate.clustering.BaseClustering´. It uses the absolute spatial correlation for distance
-    computations.
+
+def silhouette(modK):  # lower the better
+    """
+    Compute the mean Silhouette Coefficient of a fitted clustering algorithm.
+    This function is a proxy function for
+    :func:`sklearn.metrics.silhouette_score` that applies directly to a fitted
+    :class:´pycrostate.clustering.BaseClustering´. It uses the absolute spatial
+    correlation for distance computations.
 
     Parameters
     ----------
     BaseClustering : :class:`pycrostate.clustering.BaseClustering`
-            Fitted clustering algorithm from which to compute score.
+        Fitted clustering algorithm from which to compute score.
 
     Returns
     -------
@@ -28,14 +33,16 @@ def silhouette(modK): #lower the better
 
     Notes
     -----
-    For more details regarding the implementation, please refere to :func:`sklearn.metrics.silhouette_score`.
-    This proxy function uses metric="precomputed" with the absolute spatial correlation for distance
-    computations.
+    For more details regarding the implementation, please refere to
+    :func:`sklearn.metrics.silhouette_score`.
+    This proxy function uses metric="precomputed" with the absolute spatial
+    correlation for distance computations.
 
     References
     ----------
-    .. [1] `Peter J. Rousseeuw (1987). 
-       "Silhouettes: a Graphical Aid to the Interpretation and Validation of Cluster Analysis".
+    .. [1] `Peter J. Rousseeuw (1987).
+       "Silhouettes: a Graphical Aid to the Interpretation and Validation of
+       Cluster Analysis".
        Computational and Applied Mathematics 20: 53-65.
        <https://doi.org/10.1016/0377-0427(87)90125-7>`_
     """
@@ -47,7 +54,7 @@ def silhouette(modK): #lower the better
     labels = labels[keep]
     distances = _distance_matrix(data.T)
     silhouette = silhouette_score(distances, labels, metric='precomputed')
-    return(silhouette)
+    return silhouette
 
 
 def _davies_bouldin_score(X, labels):
@@ -77,11 +84,14 @@ def _davies_bouldin_score(X, labels):
     scores = np.max(combined_intra_dists / centroid_distances, axis=1)
     return np.mean(scores)
 
-def davies_bouldin(modK): # lower the better
+
+def davies_bouldin(modK):  # lower the better
     """Computes the Davies-Bouldin score.
-    This function is a proxy function for :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a
-    fitted :class:`pycrostate.clustering.BaseClustering`. It uses the absolute spatial correlation for distance
-    computations.
+
+    This function is a proxy function for
+    :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a
+    fitted :class:`pycrostate.clustering.BaseClustering`. It uses the absolute
+    spatial correlation for distance computations.
 
     Parameters
     ----------
@@ -95,9 +105,10 @@ def davies_bouldin(modK): # lower the better
 
     Notes
     -----
-    For more details regarding the implementation, please refere to :func:`sklearn.metrics.davies_bouldin_score`.
-    This function was modified in order to use the absolute spatial correlation for distance
-    computations instead of euclidean distance.
+    For more details regarding the implementation, please refere to
+    :func:`sklearn.metrics.davies_bouldin_score`.
+    This function was modified in order to use the absolute spatial correlation
+    for distance computations instead of euclidean distance.
 
     References
     ----------
@@ -114,27 +125,30 @@ def davies_bouldin(modK): # lower the better
     data = data[:, keep]
     labels = labels[keep]
     davies_bouldin_score = _davies_bouldin_score(data.T, labels)
-    return(davies_bouldin_score)
+    return davies_bouldin_score
 
 
-def calinski_harabasz(modK): # lower the better
+def calinski_harabasz(modK):  # lower the better
     """Compute the Calinski and Harabasz score.
-    This function is a proxy function for :func:`sklearn.metrics.calinski_harabasz_score` that applies directly to a
+
+    This function is a proxy function for
+    :func:`sklearn.metrics.calinski_harabasz_score` that applies directly to a
     fitted :class:`pycrostate.clustering.BaseClustering`.
 
     Parameters
     ----------
     BaseClustering : :class:`pycrostate.clustering.BaseClustering`
-            Fitted clustering algorithm from which to compute score.
+        Fitted clustering algorithm from which to compute score.
 
     Returns
     -------
     score : float
         The resulting Davies-Bouldin score.
-        
+
     Notes
     -----
-    For more details regarding the implementation, please refere to :func:`sklearn.metrics.calinski_harabasz_score`.
+    For more details regarding the implementation, please refer to
+    :func:`sklearn.metrics.calinski_harabasz_score`.
 
     References
     ----------
@@ -150,7 +164,7 @@ def calinski_harabasz(modK): # lower the better
     data = data[:, keep]
     labels = labels[keep]
     score = calinski_harabasz_score(data.T, labels)
-    return(score)
+    return score
 
 
 def _delta_fast(ck, cl, distances):
@@ -158,11 +172,13 @@ def _delta_fast(ck, cl, distances):
     values = values[np.nonzero(values)]
     return np.min(values)
 
+
 def _big_delta_fast(ci, distances):
     values = distances[np.where(ci)][:, np.where(ci)]
     return np.max(values)
 
-def _dunn_score(X, labels): #lower the better
+
+def _dunn_score(X, labels):  # lower the better
     # based on https://github.com/jqmviegas/jqm_cvi
     """Compute the Dunn index.
 
@@ -175,39 +191,39 @@ def _dunn_score(X, labels): #lower the better
     """
     distances = _distance_matrix(X)
     ks = np.sort(np.unique(labels))
-    
+
     deltas = np.ones([len(ks), len(ks)])*1000000
     big_deltas = np.zeros([len(ks), 1])
-    
-    l_range = list(range(0, len(ks)))
-    
-    for k in l_range:
-        for l in (l_range[0:k]+l_range[k+1:]):
-            deltas[k, l] = _delta_fast((labels == ks[k]), (labels == ks[l]), distances)
-        
-        big_deltas[k] = _big_delta_fast((labels == ks[k]), distances)
+
+    for i in range(0, len(ks)):
+        for j in range(0, len(ks)):
+            if i == j:
+                continue  # skip diagonal
+            deltas[i, j] = _delta_fast((labels == ks[i]), (labels == ks[j]),
+                                       distances)
+        big_deltas[i] = _big_delta_fast((labels == ks[i]), distances)
 
     di = np.min(deltas)/np.max(big_deltas)
     return di
 
-def dunn(modK): #lower the better
-    """Compute the Dunn index score.
 
+def dunn(modK):  # lower the better
+    """Compute the Dunn index score.
 
     Parameters
     ----------
     BaseClustering : :class:`pycrostate.clustering.BaseClustering`
-            Fitted clustering algorithm from which to compute score.
+        Fitted clustering algorithm from which to compute score.
 
     Returns
     -------
     score : float
         The resulting Davies-Bouldin score.
-        
+
     Notes
     -----
     This function uses the absolute spatial correlation for distance.
-        
+
     References
     ----------
     .. [1] `J. C. Dunn (1974).
@@ -222,4 +238,4 @@ def dunn(modK): #lower the better
     data = data[:, keep]
     labels = labels[keep]
     score = _dunn_score(data.T, labels)
-    return(score)
+    return score

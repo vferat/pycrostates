@@ -12,6 +12,16 @@
       "profile": "https://vferat.github.io/about/",
       "contributions": [
         "test",
+        "code"
+      ]
+    },
+    {
+      "login": "mscheltienne",
+      "name": "Mathieu Scheltienne",
+      "avatar_url": "https://avatars.githubusercontent.com/u/73893616?v=4",
+      "profile": "https://github.com/mscheltienne",
+      "contributions": [
+        "code"
       ]
     }
   ],
