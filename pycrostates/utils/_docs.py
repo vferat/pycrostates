@@ -10,11 +10,20 @@ from mne.utils.docs import docdict as docdict_mne
 # ------------------------- Documentation dictionary -------------------------
 docdict = dict()
 
-# Documentation to inc. from MNE
+# ---- Documentation to inc. from MNE ----
 keys = ['random_state', 'verbose', 'reject_by_annotation_raw', 'n_jobs',
         'raw_tmin', 'raw_tmax']
 for key in keys:
     docdict[key] = docdict_mne[key]
+
+# ---- Clusters ----
+docdict['fit_inst'] = """
+inst : `~mne.io.Raw` | `~mne.Epochs`
+    Instance containing data to transform to cluster-distance space
+    (absolute spatial correlation)."""
+docdict['predict_inst'] = """
+inst : `~mne.io.Raw` | `~mne.Epochs`
+    Instance containing data to predict."""
 
 # ------------------------- Documentation functions --------------------------
 docdict_indented = dict()
