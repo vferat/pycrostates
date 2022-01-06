@@ -2,10 +2,12 @@ from abc import ABC, abstractmethod
 from copy import copy, deepcopy
 
 from mne import BaseEpochs
-from mne.io import BaseRaw, RawArray
+from mne.io import BaseRaw
+from mne.io.pick import _picks_to_idx
 
-from ..utils._logs import verbose
 from ..utils._checks import _check_type, _check_value, _check_n_jobs
+from ..utils._docs import fill_doc
+from ..utils._logs import verbose
 
 
 class _BaseCluster(ABC):
@@ -22,10 +24,10 @@ class _BaseCluster(ABC):
 
     def __repr__(self) -> str:
         name = self.__class__.__name__
-        if self.n_clusters is not None:
+        if self.fitted:
             s = f'<{name} | fitted on n = {self.n_clusters} cluster centers>'
         else:
-            s = f'<{name} | not fitted>
+            s = f'<{name} | not fitted>'
         return s
 
     def copy(self, deep=True):
@@ -50,21 +52,22 @@ class _BaseCluster(ABC):
 
     @abstractmethod
     @fill_doc
-    @verbose
-    def fit(self, inst, tmin=None, tmax=None, reject_by_annotation=True,
-            n_jobs=1, *, verbose=None):
-        """Segment `~mne.io.Raw` or `~mne.Epochs` instance into microstate
+    def fit(self, inst, picks='eeg', tmin=None, tmax=None,
+            reject_by_annotation=True, n_jobs=1):
+        """
+        Segment `~mne.io.Raw` or `~mne.Epochs` instance into microstate
         sequence.
 
         Parameters
         ----------
         %(fit_inst)s
+        %(picks_all)s
         %(raw_tmin)s
         %(raw_tmax)s
         %(reject_by_annotation_raw)s
         %(n_jobs)s
-        %(verbose)s
         """
+        # TODO: Maybe those parameters should be moved here instead of docdict?
         _check_type(inst, (BaseRaw, BaseEpochs), item_name='inst')
         _check_type(tmin, (None, 'numeric'), item_name='tmin')
         _check_type(tmax, (None, 'numeric'), item_name='tmax')
@@ -72,7 +75,32 @@ class _BaseCluster(ABC):
                     item_name='reject_by_annotation')
         n_jobs = _check_n_jobs(n_jobs)
 
-        # TODO: Add check for tmin/tmax values
+        # picks
+        picks = _picks_to_idx(inst.info, picks, none='all', exclude='bads')
+
+        # tmin/tmax
+        tmin = 0 if tmin is None else tmin
+        tmax = inst.times[-1] if tmax is None else tmax
+        # check positiveness
+        for name, arg in (('tmin', tmin), ('tmax', tmax)):
+            if arg < 0:
+                raise ValueError(
+                    f"Argument '{name}' must be positive. Provided '{arg}'.")
+        # check tmax is shorter than raw
+        if inst.times[-1] < tmax:
+            raise ValueError(
+                "Argument 'tmax' must be shorter than the instance length. "
+                f"Provided: '{tmax}', larger than {inst.times[-1]}s instance.")
+        # check that tmax is larger than tmin
+        if tmax <= tmin:
+            raise ValueError(
+                "Argument 'tmax' must be strictly larger than 'tmin'. "
+                f"Provided 'tmin' -> '{tmin}' and 'tmax' -> '{tmax}'.")
+
+        # retrieve numpy array
+        kwargs = dict() if isinstance(inst, BaseEpochs) \
+            else dict(reject_by_annotation=reject_by_annotation)
+        data = inst.get_data(picks=picks, tmin=tmin, tmax=tmax, **kwargs)
 
     def rename_clusters(self, mapping: dict):
         """
@@ -111,9 +139,6 @@ class _BaseCluster(ABC):
             _check_value(key, valids, item_name='old position')
         for value in mapping.values():
             _check_value(value, valids, item_name='new position')
-
-        self.cluster_centers_ = self.cluster_centers_[order]
-        self.names = [self.names[o] for o in order]
 
     @abstractmethod
     @fill_doc
@@ -168,8 +193,7 @@ class _BaseCluster(ABC):
     @property
     def n_clusters(self):
         """
-        Number of clusters. Returns None if cluster algorithm has not been
-        fitted.
+        Number of clusters.
 
         :type: `int`
         """
@@ -178,8 +202,7 @@ class _BaseCluster(ABC):
     @property
     def clusters_names(self):
         """
-        Name of the clusters. Returns None if cluster algorithm has not been
-        fitted.
+        Name of the clusters.
 
         :type: `list`
         """
@@ -194,3 +217,14 @@ class _BaseCluster(ABC):
         :type: `~numpy.array`
         """
         return self._cluster_centers
+
+    # --------------------------------------------------------------------
+    @staticmethod
+    def _check_n_clusters(n_clusters: int):
+        """Check that the number of clusters is a positive integer."""
+        _check_type(n_clusters, ('int', ), item_name='n_clusters')
+        if n_clusters <= 0:
+            raise ValueError(
+                "The number of clusters must be a positive integer. "
+                f"Provided: '{n_clusters}'.")
+        return n_clusters

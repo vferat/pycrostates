@@ -160,4 +160,17 @@ def verbose(f):
     return wrapper
 
 
+def _set_verbose(verbose):
+    """
+    Similar to verbose decorator.
+
+    Parameters
+    ----------
+    verbose : int | str
+        Logger verbosity.
+    """
+    mne.set_log_level(verbose)
+    set_log_level(verbose)
+
+
 init_logger()

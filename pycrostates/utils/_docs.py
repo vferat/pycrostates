@@ -12,9 +12,10 @@ docdict = dict()
 
 # ---- Documentation to inc. from MNE ----
 keys = ['random_state', 'verbose', 'reject_by_annotation_raw', 'n_jobs',
-        'raw_tmin', 'raw_tmax']
+        'raw_tmin', 'raw_tmax', 'picks_all']
 for key in keys:
     docdict[key] = docdict_mne[key]
+# TODO: sphinx :term:`data channels` in 'picks_all' has to be included.
 
 # ---- Clusters ----
 docdict['fit_inst'] = """
