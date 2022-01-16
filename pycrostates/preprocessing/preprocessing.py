@@ -5,8 +5,7 @@ from mne import BaseEpochs
 from mne.io import BaseRaw, RawArray
 from mne.preprocessing.ica import _check_start_stop
 
-from .. import logger
-from ..utils._logs import verbose
+from ..utils._logs import logger, verbose
 from ..utils._docs import fill_doc
 from ..utils._checks import _check_type, _check_random_state
 

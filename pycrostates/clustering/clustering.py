@@ -11,11 +11,10 @@ from mne.annotations import _annotations_starts_stops
 from mne.io.pick import _picks_to_idx
 from mne.preprocessing.ica import _check_start_stop
 
-from .. import logger
 from ..viz import plot_cluster_centers
 from ..segmentation import RawSegmentation, EpochsSegmentation
 from ..utils import _corr_vectors
-from ..utils._logs import verbose
+from ..utils._logs import logger, verbose
 from ..utils._docs import fill_doc
 from ..utils._checks import (_check_type, _check_ch_names, _check_n_jobs,
                              _check_random_state)
