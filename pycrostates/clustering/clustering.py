@@ -16,28 +16,26 @@ from ..segmentation import RawSegmentation, EpochsSegmentation
 from ..utils import _corr_vectors
 from ..utils._logs import logger, verbose
 from ..utils._docs import fill_doc
-from ..utils._checks import (_check_type, _check_ch_names, _check_n_jobs,
-                             _check_random_state)
+from ..utils._checks import (_check_type, _check_ch_names, _check_n_jobs)
 
 
 @verbose
 def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
-                  random_state=None, verbose=None):
+                  random_seed=None, verbose=None):
     """
     Comptues maps.
     Based on mne_microstates by Marijn van Vliet <w.m.vanvliet@gmail.com>
     https://github.com/wmvanvliet/mne_microstates/blob/master/microstates.py
     """
-    if not isinstance(random_state, np.random.RandomState):
-        random_state = np.random.RandomState(random_state)
     # -- handle zeros maps --
     # zero map can be due to non data in the recording, it's unlikly that all
-    # channels recorded the same value at the same time (=0 due to avergare
+    # channels recorded the same value at the same time (=0 due to average
     # reference)
     data = data[:, np.linalg.norm(data.T, axis=1) != 0]
     n_channels, n_samples = data.shape
     data_sum_sq = np.sum(data ** 2)
     # Select random timepoints for our initial topographic maps
+    random_state = np.random.RandomState(random_seed)
     init_times = random_state.choice(n_samples, size=n_states, replace=False)
     maps = data[:, init_times].T
     maps /= np.linalg.norm(maps, axis=1, keepdims=True)  # Normalize the maps
@@ -82,12 +80,12 @@ def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
 
 @verbose
 def _run_mod_kmeans(data: np.ndarray, n_clusters=4,
-                    max_iter=100, random_state=None,
+                    max_iter=100, random_seed=None,
                     tol=1e-6, verbose=None
                     ) -> Tuple[float, np.ndarray, np.ndarray]:
     gfp_sum_sq = np.sum(data ** 2)
     maps = _compute_maps(data, n_clusters, max_iter=max_iter,
-                         random_state=random_state, tol=tol, verbose=verbose)
+                         random_seed=random_seed, tol=tol, verbose=verbose)
     activation = maps.dot(data)
     segmentation = np.argmax(np.abs(activation), axis=0)
     map_corr = _corr_vectors(data, maps[segmentation].T)
@@ -542,7 +540,7 @@ class ModKMeans(BaseClustering):
     n_clusters : int
         The number of clusters to form as well as the number of centroids to
         generate.
-    %(random_state)s
+    random_seed : float
         As estimation can be non-deterministic it can be useful to fix the
         random state to have reproducible results.
     n_init : int
@@ -574,7 +572,7 @@ class ModKMeans(BaseClustering):
         centers.
     """
     def __init__(self,
-                 random_state=None,
+                 random_seed=None,
                  n_init=100,
                  max_iter=300,
                  tol=1e-6,
@@ -583,19 +581,20 @@ class ModKMeans(BaseClustering):
         self.n_init = n_init
         self.max_iter = max_iter
         self.tol = tol
-        self.random_state = _check_random_state(random_state)
+        self.random_seed = random_seed
 
     def _fit_data(self, data: np.ndarray,  n_jobs: int = 1, verbose=None):
         logger.info('Running Kmeans for %s clusters centers with %s random '
                     'initialisations.', self.n_clusters, self.n_init)
-        inits = self.random_state.randint(
+        random_state = np.random.RandomState(self.random_seed)
+        inits = random_state.randint(
             low=0, high=100*self.n_init, size=(self.n_init))
         if n_jobs == 1:
             best_gev = 0
             for init in inits:
                 gev, maps, segmentation = _run_mod_kmeans(
                     data, n_clusters=self.n_clusters,
-                    max_iter=self.max_iter, random_state=init,
+                    max_iter=self.max_iter, random_seed=init,
                     tol=self.tol, verbose=verbose)
                 if gev > best_gev:
                     best_gev, best_maps, best_segmentation = \
@@ -606,7 +605,7 @@ class ModKMeans(BaseClustering):
                                                n_jobs=n_jobs)
             runs = parallel(
                 p_fun(data, n_clusters=self.n_clusters, max_iter=self.max_iter,
-                      random_state=init, tol=self.tol, verbose=verbose)
+                      random_seed=init, tol=self.tol, verbose=verbose)
                 for init in inits)
             gevs = [run[0] for run in runs]
             best_run = np.argmax(gevs)
