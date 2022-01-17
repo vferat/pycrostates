@@ -70,3 +70,6 @@ setup(
         'Programming Language :: Python :: 3.7',
     ]
  )
+
+# Data
+include_package_data = True
