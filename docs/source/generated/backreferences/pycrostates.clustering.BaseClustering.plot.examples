@@ -1,7 +1,7 @@
 
 
-Examples using ``pycrostates.clustering.ModKMeans.get_cluster_centers_as_raw``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Examples using ``pycrostates.clustering.BaseClustering.plot``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. raw:: html
 

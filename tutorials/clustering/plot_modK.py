@@ -5,22 +5,16 @@ The ModKmeans object
 This tutorial introduces the :class:`pycrostates.clustering.ModKMeans` structure in detail.
 """
 
-from mne.io import read_raw_edf
-from mne.datasets import eegbci
-from mne.channels import make_standard_montage
+from mne.io import read_raw_eeglab
 
+from pycrostates.datasets import lemon
 from pycrostates.clustering import ModKMeans
 
 subject = 1
 runs = [1]
 
-raw_fnames = eegbci.load_data(subject, runs, update_path=True)[0]
-raw = read_raw_edf(raw_fnames, preload=True)
-eegbci.standardize(raw)  # set channel names
-
-raw.rename_channels(lambda x: x.strip('.'))
-montage = make_standard_montage('standard_1005')
-raw.set_montage(montage)
+raw_fname = lemon.load_data(subject='010004', condition='EC')
+raw = read_raw_eeglab(raw_fname, preload=True)
 
 raw.pick('eeg')
 raw.set_eeg_reference('average')
@@ -52,12 +46,12 @@ ModK.get_cluster_centers_as_raw()
 
 # %%
 # Clusters centers can be reordered using :meth:`ModK.reorder`:
-ModK.reorder([3,0,2,1])
+ModK.reorder([0,3,2,1])
 ModK.plot()
 
 # %%
 # and renamed using :meth:`ModK.rename`:
-ModK.rename_clusters(['A', 'B', 'C', 'D'])
+ModK.rename_clusters(['A', 'B', 'C', 'E'])
 ModK.plot()
 
 # %%
