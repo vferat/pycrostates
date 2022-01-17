@@ -1,8 +1,6 @@
 import os
 import json
 
-from pycrostates.preprocessing import resample, extract_gfp_peaks
-
 def _get_home_dir():
     """Get home directory"""
     if os.name.lower() == 'nt':
