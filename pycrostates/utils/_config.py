@@ -2,14 +2,19 @@ import os
 import json
 
 
-def _get_home_dir():
-    """Get home directory"""
+def _get_user_dir():
+    """Get user directory"""
     if os.name.lower() == 'nt':
-        parent_dir = os.getenv('USERPROFILE')
+        user_dir = os.getenv('USERPROFILE')
     else:
-        parent_dir = os.path.expanduser('~')
+        user_dir = os.path.expanduser('~')
+    return(user_dir)
 
-    home_dir = os.path.join(parent_dir, '.pycrostates')
+
+def _get_home_dir():
+    """Get pycrostates directory"""
+    user_dir = _get_user_dir()
+    home_dir = os.path.join(user_dir, '.pycrostates')
     if not os.path.isdir(home_dir):
         os.mkdir(home_dir)
     return(home_dir)
@@ -21,10 +26,17 @@ def _get_config_path():
     config_path = os.path.join(home_dir, 'pycrostates.json')
     return(config_path)
 
+def _get_data_path():
+    """Get pycrostates data directory"""
+    user_dir = _get_user_dir()
+    data_dir = os.path.join(user_dir, 'pycrostates_data')
+    if not os.path.isdir(data_dir):
+        os.mkdir(data_dir)
+    return(data_dir)
 
-default_config = {'LEMON_DATASET_PATH': os.path.join(_get_home_dir(),
-                                                     'pycrostates_data',
-                                                     'LEMON')}
+default_config = {'PREPROCESSED_LEMON_DATASET_PATH': os.path.join(
+                                                            _get_data_path(),
+                                                            'PREPROCESSED_LEMON')}
 
 
 def _save_config(config):
