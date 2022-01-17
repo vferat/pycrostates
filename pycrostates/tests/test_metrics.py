@@ -13,7 +13,7 @@ fname_raw_testing = dir_ / 'sample_audvis_trunc_raw.fif'
 raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
 raw = raw.pick('eeg')
 n_clusters = 4
-ModK = ModKMeans(n_clusters=n_clusters, random_state=1)
+ModK = ModKMeans(n_clusters=n_clusters, random_seed=1)
 ModK.fit(raw, n_jobs=1)
 
 

@@ -398,7 +398,7 @@ class BaseClustering:
             Default to True.
         reject_by_annotation : bool
             Whether to reject by annotation. If True (default), segments
-            annotated with description starting with ‘bad’ are omitted.
+            annotated with description starting with `bad` are omitted.
             If False, no rejection is done.
         %(verbose)s
 
@@ -507,6 +507,9 @@ class BaseClustering:
             The modfied instance.
         """
         self._check_fit()
+        if len(order) != self.n_clusters:
+            raise ValueError('Order contains unexpected values')
+               
         if (np.sort(order) != np.arange(0, self.n_clusters, 1)).any():
             raise ValueError('Order contains unexpected values')
 

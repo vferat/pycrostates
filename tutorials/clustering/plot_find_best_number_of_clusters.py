@@ -7,28 +7,23 @@ This step can be done at different stages of the analysis, at the subject or gro
 Pycrostates implements different scores to evaluate the quality of clustering, we will see how to use them.
 """
 
-from mne.io import read_raw_edf
-from mne.datasets import eegbci
-from mne.channels import make_standard_montage
+from mne.io import read_raw_eeglab
+
+from pycrostates.datasets import lemon
 from pycrostates.clustering import ModKMeans
 
-subject = 1
-runs = [1]
 
-raw_fnames = eegbci.load_data(subject, runs, update_path=True)[0]
-raw = read_raw_edf(raw_fnames, preload=True)
-eegbci.standardize(raw)  # set channel names
-
-raw.rename_channels(lambda x: x.strip('.'))
-montage = make_standard_montage('standard_1005')
-raw.set_montage(montage)
+raw_fname = lemon.load_data(subject='010004', condition='EC')
+raw = read_raw_eeglab(raw_fname, preload=True)
+raw.crop(0,30)
 
 raw.pick('eeg')
 raw.set_eeg_reference('average')
+
 # %%
 # We must first fit our clustering algorithm (in our case the modified Kmeans) with some data.
 n_clusters = 4
-ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
+ModK = ModKMeans(n_clusters=n_clusters, random_seed=42)
 ModK.fit(raw, n_jobs=5)
 ModK.plot()
 # %%
@@ -51,7 +46,7 @@ davies_bouldin_scores = list()
 calinski_harabasz_scores = list()
 dunn_scores = list()
 for k in K:
-    ModK = ModKMeans(n_clusters=k, random_state=42)
+    ModK = ModKMeans(n_clusters=k, random_seed=42)
     ModK.fit(raw, n_jobs=5)
     
     silhouette_score = silhouette(ModK)

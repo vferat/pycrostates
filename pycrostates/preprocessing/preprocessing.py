@@ -101,7 +101,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
 @verbose
 def resample(inst, n_epochs=None, n_samples=None, coverage=None,
              replace=True, start=None, stop=None, reject_by_annotation=True,
-             random_state=None, verbose=None):
+             random_seed=None, verbose=None):
     """Resample recording into epochs of random samples.
 
     Resample `~mne.io.Raw` or `~mne.epochs.Epochs` into ``n_epochs``
@@ -130,11 +130,12 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
         Whether to reject by annotation. If True (default), segments annotated
         with description starting with ‘bad’ are omitted. If False, no
         rejection is done.
-    %(raw_tmin)s
-    %(raw_tmax)s
-    %(random_state)s
+    random_seed : float
         As resampling can be non-deterministic it can be useful to fix the
         random state to have reproducible results.
+    %(raw_tmin)s
+    %(raw_tmax)s
+
     %(verbose)s
 
     Notes
@@ -149,7 +150,6 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
         samples).
     """
     _check_type(inst, (BaseRaw, BaseEpochs))
-    random_state = _check_random_state(random_state)
 
     if isinstance(inst, BaseRaw):
         reject_by_annotation = 'omit' if reject_by_annotation else None
@@ -191,6 +191,7 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
         'Resampling instance into %s epochs of %s covering %.2f%% of the '
         'original data.', n_epochs, n_samples, coverage * 100)
 
+    random_state = np.random.RandomState(random_seed)
     if replace:
         indices = random_state.randint(0, n_samples,
                                        size=(n_epochs, n_samples))

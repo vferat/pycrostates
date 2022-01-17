@@ -10,20 +10,19 @@ from mne.io import read_raw_eeglab
 from pycrostates.datasets import lemon
 from pycrostates.clustering import ModKMeans
 
-subject = 1
-runs = [1]
 
 raw_fname = lemon.load_data(subject='010004', condition='EC')
 raw = read_raw_eeglab(raw_fname, preload=True)
+raw.crop(0,30)
 
 raw.pick('eeg')
 raw.set_eeg_reference('average')
 # %%
 # The modified Kmeans can be instanciated with the number of cluster centers n_clusters to compute.
 # By default, the modified Kmeans will only work with EEG data, but this can be modified thanks to the ''picks'' parameter.
-# A random_state can be defined during class definition in order to have reproducible results.
-n_clusters = 4
-ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
+# A random_seed can be defined during class definition in order to have reproducible results.
+n_clusters = 5
+ModK = ModKMeans(n_clusters=n_clusters, random_seed=42)
 
 # %%
 # Most methods need the modified Kmeans to be fitted. This can be done with either :class:`mne.io.Raw`: or :class:`mne.epochs.Epcohs`: data structures:
@@ -46,18 +45,18 @@ ModK.get_cluster_centers_as_raw()
 
 # %%
 # Clusters centers can be reordered using :meth:`ModK.reorder`:
-ModK.reorder([0,3,2,1])
+ModK.reorder([0,3,2,1,4])
 ModK.plot()
 
 # %%
 # and renamed using :meth:`ModK.rename`:
-ModK.rename_clusters(['A', 'B', 'C', 'E'])
+ModK.rename_clusters(['A', 'B', 'C', 'D', 'E'])
 ModK.plot()
 
 # %%
 # Maps polarities can be inverted thanks to :meth:`ModK.invert_polarity` method. Note that this only affects visualisation:
 # this has not effect during backfitting as polarities are ignored.
-ModK.invert_polarity([False, False, True, True])
+ModK.invert_polarity([False, False, True, True, False])
 ModK.plot()
 
 # %%
