@@ -1,1 +1,1 @@
-include pycrostates/static/pycrostates/datasets/lemon/data/PREPROCESSED_LEMON_registry.txt
+include pycrostates/datasets/lemon/data/PREPROCESSED_LEMON_registry.txt
