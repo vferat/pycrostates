@@ -59,7 +59,7 @@ setup(
      license="BSD-3-Clause",
      platforms='any',
      python_requires='>=3.6',
-     install_requires=["mne", "numpy", "scipy", "joblib"],
+     install_requires=install_requires,
      packages=find_packages(exclude=['docs', 'tests']),
      classifiers=[
         'Development Status :: 3 - Alpha',
