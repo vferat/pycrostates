@@ -19,7 +19,7 @@ if version is None:
 # Descriptions
 short_description = "A simple open source Python package for EEGmicrostate segmentation"
 long_description_file = Path(__file__).parent / 'README.md'
-with open(long_description_file, 'r') as file:
+with open(long_description_file, 'r', encoding="utf8") as file:
     long_description = file.read()
 if long_description_file.suffix == '.md':
     long_description_content_type='text/markdown'
