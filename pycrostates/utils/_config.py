@@ -26,6 +26,7 @@ def _get_config_path():
     config_path = os.path.join(home_dir, 'pycrostates.json')
     return(config_path)
 
+
 def _get_data_path():
     """Get pycrostates data directory"""
     user_dir = _get_user_dir()
@@ -33,6 +34,7 @@ def _get_data_path():
     if not os.path.isdir(data_dir):
         os.mkdir(data_dir)
     return(data_dir)
+
 
 default_config = {'PREPROCESSED_LEMON_DATASET_PATH': os.path.join(
                                                             _get_data_path(),
@@ -64,14 +66,14 @@ def get_config():
 
 def set_config(key, value):
     """Set preference key in the pycrostates' config file
-    
+
     Parameters
     ----------
     key : str
         The preference key to set. Must be a valid key.
     value : str |  None
         The value to assign to the preference key.
-    """ 
+    """
     config = get_config()
     if key in default_config.keys:
         config[key] = value

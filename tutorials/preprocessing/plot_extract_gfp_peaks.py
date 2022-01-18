@@ -11,7 +11,6 @@ import mne
 from mne.io import read_raw_eeglab
 
 from pycrostates.datasets import lemon
-from pycrostates.clustering import ModKMeans
 
 
 raw_fname = lemon.load_data(subject_id='010004', condition='EC')

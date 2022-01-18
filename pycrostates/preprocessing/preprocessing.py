@@ -7,7 +7,7 @@ from mne.preprocessing.ica import _check_start_stop
 
 from ..utils._logs import logger, verbose
 from ..utils._docs import fill_doc
-from ..utils._checks import _check_type, _check_random_state
+from ..utils._checks import _check_type
 
 
 def _extract_gfps(data, min_peak_distance=2):

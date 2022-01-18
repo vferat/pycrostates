@@ -15,7 +15,7 @@ from pycrostates.clustering import ModKMeans
 
 raw_fname = lemon.load_data(subject_id='010004', condition='EC')
 raw = read_raw_eeglab(raw_fname, preload=True)
-raw.crop(0,30)
+raw.crop(0, 30)
 
 raw.pick('eeg')
 raw.set_eeg_reference('average')
@@ -40,7 +40,7 @@ dunn_score = dunn(ModK)
 print('dunn score: ', dunn_score)
 # %%
 # We can compute this score for differents values of n_clusters.
-K = range(4,8)
+K = range(4, 8)
 silhouette_scores = list()
 davies_bouldin_scores = list()
 calinski_harabasz_scores = list()
@@ -65,16 +65,16 @@ for k in K:
 # We can compute this score for differents values of n_clusters.
 import matplotlib.pyplot as plt
 
-fig, axs = plt.subplots(4,1)
-axs[0].plot(K,silhouette_scores)
+fig, axs = plt.subplots(4, 1)
+axs[0].plot(K, silhouette_scores)
 axs[0].set_title('Silhouette')
-axs[1].plot(K,davies_bouldin_scores)
+axs[1].plot(K, davies_bouldin_scores)
 axs[1].set_title('davies-bouldin')
-axs[2].plot(K,calinski_harabasz_scores)
+axs[2].plot(K, calinski_harabasz_scores)
 axs[2].set_title('calinski-harabasz')
-axs[3].plot(K,dunn_scores)
+axs[3].plot(K, dunn_scores)
 axs[3].set_title('Dunn')
 
-#sphinx_gallery_thumbnail_number = 2
+# sphinx_gallery_thumbnail_number = 2
 plt.tight_layout()
 plt.plot()

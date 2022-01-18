@@ -509,7 +509,6 @@ class BaseClustering:
         self._check_fit()
         if len(order) != self.n_clusters:
             raise ValueError('Order contains unexpected values')
-               
         if (np.sort(order) != np.arange(0, self.n_clusters, 1)).any():
             raise ValueError('Order contains unexpected values')
 

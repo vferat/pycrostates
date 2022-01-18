@@ -19,8 +19,8 @@ def load_data(subject_id, condition):
         The list of available subjects can be found
         at <https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Raw_BIDS_ID/>.
     condition : str
-        Can be 'EO' for resting state, eyes open condition 
-        or 'EC' for  resting state, eyes closed condition.
+        Can be 'EO' for resting state, eyes open condition
+         or 'EC' for  resting state, eyes closed condition.
     Returns
     -------
     path : str
@@ -50,5 +50,5 @@ def load_data(subject_id, condition):
     filename_set = f'sub-{subject_id}_{condition}.set'
     filename_fdt = f'sub-{subject_id}_{condition}.fdt'
     output_path_set = fetcher.fetch(filename_set)
-    output_path_fdt = fetcher.fetch(filename_fdt)
+    _ = fetcher.fetch(filename_fdt)
     return(output_path_set)

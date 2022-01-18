@@ -13,7 +13,7 @@ from pycrostates.clustering import ModKMeans
 
 raw_fname = lemon.load_data(subject_id='010017', condition='EC')
 raw = read_raw_eeglab(raw_fname, preload=True)
-raw.crop(0,30)
+raw.crop(0, 30)
 
 raw.pick('eeg')
 raw.set_eeg_reference('average')
@@ -45,7 +45,7 @@ ModK.get_cluster_centers_as_raw()
 
 # %%
 # Clusters centers can be reordered using :meth:`ModK.reorder`:
-ModK.reorder([3,2,0,4,1])
+ModK.reorder([3, 2, 0, 4, 1])
 ModK.plot()
 
 # %%

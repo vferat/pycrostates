@@ -17,16 +17,17 @@ if version is None:
 
 
 # Descriptions
-short_description = "A simple open source Python package for EEGmicrostate segmentation"
+short_description = "A simple open source Python package"\
+                    " for EEG microstate segmentation"
 long_description_file = Path(__file__).parent / 'README.md'
 with open(long_description_file, 'r', encoding="utf8") as file:
     long_description = file.read()
 if long_description_file.suffix == '.md':
-    long_description_content_type='text/markdown'
+    long_description_content_type = 'text/markdown'
 elif long_description_file.suffix == '.rst':
-    long_description_content_type='text/x-rst'
+    long_description_content_type = 'text/x-rst'
 else:
-    long_description_content_type='text/plain'
+    long_description_content_type = 'text/plain'
 
 
 # Dependencies
@@ -44,32 +45,30 @@ def get_requirements(path):
 
     return install_requires
 
+
 install_requires = get_requirements('requirements.txt')
 
 
 setup(
      name='pycrostates',
      version='0.1.0',
-     author="Victor Férat",
-     author_email="victor.ferat@unige.ch",
-     description="A simple open source Python package for EEGmicrostate segmentation",
+     author='Victor Férat',
+     author_email='victor.ferat@unige.ch',
+     description=short_description,
      long_description=long_description,
      long_description_content_type=long_description_content_type,
-     url=None,
-     license="BSD-3-Clause",
+     url='https://github.com/vferat/pycrostates',
+     license='BSD-3-Clause',
      platforms='any',
-     python_requires='>=3.6',
+     python_requires='>=3.7',
      install_requires=install_requires,
      packages=find_packages(exclude=['docs', 'tests']),
-     classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Science/Research',
-        'Topic :: Scientific/Engineering',
-        'License :: OSI Approved :: BSD License',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-    ],
-    # Include other files
-    include_package_data = True
- )
-
+     classifiers=['Development Status :: 3 - Alpha',
+                  'Intended Audience :: Science/Research',
+                  'Topic :: Scientific/Engineering',
+                  'License :: OSI Approved :: BSD License',
+                  'Programming Language :: Python :: 3.7',
+                  'Programming Language :: Python :: 3.8',
+                  'Programming Language :: Python :: 3.9'],
+     # Include other files
+     include_package_data=True)
