@@ -145,7 +145,7 @@ def test_BaseClustering_predict_raw():
     segmentation = ModK.predict(raw,
                                 factor=0,
                                 rejected_first_last_segments=False,
-                                min_segment_lenght=0,
+                                min_segment_length=0,
                                 reject_by_annotation=False)
     assert isinstance(segmentation, RawSegmentation)
 
@@ -156,7 +156,7 @@ def test_BaseClustering_predict_epochs():
     segmentation = ModK.predict(epochs,
                                 factor=0,
                                 rejected_first_last_segments=False,
-                                min_segment_lenght=0,
+                                min_segment_length=0,
                                 reject_by_annotation=False)
     assert isinstance(segmentation, EpochsSegmentation)
 
@@ -178,10 +178,10 @@ def test_BaseClustering_predict_epochs_rejected_first_last_segments():
         assert epoch_seg[-1] == 0
 
 
-def test_BaseClustering_predict_raw_min_segment_lenght():
+def test_BaseClustering_predict_raw_min_segment_length():
     ModK = ModKMeans(n_clusters=n_clusters)
     ModK.fit(raw, n_jobs=1)
-    segmentation = ModK.predict(raw, min_segment_lenght=3)
+    segmentation = ModK.predict(raw, min_segment_length=3)
     segment_lengths = [
         len(list(group))
         for _, group in itertools.groupby(segmentation.segmentation)][1:-2]
