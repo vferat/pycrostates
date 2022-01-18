@@ -185,7 +185,7 @@ def test_BaseClustering_predict_raw_min_segment_length():
     segment_lengths = [
         len(list(group))
         for _, group in itertools.groupby(segmentation.segmentation)][1:-2]
-    assert np.all(np.array(segment_lengths) > 3)
+    assert np.all(np.array(segment_lengths) >= 3)
 
 
 def test_BaseClustering_predict_raw_smoothing():
