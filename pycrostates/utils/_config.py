@@ -12,7 +12,7 @@ def _get_user_dir():
 
 
 def _get_home_dir():
-    """Get pycrostates directory"""
+    """Get pycrostates config directory"""
     user_dir = _get_user_dir()
     home_dir = os.path.join(user_dir, '.pycrostates')
     if not os.path.isdir(home_dir):
@@ -40,11 +40,19 @@ default_config = {'PREPROCESSED_LEMON_DATASET_PATH': os.path.join(
 
 
 def _save_config(config):
+    """Save pycrostates config"""
     with open(_get_config_path(), 'w') as f:
         json.dump(config, f)
 
 
 def get_config():
+    """Read preferences from pycrostates' config file.
+
+    Returns
+    -------
+    config : dict
+        Dictionnary containing all preferences as key/values pairs.
+    """
     config_path = _get_config_path()
     if not os.path.isfile(config_path):
         # create default config
@@ -55,7 +63,18 @@ def get_config():
 
 
 def set_config(key, value):
+    """Set preference key in the pycrostates' config file
+    
+    Parameters
+    ----------
+    key : str
+        The preference key to set. Must be a valid key.
+    value : str |  None
+        The value to assign to the preference key.
+    """ 
     config = get_config()
     if key in default_config.keys:
         config[key] = value
+    else:
+        raise ValueError('Invalid key')
     _save_config(config)
