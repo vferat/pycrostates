@@ -45,7 +45,7 @@ ModK.get_cluster_centers_as_raw()
 
 # %%
 # Clusters centers can be reordered using :meth:`ModK.reorder`:
-ModK.reorder([3, 2, 0, 4, 1])
+ModK.reorder([3, 2, 4, 0, 1])
 ModK.plot()
 
 # %%
