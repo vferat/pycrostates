@@ -163,7 +163,7 @@ def _rejected_first_last_segments(segmentation):
     return segmentation
 
 
-def _reject_small_segments(segmentation, data, min_segment_lenght):
+def _reject_small_segments(segmentation, data, min_segment_length):
     new_segmentation = segmentation.copy()
     small_segment = True
     while small_segment:
@@ -173,7 +173,7 @@ def _reject_small_segments(segmentation, data, min_segment_lenght):
         small_segment = False
         for i, segment in enumerate(segments):
             if i not in [0, len(segments)-1]:
-                if len(segment) <= min_segment_lenght and segment[0] != 0:
+                if len(segment) < min_segment_length and segment[0] != 0:
                     small_segment = True
                     left_idx = current_idx
                     right_idx = current_idx + len(segment)
@@ -292,7 +292,7 @@ class BaseClustering:
 
     @verbose
     def _predict_raw(self, raw, picks, reject_by_annotation, half_window_size,
-                     factor, crit, min_segment_lenght,
+                     factor, crit, min_segment_length,
                      rejected_first_last_segments, verbose=None):
         data = raw.get_data(picks=picks)
         if not reject_by_annotation:
@@ -329,9 +329,9 @@ class BaseClustering:
                             labels = _rejected_first_last_segments(labels)
                         segmentation[end:onset] = labels
 
-        if min_segment_lenght > 0:
+        if min_segment_length > 0:
             segmentation = _reject_small_segments(
-                segmentation, data, min_segment_lenght)
+                segmentation, data, min_segment_length)
 
         segmentation = RawSegmentation(segmentation=segmentation,
                                        inst=raw,
@@ -341,7 +341,7 @@ class BaseClustering:
 
     @verbose
     def _predict_epochs(self, epochs, picks, half_window_size, factor, crit,
-                        min_segment_lenght, rejected_first_last_segments,
+                        min_segment_length, rejected_first_last_segments,
                         verbose=None):
         data = epochs.get_data(picks=picks)
         segments = list()
@@ -349,9 +349,9 @@ class BaseClustering:
             segment = _segment(epoch, self.cluster_centers_,
                                half_window_size, factor, crit)
 
-            if min_segment_lenght > 0:
+            if min_segment_length > 0:
                 segment = _reject_small_segments(segment, epoch,
-                                                 min_segment_lenght)
+                                                 min_segment_length)
 
             if rejected_first_last_segments:
                 segment = _rejected_first_last_segments(segment)
@@ -370,7 +370,7 @@ class BaseClustering:
                 factor=0,
                 half_window_size=3,
                 crit=10e-6,
-                min_segment_lenght=0,
+                min_segment_length=0,
                 rejected_first_last_segments=True,
                 verbose=None):
         """Predict Microstates labels using competitive fitting.
@@ -385,13 +385,13 @@ class BaseClustering:
         half_window_size: int
             Number of samples used for the half windows size while smoothing
             labels.
-            Has no ffect if factor = 0.
+            Has no effect if factor = 0.
             Window size = 2 * half_window_size + 1
         crit: float
             Converge criterion. Default to 10e-6.
-        min_segment_lenght: int
+        min_segment_length: int
             Minimum segment length (in samples). If a segment is shorter than
-            this value, it will be recursively reasigned to neighbouring
+            this value, it will be recursively reassigned to neighboring
             segments based on absolute spatial correlation.
         rejected_first_last_segments: bool
             If True, set first and last segments to unlabeled.
@@ -425,10 +425,10 @@ class BaseClustering:
             logger.info(
                 'Segmenting data with factor %s and effective smoothing '
                 'window size: %s (ms)',
-                factor, (2*half_window_size+1) / inst.info["sfreq"])
-        if min_segment_lenght > 0:
+                factor, (2*half_window_size+1) / inst.info["sfreq"] * 1000)
+        if min_segment_length > 0:
             logger.info('Rejecting segments shorter than %s (ms)',
-                        min_segment_lenght / inst.info["sfreq"])
+                        min_segment_length / inst.info["sfreq"] * 1000)
         if rejected_first_last_segments:
             logger.info('Rejecting first and last segment')
 
@@ -439,7 +439,7 @@ class BaseClustering:
                 reject_by_annotation=reject_by_annotation,
                 half_window_size=half_window_size,
                 factor=factor, crit=crit,
-                min_segment_lenght=min_segment_lenght,
+                min_segment_length=min_segment_length,
                 rejected_first_last_segments=rejected_first_last_segments,
                 verbose=verbose)
 
@@ -449,7 +449,7 @@ class BaseClustering:
                 picks=picks,
                 half_window_size=half_window_size,
                 factor=factor, crit=crit,
-                min_segment_lenght=min_segment_lenght,
+                min_segment_length=min_segment_length,
                 rejected_first_last_segments=rejected_first_last_segments,
                 verbose=verbose)
         return segmentation
