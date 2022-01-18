@@ -17,7 +17,7 @@ def _extract_gfps(data, min_peak_distance=2):
     ----------
     min_peak_dist : int
         Required minimal horizontal distance (>= 1) in samples between
-        neighbouring peaks. Smaller peaks are removed first until the condition
+        neighboring peaks. Smaller peaks are removed first until the condition
         is fulfilled for all remaining peaks. Default to 2.
     X : array-like, shape ``(n_channels, n_samples)``
         The data to extrat Gfp peaks, row by row. scipy.sparse matrices should
@@ -40,7 +40,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
     `~mne.io.Raw`.
 
     .. warning:: The temporal dimension of the output `~mne.io.Raw`
-                 object has been destroyed. This object is a convinient
+                 object has been destroyed. This object is a convenient
                  container for GFP peaks and should not be used for standart
                  MEEG analysis.
 
@@ -50,7 +50,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
         Instance from which to extract GFP peaks.
     min_peak_dist : int
         Required minimal horizontal distance (>= 1) in samples between
-        neighbouring peaks. Smaller peaks are removed first until the
+        neighboring peaks. Smaller peaks are removed first until the
         is fulfilled for all remaining peaks. Default to 2.
     reject_by_annotation : bool
         Whether to reject by annotation. If True (default), segments annotated
@@ -106,7 +106,7 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
 
     Resample `~mne.io.Raw` or `~mne.epochs.Epochs` into ``n_epochs``
     `~mne.io.Raw` each containing ``n_samples``` random samples of the
-    originial recording.
+    original recording.
 
     .. warning:: The temporal dimension of the output `~mne.io.Raw` objects
                  has been destroyed. These objects should not be used for
