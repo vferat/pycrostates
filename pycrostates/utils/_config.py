@@ -75,7 +75,7 @@ def set_config(key, value):
         The value to assign to the preference key.
     """
     config = get_config()
-    if key in default_config.keys():
+    if key in default_config:
         config[key] = value
     else:
         raise ValueError('Invalid key')
