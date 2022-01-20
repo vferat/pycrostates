@@ -6,7 +6,7 @@ from ...utils._config import get_config
 
 def load_data(subject_id, condition):
     """Get path to local copy of preprocessed EEG recording
-    from the mind-brain-body dataset of MRI, EEG, cognition, emotion, 
+    from the mind-brain-body dataset of MRI, EEG, cognition, emotion,
     and peripheral physiology in young and old adults dataset files.
     If there is no local copy of the recording, this will fetch it from
     the online repository and store it on disk.
