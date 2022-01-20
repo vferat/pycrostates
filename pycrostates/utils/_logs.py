@@ -103,7 +103,7 @@ def set_log_level(verbose):
 
 class LoggerFormatter(logging.Formatter):
     """
-    Format string Syntax for BSL.
+    Format string Syntax for pycrostates.
     """
     # Format string syntax for the different Log levels
     _formatters = dict()
