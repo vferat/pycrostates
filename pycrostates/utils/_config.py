@@ -43,7 +43,7 @@ default_config = {'PREPROCESSED_LEMON_DATASET_PATH': os.path.join(
 
 def _save_config(config):
     """Save pycrostates config"""
-    with open(_get_config_path(), 'w') as f:
+    with open(_get_config_path(), 'w', encoding='utf-8') as f:
         json.dump(config, f)
 
 
@@ -59,7 +59,7 @@ def get_config():
     if not os.path.isfile(config_path):
         # create default config
         _save_config(default_config)
-    with open(config_path, 'r') as f:
+    with open(config_path, 'r', encoding='utf-8') as f:
         config = json.load(f)
     return(config)
 
@@ -75,7 +75,7 @@ def set_config(key, value):
         The value to assign to the preference key.
     """
     config = get_config()
-    if key in default_config.keys:
+    if key in default_config.keys():
         config[key] = value
     else:
         raise ValueError('Invalid key')
