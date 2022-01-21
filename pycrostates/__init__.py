@@ -2,6 +2,7 @@ from . import metrics
 from . import viz
 from . import utils
 from . import preprocessing
+from . import clustering
 from . import datasets
 
 __all__ = ('clustering',
