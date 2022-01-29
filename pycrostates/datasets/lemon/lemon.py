@@ -1,6 +1,7 @@
-import pkg_resources
-import pooch
 import os
+import pkg_resources as pkr
+import pooch
+
 from ...utils._config import get_config
 
 
@@ -17,10 +18,10 @@ def load_data(subject_id, condition):
         The subject id to use.
         For example '010276'.
         The list of available subjects can be found
-        at <https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Raw_BIDS_ID/>.
+        at https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Raw_BIDS_ID.
     condition : str
-        Can be 'EO' for resting state, eyes open condition
-         or 'EC' for  resting state, eyes closed condition.
+        Can be 'EO' for eyes open condition
+        or 'EC' for eyes closed condition.
     Returns
     -------
     path : str
@@ -28,23 +29,24 @@ def load_data(subject_id, condition):
 
     References
     ----------
-    .. [1] `Babayan, A., Erbey, M., Kumral, D., Reinelt, J. D., Reiter, A. M., Röbbig, J., ... & Villringer, A. (2019).
-       "A mind-brain-body dataset of MRI, EEG, cognition, emotion, and peripheral physiology in young and old adults."
-       Scientific data, 6(1), 1-21.
-       <https://doi.org/10.1038/sdata.2018.308>`_
-    """
+    .. [1] Babayan, A., Erbey, M., Kumral, D. et al.
+           A mind-brain-body dataset of MRI, EEG, cognition, emotion,
+           and peripheral physiology in young and old adults. Sci Data 6, 180308 (2019).
+           https://doi.org/10.1038/sdata.2018.308
+    """ # noqa
     config = get_config()
     path = config['PREPROCESSED_LEMON_DATASET_PATH']
     fetcher = pooch.create(
                 path=path,
-                base_url="https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Preprocessed_BIDS_ID/EEG_Preprocessed/",
+                base_url="https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Preprocessed_BIDS_ID/EEG_Preprocessed/", # noqa,
                 version=None,
                 registry=None)
-    registry = pkg_resources.resource_stream('pycrostates',
-                                             os.path.join('datasets',
-                                                          'lemon',
-                                                          'data',
-                                                          'PREPROCESSED_LEMON_registry.txt'))
+    registry = pkr.resource_stream(
+                    'pycrostates',
+                    os.path.join('datasets',
+                                 'lemon',
+                                 'data',
+                                 'PREPROCESSED_LEMON_registry.txt'))
     fetcher.load_registry(registry)
 
     filename_set = f'sub-{subject_id}_{condition}.set'

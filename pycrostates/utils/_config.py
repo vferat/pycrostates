@@ -36,9 +36,10 @@ def _get_data_path():
     return(data_dir)
 
 
-default_config = {'PREPROCESSED_LEMON_DATASET_PATH': os.path.join(
-                                                            _get_data_path(),
-                                                            'PREPROCESSED_LEMON')}
+default_config = {
+    'PREPROCESSED_LEMON_DATASET_PATH': os.path.join(
+                                                _get_data_path(),
+                                                'PREPROCESSED_LEMON')}
 
 
 def _save_config(config):
