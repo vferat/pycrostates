@@ -540,12 +540,7 @@ class ModKMeans(BaseClustering):
 
     Parameters
     ----------
-    n_clusters : int
-        The number of clusters to form as well as the number of centroids to
-        generate.
-    random_seed : float
-        As estimation can be non-deterministic it can be useful to fix the
-        random state to have reproducible results.
+    %(n_clusters)s
     n_init : int
         Number of time the k-means algorithm will be run with different
         centroid seeds. The final result will be the run with highest global
@@ -556,12 +551,10 @@ class ModKMeans(BaseClustering):
     tol : float
         Relative tolerance with regards estimate residual noise in the cluster
         centers of two consecutive iterations to declare convergence.
+    %(random_seed)s
 
     Attributes
     ----------
-    n_clusters : int
-        The number of clusters to form as well as the number of centroids to
-        generate.
     current_fit : bool
         Flag informing about which data type (raw, epochs or evoked) was used
         for the fit.
@@ -573,6 +566,7 @@ class ModKMeans(BaseClustering):
     GEV_ : float
         If fitted, the Global explained Variance explained all clusters
         centers.
+    %(n_clusters)s
     """
     def __init__(self,
                  random_seed=None,

@@ -16,6 +16,18 @@ keys = ['random_state', 'verbose', 'verbose_meth', 'reject_by_annotation_raw', '
 for key in keys:
     docdict[key] = docdict_mne[key]
 
+docdict['n_clusters'] = """
+n_clusters : int
+    The number of clusters as well as the number
+    of centroids (i.e. Microstate topographies).
+"""
+
+docdict['random_seed'] = """
+random_seed : float
+    As estimation can be non-deterministic it can be useful to fix the
+    random state to have reproducible results.
+"""
+
 # ------------------------- Documentation functions --------------------------
 docdict_indented = dict()
 
