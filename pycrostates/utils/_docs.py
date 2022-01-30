@@ -11,7 +11,7 @@ from mne.utils.docs import docdict as docdict_mne
 docdict = dict()
 
 # Documentation to inc. from MNE
-keys = ['random_state', 'verbose', 'reject_by_annotation_raw', 'n_jobs',
+keys = ['random_state', 'verbose', 'verbose_meth', 'reject_by_annotation_raw', 'n_jobs',
         'raw_tmin', 'raw_tmax']
 for key in keys:
     docdict[key] = docdict_mne[key]
@@ -21,37 +21,40 @@ docdict_indented = dict()
 
 
 def fill_doc(f):
-    """
-    Fill a docstring with docdict entries.
-
+    """Fill a docstring with docdict entries.
     Parameters
     ----------
     f : callable
         The function to fill the docstring of. Will be modified in place.
-
     Returns
     -------
     f : callable
-        The function, potentially with an updated __doc__.
+        The function, potentially with an updated ``__doc__``.
     """
     docstring = f.__doc__
     if not docstring:
         return f
-
     lines = docstring.splitlines()
-    indent_count = _indentcount_lines(lines)
-
+    # Find the minimum indent of the main docstring, after first line
+    if len(lines) < 2:
+        icount = 0
+    else:
+        icount = _indentcount_lines(lines[1:])
+    # Insert this indent to dictionary docstrings
     try:
-        indented = docdict_indented[indent_count]
+        indented = docdict_indented[icount]
     except KeyError:
-        indent = ' ' * indent_count
-        docdict_indented[indent_count] = indented = dict()
-
-        for name, docstr in docdict.items():
-            lines = [indent+line if k != 0 else line
-                     for k, line in enumerate(docstr.strip().splitlines())]
-            indented[name] = '\n'.join(lines)
-
+        indent = ' ' * icount
+        docdict_indented[icount] = indented = {}
+        for name, dstr in docdict.items():
+            lines = dstr.splitlines()
+            try:
+                newlines = [lines[0]]
+                for line in lines[1:]:
+                    newlines.append(indent + line)
+                indented[name] = '\n'.join(newlines)
+            except IndexError:
+                indented[name] = dstr
     try:
         f.__doc__ = docstring % indented
     except (TypeError, ValueError, KeyError) as exp:
@@ -59,7 +62,6 @@ def fill_doc(f):
         funcname = docstring.split('\n')[0] if funcname is None else funcname
         raise RuntimeError('Error documenting %s:\n%s'
                            % (funcname, str(exp)))
-
     return f
 
 

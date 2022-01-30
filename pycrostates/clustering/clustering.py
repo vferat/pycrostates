@@ -199,6 +199,7 @@ def _reject_small_segments(segmentation, data, min_segment_length):
     return new_segmentation
 
 
+@fill_doc
 class BaseClustering:
     """Base Class for Microstate Clustering algorithms.
 
@@ -363,8 +364,8 @@ class BaseClustering:
             cluster_centers=self.cluster_centers_, names=self.names)
         return segmentation
 
-    @fill_doc
     @verbose
+    @fill_doc
     def predict(self,  inst,
                 reject_by_annotation=True,
                 factor=0,
@@ -377,7 +378,7 @@ class BaseClustering:
 
         Parameters
         ----------
-        inst : `~mne.io.Raw`, `~mne.Epochs`
+        inst : mne.io.Raw, mne.Epochs
             Instance containing data to predict.
         factor: int
             Factor used for label smoothing. 0 means no smoothing.
@@ -404,7 +405,7 @@ class BaseClustering:
 
         Returns
         ----------
-        segmentation : `~numpy.ndarray`
+        segmentation : numpy.ndarray
             Microstate sequence derivated from Instance data. Timepoints are
             labeled according to cluster centers number: 1 for the first
             center, 2 for the second ect.. 0 is used for unlabeled time points.
@@ -615,24 +616,27 @@ class ModKMeans(BaseClustering):
             logger.info('Selecting run with highest GEV = %.2f%%.', best_gev)
         return best_maps, best_gev, best_segmentation
 
+
     @verbose
+    @fill_doc
     def fit(self, inst, start=None, stop=None, reject_by_annotation=True,
             n_jobs=1, verbose=None):
         """Segment Instance into microstate sequence.
 
         Parameters
         ----------
-        inst : `~mne.io.Raw`, `~mne.Epochs`
+        inst : mne.io.Raw, mne.Epochs
             Instance containing data to transform to cluster-distance space
             (absolute spatial correlation).
         reject_by_annotation : bool
             Whether to reject by annotation. If True (default), segments
-            annotated with description starting with ‘bad’ are omitted.
+            annotated with description starting with 'bad' are omitted.
             If False, no rejection is done.
-        %(n_jobs)s
+
         %(raw_tmin)s
         %(raw_tmax)s
-        %(verbose)s
+        %(verbose_meth)s
+        %(n_jobs)s
         """
         _check_type(inst, (BaseRaw, BaseEpochs))
         n_jobs = _check_n_jobs(n_jobs)
