@@ -5,3 +5,4 @@ joblib
 matplotlib
 sklearn
 pooch
+decorator
