@@ -66,29 +66,15 @@ def fill_doc(f):
 
 
 def _indentcount_lines(lines):
-    """
-    Minimum indent for all lines in line list.
-
-    >>> lines = [' one', '  two', '   three']
-    >>> indentcount_lines(lines)
-    1
-    >>> lines = []
-    >>> indentcount_lines(lines)
-    0
-    >>> lines = [' one']
-    >>> indentcount_lines(lines)
-    1
-    >>> indentcount_lines(['    '])
-    0
-    """
-    indent = sys.maxsize
+    """Compute minimum indent for all lines in line list."""
+    indentno = sys.maxsize
     for line in lines:
-        line_stripped = line.lstrip()
-        if line_stripped:
-            indent = min(indent, len(line) - len(line_stripped))
-    if indent == sys.maxsize:
+        stripped = line.lstrip()
+        if stripped:
+            indentno = min(indentno, len(line) - len(stripped))
+    if indentno == sys.maxsize:
         return 0
-    return indent
+    return indentno
 
 
 def copy_doc(source):

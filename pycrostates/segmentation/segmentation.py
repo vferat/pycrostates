@@ -135,9 +135,9 @@ class RawSegmentation(BaseSegmentation):
 
         Returns
         ----------
-        fig : 
+        fig : matplotlib.figure.Figure
             Figure
-        ax : 
+        ax : matplotlib.axes.Axes
             Axis
         """
         fig, ax = plot_segmentation(segmentation=self.segmentation,
@@ -161,33 +161,38 @@ class RawSegmentation(BaseSegmentation):
         Returns
         ----------
         dict : dict
-            Dictionaries containing microstate parameters as key/value pairs.
-            Keys are following named as follow: '{microstate name}_{parameter}'.
+            Dictionaries containing microstate parameters
+            as key/value pairs.
+            Keys are following named as follow:
+            '{microstate name}_{parameter}'.
             Available parameters are list below:
 
             'dist_corr': Distribution of correlations
-                Correlation values of each time point assigned to a given state.
+                Correlation values of each time point
+                assigned to a given state.
             'mean_corr': Mean correlation
-                Mean correlation value of each time point assigned to a given state.
+                Mean correlation value of each time point
+                assigned to a given state.
             'dist_gev': Distribution of global explained variances
-                Global explained variance values of each time point assigned to a given
-                state.
+                Global explained variance values of each time point
+                assigned to a given state.
             'gev':  Global explained variance
-                Total explained variance expressed by a given state. It is the sum of
-                global explained variance values of each time point assigned to a given
+                Total explained variance expressed by a given state.
+                It is the sum of global explained variance values of each
+                time point assigned to a given
                 state.
             'timecov': Time coverage
-                The proportion of time during which a given state is active. This
-                metric is expressed in percentage (%%).
+                The proportion of time during which a given state is active.
+                This metric is expressed in percentage (%%).
             'dist_durs': Distribution of durations.
-                Duration of each segments assigned to a given state. Each value is
-                expressed in seconds (s).
+                Duration of each segments assigned to a given state.
+                Each value is expressed in seconds (s).
             'meandurs': Mean duration
-                Mean temporal duration segments assigned to a given state. This metric
-                is expressed in seconds (s).
+                Mean temporal duration segments assigned to a given state.
+                This metric is expressed in seconds (s).
             'occurrences' : occurrences
-                Mean number of segment assigned to a given state per second. This
-                metrics is expressed in segment per second ( . / s).
+                Mean number of segment assigned to a given state per second.
+                This metrics is expressed in segment per second ( . / s).
         """
         d = _compute_microstate_parameters(
             self.segmentation, self.inst.get_data(), self.cluster_centers,
@@ -222,33 +227,38 @@ class EpochsSegmentation(BaseSegmentation):
         Returns
         ----------
         dict : dict
-            Dictionaries containing microstate parameters as key/value pairs.
-            Keys are following named as follow: '{microstate name}_{parameter}'.
+            Dictionaries containing microstate parameters
+            as key/value pairs.
+            Keys are following named as follow:
+            '{microstate name}_{parameter}'.
             Available parameters are list below:
 
             'dist_corr': Distribution of correlations
-                Correlation values of each time point assigned to a given state.
+                Correlation values of each time point
+                assigned to a given state.
             'mean_corr': Mean correlation
-                Mean correlation value of each time point assigned to a given state.
+                Mean correlation value of each time point
+                assigned to a given state.
             'dist_gev': Distribution of global explained variances
-                Global explained variance values of each time point assigned to a given
-                state.
+                Global explained variance values of each time point
+                assigned to a given state.
             'gev':  Global explained variance
-                Total explained variance expressed by a given state. It is the sum of
-                global explained variance values of each time point assigned to a given
+                Total explained variance expressed by a given state.
+                It is the sum of global explained variance values of each
+                time point assigned to a given
                 state.
             'timecov': Time coverage
-                The proportion of time during which a given state is active. This
-                metric is expressed in percentage (%%).
+                The proportion of time during which a given state is active.
+                This metric is expressed in percentage (%%).
             'dist_durs': Distribution of durations.
-                Duration of each segments assigned to a given state. Each value is
-                expressed in seconds (s).
+                Duration of each segments assigned to a given state.
+                Each value is expressed in seconds (s).
             'meandurs': Mean duration
-                Mean temporal duration segments assigned to a given state. This metric
-                is expressed in seconds (s).
+                Mean temporal duration segments assigned to a given state.
+                This metric is expressed in seconds (s).
             'occurrences' : occurrences
-                Mean number of segment assigned to a given state per second. This
-                metrics is expressed in segment per second ( . / s).
+                Mean number of segment assigned to a given state per second.
+                This metrics is expressed in segment per second ( . / s).
         """
         data = self.inst.get_data()
         data = np.swapaxes(data, 0, 1)

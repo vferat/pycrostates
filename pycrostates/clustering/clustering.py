@@ -621,18 +621,14 @@ class ModKMeans(BaseClustering):
     @fill_doc
     def fit(self, inst, start=None, stop=None, reject_by_annotation=True,
             n_jobs=1, verbose=None):
-        """Segment Instance into microstate sequence.
+        """Segment instance into microstate sequence.
 
         Parameters
         ----------
         inst : mne.io.Raw, mne.Epochs
             Instance containing data to transform to cluster-distance space
             (absolute spatial correlation).
-        reject_by_annotation : bool
-            Whether to reject by annotation. If True (default), segments
-            annotated with description starting with 'bad' are omitted.
-            If False, no rejection is done.
-
+        %(reject_by_annotation_raw)s
         %(raw_tmin)s
         %(raw_tmax)s
         %(verbose_meth)s
