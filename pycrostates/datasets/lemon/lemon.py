@@ -1,6 +1,8 @@
 import os
 import pkg_resources as pkr
+import numpy as np
 import pooch
+import mne
 
 from ...utils._config import get_config
 
@@ -54,3 +56,28 @@ def load_data(subject_id, condition):
     output_path_set = fetcher.fetch(filename_set)
     _ = fetcher.fetch(filename_fdt)
     return(output_path_set)
+
+
+def standardize(raw):
+    raw = raw.copy()
+    standard_channels = ['Fp1', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8', 'FC5', 'FC1',
+                         'FC2', 'FC6', 'T7', 'C3', 'Cz', 'C4', 'T8', 'CP5', 'CP1',
+                         'CP2', 'CP6', 'AFz', 'P7', 'P3', 'Pz', 'P4', 'P8', 'PO9',
+                         'O1', 'Oz', 'O2', 'PO10', 'AF7', 'AF3', 'AF4', 'AF8', 'F5',
+                         'F1', 'F2', 'F6', 'FT7', 'FC3', 'FC4', 'FT8', 'C5', 'C1',
+                         'C2', 'C6', 'TP7', 'CP3', 'CPz', 'CP4', 'TP8', 'P5', 'P1',
+                         'P2', 'P6', 'PO7', 'PO3', 'POz', 'PO4', 'PO8']
+    missing_channels = list(set(standard_channels) - set(raw.info['ch_names']))
+    missing_data = np.zeros((len(missing_channels), raw.n_times))
+    missing_types = ['eeg'] * len(missing_channels)
+
+    full_data = np.vstack([raw.get_data(), missing_data])
+    full_ch_names = raw.info['ch_names'] + missing_channels
+    full_ch_types = [mne.channel_type(raw.info, idx) for idx in range(0, raw.info['nchan'])] + missing_types
+    info = mne.create_info(ch_names=full_ch_names, ch_types=full_ch_types, sfreq=raw.info['sfreq'])
+    raw = mne.io.RawArray(data=full_data, info=info)
+    raw.info['bads'].extend(missing_channels)
+    raw.set_montage('standard_1005')
+    raw.interpolate_bads()
+    raw.set_eeg_reference('average')
+    return(raw)
