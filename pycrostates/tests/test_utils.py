@@ -23,4 +23,3 @@ def test_get_config():
 def test_copy_info():
     info = _copy_info(raw, sfreq=np.inf)
     assert info['sfreq'] == np.inf
-

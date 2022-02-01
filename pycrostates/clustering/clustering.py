@@ -401,7 +401,7 @@ class BaseClustering:
             Microstate sequence derivated from istance data. Timepoints are
             labeled according to cluster centers number: 1 for the first
             center, 2 for the second ect.. 0 is used for unlabeled time points.
-        """
+        """ # noqa
         self._check_fit()
         _check_type(inst, (BaseRaw, BaseEpochs))
         inst = inst.copy()
@@ -541,7 +541,8 @@ class ModKMeans(BaseClustering):
         centroid seeds. The final result will be the run with highest global
         explained variance. Default=100.
     max_iter : int
-        Maximum number of iterations of the k-means algorithm for a single run.
+        Maximum number of iterations of the k-means algorithm
+        for a single run.
         Default=300.
     tol : float
         Relative tolerance with regards estimate residual noise in the cluster
@@ -552,7 +553,8 @@ class ModKMeans(BaseClustering):
     ----------
     %(n_clusters)s
     current_fit : bool
-        Flag informing about which instance type (:class:`~mne.io.Raw` or :class:`~mne.Epochs`)
+        Flag informing about which instance type
+        (:class:`~mne.io.Raw` or :class:`~mne.Epochs`)
         was used for the fit.
     info : dict
         If fitted, :class:`~mne.Info` of fitted instance, else None.
@@ -604,7 +606,6 @@ class ModKMeans(BaseClustering):
             best_gev, best_maps, best_segmentation = runs[best_run]
             logger.info('Selecting run with highest GEV = %.2f%%.', best_gev)
         return best_maps, best_gev, best_segmentation
-
 
     @verbose
     @fill_doc

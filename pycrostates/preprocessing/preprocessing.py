@@ -10,6 +10,7 @@ from ..utils._docs import fill_doc
 from ..utils._checks import _check_type
 from ..utils.utils import _copy_info
 
+
 def _extract_gfps(data, min_peak_distance=2):
     """Extract GFP peaks from input data.
 
@@ -78,6 +79,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
             '%s GFP peaks extracted out of %s samples (%.2f%% of the original '
             'data).', peaks.shape[1], data.shape[-1],
             peaks.shape[1] / data.shape[-1] * 100)
+
     if isinstance(inst, BaseEpochs):
         data = inst.get_data()
         peaks = list()
@@ -103,9 +105,9 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
              random_seed=None, verbose=None):
     """Resample recording into epochs of random samples.
 
-    Resample :class:`~mne.io.Raw` or :class:`~mne.epochs.Epochs` into ``n_epochs``
-    :class:`~mne.io.Raw` each containing ``n_samples`` random samples of the
-    original recording.
+    Resample :class:`~mne.io.Raw` or :class:`~mne.epochs.Epochs`
+    into ``n_epochs`` :class:`~mne.io.Raw` each containing
+    ``n_samples`` random samples of the original recording.
 
     .. warning:: The temporal dimension of the output :class:`~mne.io.Raw`
                  object will be destroyed. This object is a convenient
@@ -145,8 +147,9 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
 
     Notes
     -----
-    Only two of ``n_epochs``, ``n_samples`` and ``coverage`` parameters must be defined,
-    the non-defined one being computed during function execution.
+    Only two of ``n_epochs``, ``n_samples`` and ``coverage``
+    parameters must be defined, the non-defined one being
+    computed during function execution.
     """
     _check_type(inst, (BaseRaw, BaseEpochs))
 

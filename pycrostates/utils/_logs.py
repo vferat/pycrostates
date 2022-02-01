@@ -5,8 +5,6 @@ from pathlib import Path
 from decorator import FunctionMaker
 from typing import Any, Callable, TypeVar
 
-import mne
-
 from ._checks import _check_type
 from ._docs import fill_doc
 
@@ -214,10 +212,8 @@ class use_log_level(object):
     level : int
         The level to use.
     """
-
     def __init__(self, level):  # noqa: D102
         self.level = level
-
 
     def __enter__(self):  # noqa: D105
         self.old_level = set_log_level(self.level)

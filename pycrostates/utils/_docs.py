@@ -11,7 +11,8 @@ from mne.utils.docs import docdict as docdict_mne
 docdict = dict()
 
 # Documentation to inc. from MNE
-keys = ['random_state', 'verbose', 'verbose_meth', 'reject_by_annotation_raw', 'n_jobs',
+keys = ['random_state', 'verbose', 'verbose_meth',
+        'reject_by_annotation_raw', 'n_jobs',
         'raw_tmin', 'raw_tmax']
 for key in keys:
     docdict[key] = docdict_mne[key]
@@ -36,7 +37,7 @@ verbose : bool, str, int or None
     Defaults to self.verbose.
 """
 
-docdict['picks'] =  """
+docdict['picks'] = """
 picks : str | list | slice | None
     Channels to include. Slices and lists of integers will be interpreted
     as channel indices. In lists, channel type strings (e.g.,
