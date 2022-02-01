@@ -208,15 +208,7 @@ class BaseClustering:
     n_clusters : int
         The number of clusters to form as well as the number of centroids to
         generate.
-    picks : str | list | slice | None
-        Channels to include. Slices and lists of integers will be interpreted
-        as channel indices. In lists, channel type strings (e.g.,
-        ['meg', 'eeg']) will pick channels of those types, channel name strings
-        (e.g., ['MEG0111', 'MEG2623'] will pick the given channels.
-        Can also be the string values “all” to pick all channels, or “data” to
-        pick data channels. None will pick all channels.
-        Note that channels in info['bads'] will be included if their names or
-        indices are explicitly provided. Default to 'eeg'.
+    %(picks)s
 
     Attributes
     ----------
@@ -225,13 +217,12 @@ class BaseClustering:
         generate.
     current_fit : bool
         Flag informing about which data type (raw, epochs or evoked) was used
-        for the fit.
+        for fitting.
     cluster_centers_ : `~numpy.array`, shape ``(n_clusters, n_channels)``
-            Cluster centers (i.e Microstates maps).
+            Cluster centers (i.e Microstates topographies).
     info : dict
             :class:`Measurement info <mne.Info>` of fitted instance.
-    picks : str | list | slice | None
-            picks.
+    %(picks)s
     """
     def __init__(self, n_clusters=4, picks='eeg'):
         self.n_clusters = n_clusters
@@ -258,7 +249,7 @@ class BaseClustering:
 
     def get_cluster_centers(self):
         """
-        Get cluster centers as a `~numpy.array`.
+        Get cluster centers as a :class:`~numpy.ndarray`.
         """
         self._check_fit()
         cluster_centers = self.cluster_centers_.copy()
@@ -266,7 +257,7 @@ class BaseClustering:
 
     def get_cluster_centers_as_raw(self):
         """
-        Get cluster centers as a :class:`~mne.io.Raw`
+        Get cluster centers as a :class:`~mne.io.Raw` instance.
         """
         self._check_fit()
         cluster_centers_raw = RawArray(self.cluster_centers_.T, self.info)
@@ -378,7 +369,7 @@ class BaseClustering:
 
         Parameters
         ----------
-        inst : mne.io.Raw, mne.Epochs
+        inst : :class:`~mne.io.Raw` or :class:`~mne.Epochs`
             Instance containing data to predict.
         factor: int
             Factor used for label smoothing. 0 means no smoothing.
@@ -399,14 +390,15 @@ class BaseClustering:
             Default to True.
         reject_by_annotation : bool
             Whether to reject by annotation. If True (default), segments
-            annotated with description starting with `bad` are omitted.
+            annotated with description starting with `bad` are assign
+            as 'unlabelled' (i.e. 0).
             If False, no rejection is done.
         %(verbose)s
 
         Returns
         ----------
-        segmentation : numpy.ndarray
-            Microstate sequence derivated from Instance data. Timepoints are
+        segmentation :class:`~pycrostates.segmentation.RawSegmentation` or :class:`~pycrostates.segmentation.EpochsSegmentation`
+            Microstate sequence derivated from istance data. Timepoints are
             labeled according to cluster centers number: 1 for the first
             center, 2 for the second ect.. 0 is used for unlabeled time points.
         """
@@ -460,8 +452,10 @@ class BaseClustering:
 
         Returns
         ----------
-        fig : matplotlib.figure.Figure
-            The figure.
+        fig : :class:`matplotlib.figure.Figure`
+            Figure
+        ax : :class:`matplotlib.axes.Axes`
+            Axis
         """
         self._check_fit()
         fig, axs = plot_cluster_centers(self.cluster_centers_, self.info,
@@ -479,7 +473,7 @@ class BaseClustering:
 
         Returns
         ----------
-        self : self
+        self : instance of :class:`pycrostates.clustering.BaseClustering`
             The modfied instance.
         """
         # TODO: should use a similar system to mapping types/names on ch in MNE
@@ -495,7 +489,7 @@ class BaseClustering:
         self.names = names
 
     def reorder(self, order: list):
-        """Reorder cluster centers. Operate in place.
+        """Reorder cluster centers. Operates in place.
 
         Parameters
         ----------
@@ -504,7 +498,7 @@ class BaseClustering:
 
         Returns
         ----------
-        self : self
+        self : instance of :class:`pycrostates.clustering.BaseClustering`
             The modfied instance.
         """
         self._check_fit()
@@ -541,13 +535,14 @@ class ModKMeans(BaseClustering):
     Parameters
     ----------
     %(n_clusters)s
+    %(picks)s
     n_init : int
         Number of time the k-means algorithm will be run with different
         centroid seeds. The final result will be the run with highest global
-        explained variance. Default=100
+        explained variance. Default=100.
     max_iter : int
         Maximum number of iterations of the k-means algorithm for a single run.
-        Default=300
+        Default=300.
     tol : float
         Relative tolerance with regards estimate residual noise in the cluster
         centers of two consecutive iterations to declare convergence.
@@ -555,18 +550,17 @@ class ModKMeans(BaseClustering):
 
     Attributes
     ----------
+    %(n_clusters)s
     current_fit : bool
-        Flag informing about which data type (raw, epochs or evoked) was used
-        for the fit.
-    cluster_centers_ : `~numpy.array`, shape ``(n_clusters, n_channels)``
-        If fitted, cluster centers (i.e Microstates maps)
+        Flag informing about which instance type (:class:`~mne.io.Raw` or :class:`~mne.Epochs`)
+        was used for the fit.
     info : dict
-        If fitted, :class:`Measurement info <mne.Info>` of fitted instance,
-        else None
+        If fitted, :class:`~mne.Info` of fitted instance, else None.
+    cluster_centers_ : :class:`numpy.ndarray`, shape (n_clusters, n_channels)
+        If fitted, cluster centers (i.e Microstates maps).
     GEV_ : float
         If fitted, the Global explained Variance explained all clusters
         centers.
-    %(n_clusters)s
     """
     def __init__(self,
                  random_seed=None,
@@ -579,6 +573,7 @@ class ModKMeans(BaseClustering):
         self.max_iter = max_iter
         self.tol = tol
         self.random_seed = random_seed
+        self.info = None
 
     def _fit_data(self, data: np.ndarray,  n_jobs: int = 1, verbose=None):
         logger.info('Running Kmeans for %s clusters centers with %s random '
@@ -619,7 +614,7 @@ class ModKMeans(BaseClustering):
 
         Parameters
         ----------
-        inst : mne.io.Raw, mne.Epochs
+        inst : ~mne.io.Raw or  ~mne.Epochs
             Instance containing data to transform to cluster-distance space
             (absolute spatial correlation).
         %(reject_by_annotation_raw)s

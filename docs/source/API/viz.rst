@@ -11,5 +11,3 @@ Vizualisation
 
 .. autosummary::
    :toctree: generated/
-
-   plot_segmentation

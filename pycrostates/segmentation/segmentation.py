@@ -131,13 +131,13 @@ class RawSegmentation(BaseSegmentation):
         Parameters
         ----------
         %(raw_tmin)s
-        %(raw_tmin)s
+        %(raw_tmax)s
 
         Returns
         ----------
-        fig : matplotlib.figure.Figure
+        fig : :class:`matplotlib.figure.Figure`
             Figure
-        ax : matplotlib.axes.Axes
+        ax : :class:`matplotlib.axes.Axes`
             Axis
         """
         fig, ax = plot_segmentation(segmentation=self.segmentation,

@@ -28,6 +28,26 @@ random_seed : float
     random state to have reproducible results.
 """
 
+docdict['verbose'] = """
+verbose : bool, str, int or None
+    Control verbosity of the logging output.
+    If None, use the default verbosity level.
+    Should only be passed as a keyword argument.
+    Defaults to self.verbose.
+"""
+
+docdict['picks'] =  """
+picks : str | list | slice | None
+    Channels to include. Slices and lists of integers will be interpreted
+    as channel indices. In lists, channel type strings (e.g.,
+    ['meg', 'eeg']) will pick channels of those types, channel name strings
+    (e.g., ['MEG0111', 'MEG2623'] will pick the given channels.
+    Can also be the string values “all” to pick all channels, or “data” to
+    pick data channels. None will pick all channels.
+    Note that channels in info['bads'] will be included.
+    Default to 'eeg'.
+"""
+
 # ------------------------- Documentation functions --------------------------
 docdict_indented = dict()
 
