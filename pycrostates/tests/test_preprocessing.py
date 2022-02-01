@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import numpy as np
 import mne
 from mne.io import RawArray
 from mne.datasets import testing
@@ -54,7 +55,7 @@ def test_extract_gfp_raw():
     raw = raw.pick('eeg')
     raw_peaks = extract_gfp_peaks(raw, min_peak_distance=4)
     assert isinstance(raw_peaks, RawArray)
-    assert(raw_peaks.info['sfreq'] == -1)
+    assert(raw_peaks.info['sfreq'] == np.inf)
 
 
 def test_extract_gfp_epochs():

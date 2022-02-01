@@ -1,5 +1,5 @@
 import numpy as np
-
+import mne
 
 def _corr_vectors(A, B, axis=0):
     # based on:
@@ -39,3 +39,12 @@ def _corr_vectors(A, B, axis=0):
     corr = np.nan_to_num(corr, posinf=0, neginf=0)
     np.seterr(divide='warn', invalid='warn')
     return corr
+
+def _copy_info(inst, sfreq):
+    ch_names = inst.info['ch_names']
+    ch_types = [mne.channel_type(inst.info, idx) for idx in range(0,inst.info['nchan'])]
+    new_info = mne.create_info(ch_names, sfreq=sfreq, ch_types=ch_types)
+    if inst.get_montage():
+        montage = inst.get_montage()
+        new_info.set_montage(montage)
+    return(new_info)
