@@ -59,6 +59,21 @@ def load_data(subject_id, condition):
 
 
 def standardize(raw):
+    """Standardize :class:`~mne.io.Raw` from the lemon dataset.
+    This function will interpolate missing channels from
+    the standard setup, then reorder channels and finally
+    reference to average.
+
+    inst : ~mne.io.Raw
+        :class:`~mne.io.Raw` from the lemon dataset
+    
+    Notes
+    ----------
+    If you don't want to interpolate missing channels, you can
+    use :func:`mne.channels.equalize_channels` instead to have
+    same electrodes accross recordings.
+    """
+
     raw = raw.copy()
     standard_channels = ['Fp1', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8', 'FC5', 'FC1',
                          'FC2', 'FC6', 'T7', 'C3', 'Cz', 'C4', 'T8', 'CP5', 'CP1',
@@ -77,6 +92,7 @@ def standardize(raw):
     info = mne.create_info(ch_names=full_ch_names, ch_types=full_ch_types, sfreq=raw.info['sfreq'])
     raw = mne.io.RawArray(data=full_data, info=info)
     raw.info['bads'].extend(missing_channels)
+    raw.reorder_channels(standard_channels)
     raw.set_montage('standard_1005')
     raw.interpolate_bads()
     raw.set_eeg_reference('average')
