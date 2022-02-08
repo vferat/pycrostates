@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 from copy import copy, deepcopy
+from typing import Union
 
 from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.io.pick import _picks_to_idx
 import numpy as np
 
+from .. import logger
 from ..utils._checks import _check_type, _check_value, _check_n_jobs
 from ..utils._docs import fill_doc
 from ..utils._logs import verbose
@@ -129,23 +131,74 @@ class _BaseCluster(ABC):
         self.clusters_names = [mapping[name] if name in mapping else name
                                for name in self._clusters_names]
 
-    def reorder_clusters(self, mapping: dict):
+    def reorder_clusters(self, mapping: dict = None,
+                         order: Union[list, tuple] = None):
         """
-        Reorder the clusters in-place.
+        Reorder the clusters.
 
         Parameters
         ----------
         mapping : dict
             Mapping from the old order to the new order. The positions are
             0-indexed. key: old position, value: new position.
+        order : list | tuple
+            1D iterable containing the new cluster centers order.
         """
         self._check_fit()
-        _check_type(mapping, (dict, ), item_name='mapping')
-        valids = tuple(range(len(self.cluster_centers)))
-        for key in mapping:
-            _check_value(key, valids, item_name='old position')
-        for value in mapping.values():
-            _check_value(value, valids, item_name='new position')
+
+        # check arguments
+        if mapping is not None:
+            _check_type(mapping, (dict, ), item_name='mapping')
+            valids = tuple(range(len(self._n_clusters)))
+            for key in mapping:
+                _check_value(key, valids, item_name='old position')
+            for value in mapping.values():
+                _check_value(value, valids, item_name='new position')
+
+            inverse_mapping = {value: key for key, value in mapping.items()}
+
+            # check uniqueness
+            if len(set(mapping.values())) != len(mapping.values()):
+                raise ValueError(
+                    'Position in the new order can not be repeated.')
+            # check that a cluster is not moved twice
+            for key in mapping:
+                if key in mapping.values():
+                    raise ValueError(
+                        "A position can not be present in both the old and "
+                        f"new order. Position '{key}' is mapped to "
+                        f"'{mapping[key]}' and position "
+                        f"'{inverse_mapping[key]}' is mapped to '{key}'.")
+
+            # convert to list
+            order = list(range(self._n_clusters))
+            for key, value in mapping.items():
+                order[key] = value
+            # sanity-check
+            assert len(set(order)) == self._n_clusters
+
+        elif order is not None:
+            _check_type(order, (list, tuple, np.ndarray), item_name='order')
+            if isinstance(np.ndarray) and len(order.shape) != 1:
+                raise ValueError(
+                    "Argument 'order' should be a 1D iterable and not a "
+                    f"{len(order.shape)}D iterable.")
+                order = list(order)
+            valids = tuple(range(len(self._n_clusters)))
+            for elt in order:
+                _check_value(elt, valids, item_name='order')
+            if len(order) != self._n_clusters:
+                raise ValueError(
+                    "Argument 'order' should contain 'n_clusters': "
+                    f"{self._n_clusters} elements. Provided '{len(order)}'.")
+
+        else:
+            logger.warning("Either 'mapping' or 'order' should not be 'None' "
+                           "for method 'reorder_clusters' to operate.")
+
+        # re-order
+        self._cluster_centers = self._cluster_centers[order]
+        self._clusters_names = [self._clusters_names[k] for k in order]
 
     def invert_polarity(self, invert):
         """
