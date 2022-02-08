@@ -147,6 +147,40 @@ class _BaseCluster(ABC):
         for value in mapping.values():
             _check_value(value, valids, item_name='new position')
 
+    def invert_polarity(self, invert):
+        """
+        Invert map polarities for vizualisation purposes. Operates in-place.
+
+        Parameters
+        ----------
+        invert : bool | list of bool
+            List of bool of length ``n_clusters``.
+            True will invert map polarity, while False will have no effect.
+            If a bool is provided, it is applied to all maps.
+        """
+        self._check_fit()
+
+        # Check argument
+        invert = _check_type(invert, (bool, list, tuple, np.ndarray),
+                             item_name='invert')
+        if isinstance(invert, bool):
+            invert = [invert] * self._n_clusters
+        elif isinstance(invert, (list, tuple)):
+            for inv in invert:
+                _check_type(inv, (bool, ), item_name='invert')
+        elif isinstance(invert, np.ndarray):
+            if len(invert.shape) != 1:
+                raise ValueError(
+                    "Argument 'invert' should be a 1D iterable and not a "
+                    f"{len(invert.shape)}D iterable.")
+            for inv in invert:
+                _check_type(inv, (bool, ), item_name='invert')
+
+        # Invert maps
+        for k, cluster in enumerate(self._cluster_centers):
+            if invert[k]:
+                self._cluster_centers[k] = - cluster
+
     @abstractmethod
     @fill_doc
     @verbose
