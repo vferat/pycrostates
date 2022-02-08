@@ -4,6 +4,7 @@ from copy import copy, deepcopy
 from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.io.pick import _picks_to_idx
+import numpy as np
 
 from ..utils._checks import _check_type, _check_value, _check_n_jobs
 from ..utils._docs import fill_doc
@@ -101,6 +102,12 @@ class _BaseCluster(ABC):
         kwargs = dict() if isinstance(inst, BaseEpochs) \
             else dict(reject_by_annotation=reject_by_annotation)
         data = inst.get_data(picks=picks, tmin=tmin, tmax=tmax, **kwargs)
+        # reshape if inst is Epochs
+        if isinstance(inst, BaseEpochs):
+            data = np.swapaxes(data, 0, 1)
+            data = data.reshape(data.shape[0], -1)
+
+        return data
 
     def rename_clusters(self, mapping: dict):
         """

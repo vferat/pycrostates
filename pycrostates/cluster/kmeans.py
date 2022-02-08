@@ -1,5 +1,11 @@
+from mne import pick_info
+from mne.parallel import parallel_func
+import numpy as np
+
 from ._base import _BaseCluster
-from ..utils._checks import _check_type
+from .. import logger
+from ..utils import _corr_vectors
+from ..utils._checks import _check_type, _check_random_state
 from ..utils._docs import fill_doc, copy_doc
 from ..utils._logs import _set_verbose
 
@@ -39,7 +45,7 @@ class KMeans(_BaseCluster):
         self._n_init = KMeans._check_n_init(n_init)
         self._max_iter = KMeans._check_max_iter(max_iter)
         self._tol = KMeans._check_tol(tol)
-        self._random_state = random_state
+        self._random_state = _check_random_state(random_state)
 
     @copy_doc(_BaseCluster.fit)
     @fill_doc
@@ -49,7 +55,129 @@ class KMeans(_BaseCluster):
         %(verbose)s
         """
         _set_verbose(verbose)  # TODO: decorator nesting is failing
-        super().fit(inst, picks, tmin, tmax, reject_by_annotation, n_jobs)
+        data = super().fit(inst, picks, tmin, tmax, reject_by_annotation,
+                           n_jobs)
+
+        inits = self._random_state.randint(
+            low=0, high=100*self._n_init, size=(self._n_init))
+
+        if n_jobs == 1:
+            best_gev, best_maps, best_segmentation = None, None, None
+            for init in inits:
+                gev, maps, segmentation, converged = KMeans._kmeans(
+                    data, self._n_clusters, self._max_iter, init, self._tol)
+                if not converged:
+                    continue
+                if best_gev is None or gev > best_gev:
+                    best_gev, best_maps, best_segmentation = \
+                        gev, maps, segmentation
+        else:
+            parallel, p_fun, _ = parallel_func(
+                KMeans._kmeans, n_jobs, total=self._n_init)
+            runs = parallel(
+                p_fun(data, self._n_clusters, self._max_iter, init, self._tol)
+                for init in inits)
+            try:
+                best_run = np.argmax(run[0] for run in runs if run[4])
+                best_gev, best_maps, best_segmentation = runs[best_run]
+            except ValueError:
+                best_gev, best_maps, best_segmentation = None, None, None
+
+        if best_gev is not None:
+            logger.info('Selecting run with highest GEV = %.2f%%.', best_gev)
+        else:
+            logger.warning(
+                'All the K-means run failed to converge. Please adapt the '
+                'tolerance and the maximum number of iteration.')
+            return  # break early
+
+        # TODO: confirm this is the scikit-learn variable (GEV_, labels_, ...)
+        self.GEV_ = best_gev
+        self._cluster_centers = best_maps
+        self.labels_ = best_segmentation
+        self._fitted = True
+        self.fitted_data_ = data
+        self.info = pick_info(inst.info, picks)
+
+    # --------------------------------------------------------------------
+    @staticmethod
+    def _kmeans(data, n_clusters, max_iter, random_state, tol):
+        """
+        Run the k-means algorithm.
+        """
+        gfp_sum_sq = np.sum(data ** 2)
+        maps, converged = KMeans._compute_maps(data, n_clusters, max_iter,
+                                               random_state, tol)
+        activation = maps.dot(data)
+        segmentation = np.argmax(np.abs(activation), axis=0)
+        map_corr = _corr_vectors(data, maps[segmentation].T)
+        gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
+        return gev, maps, segmentation, converged
+
+    @staticmethod
+    def _compute_maps(data, n_clusters, max_iter, random_state, tol):
+        """
+        Computes microstates maps.
+        Based on mne_microstates by Marijn van Vliet <w.m.vanvliet@gmail.com>
+        https://github.com/wmvanvliet/mne_microstates/blob/master/microstates.py
+        """
+        if not isinstance(random_state, np.random.RandomState):
+            random_state = np.random.RandomState(random_state)
+
+        # ------------------------- handle zeros maps -------------------------
+        # zero map can be due to non data in the recording, it's unlikely that
+        # all channels recorded the same value at the same time (=0 due to
+        # average reference)
+        # ---------------------------------------------------------------------
+        data = data[:, np.linalg.norm(data.T, axis=1) != 0]
+        n_channels, n_samples = data.shape
+        data_sum_sq = np.sum(data ** 2)
+
+        # Select random time points for our initial topographic maps
+        init_times = random_state.choice(
+            n_samples, size=n_clusters, replace=False)
+        maps = data[:, init_times].T
+        # Normalize the maps
+        maps /= np.linalg.norm(maps, axis=1, keepdims=True)
+
+        prev_residual = np.inf
+        for _ in range(max_iter):
+            # Assign each sample to the best matching microstate
+            activation = maps.dot(data)
+            segmentation = np.argmax(np.abs(activation), axis=0)
+
+            # Recompute the topographic maps of the microstates, based on the
+            # samples that were assigned to each state.
+            for state in range(n_clusters):
+                idx = (segmentation == state)
+                if np.sum(idx) == 0:
+                    maps[state] = 0
+                    continue
+
+                # Find largest eigenvector
+                maps[state] = data[:, idx].dot(activation[state, idx])
+                maps[state] /= np.linalg.norm(maps[state])
+
+            # Estimate residual noise
+            act_sum_sq = np.sum(
+                np.sum(maps[segmentation].T * data, axis=0) ** 2)
+            residual = abs(data_sum_sq - act_sum_sq)
+            residual /= float(n_samples * (n_channels - 1))
+
+            # check convergence
+            if (prev_residual - residual) < (tol * residual):
+                break
+
+            prev_residual = residual
+
+        else:
+            logger.warning(
+                'K-means algorithm failed to converge. Please adapt the '
+                'tolerance and the maximum number of iteration.')
+            converged = False
+        converged = True
+
+        return maps, converged
 
     # --------------------------------------------------------------------
     @property
