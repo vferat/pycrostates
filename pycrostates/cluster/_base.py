@@ -247,7 +247,6 @@ class _BaseCluster(ABC):
             if invert[k]:
                 self._cluster_centers[k] = - cluster
 
-    @abstractmethod
     @fill_doc
     @verbose
     def predict(self, inst, factor=0, half_window_size=3, tol=10e-6,
@@ -341,13 +340,13 @@ class _BaseCluster(ABC):
             segmentation = np.zeros(data.shape[-1])
 
             for onset, end in zip(onsets, ends):
-                # small segments can't be smoothed
-                factor_ = factor \
-                    if onset - end >= 2 * half_window_size + 1 else 0
+                # small segments can't be smoothed and are skipped
+                if onset - end < 2 * half_window_size + 1:
+                    continue
 
                 data_ = data[:, end:onset]
                 segment = _BaseCluster._segment(
-                    data_, self._cluster_centers, factor_, tol,
+                    data_, self._cluster_centers, factor, tol,
                     half_window_size)
                 if reject_edges:
                     segment = _BaseCluster._reject_edge_segments(segment)
@@ -457,22 +456,13 @@ class _BaseCluster(ABC):
     @staticmethod
     def _reject_edge_segments(segmentation):
         """Set the first and last segment as unlabeled (0)."""
-        # TODO: Could be vectorized
-
         # set first segment to unlabeled
-        i = 0
-        first_label = segmentation[i]
-        if first_label != 0:
-            while segmentation[i] == first_label and i < len(segmentation) - 1:
-                segmentation[i] = 0
-                i += 1
+        n = (segmentation != segmentation[0]).argmax()
+        segmentation[:n] = 0
+
         # set last segment to unlabeled
-        i = len(segmentation) - 1
-        last_label = segmentation[i]
-        if last_label != 0:
-            while segmentation[i] == last_label and i > 0:
-                segmentation[i] = 0
-                i -= 1
+        n = np.flip((segmentation != segmentation[-1])).argmax()
+        segmentation[-n:] = 0
 
     @staticmethod
     def _reject_short_segments(segmentation, epoch, min_segment_length):
