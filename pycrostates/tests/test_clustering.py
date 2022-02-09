@@ -19,35 +19,35 @@ epochs = mne.Epochs(raw, events, preload=True)
 n_clusters = 4
 
 
-def test_ModKMeans_randomstate():
-    ModK_1 = ModKMeans(n_clusters=n_clusters, random_state=1)
+def test_ModKMeans_randomseed():
+    ModK_1 = ModKMeans(n_clusters=n_clusters, random_seed=1)
     ModK_1.fit(raw, n_jobs=1)
-    ModK_2 = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK_2 = ModKMeans(n_clusters=n_clusters, random_seed=1)
     ModK_2.fit(raw, n_jobs=1)
     assert (ModK_1.cluster_centers_ == ModK_2.cluster_centers_).all()
 
 
 def test_ModKMeans_copy():
-    ModK_1 = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK_1 = ModKMeans(n_clusters=n_clusters, random_seed=1)
     ModK_2 = ModK_1.copy()
     ModK_1.n_clusters = 12
     assert ModK_2.n_clusters == 4
 
 
 def test_ModKMeans_repr():
-    ModK = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK = ModKMeans(n_clusters=n_clusters, random_seed=1)
     assert isinstance(ModK.__repr__(), str)
 
 
 def test_ModKMeans_get_cluster_centers():
-    ModK = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK = ModKMeans(n_clusters=n_clusters, random_seed=1)
     ModK.fit(raw, n_jobs=1)
     raw_clusters = ModK.get_cluster_centers()
     assert (raw_clusters == ModK.cluster_centers_).all()
 
 
 def test_ModKMeans_get_cluster_centers_as_raw():
-    ModK = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK = ModKMeans(n_clusters=n_clusters, random_seed=1)
     ModK.fit(raw, n_jobs=1)
     raw_clusters = ModK.get_cluster_centers_as_raw()
     assert (raw_clusters.get_data().T == ModK.cluster_centers_).all()
@@ -55,14 +55,14 @@ def test_ModKMeans_get_cluster_centers_as_raw():
 
 def test_ModKMeans_rename_clusters():
     names = ['a', 'b', 'c', 'd']
-    ModK = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK = ModKMeans(n_clusters=n_clusters, random_seed=1)
     ModK.fit(raw, n_jobs=1)
     ModK.rename_clusters(names)
     assert np.all(ModK.names == names)
 
 
 def test_ModKMeans_invert_polarity():
-    ModK = ModKMeans(n_clusters=n_clusters, random_state=1)
+    ModK = ModKMeans(n_clusters=n_clusters, random_seed=1)
     ModK.fit(raw, n_jobs=1)
     before = ModK.cluster_centers_.copy()
     ModK.invert_polarity([True, True, False, False])
@@ -145,7 +145,7 @@ def test_BaseClustering_predict_raw():
     segmentation = ModK.predict(raw,
                                 factor=0,
                                 rejected_first_last_segments=False,
-                                min_segment_lenght=0,
+                                min_segment_length=0,
                                 reject_by_annotation=False)
     assert isinstance(segmentation, RawSegmentation)
 
@@ -156,7 +156,7 @@ def test_BaseClustering_predict_epochs():
     segmentation = ModK.predict(epochs,
                                 factor=0,
                                 rejected_first_last_segments=False,
-                                min_segment_lenght=0,
+                                min_segment_length=0,
                                 reject_by_annotation=False)
     assert isinstance(segmentation, EpochsSegmentation)
 
@@ -178,14 +178,14 @@ def test_BaseClustering_predict_epochs_rejected_first_last_segments():
         assert epoch_seg[-1] == 0
 
 
-def test_BaseClustering_predict_raw_min_segment_lenght():
+def test_BaseClustering_predict_raw_min_segment_length():
     ModK = ModKMeans(n_clusters=n_clusters)
     ModK.fit(raw, n_jobs=1)
-    segmentation = ModK.predict(raw, min_segment_lenght=3)
+    segmentation = ModK.predict(raw, min_segment_length=3)
     segment_lengths = [
         len(list(group))
         for _, group in itertools.groupby(segmentation.segmentation)][1:-2]
-    assert np.all(np.array(segment_lengths) > 3)
+    assert np.all(np.array(segment_lengths) >= 3)
 
 
 def test_BaseClustering_predict_raw_smoothing():

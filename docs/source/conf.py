@@ -11,9 +11,9 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sys
 import pydata_sphinx_theme
 from sphinx_gallery.sorting import ExplicitOrder
+from recommonmark.transform import AutoStructify
 
 curdir = os.path.dirname(__file__)
 
@@ -75,21 +75,20 @@ numpydoc_xref_param_type = True
 
 # sphinx_gallery_conf
 sphinx_gallery_conf = {
-     'examples_dirs': os.path.abspath(os.path.join(curdir, '..', '..', 'tutorials')),   # path to example scripts
-     'gallery_dirs': 'auto_tutorials',  # path to where to save gallery generated output
-     'subsection_order': ExplicitOrder(['../../tutorials/preprocessing',
-                                       '../../tutorials/clustering',
-                                       '../../tutorials/backfitting',
-                                       '../../tutorials/group_level_analysis']),
-     'reference_url': {
-         # The module you locally document uses None
-        'pycrostates': None,
-     },
-     'backreferences_dir'  : 'generated/backreferences',
-     'doc_module': ('pycrostates',),
-
-
-}
+     'examples_dirs': os.path.abspath(os.path.join(curdir,
+                                                   '..',
+                                                   '..',
+                                                   'tutorials')),
+     'gallery_dirs': 'auto_tutorials',
+     'subsection_order': ExplicitOrder(
+                            ['../../tutorials/preprocessing',
+                             '../../tutorials/clustering',
+                             '../../tutorials/backfitting',
+                             '../../tutorials/group_level_analysis']),
+     'reference_url': {'pycrostates': None},  # current lib uses None
+     'backreferences_dir': 'generated/backreferences',
+     'doc_module': ('pycrostates',)
+                      }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -108,19 +107,18 @@ html_theme = 'pydata_sphinx_theme'
 
 html_theme_options = {
     "icon_links": [
-        {
-            "name": "GitHub",
-            "url": "https://github.com/vferat/pycrostates",
-            "icon": "fab fa-github-square",
-        }],
+        {"name": "GitHub",
+         "url": "https://github.com/vferat/pycrostates",
+         "icon": "fab fa-github-square"}],
     "external_links": [
-       {"name": "mne", "url": "https://mne.tools/stable/index.html"}],
-
-}
+        {"name": "mne",
+         "url": "https://mne.tools/stable/index.html"}],
+                     }
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = [ os.path.abspath(os.path.join(curdir, '../_static'))]
+html_static_path = [os.path.abspath(os.path.join(curdir, '../_static'))]
+
 
 def append_attr_meth_examples(app, what, name, obj, options, lines):
     """Append SG examples backreferences to method and attr docstrings."""
@@ -130,7 +128,10 @@ def append_attr_meth_examples(app, what, name, obj, options, lines):
     # Eventually this could perhaps live in SG.
     if what in ('attribute', 'method'):
         size = os.path.getsize(os.path.join(
-            os.path.dirname(__file__), 'generated', 'backreferences', '%s.examples' % (name,)))
+                                    os.path.dirname(__file__),
+                                    'generated',
+                                    'backreferences',
+                                    '%s.examples' % (name,)))
         if size > 0:
             lines += """
 .. _sphx_glr_backreferences_{1}:
@@ -139,11 +140,7 @@ def append_attr_meth_examples(app, what, name, obj, options, lines):
 """.format(name.split('.')[-1], name).split('\n')
 
 
-
 # -- Auto-convert markdown pages to demo --------------------------------------
-from recommonmark.transform import AutoStructify
-
 def setup(app):
     app.connect('autodoc-process-docstring', append_attr_meth_examples)
     app.add_transform(AutoStructify)
-

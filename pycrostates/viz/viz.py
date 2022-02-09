@@ -30,6 +30,7 @@ def plot_segmentation(
         names: list = None,
         tmin: float = 0.0, tmax: float = None) -> Tuple[Figure, Axes]:
     _check_type(inst, (BaseRaw, Evoked))
+    inst = inst.copy()
     inst.crop(tmin=tmin, tmax=tmax)
     if isinstance(inst, BaseRaw):
         data = inst.get_data()

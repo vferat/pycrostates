@@ -11,8 +11,10 @@ from mne.utils.docs import docdict as docdict_mne
 docdict = dict()
 
 # ---- Documentation to inc. from MNE ----
-keys = ['random_state', 'verbose', 'reject_by_annotation_raw', 'n_jobs',
+keys = ['random_state', 'verbose', 'verbose_meth',
+        'reject_by_annotation_raw', 'n_jobs',
         'raw_tmin', 'raw_tmax', 'picks_all']
+
 for key in keys:
     docdict[key] = docdict_mne[key]
 # TODO: sphinx :term:`data channels` in 'picks_all' has to be included.
@@ -26,42 +28,77 @@ docdict['predict_inst'] = """
 inst : `~mne.io.Raw` | `~mne.Epochs`
     Instance containing data to predict."""
 
+docdict['n_clusters'] = """
+n_clusters : int
+    The number of clusters as well as the number
+    of centroids (i.e. Microstate topographies).
+"""
+
+docdict['random_seed'] = """
+random_seed : float
+    As estimation can be non-deterministic it can be useful to fix the
+    random state to have reproducible results.
+"""
+
+docdict['verbose'] = """
+verbose : bool, str, int or None
+    Control verbosity of the logging output.
+    If None, use the default verbosity level.
+    Should only be passed as a keyword argument.
+    Defaults to self.verbose.
+"""
+
+docdict['picks'] = """
+picks : str | list | slice | None
+    Channels to include. Slices and lists of integers will be interpreted
+    as channel indices. In lists, channel type strings (e.g.,
+    ['meg', 'eeg']) will pick channels of those types, channel name strings
+    (e.g., ['MEG0111', 'MEG2623'] will pick the given channels.
+    Can also be the string values “all” to pick all channels, or “data” to
+    pick data channels. None will pick all channels.
+    Note that channels in info['bads'] will be included.
+    Default to 'eeg'.
+"""
+
 # ------------------------- Documentation functions --------------------------
 docdict_indented = dict()
 
 
 def fill_doc(f):
-    """
-    Fill a docstring with docdict entries.
-
+    """Fill a docstring with docdict entries.
     Parameters
     ----------
     f : callable
         The function to fill the docstring of. Will be modified in place.
-
     Returns
     -------
     f : callable
-        The function, potentially with an updated __doc__.
+        The function, potentially with an updated ``__doc__``.
     """
     docstring = f.__doc__
     if not docstring:
         return f
-
     lines = docstring.splitlines()
-    indent_count = _indentcount_lines(lines)
-
+    # Find the minimum indent of the main docstring, after first line
+    if len(lines) < 2:
+        icount = 0
+    else:
+        icount = _indentcount_lines(lines[1:])
+    # Insert this indent to dictionary docstrings
     try:
-        indented = docdict_indented[indent_count]
+        indented = docdict_indented[icount]
     except KeyError:
-        indent = ' ' * indent_count
-        docdict_indented[indent_count] = indented = dict()
-
-        for name, docstr in docdict.items():
-            lines = [indent+line if k != 0 else line
-                     for k, line in enumerate(docstr.strip().splitlines())]
-            indented[name] = '\n'.join(lines)
-
+        indent = ' ' * icount
+        docdict_indented[icount] = indented = {}
+        for name, dstr in docdict.items():
+            lines = dstr.splitlines()
+            try:
+                newlines = [lines[0]]
+                for line in lines[1:]:
+                    newlines.append(indent + line)
+                indented[name] = '\n'.join(newlines)
+            except IndexError:
+                indented[name] = dstr
     try:
         f.__doc__ = docstring % indented
     except (TypeError, ValueError, KeyError) as exp:
@@ -69,34 +106,19 @@ def fill_doc(f):
         funcname = docstring.split('\n')[0] if funcname is None else funcname
         raise RuntimeError('Error documenting %s:\n%s'
                            % (funcname, str(exp)))
-
     return f
 
 
 def _indentcount_lines(lines):
-    """
-    Minimum indent for all lines in line list.
-
-    >>> lines = [' one', '  two', '   three']
-    >>> indentcount_lines(lines)
-    1
-    >>> lines = []
-    >>> indentcount_lines(lines)
-    0
-    >>> lines = [' one']
-    >>> indentcount_lines(lines)
-    1
-    >>> indentcount_lines(['    '])
-    0
-    """
-    indent = sys.maxsize
+    """Compute minimum indent for all lines in line list."""
+    indentno = sys.maxsize
     for line in lines:
-        line_stripped = line.lstrip()
-        if line_stripped:
-            indent = min(indent, len(line) - len(line_stripped))
-    if indent == sys.maxsize:
+        stripped = line.lstrip()
+        if stripped:
+            indentno = min(indentno, len(line) - len(stripped))
+    if indentno == sys.maxsize:
         return 0
-    return indent
+    return indentno
 
 
 def copy_doc(source):

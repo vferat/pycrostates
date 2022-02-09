@@ -17,3 +17,4 @@
 .. citations
 
 .. _`michel 2018`: https://doi.org/10.1016/j.neuroimage.2017.11.062
+
