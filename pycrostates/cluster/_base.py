@@ -296,8 +296,9 @@ class _BaseCluster(ABC):
 
         # check that the channels match
         info = pick_info(inst.info, self._picks)
-        if self.info['ch_names'] != info['ch_names'] or \
-            self.info['chs'] != info['chs']:
+        ch_names_mismatch = self.info['ch_names'] != info['ch_names']
+        chs_mismatch = self.info['chs'] != info['chs']
+        if ch_names_mismatch or chs_mismatch:
             raise ValueError(
                 'Instance to segment into microstate sequence does not have '
                 'the same channels as the instance used for fitting.')
@@ -445,8 +446,9 @@ class _BaseCluster(ABC):
             labels = dlt
             w = np.zeros((Nu, Nt))
             w[(rmat == labels)] = 1
-            Su = np.sum(Vvar - \
-                        np.sum(np.dot(w.T, states).T * data, axis=0) ** 2) / (Nt * (Ne - 1))
+            Su = np.sum(
+                Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) ** 2) / \
+                (Nt * (Ne - 1))
             if np.abs(Su - S0) <= np.abs(tol * Su):
                 break
             S0 = Su
