@@ -2,11 +2,10 @@ from mne.parallel import parallel_func
 import numpy as np
 
 from ._base import _BaseCluster
-from .. import logger
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type, _check_random_state
 from ..utils._docs import fill_doc, copy_doc
-from ..utils._logs import _set_verbose
+from ..utils._logs import _set_verbose, logger
 
 
 @fill_doc
@@ -47,8 +46,8 @@ class ModKMeans(_BaseCluster):
         self._random_state = _check_random_state(random_state)
 
         # fit variables
-        self._GEV = None
-        self._labels = None
+        self._GEV_ = None
+        self._labels_ = None
 
     @copy_doc(_BaseCluster.fit)
     @fill_doc
@@ -83,18 +82,20 @@ class ModKMeans(_BaseCluster):
                 p_fun(data, self._n_clusters, self._max_iter, init, self._tol)
                 for init in inits)
             try:
-                best_run = np.argmax(run[0] for run in runs if run[4])
-                best_gev, best_maps, best_segmentation = runs[best_run]
+                best_run = np.nanargmax([run[0] if run[3] else np.nan
+                                         for run in runs])
+                best_gev, best_maps, best_segmentation, _ = runs[best_run]
+                count_converged = sum(run[3] for run in runs)
             except ValueError:
                 best_gev, best_maps, best_segmentation = None, None, None
-            count_converged = sum(run[4] for run in runs)
+                count_converged = 0
 
         if best_gev is not None:
             logger.info('Selecting run with highest GEV = %.2f%% after %i/%i '
                         'iteration converged.', best_gev, count_converged,
-                        self._max_iter)
+                        self._n_init)
         else:
-            logger.warning(
+            logger.error(
                 'All the K-means run failed to converge. Please adapt the '
                 'tolerance and the maximum number of iteration.')
             self.fitted = False  # reset variables related to fit
@@ -102,9 +103,9 @@ class ModKMeans(_BaseCluster):
 
         # TODO: look what are the scikit-learn names (GEV_, labels_, ...)
         # and set properties name accordingly
-        self._GEV = best_gev
-        self._cluster_centers = best_maps
-        self._labels = best_segmentation
+        self._GEV_ = best_gev
+        self._cluster_centers_ = best_maps
+        self._labels_ = best_segmentation
         self._fitted = True
 
     # --------------------------------------------------------------------
@@ -174,16 +175,13 @@ class ModKMeans(_BaseCluster):
 
             # check convergence
             if (prev_residual - residual) < (tol * residual):
+                converged = True
                 break
 
             prev_residual = residual
 
         else:
-            logger.warning(
-                'K-means algorithm failed to converge. Please adapt the '
-                'tolerance and the maximum number of iteration.')
             converged = False
-        converged = True
 
         return maps, converged
 
@@ -221,37 +219,37 @@ class ModKMeans(_BaseCluster):
         """
         Random state.
 
-        :type: `None` | `int` | `~numpy.random.RandomState`
+        :type: `~numpy.random.RandomState`
         """
         return self._random_state
 
     @property
-    def GEV(self):
+    def GEV_(self):
         """
-        GEV fit variable.
+        GEV_ fit variable.
         """
-        if self._GEV is None:
+        if self._GEV_ is None:
             assert not self._fitted  # sanity-check
             logger.warning('Clustering algorithm has not been fitted.')
-        return self._GEV
+        return self._GEV_
 
     @property
-    def labels(self):
+    def labels_(self):
         """
         labels fit variable.
         """
-        if self._labels is None:
+        if self._labels_ is None:
             assert not self._fitted  # sanity-check
             logger.warning('Clustering algorithm has not been fitted.')
-        return self._labels
+        return self._labels_
 
     @_BaseCluster.fitted.setter
     @copy_doc(_BaseCluster.fitted.setter)
     def fitted(self, fitted):
         super(self.__class__, self.__class__).fitted.__set__(self, fitted)
         if not fitted:
-            self._GEV = None
-            self._labels = None
+            self._GEV_ = None
+            self._labels_ = None
 
     # --------------------------------------------------------------------
     # ---------------

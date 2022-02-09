@@ -1,3 +1,3 @@
-from .kmeans import KMeans  # noqa: F401
+from .kmeans import ModKMeans  # noqa: F401
 
-__all__ = ('KMeans', )
+__all__ = ('ModKMeans', )

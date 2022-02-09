@@ -1,13 +1,14 @@
+from abc import ABC, abstractmethod
 import itertools
 
-import numpy as np
 from mne import BaseEpochs
 from mne.io import BaseRaw
+import numpy as np
 
-from ..viz import plot_segmentation
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
+from ..viz import plot_segmentation
 
 
 def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
@@ -16,8 +17,8 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
     Compute microstate parameters.
 
     Returns
-    ----------
-    dict : list of dic
+    -------
+    dict : list of dict
         Dictionaries containing microstate metrics.
 
     Attributes
@@ -54,7 +55,7 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
     gfp = np.std(data, axis=0)
     segments = [(s, list(group))
                 for s, group in itertools.groupby(segmentation)]
-    d = {}
+    d = dict()
     for s, state in enumerate(maps):
         state_name = maps_names[s]
         arg_where = np.argwhere(segmentation == s+1)
@@ -95,33 +96,94 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
     return d
 
 
-class BaseSegmentation():
-    def __init__(self, segmentation, inst, cluster_centers, names=None):
-        self.segmentation = segmentation
-        self.inst = inst
-        self.cluster_centers = cluster_centers
+class _BaseSegmentation(ABC):
+    """
+    Base class for a Microstates segmentation.
+    """
 
-        if names:
-            if len(self.cluster_centers) == len(names):
-                self.names = names
+    @abstractmethod
+    def __init__(self, segmentation, inst, picks, cluster_centers_,
+                 clusters_names=None):
+        self._segmentation = _BaseSegmentation._check_segmentation(
+            segmentation)
+        self._inst = inst
+        self._picks = picks
+        self._cluster_centers_ = cluster_centers_
+        self._clusters_names = _BaseSegmentation._check_cluster_names(
+            clusters_names, cluster_centers_)
+
+        # sanity-check
+        assert self._inst.times.size == self._segmentation.shape[-1]
+
+    # --------------------------------------------------------------------
+    @staticmethod
+    def _check_segmentation(segmentation):
+        """
+        Checks that the argument 'segmentation' is valid.
+        """
+        return np.array(segmentation)
+
+    @staticmethod
+    def _check_cluster_names(clusters_names, cluster_centers_):
+        """
+        Checks that the argument 'cluster_names' is valid.
+        """
+        if clusters_names is None:
+            return [str(k) for k in range(1, len(cluster_centers_)+1)]
+        else:
+            if len(cluster_centers_) == len(clusters_names):
+                return clusters_names
             else:
                 raise ValueError(
-                    'Cluster_centers and cluster_centers_names must have the '
-                    'same length')
-        else:
-            self.names = [f'{c+1}' for c in range(len(cluster_centers))]
+                    "The same number of cluster centers and cluster names "
+                    f"should be provided. There are {len(cluster_centers_)} "
+                    "cluster centers and '{len(cluster_names)}' provided.")
+
+    # --------------------------------------------------------------------
+    @property
+    def segmentation(self):
+        """
+        Segmentation predicted.
+        """
+        return self._segmentation
+
+    @property
+    def picks(self):
+        """
+        Picks used to fit the clustering algorithm and to predict the
+        segmentation.
+
+        :type: `~numpy.array`
+        """
+        return self._picks
+
+    @property
+    def cluster_centers_(self):
+        """
+        Center of the clusters.
+
+        :type: `~numpy.array`
+        """
+        return self._cluster_centers_
+
+    @property
+    def clusters_names(self):
+        """
+        Name of the clusters.
+
+        :type: `list`
+        """
+        return self._clusters_names
 
 
-class RawSegmentation(BaseSegmentation):
+class RawSegmentation(_BaseSegmentation):
+    """
+    Contains the segmentation for a raw instance.
+    """
+
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
-        _check_type(self.inst, (BaseRaw, ))
-
-        data = self.inst.get_data()
-        if data.shape[1] != len(self.segmentation):
-            raise ValueError(
-                'Instance and segmentation must have the same number of '
-                'samples.')
+        _check_type(self._inst, (BaseRaw, ), item_name='raw')
 
     @fill_doc
     def plot(self, tmin=0.0, tmax=None):
@@ -134,19 +196,16 @@ class RawSegmentation(BaseSegmentation):
         %(raw_tmax)s
 
         Returns
-        ----------
+        -------
         fig : :class:`matplotlib.figure.Figure`
             Figure
         ax : :class:`matplotlib.axes.Axes`
             Axis
         """
-        fig, ax = plot_segmentation(segmentation=self.segmentation,
-                                    inst=self.inst,
-                                    cluster_centers=self.cluster_centers,
-                                    names=self.names,
-                                    tmin=tmin,
-                                    tmax=tmax)
-        return fig, ax
+        return plot_segmentation(
+            segmentation=self.segmentation, inst=self.raw,
+            cluster_centers=self.cluster_centers_, names=self.clusters_names,
+            tmin=tmin, tmax=tmax)
 
     def compute_parameters(self, norm_gfp=True):
         """
@@ -159,14 +218,12 @@ class RawSegmentation(BaseSegmentation):
             Defaults to True.
 
         Returns
-        ----------
+        -------
         dict : dict
-            Dictionaries containing microstate parameters
-            as key/value pairs.
-            Keys are following named as follow:
-            '{microstate name}_{parameter}'.
-            Available parameters are list below:
+            Dictionaries containing microstate parameters as key/value pairs.
+            Keys are named as follow: '{microstate name}_{parameter}'.
 
+            Available parameters are list below:
             'dist_corr': Distribution of correlations
                 Correlation values of each time point
                 assigned to a given state.
@@ -194,25 +251,31 @@ class RawSegmentation(BaseSegmentation):
                 Mean number of segment assigned to a given state per second.
                 This metrics is expressed in segment per second ( . / s).
         """
-        d = _compute_microstate_parameters(
-            self.segmentation, self.inst.get_data(), self.cluster_centers,
-            self.names, self.inst.info['sfreq'], norm_gfp=norm_gfp)
-        return d
+        return _compute_microstate_parameters(
+            self.segmentation, self.raw.get_data(picks=self.picks),
+            self.cluster_centers_, self.clusters_names,
+            self.raw.info['sfreq'], norm_gfp=norm_gfp)
+
+    # --------------------------------------------------------------------
+    @property
+    def raw(self):
+        """
+        Raw instance.
+        """
+        return self._inst
 
 
-class EpochsSegmentation(BaseSegmentation):
+class EpochsSegmentation(_BaseSegmentation):
+    """
+    Contains the segmentation for an epoch instance.
+    """
+
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
-        _check_type(self.inst, (BaseEpochs, ))
+        _check_type(self._inst, (BaseEpochs, ), 'epochs')
 
-        data = self.inst.get_data()
-        if data.shape[0] != self.segmentation.shape[0]:
-            raise ValueError(
-                'Epochs and segmentation must have the number of ''epochs.')
-        if data.shape[2] != self.segmentation.shape[1]:
-            raise ValueError(
-                'Epochs and segmentation must have the number of samples per '
-                'epoch.')
+        # sanity-check
+        assert len(self._inst) == self.segmentation.shape[0]
 
     def compute_parameters(self, norm_gfp=True):
         """
@@ -225,7 +288,7 @@ class EpochsSegmentation(BaseSegmentation):
             Defaults to True.
 
         Returns
-        ----------
+        -------
         dict : dict
             Dictionaries containing microstate parameters
             as key/value pairs.
@@ -260,11 +323,18 @@ class EpochsSegmentation(BaseSegmentation):
                 Mean number of segment assigned to a given state per second.
                 This metrics is expressed in segment per second ( . / s).
         """
-        data = self.inst.get_data()
+        data = self.epochs.get_data(picks=self.picks)
         data = np.swapaxes(data, 0, 1)
         data = data.reshape(data.shape[0], -1)
         segmentation = self.segmentation.reshape(-1)
-        d = _compute_microstate_parameters(
-            segmentation, data, self.cluster_centers, self.names,
-            self.inst.info['sfreq'], norm_gfp=norm_gfp)
-        return d
+        return _compute_microstate_parameters(
+            segmentation, data, self.cluster_centers_, self.clusters_names,
+            self.epochs.info['sfreq'], norm_gfp=norm_gfp)
+
+    # --------------------------------------------------------------------
+    @property
+    def epochs(self):
+        """
+        Epochs instance.
+        """
+        return self._inst

@@ -5,7 +5,7 @@ Most-used classes
 
 .. autosummary::
    :toctree: generated/
-   
-   clustering.ModKMeans
+
+   cluster.ModKMeans
    segmentation.RawSegmentation
    segmentation.EpochsSegmentation

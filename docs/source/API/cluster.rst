@@ -1,0 +1,15 @@
+Cluster
+=======
+
+:py:mod:`pycrostates.cluster`:
+
+.. currentmodule:: pycrostates.cluster
+
+.. automodule:: pycrostates.cluster
+   :no-members:
+   :no-inherited-members:
+
+.. autosummary::
+   :toctree: generated/
+
+   ModKMeans

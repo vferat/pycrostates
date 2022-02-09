@@ -2,12 +2,17 @@ from . import metrics
 from . import viz
 from . import utils
 from . import preprocessing
-from . import clustering
+from . import cluster
 from . import datasets
 
-__all__ = ('clustering',
-           'metrics',
-           'viz',
-           'utils',
-           'preprocessing',
-           'datasets')
+from .utils._logs import set_log_level
+
+__all__ = (
+    'cluster',
+    'datasets',
+    'metrics',
+    'preprocessing',
+    'utils',
+    'viz',
+    'set_log_level'
+    )
