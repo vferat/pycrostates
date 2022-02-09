@@ -87,7 +87,7 @@ def set_handler_log_level(verbose, handler_id=0):
     logger.handlers[handler_id].setLevel = verbose
 
 
-def set_log_level(verbose):
+def set_log_level(verbose, return_old_level=False):
     """
     Set the log level for the logger.
 
@@ -97,9 +97,11 @@ def set_log_level(verbose):
         Logger verbosity.
     """
     _check_type(verbose, (bool, str, int, None), item_name='verbose')
+    old_verbose= logger.level
     if verbose is None:
         verbose = 'INFO'
     logger.setLevel(verbose)
+    return (old_verbose if return_old_level else None)
 
 
 class LoggerFormatter(logging.Formatter):
@@ -205,7 +207,7 @@ def %(name)s(%(signature)s):\n
     return fm.make(body, evaldict, addsource=True, **attrs)
 
 
-class use_log_level(object):
+class use_log_level():
     """Context handler for logging level.
     Parameters
     ----------
@@ -216,7 +218,7 @@ class use_log_level(object):
         self.level = level
 
     def __enter__(self):  # noqa: D105
-        self.old_level = set_log_level(self.level)
+        self.old_level = set_log_level(self.level, return_old_level=True)
 
     def __exit__(self, *args):  # noqa: D105
         set_log_level(self.old_level)
