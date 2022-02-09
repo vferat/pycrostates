@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from copy import copy, deepcopy
 from typing import Union
 
-from mne import BaseEpochs
+from mne import BaseEpochs, pick_info
 from mne.io import BaseRaw
 from mne.io.pick import _picks_to_idx
 import numpy as np
@@ -20,10 +20,15 @@ class _BaseCluster(ABC):
 
     @abstractmethod
     def __init__(self):
-        self._fitted = False
         self._n_clusters = None
         self._clusters_names = None
         self._cluster_centers = None
+
+        # fit variables
+        self._picks = None
+        self._info = None
+        self._fitted_data = None
+        self._fitted = False
 
     def __repr__(self) -> str:
         name = self.__class__.__name__
@@ -108,6 +113,11 @@ class _BaseCluster(ABC):
         if isinstance(inst, BaseEpochs):
             data = np.swapaxes(data, 0, 1)
             data = data.reshape(data.shape[0], -1)
+
+        # store picks and info
+        self._picks = picks
+        self._info = pick_info(inst.info, picks)
+        self._fitted_data = data
 
         return data
 
@@ -276,15 +286,6 @@ class _BaseCluster(ABC):
 
     # --------------------------------------------------------------------
     @property
-    def fitted(self):
-        """
-        Current fitting state.
-
-        :type: `bool`
-        """
-        return self._fitted
-
-    @property
     def n_clusters(self):
         """
         Number of clusters.
@@ -311,6 +312,60 @@ class _BaseCluster(ABC):
         :type: `~numpy.array`
         """
         return self._cluster_centers
+
+    @property
+    def picks(self):
+        """
+        Picks selected when fitting the clustering algorithm.
+        The picks have been converted to IDx.
+
+        :type: `list`
+        """
+        # TODO: Might be np.array and not list
+        if self._picks is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+        return self._picks
+
+    @property
+    def info(self):
+        """
+        Info instance corresponding to the MNE object used to fit the
+        clustering algorithm.
+
+        :type: `mne.io.Info`
+        """
+        if self._info is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+        return self._info
+
+    @property
+    def fitted_data(self):
+        """
+        Data array retrieved from MNE used to fit the clustering algorithm.
+
+        :type: `~numpy.array`
+        """
+        # TODO: Add shape of the numpy array
+        if self._fitted_data is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+        return self._fitted_data
+
+    @property
+    def fitted(self):
+        """
+        Current fitting state.
+
+        :type: `bool`
+        """
+        return self._fitted
+
+    @fitted.setter
+    def fitted(self, fitted):
+        """Property-setter used to reset all fit variables."""
+        pass
 
     # --------------------------------------------------------------------
     @staticmethod

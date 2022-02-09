@@ -1,4 +1,3 @@
-from mne import pick_info
 from mne.parallel import parallel_func
 import numpy as np
 
@@ -47,6 +46,10 @@ class KMeans(_BaseCluster):
         self._tol = KMeans._check_tol(tol)
         self._random_state = _check_random_state(random_state)
 
+        # fit variables
+        self._GEV = None
+        self._labels = None
+
     @copy_doc(_BaseCluster.fit)
     @fill_doc
     def fit(self, inst, picks='eeg', tmin=None, tmax=None,
@@ -89,15 +92,14 @@ class KMeans(_BaseCluster):
             logger.warning(
                 'All the K-means run failed to converge. Please adapt the '
                 'tolerance and the maximum number of iteration.')
+            self.fitted = False  # reset variables related to fit
             return  # break early
 
-        # TODO: confirm this is the scikit-learn variable (GEV_, labels_, ...)
-        self.GEV_ = best_gev
+        # TODO: look what are the scikit-learn names (GEV_, labels_, ...)
+        self._GEV = best_gev
         self._cluster_centers = best_maps
-        self.labels_ = best_segmentation
+        self._labels = best_segmentation
         self._fitted = True
-        self.fitted_data_ = data
-        self.info = pick_info(inst.info, picks)
 
     # --------------------------------------------------------------------
     @staticmethod
@@ -216,6 +218,26 @@ class KMeans(_BaseCluster):
         :type: `None` | `int` | `~numpy.random.RandomState`
         """
         return self._random_state
+
+    @property
+    def GEV(self):
+        """
+        GEV fit variable.
+        """
+        if self._GEV is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+        return self._GEV
+
+    @property
+    def labels(self):
+        """
+        labels fit variable.
+        """
+        if self._labels is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+        return self._labels
 
     # --------------------------------------------------------------------
     # ---------------
