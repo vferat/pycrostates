@@ -2,7 +2,7 @@ import itertools
 from typing import Tuple
 from copy import deepcopy
 
-import scipy
+import scipy.signal
 import numpy as np
 from mne import BaseEpochs, pick_info
 from mne.io import BaseRaw, RawArray
