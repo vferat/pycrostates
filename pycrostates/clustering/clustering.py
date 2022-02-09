@@ -115,15 +115,13 @@ def _segment(data, states, half_window_size=3, factor=0, crit=10e-6):
 
     labels_all = np.argmax(np.abs(np.dot(states, data)), axis=0)
 
-    # TODO: Check parenthesis for each Vvar; doesn't look consistent.
 
     if factor != 0:
         w = np.zeros((Nu, Nt))
         w[(rmat == labels_all)] = 1
         e = np.sum(
-            Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) ** 2 /
+            Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) ** 2) / \
             (Nt * (Ne - 1))
-            )
 
         window = np.ones((1, 2*half_window_size+1))
 
