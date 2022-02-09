@@ -97,7 +97,7 @@ def set_log_level(verbose, return_old_level=False):
         Logger verbosity.
     """
     _check_type(verbose, (bool, str, int, None), item_name='verbose')
-    old_verbose= logger.level
+    old_verbose = logger.level
     if verbose is None:
         verbose = 'INFO'
     logger.setLevel(verbose)
