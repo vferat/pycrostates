@@ -4,4 +4,3 @@ pytest-cov
 flake8
 twine
 wheel
-pooch

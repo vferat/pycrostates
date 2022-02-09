@@ -8,16 +8,16 @@ This example demonstrates how to extract global field power (gfp) peaks for an e
 # %%
 # We start by loading some example data:
 import mne
-from mne.io import read_raw_edf
-from mne.datasets import eegbci
-from mne.channels import make_standard_montage
-subject = 1
-runs = [1]
+from mne.io import read_raw_eeglab
 
-raw_fnames = eegbci.load_data(subject, runs, update_path=True)[0]
-raw = read_raw_edf(raw_fnames, preload=True)
+from pycrostates.datasets import lemon
+
+
+raw_fname = lemon.load_data(subject_id='010004', condition='EC')
+raw = read_raw_eeglab(raw_fname, preload=True)
+
 raw.pick('eeg')
-
+raw.set_eeg_reference('average')
 # %%
 # We can then use the :func:`~pycrostates.preprocessing.extract_gfp_peaks` function to extract samples with highest global field power.
 # The min_peak_distance allow to select the minimum number of sample beween 2 selected peaks.

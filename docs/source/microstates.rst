@@ -27,16 +27,3 @@ Pycrostates implements a conveniente class :class:`pycrostates.clustering.ModKMe
 allowing to perform clustering through the :meth:`pycrostates.clustering.ModKMeans.fit` method
 and backfitting throught the :meth:`pycrostates.clustering.ModKMeans.predict` method.
 It also implements other methods to facilitate the analysis and display of results.
-
-How to choose the number of clusters ?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-How many maps should I use for my analysis? 4, 5, 7 or 12? This question comes up many times in the scientific debate.
-While some software lets the user choose a predefined number, others rely on metacriterion calculations to choose that number for you.
-Pycrostates will not calculate this number for you, as there is currently no reliable method to determine it. 
-However, it offers several metrics to assess the clustering quality that could gives indications on which number of clusters is the most appropriate.
-These measures are grouped together in the  :mod:`pycrostates.metrics` module.
-
-
-The canonical maps
-^^^^^^^^^^^^^^^^^^

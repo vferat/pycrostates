@@ -5,10 +5,10 @@ from mne import BaseEpochs
 from mne.io import BaseRaw, RawArray
 from mne.preprocessing.ica import _check_start_stop
 
-from .. import logger
-from ..utils._logs import verbose
+from ..utils._logs import logger, verbose
 from ..utils._docs import fill_doc
-from ..utils._checks import _check_type, _check_random_state
+from ..utils._checks import _check_type
+from ..utils.utils import _copy_info
 
 
 def _extract_gfps(data, min_peak_distance=2):
@@ -18,7 +18,7 @@ def _extract_gfps(data, min_peak_distance=2):
     ----------
     min_peak_dist : int
         Required minimal horizontal distance (>= 1) in samples between
-        neighbouring peaks. Smaller peaks are removed first until the condition
+        neighboring peaks. Smaller peaks are removed first until the condition
         is fulfilled for all remaining peaks. Default to 2.
     X : array-like, shape ``(n_channels, n_samples)``
         The data to extrat Gfp peaks, row by row. scipy.sparse matrices should
@@ -38,20 +38,20 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
     """Perform GFP peaks extraction.
 
     Extract global field power peaks from :class:`mne.Epochs` or
-    `~mne.io.Raw`.
+    :class:`~mne.io.Raw`.
 
-    .. warning:: The temporal dimension of the output `~mne.io.Raw`
-                 object has been destroyed. This object is a convinient
+    .. warning:: The temporal dimension of the output :class:`~mne.io.Raw`
+                 object will be destroyed. This object is a convenient
                  container for GFP peaks and should not be used for standart
                  MEEG analysis.
 
     Parameters
     ----------
-    inst : `~mne.io.Raw`, `~mne.Epochs`
+    inst : :class:`~mne.io.Raw`, :class:`~mne.Epochs`
         Instance from which to extract GFP peaks.
     min_peak_dist : int
         Required minimal horizontal distance (>= 1) in samples between
-        neighbouring peaks. Smaller peaks are removed first until the
+        neighboring peaks. Smaller peaks are removed first until the
         is fulfilled for all remaining peaks. Default to 2.
     reject_by_annotation : bool
         Whether to reject by annotation. If True (default), segments annotated
@@ -63,7 +63,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
 
     Returns
     -------
-    raw : `~mne.io.Raw`
+    raw : :class:`~mne.io.Raw`
         The Raw instance containing extracted GFP peaks.
     """
     _check_type(inst, (BaseRaw, BaseEpochs))
@@ -79,6 +79,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
             '%s GFP peaks extracted out of %s samples (%.2f%% of the original '
             'data).', peaks.shape[1], data.shape[-1],
             peaks.shape[1] / data.shape[-1] * 100)
+
     if isinstance(inst, BaseEpochs):
         data = inst.get_data()
         peaks = list()
@@ -92,8 +93,7 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
             'data).', peaks.shape[1], data.shape[0] * data.shape[2],
             peaks.shape[1] / (data.shape[0] * data.shape[2]) * 100)
 
-    info = inst.info.copy()
-    info['sfreq'] = -1
+    info = _copy_info(inst, sfreq=np.inf)
     raw_peaks = RawArray(data=peaks, info=info, verbose=False)
     return raw_peaks
 
@@ -102,20 +102,21 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
 @verbose
 def resample(inst, n_epochs=None, n_samples=None, coverage=None,
              replace=True, start=None, stop=None, reject_by_annotation=True,
-             random_state=None, verbose=None):
+             random_seed=None, verbose=None):
     """Resample recording into epochs of random samples.
 
-    Resample `~mne.io.Raw` or `~mne.epochs.Epochs` into ``n_epochs``
-    `~mne.io.Raw` each containing ``n_samples``` random samples of the
-    originial recording.
+    Resample :class:`~mne.io.Raw` or :class:`~mne.epochs.Epochs`
+    into ``n_epochs`` :class:`~mne.io.Raw` each containing
+    ``n_samples`` random samples of the original recording.
 
-    .. warning:: The temporal dimension of the output `~mne.io.Raw` objects
-                 has been destroyed. These objects should not be used for
-                 standart MEEG analysis.
+    .. warning:: The temporal dimension of the output :class:`~mne.io.Raw`
+                 object will be destroyed. This object is a convenient
+                 container for GFP peaks and should not be used for standart
+                 MEEG analysis.
 
     Parameters
     ----------
-    inst : `~mne.io.Raw`, `~mne.Epochs`
+    inst : :class:`~mne.io.Raw`, :class:`~mne.Epochs`
         Instance from which to extract GFP peaks.
     n_epochs : int
         Number of epoch to draw.
@@ -131,26 +132,26 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
         Whether to reject by annotation. If True (default), segments annotated
         with description starting with ‘bad’ are omitted. If False, no
         rejection is done.
-    %(raw_tmin)s
-    %(raw_tmax)s
-    %(random_state)s
+    random_seed : float
         As resampling can be non-deterministic it can be useful to fix the
         random state to have reproducible results.
+    %(raw_tmin)s
+    %(raw_tmax)s
     %(verbose)s
-
-    Notes
-    -----
-    Only two of n_epochs, n_samples and coverage parameters must be defined,
-    the non-defined one being computed during function execution.
 
     Returns
     -------
-    raw : list of `~mne.io.Raw`
-        Raw objects each containing resampled data (n_epochs raws of n_samples
-        samples).
+    raw : list of :class:`~mne.io.Raw`
+        Raw objects each containing resampled data
+        (n_epochs raws of n_samples samples).
+
+    Notes
+    -----
+    Only two of ``n_epochs``, ``n_samples`` and ``coverage``
+    parameters must be defined, the non-defined one being
+    computed during function execution.
     """
     _check_type(inst, (BaseRaw, BaseEpochs))
-    random_state = _check_random_state(random_state)
 
     if isinstance(inst, BaseRaw):
         reject_by_annotation = 'omit' if reject_by_annotation else None
@@ -192,6 +193,7 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
         'Resampling instance into %s epochs of %s covering %.2f%% of the '
         'original data.', n_epochs, n_samples, coverage * 100)
 
+    random_state = np.random.RandomState(random_seed)
     if replace:
         indices = random_state.randint(0, n_samples,
                                        size=(n_epochs, n_samples))
@@ -204,8 +206,9 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
     data = data[:, indices]
     data = np.swapaxes(data, 0, 1)
 
+    info = _copy_info(inst, sfreq=np.inf)
     resamples = list()
     for d in data:
-        raw = RawArray(d, info=inst.info, verbose=False)
+        raw = RawArray(d, info=info, verbose=False)
         resamples.append(raw)
     return resamples

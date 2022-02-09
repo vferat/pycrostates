@@ -11,34 +11,31 @@ from mne.annotations import _annotations_starts_stops
 from mne.io.pick import _picks_to_idx
 from mne.preprocessing.ica import _check_start_stop
 
-from .. import logger
 from ..viz import plot_cluster_centers
 from ..segmentation import RawSegmentation, EpochsSegmentation
 from ..utils import _corr_vectors
-from ..utils._logs import verbose
+from ..utils._logs import logger, verbose
 from ..utils._docs import fill_doc
-from ..utils._checks import (_check_type, _check_ch_names, _check_n_jobs,
-                             _check_random_state)
+from ..utils._checks import (_check_type, _check_ch_names, _check_n_jobs)
 
 
 @verbose
 def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
-                  random_state=None, verbose=None):
+                  random_seed=None, verbose=None):
     """
     Comptues maps.
     Based on mne_microstates by Marijn van Vliet <w.m.vanvliet@gmail.com>
     https://github.com/wmvanvliet/mne_microstates/blob/master/microstates.py
     """
-    if not isinstance(random_state, np.random.RandomState):
-        random_state = np.random.RandomState(random_state)
     # -- handle zeros maps --
     # zero map can be due to non data in the recording, it's unlikly that all
-    # channels recorded the same value at the same time (=0 due to avergare
+    # channels recorded the same value at the same time (=0 due to average
     # reference)
     data = data[:, np.linalg.norm(data.T, axis=1) != 0]
     n_channels, n_samples = data.shape
     data_sum_sq = np.sum(data ** 2)
     # Select random timepoints for our initial topographic maps
+    random_state = np.random.RandomState(random_seed)
     init_times = random_state.choice(n_samples, size=n_states, replace=False)
     maps = data[:, init_times].T
     maps /= np.linalg.norm(maps, axis=1, keepdims=True)  # Normalize the maps
@@ -83,12 +80,12 @@ def _compute_maps(data, n_states=4, max_iter=1000, tol=1e-6,
 
 @verbose
 def _run_mod_kmeans(data: np.ndarray, n_clusters=4,
-                    max_iter=100, random_state=None,
+                    max_iter=100, random_seed=None,
                     tol=1e-6, verbose=None
                     ) -> Tuple[float, np.ndarray, np.ndarray]:
     gfp_sum_sq = np.sum(data ** 2)
     maps = _compute_maps(data, n_clusters, max_iter=max_iter,
-                         random_state=random_state, tol=tol, verbose=verbose)
+                         random_seed=random_seed, tol=tol, verbose=verbose)
     activation = maps.dot(data)
     segmentation = np.argmax(np.abs(activation), axis=0)
     map_corr = _corr_vectors(data, maps[segmentation].T)
@@ -166,7 +163,7 @@ def _rejected_first_last_segments(segmentation):
     return segmentation
 
 
-def _reject_small_segments(segmentation, data, min_segment_lenght):
+def _reject_small_segments(segmentation, data, min_segment_length):
     new_segmentation = segmentation.copy()
     small_segment = True
     while small_segment:
@@ -176,7 +173,7 @@ def _reject_small_segments(segmentation, data, min_segment_lenght):
         small_segment = False
         for i, segment in enumerate(segments):
             if i not in [0, len(segments)-1]:
-                if len(segment) <= min_segment_lenght and segment[0] != 0:
+                if len(segment) < min_segment_length and segment[0] != 0:
                     small_segment = True
                     left_idx = current_idx
                     right_idx = current_idx + len(segment)
@@ -202,6 +199,7 @@ def _reject_small_segments(segmentation, data, min_segment_lenght):
     return new_segmentation
 
 
+@fill_doc
 class BaseClustering:
     """Base Class for Microstate Clustering algorithms.
 
@@ -210,15 +208,7 @@ class BaseClustering:
     n_clusters : int
         The number of clusters to form as well as the number of centroids to
         generate.
-    picks : str | list | slice | None
-        Channels to include. Slices and lists of integers will be interpreted
-        as channel indices. In lists, channel type strings (e.g.,
-        ['meg', 'eeg']) will pick channels of those types, channel name strings
-        (e.g., ['MEG0111', 'MEG2623'] will pick the given channels.
-        Can also be the string values “all” to pick all channels, or “data” to
-        pick data channels. None will pick all channels.
-        Note that channels in info['bads'] will be included if their names or
-        indices are explicitly provided. Default to 'eeg'.
+    %(picks)s
 
     Attributes
     ----------
@@ -227,13 +217,12 @@ class BaseClustering:
         generate.
     current_fit : bool
         Flag informing about which data type (raw, epochs or evoked) was used
-        for the fit.
+        for fitting.
     cluster_centers_ : `~numpy.array`, shape ``(n_clusters, n_channels)``
-            Cluster centers (i.e Microstates maps).
+            Cluster centers (i.e Microstates topographies).
     info : dict
             :class:`Measurement info <mne.Info>` of fitted instance.
-    picks : str | list | slice | None
-            picks.
+    %(picks)s
     """
     def __init__(self, n_clusters=4, picks='eeg'):
         self.n_clusters = n_clusters
@@ -260,7 +249,7 @@ class BaseClustering:
 
     def get_cluster_centers(self):
         """
-        Get cluster centers as a `~numpy.array`.
+        Get cluster centers as a :class:`~numpy.ndarray`.
         """
         self._check_fit()
         cluster_centers = self.cluster_centers_.copy()
@@ -268,7 +257,7 @@ class BaseClustering:
 
     def get_cluster_centers_as_raw(self):
         """
-        Get cluster centers as a :class:`~mne.io.Raw`
+        Get cluster centers as a :class:`~mne.io.Raw` instance.
         """
         self._check_fit()
         cluster_centers_raw = RawArray(self.cluster_centers_.T, self.info)
@@ -295,7 +284,7 @@ class BaseClustering:
 
     @verbose
     def _predict_raw(self, raw, picks, reject_by_annotation, half_window_size,
-                     factor, crit, min_segment_lenght,
+                     factor, crit, min_segment_length,
                      rejected_first_last_segments, verbose=None):
         data = raw.get_data(picks=picks)
         if not reject_by_annotation:
@@ -332,9 +321,9 @@ class BaseClustering:
                             labels = _rejected_first_last_segments(labels)
                         segmentation[end:onset] = labels
 
-        if min_segment_lenght > 0:
+        if min_segment_length > 0:
             segmentation = _reject_small_segments(
-                segmentation, data, min_segment_lenght)
+                segmentation, data, min_segment_length)
 
         segmentation = RawSegmentation(segmentation=segmentation,
                                        inst=raw,
@@ -344,7 +333,7 @@ class BaseClustering:
 
     @verbose
     def _predict_epochs(self, epochs, picks, half_window_size, factor, crit,
-                        min_segment_lenght, rejected_first_last_segments,
+                        min_segment_length, rejected_first_last_segments,
                         verbose=None):
         data = epochs.get_data(picks=picks)
         segments = list()
@@ -352,9 +341,9 @@ class BaseClustering:
             segment = _segment(epoch, self.cluster_centers_,
                                half_window_size, factor, crit)
 
-            if min_segment_lenght > 0:
+            if min_segment_length > 0:
                 segment = _reject_small_segments(segment, epoch,
-                                                 min_segment_lenght)
+                                                 min_segment_length)
 
             if rejected_first_last_segments:
                 segment = _rejected_first_last_segments(segment)
@@ -366,21 +355,21 @@ class BaseClustering:
             cluster_centers=self.cluster_centers_, names=self.names)
         return segmentation
 
-    @fill_doc
     @verbose
+    @fill_doc
     def predict(self,  inst,
                 reject_by_annotation=True,
                 factor=0,
                 half_window_size=3,
                 crit=10e-6,
-                min_segment_lenght=0,
+                min_segment_length=0,
                 rejected_first_last_segments=True,
                 verbose=None):
         """Predict Microstates labels using competitive fitting.
 
         Parameters
         ----------
-        inst : `~mne.io.Raw`, `~mne.Epochs`
+        inst : :class:`~mne.io.Raw` or :class:`~mne.Epochs`
             Instance containing data to predict.
         factor: int
             Factor used for label smoothing. 0 means no smoothing.
@@ -388,30 +377,31 @@ class BaseClustering:
         half_window_size: int
             Number of samples used for the half windows size while smoothing
             labels.
-            Has no ffect if factor = 0.
+            Has no effect if factor = 0.
             Window size = 2 * half_window_size + 1
         crit: float
             Converge criterion. Default to 10e-6.
-        min_segment_lenght: int
+        min_segment_length: int
             Minimum segment length (in samples). If a segment is shorter than
-            this value, it will be recursively reasigned to neighbouring
+            this value, it will be recursively reassigned to neighboring
             segments based on absolute spatial correlation.
         rejected_first_last_segments: bool
             If True, set first and last segments to unlabeled.
             Default to True.
         reject_by_annotation : bool
             Whether to reject by annotation. If True (default), segments
-            annotated with description starting with ‘bad’ are omitted.
+            annotated with description starting with `bad` are assign
+            as 'unlabelled' (i.e. 0).
             If False, no rejection is done.
         %(verbose)s
 
         Returns
         ----------
-        segmentation : `~numpy.ndarray`
-            Microstate sequence derivated from Instance data. Timepoints are
+        segmentation :class:`~pycrostates.segmentation.RawSegmentation` or :class:`~pycrostates.segmentation.EpochsSegmentation`
+            Microstate sequence derivated from istance data. Timepoints are
             labeled according to cluster centers number: 1 for the first
             center, 2 for the second ect.. 0 is used for unlabeled time points.
-        """
+        """ # noqa
         self._check_fit()
         _check_type(inst, (BaseRaw, BaseEpochs))
         inst = inst.copy()
@@ -428,10 +418,10 @@ class BaseClustering:
             logger.info(
                 'Segmenting data with factor %s and effective smoothing '
                 'window size: %s (ms)',
-                factor, (2*half_window_size+1) / inst.info["sfreq"])
-        if min_segment_lenght > 0:
+                factor, (2*half_window_size+1) / inst.info["sfreq"] * 1000)
+        if min_segment_length > 0:
             logger.info('Rejecting segments shorter than %s (ms)',
-                        min_segment_lenght / inst.info["sfreq"])
+                        min_segment_length / inst.info["sfreq"] * 1000)
         if rejected_first_last_segments:
             logger.info('Rejecting first and last segment')
 
@@ -442,7 +432,7 @@ class BaseClustering:
                 reject_by_annotation=reject_by_annotation,
                 half_window_size=half_window_size,
                 factor=factor, crit=crit,
-                min_segment_lenght=min_segment_lenght,
+                min_segment_length=min_segment_length,
                 rejected_first_last_segments=rejected_first_last_segments,
                 verbose=verbose)
 
@@ -452,7 +442,7 @@ class BaseClustering:
                 picks=picks,
                 half_window_size=half_window_size,
                 factor=factor, crit=crit,
-                min_segment_lenght=min_segment_lenght,
+                min_segment_length=min_segment_length,
                 rejected_first_last_segments=rejected_first_last_segments,
                 verbose=verbose)
         return segmentation
@@ -462,8 +452,10 @@ class BaseClustering:
 
         Returns
         ----------
-        fig : matplotlib.figure.Figure
-            The figure.
+        fig : :class:`matplotlib.figure.Figure`
+            Figure
+        ax : :class:`matplotlib.axes.Axes`
+            Axis
         """
         self._check_fit()
         fig, axs = plot_cluster_centers(self.cluster_centers_, self.info,
@@ -481,7 +473,7 @@ class BaseClustering:
 
         Returns
         ----------
-        self : self
+        self : instance of :class:`pycrostates.clustering.BaseClustering`
             The modfied instance.
         """
         # TODO: should use a similar system to mapping types/names on ch in MNE
@@ -497,7 +489,7 @@ class BaseClustering:
         self.names = names
 
     def reorder(self, order: list):
-        """Reorder cluster centers. Operate in place.
+        """Reorder cluster centers. Operates in place.
 
         Parameters
         ----------
@@ -506,10 +498,12 @@ class BaseClustering:
 
         Returns
         ----------
-        self : self
+        self : instance of :class:`pycrostates.clustering.BaseClustering`
             The modfied instance.
         """
         self._check_fit()
+        if len(order) != self.n_clusters:
+            raise ValueError('Order contains unexpected values')
         if (np.sort(order) != np.arange(0, self.n_clusters, 1)).any():
             raise ValueError('Order contains unexpected values')
 
@@ -540,42 +534,38 @@ class ModKMeans(BaseClustering):
 
     Parameters
     ----------
-    n_clusters : int
-        The number of clusters to form as well as the number of centroids to
-        generate.
-    %(random_state)s
-        As estimation can be non-deterministic it can be useful to fix the
-        random state to have reproducible results.
+    %(n_clusters)s
+    %(picks)s
     n_init : int
         Number of time the k-means algorithm will be run with different
         centroid seeds. The final result will be the run with highest global
-        explained variance. Default=100
+        explained variance. Default=100.
     max_iter : int
-        Maximum number of iterations of the k-means algorithm for a single run.
-        Default=300
+        Maximum number of iterations of the k-means algorithm
+        for a single run.
+        Default=300.
     tol : float
         Relative tolerance with regards estimate residual noise in the cluster
         centers of two consecutive iterations to declare convergence.
+    %(random_seed)s
 
     Attributes
     ----------
-    n_clusters : int
-        The number of clusters to form as well as the number of centroids to
-        generate.
+    %(n_clusters)s
     current_fit : bool
-        Flag informing about which data type (raw, epochs or evoked) was used
-        for the fit.
-    cluster_centers_ : `~numpy.array`, shape ``(n_clusters, n_channels)``
-        If fitted, cluster centers (i.e Microstates maps)
+        Flag informing about which instance type
+        (:class:`~mne.io.Raw` or :class:`~mne.Epochs`)
+        was used for the fit.
     info : dict
-        If fitted, :class:`Measurement info <mne.Info>` of fitted instance,
-        else None
+        If fitted, :class:`~mne.Info` of fitted instance, else None.
+    cluster_centers_ : :class:`numpy.ndarray`, shape (n_clusters, n_channels)
+        If fitted, cluster centers (i.e Microstates maps).
     GEV_ : float
         If fitted, the Global explained Variance explained all clusters
         centers.
     """
     def __init__(self,
-                 random_state=None,
+                 random_seed=None,
                  n_init=100,
                  max_iter=300,
                  tol=1e-6,
@@ -584,19 +574,21 @@ class ModKMeans(BaseClustering):
         self.n_init = n_init
         self.max_iter = max_iter
         self.tol = tol
-        self.random_state = _check_random_state(random_state)
+        self.random_seed = random_seed
+        self.info = None
 
     def _fit_data(self, data: np.ndarray,  n_jobs: int = 1, verbose=None):
         logger.info('Running Kmeans for %s clusters centers with %s random '
                     'initialisations.', self.n_clusters, self.n_init)
-        inits = self.random_state.randint(
+        random_state = np.random.RandomState(self.random_seed)
+        inits = random_state.randint(
             low=0, high=100*self.n_init, size=(self.n_init))
         if n_jobs == 1:
             best_gev = 0
             for init in inits:
                 gev, maps, segmentation = _run_mod_kmeans(
                     data, n_clusters=self.n_clusters,
-                    max_iter=self.max_iter, random_state=init,
+                    max_iter=self.max_iter, random_seed=init,
                     tol=self.tol, verbose=verbose)
                 if gev > best_gev:
                     best_gev, best_maps, best_segmentation = \
@@ -607,7 +599,7 @@ class ModKMeans(BaseClustering):
                                                n_jobs=n_jobs)
             runs = parallel(
                 p_fun(data, n_clusters=self.n_clusters, max_iter=self.max_iter,
-                      random_state=init, tol=self.tol, verbose=verbose)
+                      random_seed=init, tol=self.tol, verbose=verbose)
                 for init in inits)
             gevs = [run[0] for run in runs]
             best_run = np.argmax(gevs)
@@ -616,23 +608,21 @@ class ModKMeans(BaseClustering):
         return best_maps, best_gev, best_segmentation
 
     @verbose
+    @fill_doc
     def fit(self, inst, start=None, stop=None, reject_by_annotation=True,
             n_jobs=1, verbose=None):
-        """Segment Instance into microstate sequence.
+        """Segment instance into microstate sequence.
 
         Parameters
         ----------
-        inst : `~mne.io.Raw`, `~mne.Epochs`
+        inst : ~mne.io.Raw or  ~mne.Epochs
             Instance containing data to transform to cluster-distance space
             (absolute spatial correlation).
-        reject_by_annotation : bool
-            Whether to reject by annotation. If True (default), segments
-            annotated with description starting with ‘bad’ are omitted.
-            If False, no rejection is done.
-        %(n_jobs)s
+        %(reject_by_annotation_raw)s
         %(raw_tmin)s
         %(raw_tmax)s
-        %(verbose)s
+        %(verbose_meth)s
+        %(n_jobs)s
         """
         _check_type(inst, (BaseRaw, BaseEpochs))
         n_jobs = _check_n_jobs(n_jobs)
