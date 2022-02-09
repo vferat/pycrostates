@@ -3,11 +3,14 @@ from copy import copy, deepcopy
 from typing import Union
 
 from mne import BaseEpochs, pick_info
+from mne.annotations import _annotations_starts_stops
 from mne.io import BaseRaw
 from mne.io.pick import _picks_to_idx
 import numpy as np
+from scipy.signal import convolve2d
 
 from .. import logger
+from ..segmentation import RawSegmentation, EpochsSegmentation
 from ..utils._checks import _check_type, _check_value, _check_n_jobs
 from ..utils._docs import fill_doc
 from ..utils._logs import verbose
@@ -281,8 +284,200 @@ class _BaseCluster(ABC):
         _check_type(min_segment_lenght, ('int', ),
                     item_name='min_segment_lenght')
         _check_type(reject_edges, (bool, ), item_name='reject_edges')
-        _check_type(reject_by_annotation, (bool, ),
+        _check_type(reject_by_annotation, (bool, str),
                     item_name='reject_by_annotation')
+        if isinstance(reject_by_annotation, str):
+            if reject_by_annotation == 'omit':
+                reject_by_annotation = True
+            else:
+                logger.warning(
+                    "'reject_by_annotation' can be set to 'True', 'False' or "
+                    "'omit' (True). '%s' is not supported. Setting to "
+                    "'False'.", reject_by_annotation)
+
+        # check that the channels match
+        info = pick_info(inst.info, self._picks)
+        if self.info['ch_names'] != info['ch_names'] or \
+            self.info['chs'] != info['chs']:
+            raise ValueError(
+                'Instance to segment into microstate sequence does not have '
+                'the same channels as the instance used for fitting.')
+
+        # logging messages
+        if factor == 0:
+            logger.info('Segmenting data without smoothing')
+        else:
+            logger.info(
+                'Segmenting data with factor %s and effective smoothing '
+                'window size: %s (ms).', factor,
+                (2*half_window_size+1) / inst.info["sfreq"])
+        if min_segment_lenght > 0:
+            logger.info('Rejecting segments shorter than %s (ms).',
+                        min_segment_lenght / inst.info["sfreq"])
+        if reject_edges:
+            logger.info('Rejecting first and last segments.')
+
+        if isinstance(inst, BaseRaw):
+            segmentation = self._predict_raw(
+                inst, self._picks, factor, tol, half_window_size,
+                min_segment_lenght, reject_edges, reject_by_annotation)
+        elif isinstance(inst, BaseEpochs):
+            segmentation = self._predict_epochs(
+                inst, self._picks, factor, tol, half_window_size,
+                min_segment_lenght, reject_edges)
+        return segmentation
+
+    def _predict_raw(self, raw, picks, factor, tol, half_window_size,
+                     min_segment_lenght, reject_edges, reject_by_annotation):
+        """Create segmentation for raw."""
+        data = raw.get_data(picks=picks)
+
+        if reject_by_annotation:
+            # retrieve onsets/ends for BAD annotations
+            onsets, ends = _annotations_starts_stops(raw, ['BAD'])
+            onsets = onsets.tolist() + [data.shape[-1] - 1]
+            ends = [0] + ends.tolist()
+
+            segmentation = np.zeros(data.shape[-1])
+
+            for onset, end in zip(onsets, ends):
+                # small segments can't be smoothed
+                factor_ = factor \
+                    if onset - end >= 2 * half_window_size + 1 else 0
+
+                data_ = data[:, end:onset]
+                segment = _BaseCluster._segment(
+                    data_, self._cluster_centers, factor_, tol,
+                    half_window_size)
+                if reject_edges:
+                    segment = _BaseCluster._reject_edge_segments(segment)
+                segmentation[end:onset] = segment
+
+        else:
+            segmentation = _BaseCluster._segment(
+                data, self._cluster_centers, factor, tol, half_window_size)
+            if reject_edges:
+                segmentation = _BaseCluster._reject_edge_segments(segmentation)
+
+        if 0 < min_segment_lenght:
+            segmentation = _BaseCluster._reject_short_segments(
+                segmentation, data, min_segment_lenght)
+
+        return RawSegmentation(segmentation=segmentation, inst=raw,
+                               cluster_centers=self._cluster_centers,
+                               names=self._clusters_names)
+
+    def _predict_epochs(self, epochs, picks, factor, tol, half_window_size,
+                        min_segment_lenght, reject_edges):
+        """Create segmentation for epochs."""
+        data = epochs.get_data(picks=picks)
+        segments = list()
+        for epoch_data in data:
+            segment = _BaseCluster._segment(epoch_data, self._cluster_centers,
+                                            factor, tol, half_window_size)
+
+            if 0 < min_segment_lenght:
+                segment = _BaseCluster._reject_short_segments(
+                    segment, epoch_data, min_segment_lenght)
+            if reject_edges:
+                segment = _BaseCluster._reject_edge_segments(segment)
+
+            segments.append(segment)
+
+        return EpochsSegmentation(segmentation=np.array(segments), inst=epochs,
+                                  cluster_centers=self._cluster_centers,
+                                  names=self._clusters_names)
+
+    # --------------------------------------------------------------------
+    @staticmethod
+    def _segment(data, states, factor, tol, half_window_size):
+        """Create segmentation."""
+        data -= np.mean(data, axis=0)
+        std = np.std(data, axis=0)
+        std[std == 0] = 1  # std == 0 -> null map
+        data /= std
+
+        # TODO: Remove transpose and change axis
+        states = states.T
+        states -= np.mean(states, axis=0)
+        states /= np.std(states, axis=0)
+        states = states.T
+
+        labels = np.argmax(np.abs(np.dot(states, data)), axis=0)
+
+        if factor != 0:
+            _BaseCluster._smooth_segmentation(data, states, labels, factor,
+                                              tol, half_window_size)
+        return labels + 1
+
+    @staticmethod
+    def _smooth_segmentation(data, states, labels, factor, tol,
+                             half_window_size):
+        """Apply smooting. Adapted from [1]
+
+        References
+        ----------
+        .. [1] R. D. Pascual-Marqui, C. M. Michel and D. Lehmann.
+            Segmentation of brain electrical activity into microstates:
+            model estimation and validation.
+            IEEE Transactions on Biomedical Engineering,
+            vol. 42, no. 7, pp. 658-665, July 1995,
+            https://doi.org/10.1109/10.391164."""
+        # TODO: Check the smooting equations
+        Ne, Nt = data.shape
+        Nu = states.shape[0]
+        Vvar = np.sum(data * data, axis=0)
+        rmat = np.tile(np.arange(0, Nu), (Nt, 1)).T
+
+        w = np.zeros((Nu, Nt))
+        w[(rmat == labels)] = 1
+        e = np.sum(
+            Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) ** 2) / \
+            (Nt * (Ne - 1))
+        window = np.ones((1, 2 * half_window_size + 1))
+
+        S0 = 0
+        while True:
+            Nb = convolve2d(w, window, mode='same')
+            x = (np.tile(Vvar, (Nu, 1)) - (np.dot(states, data)) ** 2) / \
+                (2 * e * (Ne - 1)) - factor * Nb
+            dlt = np.argmin(x, axis=0)
+
+            labels = dlt
+            w = np.zeros((Nu, Nt))
+            w[(rmat == labels)] = 1
+            Su = np.sum(Vvar - \
+                        np.sum(np.dot(w.T, states).T * data, axis=0) ** 2) / (Nt * (Ne - 1))
+            if np.abs(Su - S0) <= np.abs(tol * Su):
+                break
+            S0 = Su
+
+        return labels
+
+    @staticmethod
+    def _reject_edge_segments(segmentation):
+        """Set the first and last segment as unlabeled (0)."""
+        # TODO: Could be vectorized
+
+        # set first segment to unlabeled
+        i = 0
+        first_label = segmentation[i]
+        if first_label != 0:
+            while segmentation[i] == first_label and i < len(segmentation) - 1:
+                segmentation[i] = 0
+                i += 1
+        # set last segment to unlabeled
+        i = len(segmentation) - 1
+        last_label = segmentation[i]
+        if last_label != 0:
+            while segmentation[i] == last_label and i > 0:
+                segmentation[i] = 0
+                i -= 1
+
+    @staticmethod
+    def _reject_short_segments(segmentation, epoch, min_segment_length):
+        """Reject segments that are too short."""
+        return segmentation
 
     # --------------------------------------------------------------------
     @property
