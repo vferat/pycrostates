@@ -1,3 +1,3 @@
-from .clustering import ModKMeans, BaseClustering  # noqa: F401
+from .kmeans import KMeans  # noqa: F401
 
-__all__ = ('ModKMeans', 'BaseClustering')
+__all__ = ('KMeans', )
