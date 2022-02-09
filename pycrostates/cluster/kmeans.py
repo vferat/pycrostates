@@ -66,6 +66,7 @@ class KMeans(_BaseCluster):
 
         if n_jobs == 1:
             best_gev, best_maps, best_segmentation = None, None, None
+            count_converged = 0
             for init in inits:
                 gev, maps, segmentation, converged = KMeans._kmeans(
                     data, self._n_clusters, self._max_iter, init, self._tol)
@@ -74,6 +75,7 @@ class KMeans(_BaseCluster):
                 if best_gev is None or gev > best_gev:
                     best_gev, best_maps, best_segmentation = \
                         gev, maps, segmentation
+                count_converged += 1
         else:
             parallel, p_fun, _ = parallel_func(
                 KMeans._kmeans, n_jobs, total=self._n_init)
@@ -85,9 +87,12 @@ class KMeans(_BaseCluster):
                 best_gev, best_maps, best_segmentation = runs[best_run]
             except ValueError:
                 best_gev, best_maps, best_segmentation = None, None, None
+            count_converged = sum(run[4] for run in runs)
 
         if best_gev is not None:
-            logger.info('Selecting run with highest GEV = %.2f%%.', best_gev)
+            logger.info('Selecting run with highest GEV = %.2f%% after %i/%i '
+                        'iteration converged.', best_gev, count_converged,
+                        self._max_iter)
         else:
             logger.warning(
                 'All the K-means run failed to converge. Please adapt the '
