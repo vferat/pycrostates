@@ -10,9 +10,9 @@ from ..utils._logs import _set_verbose
 
 
 @fill_doc
-class KMeans(_BaseCluster):
+class ModKMeans(_BaseCluster):
     """
-    K-Means clustering algorithms.
+    Modified K-Means clustering algorithms.
 
     Parameters
     ----------
@@ -41,9 +41,9 @@ class KMeans(_BaseCluster):
         self._clusters_names = [str(k) for k in range(1, self.n_clusters + 1)]
 
         # k-means settings
-        self._n_init = KMeans._check_n_init(n_init)
-        self._max_iter = KMeans._check_max_iter(max_iter)
-        self._tol = KMeans._check_tol(tol)
+        self._n_init = ModKMeans._check_n_init(n_init)
+        self._max_iter = ModKMeans._check_max_iter(max_iter)
+        self._tol = ModKMeans._check_tol(tol)
         self._random_state = _check_random_state(random_state)
 
         # fit variables
@@ -68,7 +68,7 @@ class KMeans(_BaseCluster):
             best_gev, best_maps, best_segmentation = None, None, None
             count_converged = 0
             for init in inits:
-                gev, maps, segmentation, converged = KMeans._kmeans(
+                gev, maps, segmentation, converged = ModKMeans._kmeans(
                     data, self._n_clusters, self._max_iter, init, self._tol)
                 if not converged:
                     continue
@@ -78,7 +78,7 @@ class KMeans(_BaseCluster):
                 count_converged += 1
         else:
             parallel, p_fun, _ = parallel_func(
-                KMeans._kmeans, n_jobs, total=self._n_init)
+                ModKMeans._kmeans, n_jobs, total=self._n_init)
             runs = parallel(
                 p_fun(data, self._n_clusters, self._max_iter, init, self._tol)
                 for init in inits)
@@ -114,8 +114,8 @@ class KMeans(_BaseCluster):
         Run the k-means algorithm.
         """
         gfp_sum_sq = np.sum(data ** 2)
-        maps, converged = KMeans._compute_maps(data, n_clusters, max_iter,
-                                               random_state, tol)
+        maps, converged = ModKMeans._compute_maps(data, n_clusters, max_iter,
+                                                  random_state, tol)
         activation = maps.dot(data)
         segmentation = np.argmax(np.abs(activation), axis=0)
         map_corr = _corr_vectors(data, maps[segmentation].T)
