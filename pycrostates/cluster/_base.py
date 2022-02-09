@@ -247,8 +247,8 @@ class _BaseCluster(ABC):
             if invert[k]:
                 self._cluster_centers[k] = - cluster
 
-    @fill_doc
     @verbose
+    @fill_doc
     def predict(self, inst, factor=0, half_window_size=3, tol=10e-6,
                 min_segment_lenght=0, reject_edges=True,
                 reject_by_annotation=True, *, verbose=None):
