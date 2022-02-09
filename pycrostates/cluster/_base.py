@@ -365,7 +365,21 @@ class _BaseCluster(ABC):
     @fitted.setter
     def fitted(self, fitted):
         """Property-setter used to reset all fit variables."""
-        pass
+        _check_type(fitted, (bool, ), item_name='fitted')
+        if fitted and not self._fitted:
+            logger.warning(
+                "The property 'fitted' can not be set to 'True' directly. "
+                "Please use the .fit() method to fit the clustering "
+                "algorithm.")
+        elif fitted and self._fitted:
+            logger.warning(
+                "The property 'fitted' can not be set to 'True' directly. "
+                "The clustering algorithm has already been fitted.")
+        else:
+            self._picks = None
+            self._info = None
+            self._fitted_data = None
+            self._fitted = False
 
     # --------------------------------------------------------------------
     @staticmethod

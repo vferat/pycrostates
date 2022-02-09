@@ -96,6 +96,7 @@ class KMeans(_BaseCluster):
             return  # break early
 
         # TODO: look what are the scikit-learn names (GEV_, labels_, ...)
+        # and set properties name accordingly
         self._GEV = best_gev
         self._cluster_centers = best_maps
         self._labels = best_segmentation
@@ -238,6 +239,14 @@ class KMeans(_BaseCluster):
             assert not self._fitted  # sanity-check
             logger.warning('Clustering algorithm has not been fitted.')
         return self._labels
+
+    @_BaseCluster.fitted.setter
+    @copy_doc(_BaseCluster.fitted.setter)
+    def fitted(self, fitted):
+        super(self.__class__, self.__class__).fitted.__set__(self, fitted)
+        if not fitted:
+            self._GEV = None
+            self._labels = None
 
     # --------------------------------------------------------------------
     # ---------------
