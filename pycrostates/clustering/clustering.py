@@ -375,6 +375,7 @@ class BaseClustering:
                 rejected_first_last_segments=True,
                 verbose=None):
         """Predict Microstates labels using competitive fitting.
+        Adapted from [1].
 
         Parameters
         ----------
@@ -409,7 +410,16 @@ class BaseClustering:
             Microstate sequence derivated from Instance data. Timepoints are
             labeled according to cluster centers number: 1 for the first
             center, 2 for the second ect.. 0 is used for unlabeled time points.
-        """
+            
+        References
+        ----------
+        .. [1] R. D. Pascual-Marqui, C. M. Michel and D. Lehmann.
+            Segmentation of brain electrical activity into microstates:
+            model estimation and validation.
+            IEEE Transactions on Biomedical Engineering,
+            vol. 42, no. 7, pp. 658-665, July 1995,
+            https://doi.org/10.1109/10.391164.
+        """ 
         self._check_fit()
         _check_type(inst, (BaseRaw, BaseEpochs))
         inst = inst.copy()
