@@ -21,7 +21,7 @@ steps:
     codeCoverageTool: Cobertura
     summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
 
-- script: |
-    pip install codecov
-    codecov --file coverage.xml
+- bash: |
+     bash <(curl -s https://codecov.io/bash)
+  condition: and(eq(variables['Agent.OS'], 'Linux' ), eq(variables['python.version'], '3.9' ))
   displayName: 'Upload to codecov.io'
