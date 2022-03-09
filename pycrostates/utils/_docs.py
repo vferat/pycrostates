@@ -10,12 +10,23 @@ from mne.utils.docs import docdict as docdict_mne
 # ------------------------- Documentation dictionary -------------------------
 docdict = dict()
 
-# Documentation to inc. from MNE
+# ---- Documentation to inc. from MNE ----
 keys = ['random_state', 'verbose', 'verbose_meth',
         'reject_by_annotation_raw', 'n_jobs',
-        'raw_tmin', 'raw_tmax']
+        'raw_tmin', 'raw_tmax', 'picks_all']
+
 for key in keys:
     docdict[key] = docdict_mne[key]
+# TODO: sphinx :term:`data channels` in 'picks_all' has to be included.
+
+# ---- Clusters ----
+docdict['fit_inst'] = """
+inst : `~mne.io.Raw` | `~mne.Epochs`
+    Instance containing data to transform to cluster-distance space
+    (absolute spatial correlation)."""
+docdict['predict_inst'] = """
+inst : `~mne.io.Raw` | `~mne.Epochs`
+    Instance containing data to predict."""
 
 docdict['n_clusters'] = """
 n_clusters : int

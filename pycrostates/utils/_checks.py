@@ -9,7 +9,7 @@ from mne.parallel import check_n_jobs
 from mne.utils import check_random_state
 
 
-def _ensure_int(item, *, item_name=None):
+def _ensure_int(item, item_name=None):
     """
     Ensure a variable is an integer.
 
@@ -66,7 +66,7 @@ _types = {
 }
 
 
-def _check_type(item, types, *, item_name=None):
+def _check_type(item, types, item_name=None):
     """
     Check that item is an instance of types.
 
@@ -108,7 +108,7 @@ def _check_type(item, types, *, item_name=None):
     return item
 
 
-def _check_value(item, allowed_values, *, item_name=None, extra=None):
+def _check_value(item, allowed_values, item_name=None, extra=None):
     """
     Check the value of a parameter against a list of valid options.
 
@@ -148,21 +148,6 @@ def _check_value(item, allowed_values, *, item_name=None, extra=None):
                                     options=options, item=item))
 
     return item
-
-
-def _check_ch_names(inst1, inst2, *, inst1_name=None, inst2_name=None):
-    """
-    Checks that both instance have the same channel names.
-    """
-    # TODO: Not a fan of this one; it's failing on hasttr(inst, 'ch_names')
-    # which should not be the case.
-    if inst1.info['ch_names'] != inst2.info['ch_names']:
-        inst1_name = "" if inst1_name is None else " '%s'" % inst1_name
-        inst2_name = "" if inst2_name is None else " '%s'" % inst2_name
-        msg = ("Instance{inst1_name} and instance{inst2_name} do not have "
-               "the same channels.")
-        raise ValueError(
-            msg.format(inst1_name=inst1_name, inst2_name=inst2_name))
 
 
 def _check_n_jobs(n_jobs):

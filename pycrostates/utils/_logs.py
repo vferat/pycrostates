@@ -1,9 +1,10 @@
+from decorator import FunctionMaker
 import sys
 import logging
 from pathlib import Path
-
-from decorator import FunctionMaker
 from typing import Any, Callable, TypeVar
+
+import mne
 
 from ._checks import _check_type
 from ._docs import fill_doc
@@ -148,14 +149,17 @@ _FuncT = TypeVar('_FuncT', bound=Callable[..., Any])
 
 def verbose(function: _FuncT) -> _FuncT:
     """Verbose decorator to allow functions to override log-level.
+
     Parameters
     ----------
     function : callable
         Function to be decorated by setting the verbosity level.
+
     Returns
     -------
     dec : callable
         The decorated function.
+
     Notes
     -----
     This decorator is used to set the verbose level during a function or method
@@ -222,6 +226,19 @@ class use_log_level():
 
     def __exit__(self, *args):  # noqa: D105
         set_log_level(self.old_level)
+
+
+def _set_verbose(verbose):
+    """
+    Similar to verbose decorator.
+
+    Parameters
+    ----------
+    verbose : int | str
+        Logger verbosity.
+    """
+    mne.set_log_level(verbose)
+    set_log_level(verbose)
 
 
 init_logger()

@@ -3,7 +3,7 @@ from pathlib import Path
 import mne
 from mne.datasets import testing
 
-from pycrostates.clustering import ModKMeans
+from pycrostates.cluster import ModKMeans
 
 
 dir_ = Path(testing.data_path()) / 'MEG' / 'sample'

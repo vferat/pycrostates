@@ -1,5 +1,9 @@
-import numpy as np
+from copy import deepcopy
+
 import mne
+import numpy as np
+
+from ._logs import logger
 
 
 def _corr_vectors(A, B, axis=0):
@@ -44,9 +48,54 @@ def _corr_vectors(A, B, axis=0):
 
 def _copy_info(inst, sfreq):
     ch_names = inst.info['ch_names']
-    ch_types = [mne.channel_type(inst.info, idx) for idx in range(0, inst.info['nchan'])] # noqa
+    ch_types = [mne.channel_type(inst.info, idx)
+                for idx in range(0, inst.info['nchan'])]
     new_info = mne.create_info(ch_names, sfreq=sfreq, ch_types=ch_types)
     if inst.get_montage():
         montage = inst.get_montage()
         new_info.set_montage(montage)
-    return(new_info)
+    return new_info
+
+
+def _compare_infos(info1, info2):
+    """
+    Checks that both info have the same channels.
+    """
+    if not info1['ch_names'] == info2['ch_names']:
+        raise ValueError(
+            'Instance to segment into microstates sequence does not have '
+            'the same channels as the instance used for fitting.')
+
+    # Extract loc arrays
+    loc1 = list()
+    for ch in info1['chs']:
+        loc1.append(deepcopy(ch['loc']))
+    loc2 = list()
+    for ch in info2['chs']:
+        loc2.append(deepcopy(ch['loc']))
+
+    # Compare loc
+    assert len(loc1) == len(loc2)  # sanity-check
+    for l1, l2 in zip(loc1, loc2):
+        if not np.allclose(l1, l2, equal_nan=True):
+            logger.warning(
+                'Instance to segment into microstates sequence does not have '
+                'the same channels montage as the instance used for fitting. ')
+            break
+
+    # Compare attributes in chs
+    if not all(ch1['kind'] == ch2['kind']
+               for ch1, ch2 in zip(info1['chs'], info2['chs'])):
+        logger.warning(
+            'Instance to segment into microstates sequence does not have '
+            'the same channels kinds as the instance used for fitting. ')
+    if not all(ch1['unit'] == ch2['unit']
+               for ch1, ch2 in zip(info1['chs'], info2['chs'])):
+        logger.warning(
+            'Instance to segment into microstates sequence does not have '
+            'the same channels units as the instance used for fitting. ')
+    if not all(ch1['coord_frame'] == ch2['coord_frame']
+               for ch1, ch2 in zip(info1['chs'], info2['chs'])):
+        logger.warning(
+            'Instance to segment into microstates sequence does not have '
+            'the same coordinate frames as the instance used for fitting. ')

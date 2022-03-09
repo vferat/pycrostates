@@ -26,7 +26,7 @@ This is the reference for classes (``CamelCase`` names) and functions
 
     most_used_classes
     datasets
-    clustering
+    cluster
     preprocessing
     segmentation
     viz
