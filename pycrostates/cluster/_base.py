@@ -491,11 +491,8 @@ class _BaseCluster(ABC):
         std[std == 0] = 1  # std == 0 -> null map
         data /= std
 
-        # TODO: Remove transpose and change axis
-        states = states.T
-        states -= np.mean(states, axis=0)
-        states /= np.std(states, axis=0)
-        states = states.T
+        states -= np.mean(states, axis=1)[:, np.newaxis]
+        states /= np.std(states, axis=1)[:, np.newaxis]
 
         labels = np.argmax(np.abs(np.dot(states, data)), axis=0)
 
