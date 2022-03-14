@@ -271,6 +271,12 @@ class _BaseCluster(ABC):
         # re-order
         self._cluster_centers_ = self._cluster_centers_[order]
         self._clusters_names = [self._clusters_names[k] for k in order]
+        new_labels = np.zeros(self._labels_.shape)
+        if hasattr(self, '_labels_'):
+            for k in range(0, self.n_clusters):
+                new_labels[self._labels_ == k+1] = order[k] + 1
+            self._labels_ = new_labels
+        
 
     def invert_polarity(self, invert):
         """
