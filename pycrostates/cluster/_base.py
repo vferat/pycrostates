@@ -276,7 +276,6 @@ class _BaseCluster(ABC):
             for k in range(0, self.n_clusters):
                 new_labels[self._labels_ == k+1] = order[k] + 1
             self._labels_ = new_labels
-        
 
     def invert_polarity(self, invert):
         """
