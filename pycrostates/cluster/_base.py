@@ -160,7 +160,6 @@ class _BaseCluster(ABC):
         new_names : list | tuple
             1D iterable containing the new cluster names.
         """
-        # TODO: Add support for mapping to be a callable function (str -> str)
         self._check_fit()
 
         if mapping is not None and new_names is not None:
@@ -492,11 +491,8 @@ class _BaseCluster(ABC):
         std[std == 0] = 1  # std == 0 -> null map
         data /= std
 
-        # TODO: Remove transpose and change axis
-        states = states.T
-        states -= np.mean(states, axis=0)
-        states /= np.std(states, axis=0)
-        states = states.T
+        states -= np.mean(states, axis=1)[:, np.newaxis]
+        states /= np.std(states, axis=1)[:, np.newaxis]
 
         labels = np.argmax(np.abs(np.dot(states, data)), axis=0)
 
@@ -519,7 +515,6 @@ class _BaseCluster(ABC):
             IEEE Transactions on Biomedical Engineering,
             vol. 42, no. 7, pp. 658-665, July 1995,
             https://doi.org/10.1109/10.391164."""
-        # TODO: Check the smooting equations
         Ne, Nt = data.shape
         Nu = states.shape[0]
         Vvar = np.sum(data * data, axis=0)
