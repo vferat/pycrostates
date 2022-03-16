@@ -293,6 +293,12 @@ def test_reorder(caplog):
     assert ModK.clusters_names[0] == ModK_.clusters_names[1]
     assert ModK.clusters_names[0] == ModK_.clusters_names[1]
 
+    # test .labels_ reordering
+    x = ModK_.labels_[:20]
+    # x = [3, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+    y = [3, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0]
+    assert (np.all(x == y))
+
     # Test invalid arguments
     ModK_ = ModK.copy()
     with pytest.raises(TypeError, match="'mapping' must be an instance of "):
