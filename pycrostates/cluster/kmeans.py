@@ -47,7 +47,6 @@ class ModKMeans(_BaseCluster):
 
         # fit variables
         self._GEV_ = None
-        self._labels_ = None
 
     @copy_doc(_BaseCluster.fit)
     @fill_doc
@@ -232,16 +231,6 @@ class ModKMeans(_BaseCluster):
             assert not self._fitted  # sanity-check
             logger.warning('Clustering algorithm has not been fitted.')
         return self._GEV_
-
-    @property
-    def labels_(self):
-        """
-        labels fit variable.
-        """
-        if self._labels_ is None:
-            assert not self._fitted  # sanity-check
-            logger.warning('Clustering algorithm has not been fitted.')
-        return self._labels_
 
     @_BaseCluster.fitted.setter
     @copy_doc(_BaseCluster.fitted.setter)

@@ -34,6 +34,7 @@ class _BaseCluster(ABC):
         self._info = None
         self._fitted_data = None
         self._fitted = False
+        self._labels_ = None
 
     def __repr__(self) -> str:
         name = self.__class__.__name__
@@ -751,6 +752,16 @@ class _BaseCluster(ABC):
             self._info = None
             self._fitted_data = None
             self._fitted = False
+
+    @property
+    def labels_(self):
+        """
+        labels fit variable.
+        """
+        if self._labels_ is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+        return self._labels_
 
     # --------------------------------------------------------------------
     @staticmethod
