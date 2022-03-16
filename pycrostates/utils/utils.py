@@ -6,11 +6,14 @@ import numpy as np
 from ._logs import logger
 
 
+# TODO: Add test for this. Also compare speed with latest version of numpy.
+# Also compared speed with a numba implementation.
 def _corr_vectors(A, B, axis=0):
     # based on:
     # https://github.com/wmvanvliet/mne_microstates/blob/master/microstates.py
     # written by Marijn van Vliet <w.m.vanvliet@gmail.com>
     """Compute pairwise correlation of multiple pairs of vectors.
+
     Fast way to compute correlation of multiple pairs of vectors without
     computing all pairs as would with corr(A,B). Borrowed from Oli at
     StackOverflow. Note the resulting coefficients vary slightly from the ones
@@ -46,6 +49,7 @@ def _corr_vectors(A, B, axis=0):
     return corr
 
 
+# TODO: To be removed when ChInfo is implemented.
 def _copy_info(inst, sfreq):
     ch_names = inst.info['ch_names']
     ch_types = [mne.channel_type(inst.info, idx)
@@ -57,6 +61,8 @@ def _copy_info(inst, sfreq):
     return new_info
 
 
+# TODO: To update as a == method in ChInfo. Maybe we need support for comparing
+# ChInfo with mne Info?
 def _compare_infos(info1, info2):
     """
     Checks that both info have the same channels.
