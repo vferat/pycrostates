@@ -11,9 +11,21 @@ from mne.utils.docs import docdict as docdict_mne
 docdict = dict()
 
 # ---- Documentation to inc. from MNE ----
-keys = ['random_state', 'verbose', 'verbose_meth',
-        'reject_by_annotation_raw', 'n_jobs',
-        'raw_tmin', 'raw_tmax', 'picks_all']
+keys = (
+    'match_alias',
+    'match_case',
+    'montage',
+    'montage_types',
+    'n_jobs',
+    'on_missing_montage',
+    'picks_all',
+    'random_state',
+    'raw_tmin',
+    'raw_tmax',
+    'reject_by_annotation_raw',
+    'verbose',
+    'verbose_meth',
+    )
 
 for key in keys:
     docdict[key] = docdict_mne[key]
