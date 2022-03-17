@@ -3,7 +3,7 @@ from numbers import Number
 
 from mne.io import Info
 from mne.io.constants import FIFF
-from mne.io.meas_info import _check_ch_keys, _unique_channel_names
+from mne.io.meas_info import _check_ch_keys, _unique_channel_names, _check_bads
 from mne.io.pick import get_channel_type_constants
 from mne.io.proj import Projection
 from mne.io.tag import _ch_coord_dict
@@ -115,6 +115,31 @@ class ChInfo(Info):
              The coordinate frame used, e.g. ``FIFFV_COORD_HEAD``.
     """
 
+    _attributes = {
+        'bads': _check_bads,
+        'ch_names': 'ch_names cannot be set directly. '
+                    'Please use methods inst.add_channels(), '
+                    'inst.drop_channels(), inst.pick_channels(), '
+                    'inst.rename_channels(), inst.reorder_channels() '
+                    'and inst.set_channel_types() instead.',
+        'chs': 'chs cannot be set directly. '
+               'Please use methods inst.add_channels(), '
+               'inst.drop_channels(), inst.pick_channels(), '
+               'inst.rename_channels(), inst.reorder_channels() '
+               'and inst.set_channel_types() instead.',
+        'custom_ref_applied': 'custom_ref_applied cannot be set directly. '
+                              'Please use method inst.set_eeg_reference() '
+                              'instead.',
+        'dig': 'dig cannot be set directly. '
+               'Please use method inst.set_montage() instead.',
+        'nchan': 'nchan cannot be set directly. '
+                 'Please use methods inst.add_channels(), '
+                 'inst.drop_channels(), and inst.pick_channels() instead.',
+        'projs': 'projs cannot be set directly. '
+                 'Please use methods inst.add_proj() and inst.del_proj() '
+                 'instead.',
+    }
+
     def __init__(self, info=None, ch_names=None, ch_types=None):
         if all(arg is None for arg in (info, ch_names, ch_types)):
             raise RuntimeError(
@@ -208,6 +233,7 @@ class ChInfo(Info):
         # add ch_names and nchan
         self._update_redundant()
 
+    # ------------------------------------------------------------------------
     def __deepcopy__(self, memodict):
         """Make a deepcopy."""
         result = ChInfo.__new__(ChInfo)
