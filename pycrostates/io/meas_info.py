@@ -16,153 +16,12 @@ from ._docs import fill_doc
 from ._logs import verbose
 
 
-# TODO: Copying the Mixin is a pain.. It should be possible to fool isinstance
-# in believing that `ChInfo` is an `Info` instance by giving to `ChInfo` only
-# the 'type' from `Info`.
-# https://stackoverflow.com/questions/71505152/inherit-only-the-type-from-parent-class-in-python
-class MontageMixin:
-    """Mixin for Montage getting and setting."""
-
-    @fill_doc
-    def get_montage(self):
-        """Get a DigMontage from instance.
-
-        Returns
-        -------
-        %(montage)s
-        """
-        from mne.channels.montage import make_dig_montage
-        info = self if isinstance(self, ChInfo) else self.info
-        if info['dig'] is None:
-            return None
-        # obtain coord_frame, and landmark coords
-        # (nasion, lpa, rpa, hsp, hpi) from DigPoints
-        montage_bunch = _get_data_as_dict_from_dig(info['dig'])
-        coord_frame = _frame_to_str.get(montage_bunch.coord_frame)
-
-        # get the channel names and chs data structure
-        ch_names, chs = info['ch_names'], info['chs']
-        picks = pick_types(info, meg=False, eeg=True, seeg=True,
-                           ecog=True, dbs=True, fnirs=True, exclude=[])
-
-        # channel positions from dig do not match ch_names one to one,
-        # so use loc[:3] instead
-        ch_pos = {ch_names[ii]: chs[ii]['loc'][:3] for ii in picks}
-
-        # create montage
-        montage = make_dig_montage(
-            ch_pos=ch_pos,
-            coord_frame=coord_frame,
-            nasion=montage_bunch.nasion,
-            lpa=montage_bunch.lpa,
-            rpa=montage_bunch.rpa,
-            hsp=montage_bunch.hsp,
-            hpi=montage_bunch.hpi,
-        )
-        return montage
-
-    @verbose
-    def set_montage(self, montage, match_case=True, match_alias=False,
-                    on_missing='raise', verbose=None):
-        """Set %(montage_types)s channel positions and digitization points.
-
-        Parameters
-        ----------
-        %(montage)s
-        %(match_case)s
-        %(match_alias)s
-        %(on_missing_montage)s
-        %(verbose)s
-
-        Returns
-        -------
-        inst : instance of ChInfo | Cluster | ChData
-            The instance.
-
-        Notes
-        -----
-        Operates in place.
-
-        .. warning::
-            Only %(montage_types)s channels can have their positions set using
-            a montage. Other channel types (e.g., MEG channels) should have
-            their positions defined properly using their data reading
-            functions.
-        """
-        from mne.channels.montage import _set_montage
-        info = self if isinstance(self, Info) else self.info
-        _set_montage(info, montage, match_case, match_alias, on_missing)
-        return self
-
-
-class ContainsMixin:
-    """Mixin class for channel types."""
-
-    def __contains__(self, ch_type):
-        """Check channel type membership.
-
-        Parameters
-        ----------
-        ch_type : str
-            Channel type to check for. Can be e.g. 'meg', 'eeg', 'stim', etc.
-
-        Returns
-        -------
-        in : bool
-            Whether or not the instance contains the given channel type.
-
-        Examples
-        --------
-        Channel type membership can be tested as::
-
-            >>> 'meg' in inst  # doctest: +SKIP
-            True
-            >>> 'seeg' in inst  # doctest: +SKIP
-            False
-
-        """
-        info = self if isinstance(self, ChInfo) else self.info
-        if ch_type == 'meg':
-            has_ch_type = (_contains_ch_type(info, 'mag') or
-                           _contains_ch_type(info, 'grad'))
-        else:
-            has_ch_type = _contains_ch_type(info, ch_type)
-        return has_ch_type
-
-    @property
-    def compensation_grade(self):
-        """The current gradient compensation grade."""
-        info = self if isinstance(self, ChInfo) else self.info
-        return get_current_comp(info)
-
-    @fill_doc
-    def get_channel_types(self, picks=None, unique=False, only_data_chs=False):
-        """Get a list of channel type for each channel.
-
-        Parameters
-        ----------
-        %(picks_all)s
-        unique : bool
-            Whether to return only unique channel types. Default is ``False``.
-        only_data_chs : bool
-            Whether to ignore non-data channels. Default is ``False``.
-
-        Returns
-        -------
-        channel_types : list
-            The channel types.
-        """
-        info = self if isinstance(self, ChInfo) else self.info
-        return _get_channel_types(info, picks=picks, unique=unique,
-                                  only_data_chs=only_data_chs)
-
-
 # TODO: Add the locking/unlocking mechanism to prevent users from directly
 # modifying entries in ChInfo.
 # TODO: Add == and != method to compare ChInfo with other ChInfo and with other
 # mne Info.
 # TODO: Add __repr__ method to summarize info.
-class ChInfo(dict, MontageMixin, ContainsMixin):
+class ChInfo(Info):
     """Measurement information.
 
     Similar to a mne.Info class, but without any temporal information. Only the
@@ -285,8 +144,8 @@ class ChInfo(dict, MontageMixin, ContainsMixin):
         """Init instance from mne Info."""
         self['custom_ref_applied'] = info['custom_ref_applied']
         self['bads'] = info['bads']
-        self['chs'] = tuple(info['chs'])
-        self['dig'] = None if info['dig'] is None else tuple(info['dig'])
+        self['chs'] = info['chs']
+        self['dig'] = None if info['dig'] is None else info['dig']
         self._update_redundant()
 
     def _init_from_channels(self, ch_names, ch_types):
@@ -343,7 +202,7 @@ class ChInfo(dict, MontageMixin, ContainsMixin):
             self['chs'].append(chan_info)
 
         # convert to immutable
-        self['chs'] = tuple(self['chs'])
+        self['chs'] = self['chs']
 
         # add empty dig
         self['dig'] = None
@@ -353,7 +212,7 @@ class ChInfo(dict, MontageMixin, ContainsMixin):
 
     def _update_redundant(self):
         """Update the redundant entries."""
-        self['ch_names'] = tuple([ch['ch_name'] for ch in self['chs']])
+        self['ch_names'] = [ch['ch_name'] for ch in self['chs']]
         self['nchan'] = len(self['chs'])
 
     def copy(self):
@@ -365,36 +224,3 @@ class ChInfo(dict, MontageMixin, ContainsMixin):
             The copied info.
         """
         return deepcopy(self)
-
-    # ------------------------------------------------------------------------
-    @property
-    def bads(self):
-        """List of bad channels."""
-        return self['bads']
-
-    @property
-    def chs(self):
-        """Channel information dictionary."""
-        return self['chs']
-
-    @property
-    def ch_names(self):
-        """Tuple of the channel names."""
-        return self['ch_names']
-
-    @property
-    def dig(self):
-        """Montage"""
-        return self['dig']
-
-    @property
-    def nchan(self):
-        """Number of channels."""
-        return self['nchan']
-
-    @property
-    def custom_ref_applied(self):
-        """The reference applied."""
-        # TODO: This should be replaced by knowledge of what the reference
-        # actually is. see mne-python/issues/8962
-        return self['custom_ref_applied']
