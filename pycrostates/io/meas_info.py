@@ -100,19 +100,19 @@ class ChInfo(Info):
         unit_mul : int
             Unit multipliers, most commonly ``FIFF_UNITM_NONE``.
 
-     * ``dig`` list of dict:
+    * ``dig`` list of dict:
 
-         kind : int
-             The kind of channel,
-             e.g. ``FIFFV_POINT_EEG``, ``FIFFV_POINT_CARDINAL``.
-         r : array, shape (3,)
-             3D position in m. and coord_frame.
-         ident : int
-             Number specifying the identity of the point.
-             e.g. ``FIFFV_POINT_NASION`` if kind is ``FIFFV_POINT_CARDINAL``, or
-             42 if kind is ``FIFFV_POINT_EEG``.
-         coord_frame : int
-             The coordinate frame used, e.g. ``FIFFV_COORD_HEAD``.
+        kind : int
+            The kind of channel,
+            e.g. ``FIFFV_POINT_EEG``, ``FIFFV_POINT_CARDINAL``.
+        r : array, shape (3,)
+            3D position in m. and coord_frame.
+        ident : int
+            Number specifying the identity of the point.
+            e.g. ``FIFFV_POINT_NASION`` if kind is ``FIFFV_POINT_CARDINAL``, or
+            42 if kind is ``FIFFV_POINT_EEG``.
+        coord_frame : int
+            The coordinate frame used, e.g. ``FIFFV_COORD_HEAD``.
     """
 
     _attributes = {
@@ -185,8 +185,8 @@ class ChInfo(Info):
         ch_types = tuple(ch_types)
 
         # check shape of ch_types
-        if np.atleast_1d(np.array(ch_types, np.str_)).ndim != 1 or \
-            len(ch_types) != nchan:
+        ndim = np.atleast_1d(np.array(ch_types, np.str_)).ndim
+        if ndim != 1 or len(ch_types) != nchan:
             raise ValueError(
                 'ch_types and ch_names must be the same length '
                 f'({len(ch_types)} != {nchan}) for ch_types={ch_types}')
