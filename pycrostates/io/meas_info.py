@@ -1,26 +1,17 @@
 from copy import deepcopy
-from operator import index
+from numbers import Number
 
-from mne.transforms import _frame_to_str
 from mne.io import Info
-from mne.io.compensator import get_current_comp
 from mne.io.constants import FIFF
-from mne.io.pick import (get_channel_type_constants, pick_types,
-                         _contains_ch_type, _get_channel_types)
+from mne.io.meas_info import _check_ch_keys, _unique_channel_names
+from mne.io.pick import get_channel_type_constants
+from mne.io.proj import Projection
 from mne.io.tag import _ch_coord_dict
-from mne.io._digitization import _get_data_as_dict_from_dig
 import numpy as np
 
-from ._checks import _check_type, _IntLike
-from ._docs import fill_doc
-from ._logs import verbose
+from ..utils._checks import _check_type, _IntLike
 
 
-# TODO: Add the locking/unlocking mechanism to prevent users from directly
-# modifying entries in ChInfo.
-# TODO: Add == and != method to compare ChInfo with other ChInfo and with other
-# mne Info.
-# TODO: Add __repr__ method to summarize info.
 class ChInfo(Info):
     """Measurement information.
 
@@ -67,6 +58,9 @@ class ChInfo(Info):
         See Notes for more information.
     nchan : int
         Number of channels.
+    projs : list of Projection
+        List of SSP operators that operate on the data.
+        See :class:`mne.Projection` for details.
 
     Notes
     -----
@@ -150,6 +144,8 @@ class ChInfo(Info):
 
     def _init_from_channels(self, ch_names, ch_types):
         """Init instance from channel names and types."""
+        self._unlocked = True
+
         # convert ch_names to immutable
         if isinstance(ch_names, _IntLike()):
             ch_names = np.arange(ch_names).astype(str)
@@ -207,20 +203,76 @@ class ChInfo(Info):
         # add empty dig
         self['dig'] = None
 
+        self._unlocked = False
+
         # add ch_names and nchan
         self._update_redundant()
 
-    def _update_redundant(self):
-        """Update the redundant entries."""
-        self['ch_names'] = [ch['ch_name'] for ch in self['chs']]
-        self['nchan'] = len(self['chs'])
+    def __deepcopy__(self, memodict):
+        """Make a deepcopy."""
+        result = ChInfo.__new__(ChInfo)
+        result._unlocked = True
+        for k, v in self.items():
+            # chs is roughly half the time but most are immutable
+            if k == 'chs':
+                # dict shallow copy is fast, so use it then overwrite
+                result[k] = list()
+                for ch in v:
+                    ch = ch.copy()  # shallow
+                    ch['loc'] = ch['loc'].copy()
+                    result[k].append(ch)
+            elif k == 'ch_names':
+                # we know it's list of str, shallow okay and saves ~100 µs
+                result[k] = v.copy()
+            else:
+                result[k] = deepcopy(v, memodict)
+        result._unlocked = False
+        return result
 
-    def copy(self):
-        """Copy the instance.
+    def _check_consistency(self, prepend_error=''):
+        """Do some self-consistency checks and datatype tweaks."""
+        missing = [bad for bad in self['bads'] if bad not in self['ch_names']]
+        if len(missing) > 0:
+            msg = '%sbad channel(s) %s marked do not exist in info'
+            raise RuntimeError(msg % (prepend_error, missing,))
 
-        Returns
-        -------
-        info : instance of ChInfo
-            The copied info.
-        """
-        return deepcopy(self)
+        chs = [ch['ch_name'] for ch in self['chs']]
+        if len(self['ch_names']) != len(chs) or any(
+                ch_1 != ch_2 for ch_1, ch_2 in zip(self['ch_names'], chs)) or \
+                self['nchan'] != len(chs):
+            raise RuntimeError('%sinfo channel name inconsistency detected, '
+                               'please notify developers.'
+                               % (prepend_error,))
+
+        for pi, proj in enumerate(self.get('projs', [])):
+            _check_type(proj, (Projection, ), f'info["projs"][{pi}]')
+            for key in ('kind', 'active', 'desc', 'data', 'explained_var'):
+                if key not in proj:
+                    raise RuntimeError(f'Projection incomplete, missing {key}')
+
+        # Ensure info['chs'] has immutable entries (copies much faster)
+        for ci, ch in enumerate(self['chs']):
+            _check_ch_keys(ch, ci)
+            ch_name = ch['ch_name']
+            if not isinstance(ch_name, str):
+                raise TypeError(
+                    'Bad info: info["chs"][%d]["ch_name"] is not a string, '
+                    'got type %s' % (ci, type(ch_name)))
+            for key in ('scanno', 'logno', 'kind', 'range', 'cal', 'coil_type',
+                        'unit', 'unit_mul', 'coord_frame'):
+                val = ch.get(key, 1)
+                if not isinstance(val, Number):
+                    raise TypeError(
+                        'Bad info: info["chs"][%d][%r] = %s is type %s, must '
+                        'be float or int' % (ci, key, val, type(val)))
+            loc = ch['loc']
+            if not (isinstance(loc, np.ndarray) and loc.shape == (12,)):
+                raise TypeError(
+                    'Bad info: info["chs"][%d]["loc"] must be ndarray with '
+                    '12 elements, got %r' % (ci, loc))
+
+        # make sure channel names are unique
+        with self._unlock():
+            self['ch_names'] = _unique_channel_names(self['ch_names'])
+            for idx, ch_name in enumerate(self['ch_names']):
+                self['chs'][idx]['ch_name'] = ch_name
