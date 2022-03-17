@@ -22,8 +22,8 @@ def load_data(subject_id, condition):
         The list of available subjects can be found
         at https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Raw_BIDS_ID.
     condition : str
-        Can be 'EO' for eyes open condition
-        or 'EC' for eyes closed condition.
+        Can be 'EO' for eyes open condition or 'EC' for eyes closed condition.
+
     Returns
     -------
     path : str
@@ -55,7 +55,7 @@ def load_data(subject_id, condition):
     filename_fdt = f'sub-{subject_id}_{condition}.fdt'
     output_path_set = fetcher.fetch(filename_set)
     _ = fetcher.fetch(filename_fdt)
-    return(output_path_set)
+    return output_path_set
 
 
 def standardize(raw):
@@ -101,4 +101,4 @@ def standardize(raw):
     raw.set_montage('standard_1005')
     raw.interpolate_bads()
     raw.set_eeg_reference('average')
-    return(raw)
+    return raw

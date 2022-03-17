@@ -12,32 +12,28 @@ docdict = dict()
 
 # ---- Documentation to inc. from MNE ----
 keys = (
-    'match_alias',
-    'match_case',
-    'montage',
-    'montage_types',
     'n_jobs',
-    'on_missing_montage',
     'picks_all',
     'random_state',
-    'raw_tmin',
-    'raw_tmax',
+    'tmin_raw',
+    'tmax_raw',
     'reject_by_annotation_raw',
     'verbose',
-    'verbose_meth',
     )
 
 for key in keys:
     docdict[key] = docdict_mne[key]
-# TODO: sphinx :term:`data channels` in 'picks_all' has to be included.
+
+# TODO: sphinx :term:`data channels` in 'picks_all' to be inc.
+# TODO: :ref:`logging documentation <tut-logging>` in 'verbose' to be inc.
 
 # ---- Clusters ----
 docdict['fit_inst'] = """
-inst : `~mne.io.Raw` | `~mne.Epochs`
+inst : Raw | Epochs
     Instance containing data to transform to cluster-distance space
     (absolute spatial correlation)."""
 docdict['predict_inst'] = """
-inst : `~mne.io.Raw` | `~mne.Epochs`
+inst : Raw | Epochs
     Instance containing data to predict."""
 
 docdict['n_clusters'] = """
@@ -50,14 +46,6 @@ docdict['random_seed'] = """
 random_seed : float
     As estimation can be non-deterministic it can be useful to fix the
     random state to have reproducible results.
-"""
-
-docdict['verbose'] = """
-verbose : bool, str, int or None
-    Control verbosity of the logging output.
-    If None, use the default verbosity level.
-    Should only be passed as a keyword argument.
-    Defaults to self.verbose.
 """
 
 docdict['picks'] = """

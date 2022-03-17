@@ -192,8 +192,8 @@ class RawSegmentation(_BaseSegmentation):
 
         Parameters
         ----------
-        %(raw_tmin)s
-        %(raw_tmax)s
+        %(tmin_raw)s
+        %(tmax_raw)s
 
         Returns
         -------

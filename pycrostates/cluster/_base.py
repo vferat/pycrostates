@@ -75,8 +75,8 @@ class _BaseCluster(ABC):
         ----------
         %(fit_inst)s
         %(picks_all)s
-        %(raw_tmin)s
-        %(raw_tmax)s
+        %(tmin_raw)s
+        %(tmax_raw)s
         %(reject_by_annotation_raw)s
         %(n_jobs)s
         """
@@ -316,8 +316,8 @@ class _BaseCluster(ABC):
 
         Returns
         -------
-        fig : :class:`matplotlib.figure.Figure`
-            Figure
+        fig : Figure
+            Matplotlib figure containing the topographic plots.
         ax : :class:`matplotlib.axes.Axes`
             Axis
         """
@@ -354,7 +354,7 @@ class _BaseCluster(ABC):
 
         Returns
         -------
-        segmentation `RawSegmentation` | `EpochsSegmentation`
+        segmentation RawSegmentation | EpochsSegmentation
             Microstate sequence derivated from istance data. Timepoints are
             labeled according to cluster centers number: 1 for the first
             center, 2 for the second, etc..
@@ -710,9 +710,8 @@ class _BaseCluster(ABC):
         """
         Data array retrieved from MNE used to fit the clustering algorithm.
 
-        :type: `~numpy.array`
+        :type: `~numpy.array` shape (n_channels, n_samples)
         """
-        # TODO: Add shape of the numpy array to the docstring
         if self._fitted_data is None:
             assert not self._fitted  # sanity-check
             logger.warning('Clustering algorithm has not been fitted.')

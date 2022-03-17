@@ -57,8 +57,8 @@ def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
         Whether to reject by annotation. If True (default), segments annotated
         with description starting with ‘bad’ are omitted. If False, no
         rejection is done.
-    %(raw_tmin)s
-    %(raw_tmax)s
+    %(tmin_raw)s
+    %(tmax_raw)s
     %(verbose)s
 
     Returns
@@ -135,8 +135,8 @@ def resample(inst, n_epochs=None, n_samples=None, coverage=None,
     random_seed : float
         As resampling can be non-deterministic it can be useful to fix the
         random state to have reproducible results.
-    %(raw_tmin)s
-    %(raw_tmax)s
+    %(tmin_raw)s
+    %(tmax_raw)s
     %(verbose)s
 
     Returns
