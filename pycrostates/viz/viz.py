@@ -35,7 +35,7 @@ def plot_segmentation(
     if isinstance(inst, BaseRaw):
         data = inst.get_data()
     elif isinstance(inst, Evoked):
-        data = inst.data
+        data = inst.data  # TODO: I think it supports .get_data() nowadays
     gfp = np.std(data, axis=0)
     times = inst.times + tmin
 
