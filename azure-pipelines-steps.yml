@@ -12,7 +12,7 @@ steps:
 
 - script: |
     pip install pytest==7.0.1 pytest-azurepipelines     # TODO: change pytest==7.0.1 to pytest
-    pip install pytest-cov
+    pip install pytest-cov  # TODO: move to  requirements_testing.txt and delete
     pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
   displayName: 'pytest'
 

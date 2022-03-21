@@ -76,8 +76,8 @@ class _BaseCluster(ABC):
         ----------
         %(fit_inst)s
         %(picks_all)s
-        %(raw_tmin)s
-        %(raw_tmax)s
+        %(tmin_raw)s
+        %(tmax_raw)s
         %(reject_by_annotation_raw)s
         %(n_jobs)s
         """
