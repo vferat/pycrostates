@@ -668,16 +668,16 @@ def test_predict(caplog):
     # raw, no smoothing, with edge rejection
     segmentation = ModK.predict(raw, factor=0, reject_edges=True)
     assert isinstance(segmentation, RawSegmentation)
-    assert segmentation.segmentation[0] == -1
-    assert segmentation.segmentation[-1] == -1
+    assert segmentation.labels[0] == -1
+    assert segmentation.labels[-1] == -1
     assert 'Rejecting first and last segments.' in caplog.text
     caplog.clear()
 
     # raw, with smoothing
     segmentation = ModK.predict(raw, factor=3, reject_edges=True)
     assert isinstance(segmentation, RawSegmentation)
-    assert segmentation.segmentation[0] == -1
-    assert segmentation.segmentation[-1] == -1
+    assert segmentation.labels[0] == -1
+    assert segmentation.labels[-1] == -1
     assert 'Segmenting data with factor 3' in caplog.text
     caplog.clear()
 
@@ -686,7 +686,7 @@ def test_predict(caplog):
                                 min_segment_length=5)
     assert isinstance(segmentation, RawSegmentation)
     segment_lengths = [len(list(group))
-                       for _, group in groupby(segmentation.segmentation)]
+                       for _, group in groupby(segmentation.labels)]
     assert all(5 <= size for size in segment_lengths[1:-1])
     assert 'Rejecting segments shorter than' in caplog.text
     caplog.clear()
@@ -700,18 +700,18 @@ def test_predict(caplog):
     # epochs, no smoothing, with edge rejection
     segmentation = ModK.predict(epochs, factor=0, reject_edges=True)
     assert isinstance(segmentation, EpochsSegmentation)
-    for epoch_segmentation in segmentation.segmentation:
-        assert epoch_segmentation[0] == -1
-        assert epoch_segmentation[-1] == -1
+    for epoch_labels in segmentation.labels:
+        assert epoch_labels[0] == -1
+        assert epoch_labels[-1] == -1
     assert 'Rejecting first and last segments.' in caplog.text
     caplog.clear()
 
     # epochs, with smoothing
     segmentation = ModK.predict(epochs, factor=3, reject_edges=True)
     assert isinstance(segmentation, EpochsSegmentation)
-    for epoch_segmentation in segmentation.segmentation:
-        assert epoch_segmentation[0] == -1
-        assert epoch_segmentation[-1] == -1
+    for epoch_labels in segmentation.labels:
+        assert epoch_labels[0] == -1
+        assert epoch_labels[-1] == -1
     assert 'Segmenting data with factor 3' in caplog.text
     caplog.clear()
 
@@ -719,9 +719,9 @@ def test_predict(caplog):
     segmentation = ModK.predict(epochs, factor=0, reject_edges=False,
                                 min_segment_length=5)
     assert isinstance(segmentation, EpochsSegmentation)
-    for epoch_segmentation in segmentation.segmentation:
+    for epoch_labels in segmentation.labels:
         segment_lengths = [len(list(group))
-                           for _, group in groupby(epoch_segmentation)]
+                           for _, group in groupby(epoch_labels)]
         assert all(5 <= size for size in segment_lengths[1:-1])
     assert 'Rejecting segments shorter than' in caplog.text
     caplog.clear()
@@ -738,12 +738,12 @@ def test_predict(caplog):
                                          reject_by_annotation=None)
     segmentation_no_annot = ModK.predict(raw, factor=0, reject_edges=True,
                                          reject_by_annotation='omit')
-    assert not np.isclose(segmentation_rej_True.segmentation,
-                          segmentation_rej_False.segmentation).all()
-    assert np.isclose(segmentation_no_annot.segmentation,
-                      segmentation_rej_False.segmentation).all()
-    assert np.isclose(segmentation_rej_None.segmentation,
-                      segmentation_rej_False.segmentation).all()
+    assert not np.isclose(segmentation_rej_True.labels,
+                          segmentation_rej_False.labels).all()
+    assert np.isclose(segmentation_no_annot.labels,
+                      segmentation_rej_False.labels).all()
+    assert np.isclose(segmentation_rej_None.labels,
+                      segmentation_rej_False.labels).all()
 
     # test different half_window_size
     segmentation1 = ModK.predict(raw, factor=3, reject_edges=False,
@@ -752,12 +752,12 @@ def test_predict(caplog):
                                  half_window_size=60)
     segmentation3 = ModK.predict(raw, factor=0, reject_edges=False,
                                  half_window_size=3)
-    assert not np.isclose(segmentation1.segmentation,
-                          segmentation2.segmentation).all()
-    assert not np.isclose(segmentation1.segmentation,
-                          segmentation3.segmentation).all()
-    assert not np.isclose(segmentation2.segmentation,
-                          segmentation3.segmentation).all()
+    assert not np.isclose(segmentation1.labels,
+                          segmentation2.labels).all()
+    assert not np.isclose(segmentation1.labels,
+                          segmentation3.labels).all()
+    assert not np.isclose(segmentation2.labels,
+                          segmentation3.labels).all()
 
 
 def test_predict_invalid_arguments(caplog):

@@ -460,7 +460,7 @@ class _BaseCluster(ABC):
             segmentation = _BaseCluster._reject_short_segments(
                 segmentation, data, min_segment_length)
 
-        return RawSegmentation(segmentation=segmentation,
+        return RawSegmentation(labels=segmentation,
                                inst=raw, picks=picks,
                                cluster_centers_=self._cluster_centers_,
                                clusters_names=self._clusters_names)
@@ -483,7 +483,7 @@ class _BaseCluster(ABC):
 
             segments.append(segment)
 
-        return EpochsSegmentation(segmentation=np.array(segments),
+        return EpochsSegmentation(labels=np.array(segments),
                                   inst=epochs, picks=picks,
                                   cluster_centers_=self._cluster_centers_,
                                   clusters_names=self._clusters_names)
