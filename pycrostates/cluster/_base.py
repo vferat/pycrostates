@@ -365,7 +365,7 @@ class _BaseCluster(ABC):
 
         Returns
         -------
-        segmentation `RawSegmentation` | `EpochsSegmentation`
+        segmentation : `RawSegmentation` | `EpochsSegmentation`
             Microstate sequence derivated from istance data. Timepoints are
             labeled according to cluster centers number: 1 for the first
             center, 2 for the second, etc..
