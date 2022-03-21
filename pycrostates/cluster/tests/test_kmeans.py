@@ -810,7 +810,7 @@ def test_fit_not_converged(caplog):
                       random_state=1)
     ModK_.fit(raw, n_jobs=1)
     _check_fitted(ModK_)
-    assert 'after 10/10 iteration converged.' in caplog.text
+    assert 'after 10/10 iterations converged.' in caplog.text
     caplog.clear()
 
     # 6/10 converged
@@ -818,7 +818,7 @@ def test_fit_not_converged(caplog):
                       random_state=1)
     ModK_.fit(raw, n_jobs=1)
     _check_fitted(ModK_)
-    assert 'after 6/10 iteration converged.' in caplog.text
+    assert 'after 6/10 iterations converged.' in caplog.text
     caplog.clear()
 
     # 0/10 converged
