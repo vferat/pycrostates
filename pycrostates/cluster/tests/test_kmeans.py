@@ -98,7 +98,7 @@ def test_ModKMeans():
     _check_unfitted(ModK1)
 
     # Test default clusters names
-    assert ModK1.clusters_names == ['1', '2', '3', '4']
+    assert ModK1.clusters_names == ['0', '1', '2', '3']
 
     # Test fit on RAW
     ModK1.fit(raw, n_jobs=1)
@@ -296,7 +296,7 @@ def test_reorder(caplog):
     # test .labels_ reordering
     x = ModK_.labels_[:20]
     # x = [3, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
-    y = [3, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0]
+    y = [3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]
     assert (np.all(x == y))
 
     # Test invalid arguments
@@ -668,16 +668,16 @@ def test_predict(caplog):
     # raw, no smoothing, with edge rejection
     segmentation = ModK.predict(raw, factor=0, reject_edges=True)
     assert isinstance(segmentation, RawSegmentation)
-    assert segmentation.segmentation[0] == 0
-    assert segmentation.segmentation[-1] == 0
+    assert segmentation.segmentation[0] == -1
+    assert segmentation.segmentation[-1] == -1
     assert 'Rejecting first and last segments.' in caplog.text
     caplog.clear()
 
     # raw, with smoothing
     segmentation = ModK.predict(raw, factor=3, reject_edges=True)
     assert isinstance(segmentation, RawSegmentation)
-    assert segmentation.segmentation[0] == 0
-    assert segmentation.segmentation[-1] == 0
+    assert segmentation.segmentation[0] == -1
+    assert segmentation.segmentation[-1] == -1
     assert 'Segmenting data with factor 3' in caplog.text
     caplog.clear()
 
@@ -701,8 +701,8 @@ def test_predict(caplog):
     segmentation = ModK.predict(epochs, factor=0, reject_edges=True)
     assert isinstance(segmentation, EpochsSegmentation)
     for epoch_segmentation in segmentation.segmentation:
-        assert epoch_segmentation[0] == 0
-        assert epoch_segmentation[-1] == 0
+        assert epoch_segmentation[0] == -1
+        assert epoch_segmentation[-1] == -1
     assert 'Rejecting first and last segments.' in caplog.text
     caplog.clear()
 
@@ -710,8 +710,8 @@ def test_predict(caplog):
     segmentation = ModK.predict(epochs, factor=3, reject_edges=True)
     assert isinstance(segmentation, EpochsSegmentation)
     for epoch_segmentation in segmentation.segmentation:
-        assert epoch_segmentation[0] == 0
-        assert epoch_segmentation[-1] == 0
+        assert epoch_segmentation[0] == -1
+        assert epoch_segmentation[-1] == -1
     assert 'Segmenting data with factor 3' in caplog.text
     caplog.clear()
 

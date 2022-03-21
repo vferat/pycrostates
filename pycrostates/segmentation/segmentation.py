@@ -58,7 +58,7 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
     d = dict()
     for s, state in enumerate(maps):
         state_name = maps_names[s]
-        arg_where = np.argwhere(segmentation == s+1)
+        arg_where = np.argwhere(segmentation == s)
         if len(arg_where) != 0:
             labeled_tp = data.T[arg_where][:, 0, :].T
             labeled_gfp = gfp[arg_where][:, 0]
@@ -73,11 +73,11 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
             d[f'{state_name}_gev'] = np.sum(gev)
 
             s_segments = np.array(
-                [len(group) for s_, group in segments if s_ == s + 1])
+                [len(group) for s_, group in segments if s_ == s])
             occurrences = len(s_segments) / len(segmentation) * sfreq
             d[f'{state_name}_occurrences'] = occurrences
 
-            timecov = np.sum(s_segments) / len(np.where(segmentation != 0)[0])
+            timecov = np.sum(s_segments) / len(np.where(segmentation != -1)[0])
             d[f'{state_name}_timecov'] = timecov
 
             durs = s_segments / sfreq

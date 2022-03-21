@@ -272,9 +272,9 @@ class _BaseCluster(ABC):
         self._cluster_centers_ = self._cluster_centers_[order]
         self._clusters_names = [self._clusters_names[k] for k in order]
         if self._labels_ is not None:
-            new_labels = np.zeros(self._labels_.shape)
+            new_labels = np.full(self._labels_.shape, -1)
             for k in range(0, self.n_clusters):
-                new_labels[self._labels_ == k+1] = order[k] + 1
+                new_labels[self._labels_ == k] = order[k]
             self._labels_ = new_labels
 
     def invert_polarity(self, invert):
@@ -434,7 +434,7 @@ class _BaseCluster(ABC):
             onsets = onsets.tolist() + [data.shape[-1] - 1]
             ends = [0] + ends.tolist()
 
-            segmentation = np.zeros(data.shape[-1])
+            segmentation = np.full(data.shape[-1], -1)
 
             for onset, end in zip(onsets, ends):
                 # small segments can't be smoothed
@@ -506,7 +506,7 @@ class _BaseCluster(ABC):
             labels = _BaseCluster._smooth_segmentation(
                 data, states, labels, factor, tol, half_window_size)
 
-        return labels + 1
+        return labels
 
     @staticmethod
     def _smooth_segmentation(data, states, labels, factor, tol,
@@ -564,7 +564,7 @@ class _BaseCluster(ABC):
             for k, segment in enumerate(segments):
                 skip_condition = [
                     k in (0, len(segments)-1),  # ignore edge segments
-                    segment[0] == 0,  # ignore segments labelled with 0
+                    segment[0] == -1,  # ignore segments labelled with 0
                     min_segment_length <= len(segment)  # ignore large segments
                     ]
                 if any(skip_condition):
@@ -618,11 +618,11 @@ class _BaseCluster(ABC):
         """Set the first and last segment as unlabeled (0)."""
         # set first segment to unlabeled
         n = (segmentation != segmentation[0]).argmax()
-        segmentation[:n] = 0
+        segmentation[:n] = -1
 
         # set last segment to unlabeled
         n = np.flip((segmentation != segmentation[-1])).argmax()
-        segmentation[-n:] = 0
+        segmentation[-n:] = -1
 
         return segmentation
 
