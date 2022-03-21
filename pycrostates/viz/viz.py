@@ -40,7 +40,7 @@ def plot_segmentation(
     times = inst.times + tmin
 
     n_colors = 1 + len(cluster_centers)
-    state_labels = [-1] + [k for k in range(len(cluster_centers))]
+    state_labels = [-1] + list(range(len(cluster_centers)))
     if not names:
         names = ['unlabeled'] + [str(k) for k in range(len(cluster_centers))]
     else:
