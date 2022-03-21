@@ -96,10 +96,10 @@ class ModKMeans(_BaseCluster):
                 count_converged = 0
 
         if best_gev is not None:
-            logger.info(f'Selecting run with highest '
-                        f'GEV = {best_gev*100:.2f}% '
-                        f'after {count_converged}/{self._n_init} '
-                        f'iterations converged.')
+            logger.info(
+                'Selecting run with highest GEV = %.2f%% after %i/%i '
+                'iteration converged.', best_gev * 100, count_converged,
+                self._n_init)
         else:
             logger.error(
                 'All the K-means run failed to converge. Please adapt the '
