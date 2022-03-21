@@ -98,7 +98,7 @@ class ModKMeans(_BaseCluster):
         if best_gev is not None:
             logger.info(
                 'Selecting run with highest GEV = %.2f%% after %i/%i '
-                'iteration converged.', best_gev * 100, count_converged,
+                'iterations converged.', best_gev * 100, count_converged,
                 self._n_init)
         else:
             logger.error(
