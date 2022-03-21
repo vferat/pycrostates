@@ -48,6 +48,12 @@ class ModKMeans(_BaseCluster):
         # fit variables
         self._GEV_ = None
 
+    @copy_doc(_BaseCluster._check_fit)
+    def _check_fit(self):
+        super()._check_fit()
+        # sanity-check
+        assert self.GEV_ is not None
+
     @copy_doc(_BaseCluster.fit)
     @fill_doc
     def fit(self, inst, picks='eeg', tmin=None, tmax=None,
@@ -239,7 +245,6 @@ class ModKMeans(_BaseCluster):
         super(self.__class__, self.__class__).fitted.__set__(self, fitted)
         if not fitted:
             self._GEV_ = None
-            self._labels_ = None
 
     # --------------------------------------------------------------------
     # ---------------

@@ -33,8 +33,8 @@ class _BaseCluster(ABC):
         self._picks = None
         self._info = None
         self._fitted_data = None
-        self._fitted = False
         self._labels_ = None
+        self._fitted = False
 
     def __repr__(self) -> str:
         name = self.__class__.__name__
@@ -63,6 +63,12 @@ class _BaseCluster(ABC):
             raise RuntimeError(
                 'Clustering algorithm must be fitted before using '
                 f'{self.__class__.__name__}')
+        # sanity-check
+        assert self.cluster_centers_ is not None
+        assert self.picks is not None
+        assert self.info is not None
+        assert self.fitted_data is not None
+        assert self.labels_ is not None
 
     @abstractmethod
     @fill_doc
@@ -271,11 +277,10 @@ class _BaseCluster(ABC):
         # re-order
         self._cluster_centers_ = self._cluster_centers_[order]
         self._clusters_names = [self._clusters_names[k] for k in order]
-        if self._labels_ is not None:
-            new_labels = np.full(self._labels_.shape, -1)
-            for k in range(0, self.n_clusters):
-                new_labels[self._labels_ == k] = order[k]
-            self._labels_ = new_labels
+        new_labels = np.full(self._labels_.shape, -1)
+        for k in range(0, self.n_clusters):
+            new_labels[self._labels_ == k] = order[k]
+        self._labels_ = new_labels
 
     def invert_polarity(self, invert):
         """
@@ -751,6 +756,7 @@ class _BaseCluster(ABC):
             self._picks = None
             self._info = None
             self._fitted_data = None
+            self._labels_ = None
             self._fitted = False
 
     @property
