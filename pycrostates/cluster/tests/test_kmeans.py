@@ -295,9 +295,11 @@ def test_reorder(caplog):
 
     # test .labels_ reordering
     x = ModK_.labels_[:20]
+    # x: before re-order:
     # x = [3, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+    # y: expected re-ordered labels
     y = [3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]
-    assert (np.all(x == y))
+    assert np.all(x == y)
 
     # Test invalid arguments
     ModK_ = ModK.copy()
