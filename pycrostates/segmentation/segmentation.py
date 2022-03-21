@@ -206,7 +206,7 @@ class RawSegmentation(_BaseSegmentation):
             Axis
         """
         return plot_segmentation(
-            segmentation=self._labels, inst=self.raw,
+            labels=self._labels, inst=self.raw,
             cluster_centers=self.cluster_centers_, names=self.clusters_names,
             tmin=tmin, tmax=tmax)
 
