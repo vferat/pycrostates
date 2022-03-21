@@ -730,6 +730,16 @@ class _BaseCluster(ABC):
         return self._fitted_data
 
     @property
+    def labels_(self):
+        """
+        labels fit variable.
+        """
+        if self._labels_ is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+        return self._labels_
+
+    @property
     def fitted(self):
         """
         Current fitting state.
@@ -758,16 +768,6 @@ class _BaseCluster(ABC):
             self._fitted_data = None
             self._labels_ = None
             self._fitted = False
-
-    @property
-    def labels_(self):
-        """
-        labels fit variable.
-        """
-        if self._labels_ is None:
-            assert not self._fitted  # sanity-check
-            logger.warning('Clustering algorithm has not been fitted.')
-        return self._labels_
 
     # --------------------------------------------------------------------
     @staticmethod
