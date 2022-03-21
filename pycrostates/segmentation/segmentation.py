@@ -74,7 +74,10 @@ def _compute_microstate_parameters(labels, data, maps, maps_names, sfreq,
 
             s_segments = np.array(
                 [len(group) for s_, group in segments if s_ == s])
-            occurrences = len(s_segments) / len(np.where(labels != -1)[0]) * sfreq
+            occurrences = (len(s_segments)
+                           / len(np.where(labels != -1)[0])
+                           * sfreq)
+
             d[f'{state_name}_occurrences'] = occurrences
 
             timecov = np.sum(s_segments) / len(np.where(labels != -1)[0])
