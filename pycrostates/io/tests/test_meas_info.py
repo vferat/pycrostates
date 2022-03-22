@@ -39,6 +39,11 @@ def test_create_from_info():
         info['custom_ref_applied'] = FIFF.FIFFV_MNE_CUSTOM_REF_ON
     assert chinfo['custom_ref_applied'] == FIFF.FIFFV_MNE_CUSTOM_REF_OFF
 
+    # test adding bads
+    assert len(chinfo['bads']) == 0
+    chinfo['bads'] = ['1']
+    assert len(chinfo['bads']) == 1
+
     # test with info that has montage
     info = create_info(ch_names=['Fp1', 'Fp2', 'Fpz'], sfreq=1, ch_types='eeg')
     info.set_montage('standard_1020')
@@ -222,12 +227,43 @@ def test_montage():
 
 
 def test_contains():
-    pass
+    """Test methods from contain Mixin."""
+    info = create_info(ch_names=['Fp1', 'Fp2', 'Fpz'], sfreq=1, ch_types='eeg')
+    info.set_montage('standard_1020')
+    chinfo = ChInfo(info=info)
+    assert chinfo.get_channel_types() == ['eeg'] * 3
+    # TODO: Looks like __contains__ and compensation_grade() is failing
+    # upstream.
 
 
 def test_copy():
-    pass
+    """Test copy (which is a deepcopy)."""
+    info = create_info(ch_names=['Fp1', 'Fp2', 'Fpz'], sfreq=1, ch_types='eeg')
+    info.set_montage('standard_1020')
+    chinfo = ChInfo(info=info)
+    chinfo2 = chinfo.copy()
+    with chinfo._unlock():
+        chinfo['custom_ref_applied'] = FIFF.FIFFV_MNE_CUSTOM_REF_ON
+    assert chinfo['custom_ref_applied'] == FIFF.FIFFV_MNE_CUSTOM_REF_ON
+    assert chinfo2['custom_ref_applied'] == FIFF.FIFFV_MNE_CUSTOM_REF_OFF
 
 
 def test_repr():
-    pass
+    """Test normal and HTML representation."""
+    info = create_info(ch_names=['Fp1', 'Fp2', 'Fpz'], sfreq=1, ch_types='eeg')
+    info.set_montage('standard_1020')
+    chinfo = ChInfo(info=info)
+
+    # normal repr
+    repr_ = chinfo.__repr__()
+    assert 'Info | 4 non-empty values' in repr_
+    assert 'bads: []' in repr_
+    assert 'ch_names: Fp1, Fp2, Fpz' in repr_
+    assert 'chs: 3 EEG' in repr_
+    assert 'custom_ref_applied: False' in repr_
+    assert 'dig: 6 items (3 Cardinal, 3 EEG)' in repr_
+    assert 'nchan: 3' in repr_
+
+    # html repr
+    chinfo._repr_html_()
+    # TODO: Needs more test and probably an overwrite of _repr_html_().
