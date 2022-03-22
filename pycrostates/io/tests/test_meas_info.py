@@ -161,13 +161,13 @@ def test_create_from_channels():
 
     # basic tests
     assert chinfo['bads'] == []
-    assert chinfo['ch_names'] == ['1', '2', '3']
+    assert chinfo['ch_names'] == ['0', '1', '2']
     for k, ch in enumerate(chinfo['chs']):
         assert ch['kind'] == FIFF.FIFFV_EEG_CH
         assert ch['coil_type'] == FIFF.FIFFV_COIL_EEG
         assert ch['unit'] == FIFF.FIFF_UNIT_V
         assert ch['coord_frame'] == FIFF.FIFFV_COORD_HEAD
-        assert ch['ch_name'] == str(k+1)
+        assert ch['ch_name'] == str(k)
         assert all(np.isnan(elt) for elt in ch['loc'])
     assert chinfo['dig'] is None
     assert chinfo['custom_ref_applied'] == FIFF.FIFFV_MNE_CUSTOM_REF_OFF
