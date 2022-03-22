@@ -37,7 +37,7 @@ class ModKMeans(_BaseCluster):
 
         # k-means has a fix number of clusters defined at init
         self._n_clusters = _BaseCluster._check_n_clusters(n_clusters)
-        self._clusters_names = [str(k) for k in range(1, self.n_clusters + 1)]
+        self._clusters_names = [str(k) for k in range(self.n_clusters)]
 
         # k-means settings
         self._n_init = ModKMeans._check_n_init(n_init)
@@ -47,7 +47,12 @@ class ModKMeans(_BaseCluster):
 
         # fit variables
         self._GEV_ = None
-        self._labels_ = None
+
+    @copy_doc(_BaseCluster._check_fit)
+    def _check_fit(self):
+        super()._check_fit()
+        # sanity-check
+        assert self.GEV_ is not None
 
     @copy_doc(_BaseCluster.fit)
     @fill_doc
@@ -91,9 +96,10 @@ class ModKMeans(_BaseCluster):
                 count_converged = 0
 
         if best_gev is not None:
-            logger.info('Selecting run with highest GEV = %.2f%% after %i/%i '
-                        'iteration converged.', best_gev, count_converged,
-                        self._n_init)
+            logger.info(
+                'Selecting run with highest GEV = %.2f%% after %i/%i '
+                'iterations converged.', best_gev * 100, count_converged,
+                self._n_init)
         else:
             logger.error(
                 'All the K-means run failed to converge. Please adapt the '
@@ -231,23 +237,12 @@ class ModKMeans(_BaseCluster):
             logger.warning('Clustering algorithm has not been fitted.')
         return self._GEV_
 
-    @property
-    def labels_(self):
-        """
-        labels fit variable.
-        """
-        if self._labels_ is None:
-            assert not self._fitted  # sanity-check
-            logger.warning('Clustering algorithm has not been fitted.')
-        return self._labels_
-
     @_BaseCluster.fitted.setter
     @copy_doc(_BaseCluster.fitted.setter)
     def fitted(self, fitted):
         super(self.__class__, self.__class__).fitted.__set__(self, fitted)
         if not fitted:
             self._GEV_ = None
-            self._labels_ = None
 
     # --------------------------------------------------------------------
     # ---------------

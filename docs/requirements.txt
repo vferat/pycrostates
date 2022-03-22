@@ -7,3 +7,5 @@ m2r2
 recommonmark
 pillow
 numpydoc
+# For EEGLAB I/O in datasets
+pymatreader

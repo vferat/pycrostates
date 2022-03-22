@@ -33,6 +33,7 @@ class _BaseCluster(ABC):
         self._picks = None
         self._info = None
         self._fitted_data = None
+        self._labels_ = None
         self._fitted = False
 
     def __repr__(self) -> str:
@@ -62,6 +63,12 @@ class _BaseCluster(ABC):
             raise RuntimeError(
                 'Clustering algorithm must be fitted before using '
                 f'{self.__class__.__name__}')
+        # sanity-check
+        assert self.cluster_centers_ is not None
+        assert self.picks is not None
+        assert self.info is not None
+        assert self.fitted_data is not None
+        assert self.labels_ is not None
 
     @abstractmethod
     @fill_doc
@@ -270,6 +277,10 @@ class _BaseCluster(ABC):
         # re-order
         self._cluster_centers_ = self._cluster_centers_[order]
         self._clusters_names = [self._clusters_names[k] for k in order]
+        new_labels = np.full(self._labels_.shape, -1)
+        for k in range(0, self.n_clusters):
+            new_labels[self._labels_ == k] = order[k]
+        self._labels_ = new_labels
 
     def invert_polarity(self, invert):
         """
@@ -354,11 +365,11 @@ class _BaseCluster(ABC):
 
         Returns
         -------
-        segmentation RawSegmentation | EpochsSegmentation
-            Microstate sequence derivated from istance data. Timepoints are
-            labeled according to cluster centers number: 1 for the first
-            center, 2 for the second, etc..
-            0 is used for unlabeled time points.
+        segmentation : `RawSegmentation` | `EpochsSegmentation`
+            Microstate sequence derivated from instance data. Timepoints are
+            labeled according to cluster centers number: 0 for the first
+            center, 1 for the second, etc..
+            -1 is used for unlabeled time points.
         """
         # TODO: reject_by_annotation_raw doc probably doesn't match the correct
         # argument types.
@@ -428,7 +439,7 @@ class _BaseCluster(ABC):
             onsets = onsets.tolist() + [data.shape[-1] - 1]
             ends = [0] + ends.tolist()
 
-            segmentation = np.zeros(data.shape[-1])
+            segmentation = np.full(data.shape[-1], -1)
 
             for onset, end in zip(onsets, ends):
                 # small segments can't be smoothed
@@ -454,7 +465,7 @@ class _BaseCluster(ABC):
             segmentation = _BaseCluster._reject_short_segments(
                 segmentation, data, min_segment_length)
 
-        return RawSegmentation(segmentation=segmentation,
+        return RawSegmentation(labels=segmentation,
                                inst=raw, picks=picks,
                                cluster_centers_=self._cluster_centers_,
                                clusters_names=self._clusters_names)
@@ -477,7 +488,7 @@ class _BaseCluster(ABC):
 
             segments.append(segment)
 
-        return EpochsSegmentation(segmentation=np.array(segments),
+        return EpochsSegmentation(labels=np.array(segments),
                                   inst=epochs, picks=picks,
                                   cluster_centers_=self._cluster_centers_,
                                   clusters_names=self._clusters_names)
@@ -500,7 +511,7 @@ class _BaseCluster(ABC):
             labels = _BaseCluster._smooth_segmentation(
                 data, states, labels, factor, tol, half_window_size)
 
-        return labels + 1
+        return labels
 
     @staticmethod
     def _smooth_segmentation(data, states, labels, factor, tol,
@@ -558,7 +569,7 @@ class _BaseCluster(ABC):
             for k, segment in enumerate(segments):
                 skip_condition = [
                     k in (0, len(segments)-1),  # ignore edge segments
-                    segment[0] == 0,  # ignore segments labelled with 0
+                    segment[0] == -1,  # ignore segments labelled with 0
                     min_segment_length <= len(segment)  # ignore large segments
                     ]
                 if any(skip_condition):
@@ -612,11 +623,11 @@ class _BaseCluster(ABC):
         """Set the first and last segment as unlabeled (0)."""
         # set first segment to unlabeled
         n = (segmentation != segmentation[0]).argmax()
-        segmentation[:n] = 0
+        segmentation[:n] = -1
 
         # set last segment to unlabeled
         n = np.flip((segmentation != segmentation[-1])).argmax()
-        segmentation[-n:] = 0
+        segmentation[-n:] = -1
 
         return segmentation
 
@@ -718,6 +729,16 @@ class _BaseCluster(ABC):
         return self._fitted_data
 
     @property
+    def labels_(self):
+        """
+        labels fit variable.
+        """
+        if self._labels_ is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+        return self._labels_
+
+    @property
     def fitted(self):
         """
         Current fitting state.
@@ -744,6 +765,7 @@ class _BaseCluster(ABC):
             self._picks = None
             self._info = None
             self._fitted_data = None
+            self._labels_ = None
             self._fitted = False
 
     # --------------------------------------------------------------------

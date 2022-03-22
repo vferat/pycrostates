@@ -11,7 +11,7 @@ from ..utils._docs import fill_doc
 from ..viz import plot_segmentation
 
 
-def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
+def _compute_microstate_parameters(labels, data, maps, maps_names, sfreq,
                                    norm_gfp=True):
     """
     Compute microstate parameters.
@@ -54,11 +54,11 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
 
     gfp = np.std(data, axis=0)
     segments = [(s, list(group))
-                for s, group in itertools.groupby(segmentation)]
+                for s, group in itertools.groupby(labels)]
     d = dict()
     for s, state in enumerate(maps):
         state_name = maps_names[s]
-        arg_where = np.argwhere(segmentation == s+1)
+        arg_where = np.argwhere(labels == s)
         if len(arg_where) != 0:
             labeled_tp = data.T[arg_where][:, 0, :].T
             labeled_gfp = gfp[arg_where][:, 0]
@@ -73,11 +73,14 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
             d[f'{state_name}_gev'] = np.sum(gev)
 
             s_segments = np.array(
-                [len(group) for s_, group in segments if s_ == s + 1])
-            occurrences = len(s_segments) / len(segmentation) * sfreq
+                [len(group) for s_, group in segments if s_ == s])
+            occurrences = (len(s_segments)
+                           / len(np.where(labels != -1)[0])
+                           * sfreq)
+
             d[f'{state_name}_occurrences'] = occurrences
 
-            timecov = np.sum(s_segments) / len(np.where(segmentation != 0)[0])
+            timecov = np.sum(s_segments) / len(np.where(labels != -1)[0])
             d[f'{state_name}_timecov'] = timecov
 
             durs = s_segments / sfreq
@@ -92,7 +95,7 @@ def _compute_microstate_parameters(segmentation, data, maps, maps_names, sfreq,
             d[f'{state_name}_dist_durs'] = 0
             d[f'{state_name}_meandurs'] = 0
             d[f'{state_name}_occurrences'] = 0
-    d['unlabeled'] = len(np.argwhere(segmentation == 0)) / len(gfp)
+    d['unlabeled'] = len(np.argwhere(labels == -1)) / len(gfp)
     return d
 
 
@@ -102,10 +105,10 @@ class _BaseSegmentation(ABC):
     """
 
     @abstractmethod
-    def __init__(self, segmentation, inst, picks, cluster_centers_,
+    def __init__(self, labels, inst, picks, cluster_centers_,
                  clusters_names=None):
-        self._segmentation = _BaseSegmentation._check_segmentation(
-            segmentation)
+        self._labels = _BaseSegmentation._check_labels(
+            labels)
         self._inst = inst
         self._picks = picks
         self._cluster_centers_ = cluster_centers_
@@ -113,15 +116,15 @@ class _BaseSegmentation(ABC):
             clusters_names, cluster_centers_)
 
         # sanity-check
-        assert self._inst.times.size == self._segmentation.shape[-1]
+        assert self._inst.times.size == self._labels.shape[-1]
 
     # --------------------------------------------------------------------
     @staticmethod
-    def _check_segmentation(segmentation):
+    def _check_labels(labels):
         """
-        Checks that the argument 'segmentation' is valid.
+        Checks that the argument 'labels' is valid.
         """
-        return np.array(segmentation)
+        return np.array(labels)
 
     @staticmethod
     def _check_cluster_names(clusters_names, cluster_centers_):
@@ -141,11 +144,11 @@ class _BaseSegmentation(ABC):
 
     # --------------------------------------------------------------------
     @property
-    def segmentation(self):
+    def labels(self):
         """
         Segmentation predicted.
         """
-        return self._segmentation
+        return self._labels
 
     @property
     def picks(self):
@@ -203,7 +206,7 @@ class RawSegmentation(_BaseSegmentation):
             Axis
         """
         return plot_segmentation(
-            segmentation=self.segmentation, inst=self.raw,
+            labels=self._labels, inst=self.raw,
             cluster_centers=self.cluster_centers_, names=self.clusters_names,
             tmin=tmin, tmax=tmax)
 
@@ -252,7 +255,7 @@ class RawSegmentation(_BaseSegmentation):
                 This metrics is expressed in segment per second ( . / s).
         """
         return _compute_microstate_parameters(
-            self.segmentation, self.raw.get_data(picks=self.picks),
+            self.labels, self.raw.get_data(picks=self.picks),
             self.cluster_centers_, self.clusters_names,
             self.raw.info['sfreq'], norm_gfp=norm_gfp)
 
@@ -275,7 +278,7 @@ class EpochsSegmentation(_BaseSegmentation):
         _check_type(self._inst, (BaseEpochs, ), 'epochs')
 
         # sanity-check
-        assert len(self._inst) == self.segmentation.shape[0]
+        assert len(self._inst) == self._labels.shape[0]
 
     def compute_parameters(self, norm_gfp=True):
         """
@@ -326,9 +329,9 @@ class EpochsSegmentation(_BaseSegmentation):
         data = self.epochs.get_data(picks=self.picks)
         data = np.swapaxes(data, 0, 1)
         data = data.reshape(data.shape[0], -1)
-        segmentation = self.segmentation.reshape(-1)
+        labels = self.labels.reshape(-1)
         return _compute_microstate_parameters(
-            segmentation, data, self.cluster_centers_, self.clusters_names,
+            labels, data, self.cluster_centers_, self.clusters_names,
             self.epochs.info['sfreq'], norm_gfp=norm_gfp)
 
     # --------------------------------------------------------------------
