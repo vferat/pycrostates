@@ -233,7 +233,7 @@ def test_contains():
     chinfo = ChInfo(info=info)
     assert chinfo.get_channel_types() == ['eeg'] * 3
     # TODO: Looks like __contains__ and compensation_grade() is failing
-    # upstream.
+    # upstream. Issue: mne/10453. Possible fix in 1.1.0
 
 
 def test_copy():
