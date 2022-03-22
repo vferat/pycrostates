@@ -50,7 +50,7 @@ jobs:
   steps: 
     - template: azure-pipelines-steps.yml
 
-- job: Build_Linux_MNE-dev
+- job: Build_Linux_MNE_dev
   pool:  
    vmImage: 'ubuntu-latest'
   strategy:
