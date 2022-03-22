@@ -4,6 +4,8 @@ Inspired from pandas: https://pandas.pydata.org/
 """
 import importlib
 
+from ._logs import logger
+
 
 # A mapping from import name to package name (on PyPI) when the package name
 # is different. {python: PyPI}
@@ -29,9 +31,10 @@ def import_optional_dependency(
         Additional text to include in the ImportError message.
     raise_error : bool
         What to do when a dependency is not found.
-        * True : Raise an ImportError.
-        * False: If the module is not installed, return None, otherwise, return
-        the module.
+        * True : If the module is not installed, raise an ImportError,
+                 otherwise, return the module.
+        * False: If the module is not installed, issue a warning and return
+                 None, otherwise, return the module.
 
     Returns
     -------
@@ -46,11 +49,12 @@ def import_optional_dependency(
     try:
         module = importlib.import_module(name)
     except ImportError:
+        msg = f"Missing optional dependency '{install_name}'. {extra} " + \
+            f"Use pip or conda to install '{install_name}'."
         if raise_error:
-            raise ImportError(
-                f"Missing optional dependency '{install_name}'. {extra} "
-                f"Use pip or conda to install {install_name}.")
+            raise ImportError(msg)
         else:
+            logger.warning(msg)
             return None
 
     return module
