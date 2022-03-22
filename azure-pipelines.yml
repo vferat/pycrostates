@@ -55,7 +55,7 @@ jobs:
    vmImage: 'ubuntu-latest'
   strategy:
     matrix:
-      Python37:
+      Python39:
         python.version: '3.9'
   steps: 
     - template: azure-pipelines-steps-mne.yml
