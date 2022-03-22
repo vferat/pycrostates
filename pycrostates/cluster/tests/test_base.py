@@ -38,11 +38,11 @@ def test_reject_edge_segments():
     """Test method rejecting edge segments."""
     segmentation = np.array([1, 1, 2, 3, 2, 2, 3, 4, 4])
     segmentation = _BaseCluster._reject_edge_segments(segmentation)
-    assert ([0, 0, 2, 3, 2, 2, 3, 0, 0] == segmentation).all()
+    assert ([-1, -1, 2, 3, 2, 2, 3, -1, -1] == segmentation).all()
 
     segmentation = np.array([0, 1, 2, 3, 2, 2, 3, 0, 4])
     segmentation = _BaseCluster._reject_edge_segments(segmentation)
-    assert ([0, 1, 2, 3, 2, 2, 3, 0, 0] == segmentation).all()
+    assert ([-1, 1, 2, 3, 2, 2, 3, 0, -1] == segmentation).all()
 
 
 def test_reject_short_segments():
