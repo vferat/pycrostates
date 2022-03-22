@@ -366,10 +366,10 @@ class _BaseCluster(ABC):
         Returns
         -------
         segmentation : `RawSegmentation` | `EpochsSegmentation`
-            Microstate sequence derivated from istance data. Timepoints are
-            labeled according to cluster centers number: 1 for the first
-            center, 2 for the second, etc..
-            0 is used for unlabeled time points.
+            Microstate sequence derivated from instance data. Timepoints are
+            labeled according to cluster centers number: 0 for the first
+            center, 1 for the second, etc..
+            -1 is used for unlabeled time points.
         """
         # TODO: reject_by_annotation_raw doc probably doesn't match the correct
         # argument types.
