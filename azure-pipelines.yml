@@ -50,3 +50,12 @@ jobs:
   steps: 
     - template: azure-pipelines-steps.yml
 
+- job: Build_Linux_MNE-dev
+  pool:  
+   vmImage: 'ubuntu-latest'
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.9'
+  steps: 
+    - template: azure-pipelines-steps-mne.yml

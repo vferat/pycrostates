@@ -14,13 +14,3 @@ steps:
     pip install pytest-azurepipelines
     pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
   displayName: 'pytest'
-
-- task: PublishCodeCoverageResults@1
-  inputs:
-    codeCoverageTool: Cobertura
-    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
-
-- bash: |
-     bash <(curl -s https://codecov.io/bash)
-  condition: and(eq(variables['Agent.OS'], 'Linux' ), eq(variables['python.version'], '3.9' ))
-  displayName: 'Upload to codecov.io'

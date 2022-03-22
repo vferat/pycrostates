@@ -1,5 +1,5 @@
 # requirements for running tests
-pytest
+pytest==7.0.1
 pytest-cov
 flake8
 twine
