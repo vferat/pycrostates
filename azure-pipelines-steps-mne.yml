@@ -13,6 +13,10 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
+    mne sys_info -pd
+  displayName: 'Print MNE config'
+
+- script: |
     pip install pytest-azurepipelines
     pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
   displayName: 'pytest'
