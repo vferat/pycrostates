@@ -2,7 +2,11 @@
 
 import pytest
 
+from pycrostates.utils._logs import logger, set_log_level
 from pycrostates.utils._imports import import_optional_dependency
+
+set_log_level('INFO')
+logger.propagate = True
 
 
 def test_import_optional_dependency(caplog):
