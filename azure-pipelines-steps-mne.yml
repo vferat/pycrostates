@@ -5,10 +5,10 @@ steps:
   displayName: 'Use Python $(python.version)'
 
 - script: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
-    pip install -U --no-deps https://github.com/mne-tools/mne-python/archive/main.zip
-    pip install -r requirements_testing.txt
+    python -m pip install --progress-bar off --upgrade pip setuptools wheel
+    pip install -r --progress-bar off requirements.txt
+    pip install -U --progress-bar off --no-deps https://github.com/mne-tools/mne-python/archive/main.zip
+    pip install -r --progress-bar off requirements_testing.txt
 
   displayName: 'Install dependencies'
 
