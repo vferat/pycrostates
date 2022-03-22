@@ -1,10 +1,12 @@
 """Test _imports.py"""
 
-import pytest
+from collections import OrderedDict
 
 from mne import create_info
+from mne.channels import DigMontage
 from mne.io.constants import FIFF
 import numpy as np
+import pytest
 
 from pycrostates.io import ChInfo
 from pycrostates.utils._logs import logger, set_log_level
@@ -175,7 +177,48 @@ def test_create_without_arguments():
 
 
 def test_montage():
-    pass
+    """Test methods from montage Mixin."""
+    info = create_info(ch_names=['Fp1', 'Fp2', 'Fpz'], sfreq=1, ch_types='eeg')
+    info.set_montage('standard_1020')
+    chinfo = ChInfo(info=info)
+    assert chinfo['ch_names'] == ['Fp1', 'Fp2', 'Fpz']
+    for k, ch in enumerate(info['chs']):
+        assert ch['coord_frame'] == FIFF.FIFFV_COORD_HEAD
+        assert not all(np.isnan(elt) for elt in ch['loc'])
+    assert chinfo['dig'] is not None
+    assert chinfo['nchan'] == 3
+
+    # retrieve montage
+    montage = chinfo.get_montage()
+    assert isinstance(montage, DigMontage)
+    assert montage.ch_names == ['Fp1', 'Fp2', 'Fpz']
+
+    # add retrieved montage to different ChInfo
+    chinfo2 = ChInfo(ch_names=['Fp1', 'Fp2', 'Fpz'], ch_types='eeg')
+    assert chinfo2['dig'] is None
+    montage2 = chinfo2.get_montage()
+    assert montage2 is None
+    chinfo2.set_montage(montage)
+    montage2 = chinfo2.get_montage()
+    assert isinstance(montage2, DigMontage)
+    assert montage2.ch_names == ['Fp1', 'Fp2', 'Fpz']
+
+    # compare positions
+    assert sorted(list(montage.get_positions().keys())) == \
+        sorted(list(montage2.get_positions().keys()))
+    for key in sorted(list(montage.get_positions().keys())):
+        if montage.get_positions()[key] is None:
+            assert montage2.get_positions()[key] is None
+        elif isinstance(montage.get_positions()[key], str):
+            assert montage.get_positions()[key] == \
+                montage2.get_positions()[key]
+        elif isinstance(montage.get_positions()[key], np.ndarray):
+            assert np.allclose(montage.get_positions()[key],
+                               montage2.get_positions()[key])
+        elif isinstance(montage.get_positions()[key], OrderedDict):
+            for k, v in montage.get_positions()[key].items():
+                assert np.allclose(montage.get_positions()[key][k],
+                                   montage2.get_positions()[key][k])
 
 
 def test_contains():
