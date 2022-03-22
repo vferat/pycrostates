@@ -154,6 +154,25 @@ def test_create_from_channels():
         assert ch['ch_name'] == ch_names[k]
         assert all(np.isnan(elt) for elt in ch['loc'])
 
+    # test with ch_names as int
+    ch_names = 3
+    ch_types = ['eeg'] * 3
+    chinfo = ChInfo(ch_names=ch_names, ch_types=ch_types)
+
+    # basic tests
+    assert chinfo['bads'] == []
+    assert chinfo['ch_names'] == ['1', '2', '3']
+    for k, ch in enumerate(chinfo['chs']):
+        assert ch['kind'] == FIFF.FIFFV_EEG_CH
+        assert ch['coil_type'] == FIFF.FIFFV_COIL_EEG
+        assert ch['unit'] == FIFF.FIFF_UNIT_V
+        assert ch['coord_frame'] == FIFF.FIFFV_COORD_HEAD
+        assert ch['ch_name'] == str(k+1)
+        assert all(np.isnan(elt) for elt in ch['loc'])
+    assert chinfo['dig'] is None
+    assert chinfo['custom_ref_applied'] == FIFF.FIFFV_MNE_CUSTOM_REF_OFF
+    assert chinfo['nchan'] == 3
+
 
 def test_Create_from_channels_invalid_arguments():
     """Test creation of a ChInfo from channel names and types with invalid
