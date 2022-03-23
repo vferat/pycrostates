@@ -1,7 +1,7 @@
 from mne.parallel import parallel_func
 import numpy as np
 
-from ._base import _BaseCluster
+from .base import BaseCluster
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type, _check_random_state
 from ..utils._docs import fill_doc, copy_doc
@@ -9,7 +9,7 @@ from ..utils._logs import _set_verbose, logger
 
 
 @fill_doc
-class ModKMeans(_BaseCluster):
+class ModKMeans(BaseCluster):
     """
     Modified K-Means clustering algorithms.
 
@@ -36,7 +36,7 @@ class ModKMeans(_BaseCluster):
         super().__init__()
 
         # k-means has a fix number of clusters defined at init
-        self._n_clusters = _BaseCluster._check_n_clusters(n_clusters)
+        self._n_clusters = BaseCluster._check_n_clusters(n_clusters)
         self._clusters_names = [str(k) for k in range(self.n_clusters)]
 
         # k-means settings
@@ -48,13 +48,13 @@ class ModKMeans(_BaseCluster):
         # fit variables
         self._GEV_ = None
 
-    @copy_doc(_BaseCluster._check_fit)
+    @copy_doc(BaseCluster._check_fit)
     def _check_fit(self):
         super()._check_fit()
         # sanity-check
         assert self.GEV_ is not None
 
-    @copy_doc(_BaseCluster.fit)
+    @copy_doc(BaseCluster.fit)
     @fill_doc
     def fit(self, inst, picks='eeg', tmin=None, tmax=None,
             reject_by_annotation=True, n_jobs=1, *, verbose=None):
@@ -239,8 +239,8 @@ class ModKMeans(_BaseCluster):
             logger.warning('Clustering algorithm has not been fitted.')
         return self._GEV_
 
-    @_BaseCluster.fitted.setter
-    @copy_doc(_BaseCluster.fitted.setter)
+    @BaseCluster.fitted.setter
+    @copy_doc(BaseCluster.fitted.setter)
     def fitted(self, fitted):
         super(self.__class__, self.__class__).fitted.__set__(self, fitted)
         if not fitted:

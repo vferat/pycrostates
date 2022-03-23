@@ -94,7 +94,7 @@ class BaseCluster(ABC):
         _check_type(inst, (BaseRaw, BaseEpochs), item_name='inst')
         _check_type(tmin, (None, 'numeric'), item_name='tmin')
         _check_type(tmax, (None, 'numeric'), item_name='tmax')
-        reject_by_annotation = _BaseCluster._check_reject_by_annotation(
+        reject_by_annotation = BaseCluster._check_reject_by_annotation(
             reject_by_annotation)
         n_jobs = _check_n_jobs(n_jobs)
 
@@ -450,22 +450,22 @@ class BaseCluster(ABC):
                     continue
 
                 data_ = data[:, end:onset]
-                segment = _BaseCluster._segment(
+                segment = BaseCluster._segment(
                     data_, deepcopy(self._cluster_centers_), factor, tol,
                     half_window_size)
                 if reject_edges:
-                    segment = _BaseCluster._reject_edge_segments(segment)
+                    segment = BaseCluster._reject_edge_segments(segment)
                 segmentation[end:onset] = segment
 
         else:
-            segmentation = _BaseCluster._segment(
+            segmentation = BaseCluster._segment(
                 data, deepcopy(self._cluster_centers_), factor, tol,
                 half_window_size)
             if reject_edges:
-                segmentation = _BaseCluster._reject_edge_segments(segmentation)
+                segmentation = BaseCluster._reject_edge_segments(segmentation)
 
         if 0 < min_segment_length:
-            segmentation = _BaseCluster._reject_short_segments(
+            segmentation = BaseCluster._reject_short_segments(
                 segmentation, data, min_segment_length)
 
         return RawSegmentation(labels=segmentation,
@@ -479,15 +479,15 @@ class BaseCluster(ABC):
         data = epochs.get_data(picks=picks)
         segments = list()
         for epoch_data in data:
-            segment = _BaseCluster._segment(
+            segment = BaseCluster._segment(
                 epoch_data, deepcopy(self._cluster_centers_),
                 factor, tol, half_window_size)
 
             if 0 < min_segment_length:
-                segment = _BaseCluster._reject_short_segments(
+                segment = BaseCluster._reject_short_segments(
                     segment, epoch_data, min_segment_length)
             if reject_edges:
-                segment = _BaseCluster._reject_edge_segments(segment)
+                segment = BaseCluster._reject_edge_segments(segment)
 
             segments.append(segment)
 
@@ -511,7 +511,7 @@ class BaseCluster(ABC):
         labels = np.argmax(np.abs(np.dot(states, data)), axis=0)
 
         if factor != 0:
-            labels = _BaseCluster._smooth_segmentation(
+            labels = BaseCluster._smooth_segmentation(
                 data, states, labels, factor, tol, half_window_size)
 
         return labels
