@@ -49,6 +49,9 @@ class ChInfo(Info):
     chs : tuple of dict
         A list of channel information dictionaries, one per channel.
         See Notes for more information.
+    comps : list of dict
+        CTF software gradient compensation data.
+        See Notes for more information.
     custom_ref_applied : int
         Whether a custom (=other than average) reference has been applied to
         the EEG data. This flag is checked by some algorithms that require an
@@ -100,6 +103,20 @@ class ChInfo(Info):
         unit_mul : int
             Unit multipliers, most commonly ``FIFF_UNITM_NONE``.
 
+    * ``comps`` list of dict:
+
+        ctfkind : int
+            CTF compensation grade.
+        colcals : ndarray
+            Column calibrations.
+        mat : dict
+            A named matrix dictionary (with entries "data", "col_names", etc.)
+            containing the compensation matrix.
+        rowcals : ndarray
+            Row calibrations.
+        save_calibrated : bool
+            Were the compensation data saved in calibrated form.
+
     * ``dig`` list of dict:
 
         kind : int
@@ -128,6 +145,9 @@ class ChInfo(Info):
                'inst.drop_channels(), inst.pick_channels(), '
                'inst.rename_channels(), inst.reorder_channels() '
                'and inst.set_channel_types() instead.',
+        'comps': 'comps cannot be set directly. '
+                 'Please use method Raw.apply_gradient_compensation() '
+                 'instead.',
         'custom_ref_applied': 'custom_ref_applied cannot be set directly. '
                               'Please use method inst.set_eeg_reference() '
                               'instead.',
@@ -165,7 +185,8 @@ class ChInfo(Info):
         self['custom_ref_applied'] = info['custom_ref_applied']
         self['bads'] = info['bads']
         self['chs'] = info['chs']
-        self['dig'] = None if info['dig'] is None else info['dig']
+        self['dig'] = info['dig']
+        self['comps'] = info['comps']
         self._update_redundant()
 
     def _init_from_channels(self, ch_names, ch_types):
@@ -228,6 +249,9 @@ class ChInfo(Info):
 
         # add empty dig
         self['dig'] = None
+
+        # add empty compensation grades
+        self['comps'] = list()
 
         self._unlocked = False
 
