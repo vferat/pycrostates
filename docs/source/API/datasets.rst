@@ -13,4 +13,5 @@ Datasets
    :toctree: generated/
    
    lemon.load_data
+   lemon.standardize
 
