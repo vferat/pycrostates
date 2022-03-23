@@ -9,3 +9,4 @@ Most-used classes
    cluster.ModKMeans
    segmentation.RawSegmentation
    segmentation.EpochsSegmentation
+   io.ChInfo
