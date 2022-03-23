@@ -17,6 +17,6 @@ steps:
   displayName: 'Print MNE config'
 
 - script: |
-    pip install pytest-azurepipelines
+    pip install pytest-azurepipelines --progress-bar off
     pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
   displayName: 'pytest'

@@ -5,13 +5,13 @@ steps:
   displayName: 'Use Python $(python.version)'
 
 - script: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
-    pip install -r requirements_testing.txt
+    python -m pip install --progress-bar off --upgrade pip setuptools wheel
+    pip install -r requirements.txt --progress-bar off
+    pip install -r requirements_testing.txt --progress-bar off
   displayName: 'Install dependencies'
 
 - script: |
-    pip install pytest-azurepipelines
+    pip install pytest-azurepipelines --progress-bar off
     pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
   displayName: 'pytest'
 
