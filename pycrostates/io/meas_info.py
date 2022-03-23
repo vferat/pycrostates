@@ -115,6 +115,7 @@ class ChInfo(Info):
             The coordinate frame used, e.g. ``FIFFV_COORD_HEAD``.
     """
 
+    # valid items
     _attributes = {
         'bads': _check_bads,
         'ch_names': 'ch_names cannot be set directly. '
@@ -233,9 +234,27 @@ class ChInfo(Info):
         # add ch_names and nchan
         self._update_redundant()
 
+    def __getattribute__(self, name):
+        """Attribute getter."""
+        # invalid attributes/properties
+        _attributes = (
+            )
+
+        # invalid methods
+        _methods = (
+            'pick_channels'
+            )
+
+        # disable method/attributes that we do not support
+        if name in _attributes or name in _methods:
+            raise AttributeError(
+                f"'{self.__class__.__name__}' has not attribute '{name}'")
+        else:
+            return super().__getattribute__(name)
+
     # ------------------------------------------------------------------------
     def __setitem__(self, key, val):
-        """Attribute setter."""
+        """Dict item setter."""
         # During unpickling, the _unlocked attribute has not been set, so
         # let __setstate__ do it later and act unlocked now
         unlocked = getattr(self, '_unlocked', True)
