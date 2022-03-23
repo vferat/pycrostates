@@ -242,7 +242,7 @@ class ChInfo(Info):
 
         # invalid methods
         _methods = (
-            'pick_channels'
+            'pick_channels'  # TODO: Can be removed when req. for MNE = 1.1.0
             )
 
         # disable method/attributes that we do not support
