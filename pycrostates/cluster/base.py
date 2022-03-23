@@ -18,9 +18,12 @@ from ..utils._logs import verbose, logger
 from ..viz import plot_cluster_centers
 
 
-class _BaseCluster(ABC):
+class BaseCluster(ABC):
     """
     Base Class for Microstates Clustering algorithms.
+
+    This class can not be instanciated directly but can be used to test for
+    object types with ``isinstance(cluster, BaseCluster)``.
     """
 
     @abstractmethod
