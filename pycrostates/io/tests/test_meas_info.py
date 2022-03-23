@@ -285,3 +285,23 @@ def test_repr():
     # html repr
     chinfo._repr_html_()
     # TODO: Needs more test and probably an overwrite of _repr_html_().
+
+
+def test_setting_invalid_keys():
+    """Test raise when invalid keys are set. Test locking mechanism."""
+    info = create_info(ch_names=3, sfreq=1, ch_types='eeg')
+    chinfo = ChInfo(info=info)
+
+    with pytest.raises(RuntimeError,
+                       match="Supported keys are 'bads', 'ch_names', 'chs'"):
+        chinfo['test'] = 5
+
+    with pytest.raises(RuntimeError, match='ch_names cannot be set directly.'):
+        chinfo['ch_names'] = ['4', '5', '6']
+
+    with chinfo._unlock():
+        chinfo['ch_names'] = ['4', '5', '6']
+    assert chinfo['ch_names'] == ['4', '5', '6']
+
+    with pytest.raises(RuntimeError, match='info channel name inconsistency'):
+        chinfo._check_consistency()

@@ -234,6 +234,24 @@ class ChInfo(Info):
         self._update_redundant()
 
     # ------------------------------------------------------------------------
+    def __setitem__(self, key, val):
+        """Attribute setter."""
+        # During unpickling, the _unlocked attribute has not been set, so
+        # let __setstate__ do it later and act unlocked now
+        unlocked = getattr(self, '_unlocked', True)
+        if key in self._attributes:
+            if isinstance(self._attributes[key], str):
+                if not unlocked:
+                    raise RuntimeError(self._attributes[key])
+            else:
+                val = self._attributes[key](val)  # attribute checker function
+        else:
+            raise RuntimeError(
+                f"Info does not support setting the key {repr(key)}. "
+                "Supported keys are "
+                f"{', '.join(repr(k) for k in self._attributes)}")
+        super().__setitem__(key, val)  # calls the dict __setitem__
+
     def __deepcopy__(self, memodict):
         """Make a deepcopy."""
         result = ChInfo.__new__(ChInfo)
