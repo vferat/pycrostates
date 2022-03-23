@@ -21,7 +21,7 @@ class ChInfo(Info):
         - by providing the ch_names and the ch_types to create a new instance
     Only one of those 2 methods should be used at once.
 
-    .. warning:: The only entriy that should be manually changed by the user
+    .. warning:: The only entry that should be manually changed by the user
                  is ``info['bads']``. All other entries should be
                  considered read-only, though they can be modified by various
                  functions or methods (which have safeguards to ensure all
