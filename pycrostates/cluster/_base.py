@@ -666,33 +666,6 @@ class _BaseCluster(ABC, ContainsMixin):
         return self._cluster_centers_
 
     @property
-    def cluster_centers_raw(self):
-        """
-        Center of the clusters as a :class:`~mne.io.Raw` instance.
-        Returns None if cluster algorithm has not been fitted.
-        """
-        if self._cluster_centers_ is None:
-            assert not self._fitted  # sanity-check
-            logger.warning('Clustering algorithm has not been fitted.')
-            return None
-
-        # sanity-checks
-        assert self._info is not None and isinstance(self._info, Info)
-
-        # ---------------------------------------------------------------------
-        # TODO: I can't see the sfreq=-1 work well with .get_data() in the long
-        # run e.g. what happens if start, stop, tmin, tmax are provided?
-        # ---------------------------------------------------------------------
-        info = self._info.copy()
-        if hasattr(info, '_unlocked'):
-            with info._unlock():
-                info['sfreq'] = -1.
-        else:
-            info['sfreq'] = -1.
-
-        return RawArray(self._cluster_centers_.T, info)
-
-    @property
     def picks(self):
         """
         Picks selected when fitting the clustering algorithm.

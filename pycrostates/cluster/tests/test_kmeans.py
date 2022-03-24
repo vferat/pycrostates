@@ -358,10 +358,6 @@ def test_properties(caplog):
     assert 'Clustering algorithm has not been fitted.' in caplog.text
     caplog.clear()
 
-    ModK_.cluster_centers_raw
-    assert 'Clustering algorithm has not been fitted.' in caplog.text
-    caplog.clear()
-
     ModK_.picks
     assert 'Clustering algorithm has not been fitted.' in caplog.text
     caplog.clear()
@@ -381,10 +377,6 @@ def test_properties(caplog):
     assert 'Clustering algorithm has not been fitted.' not in caplog.text
     caplog.clear()
 
-    ModK_.cluster_centers_raw
-    assert 'Clustering algorithm has not been fitted.' not in caplog.text
-    caplog.clear()
-
     ModK_.picks
     assert 'Clustering algorithm has not been fitted.' not in caplog.text
     caplog.clear()
@@ -396,15 +388,6 @@ def test_properties(caplog):
     ModK_.fitted_data
     assert 'Clustering algorithm has not been fitted.' not in caplog.text
     caplog.clear()
-
-    # Test cluster_centers raw/numpy
-    cluster_centers_ = ModK_.cluster_centers_
-    cluster_centers_raw = ModK_.cluster_centers_raw
-    # -------------------------------------------------------------------------
-    # TODO: I can't see the sfreq=-1 work well with .get_data() in the long run
-    # e.g. what happens if start, stop, tmin, tmax are provided?
-    # -------------------------------------------------------------------------
-    assert np.isclose(cluster_centers_raw.get_data().T, cluster_centers_).all()
 
     # Test fitted property
     ModK_ = ModKMeans(n_clusters=n_clusters, n_init=10, max_iter=100, tol=1e-4,
