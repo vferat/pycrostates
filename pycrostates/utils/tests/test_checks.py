@@ -28,9 +28,11 @@ def test_check_type():
     # valids
     assert _check_type(101, ('int', )) == 101
     assert _check_type('101.fif', ('path-like', )) == '101.fif'
+
     def foo():
         pass
     _check_type(foo, ('callable', ))
+
     assert _check_type(101, ('numeric', )) == 101
     assert _check_type(101., ('numeric', )) == 101.
 
