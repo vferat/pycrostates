@@ -849,13 +849,11 @@ def test_contains_mixin():
     ModK_ = ModKMeans(n_clusters=n_clusters, n_init=10, max_iter=40, tol=1e-4,
                       random_state=1)
     with pytest.raises(ValueError,
-                       match='Cannot check for channels of type "eeg" because '
-                       'info is None'):
+                       match="Instance 'ModKMeans' attribute 'info' is None."):
         'eeg' in ModK_
     with pytest.raises(ValueError,
                        match="Instance 'ModKMeans' attribute 'info' is None."):
         ModK_.get_channel_types()
-
     with pytest.raises(ValueError,
                        match="Instance 'ModKMeans' attribute 'info' is None."):
         ModK_.compensation_grade
