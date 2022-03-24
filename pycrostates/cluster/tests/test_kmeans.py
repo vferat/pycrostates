@@ -853,3 +853,10 @@ def test_randomseed():
 
     assert np.isclose(ModK1.cluster_centers_, ModK2.cluster_centers_).all()
     assert not np.isclose(ModK1.cluster_centers_, ModK3.cluster_centers_).all()
+
+
+def test_contains_mixin():
+    """Test mixin classes."""
+    assert 'eeg' in ModK
+    assert ModK.compensation_grade is None
+    assert ModK.get_channel_types() == ['eeg'] * ModK.info['nchan']
