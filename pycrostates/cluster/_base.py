@@ -5,7 +5,7 @@ from typing import Union
 
 from mne import BaseEpochs, pick_info
 from mne.annotations import _annotations_starts_stops
-from mne.io import BaseRaw, Info, RawArray
+from mne.io import BaseRaw
 from mne.io.pick import _picks_to_idx
 import numpy as np
 from scipy.signal import convolve2d
