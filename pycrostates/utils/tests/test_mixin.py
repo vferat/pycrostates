@@ -1,10 +1,13 @@
 """Test mixins.py"""
 
+from mne.channels import DigMontage
+import pytest
+
 from pycrostates.io import ChInfo
-from pycrostates.utils.mixin import ContainsMixin
+from pycrostates.utils.mixin import ContainsMixin, MontageMixin
 
 
-class Foo(ContainsMixin):
+class Foo(ContainsMixin, MontageMixin):
     def __init__(self, info):
         self.info = info
 
@@ -27,3 +30,42 @@ def test_contains_mixin():
     assert 'eeg' in foo
     assert foo.compensation_grade is None
     assert foo.get_channel_types() == ch_types
+
+    # test with info equal to None
+    foo = Foo(None)
+    with pytest.raises(ValueError,
+                       match='Cannot check for channels of type "eeg" because '
+                       'info is None'):
+        'eeg' in foo
+
+    with pytest.raises(ValueError,
+                       match="Instance 'Foo' attribute 'info' is None."):
+        foo.get_channel_types()
+
+    with pytest.raises(ValueError,
+                       match="Instance 'Foo' attribute 'info' is None."):
+        foo.compensation_grade
+
+
+def test_montage_mixin():
+    """Test MontageMixin."""
+    info = ChInfo(ch_names=['Fp1', 'Fpz', 'Fp2'], ch_types='eeg')
+    assert info.get_montage() is None
+
+    foo = Foo(info)
+    assert foo.info['dig'] is None
+    foo.set_montage('standard_1020')
+    assert foo.info['dig'] is not None
+
+    montage = foo.get_montage()
+    assert isinstance(montage, DigMontage)
+
+    # test with info equal to None
+    foo = Foo(None)
+    with pytest.raises(ValueError,
+                       match="Instance 'Foo' attribute 'info' is None."):
+        foo.set_montage('standard_1020')
+
+    with pytest.raises(ValueError,
+                       match="Instance 'Foo' attribute 'info' is None."):
+        foo.get_montage()

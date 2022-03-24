@@ -6,6 +6,7 @@ from pathlib import Path
 
 from matplotlib import pyplot as plt
 import mne
+from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io.pick import _picks_to_idx
 import numpy as np
@@ -839,7 +840,45 @@ def test_randomseed():
 
 
 def test_contains_mixin():
-    """Test mixin classes."""
+    """Test contains mixin class."""
     assert 'eeg' in ModK
     assert ModK.compensation_grade is None
     assert ModK.get_channel_types() == ['eeg'] * ModK.info['nchan']
+
+    # test raise with non-fitted instance
+    ModK_ = ModKMeans(n_clusters=n_clusters, n_init=10, max_iter=40, tol=1e-4,
+                      random_state=1)
+    with pytest.raises(ValueError,
+                       match='Cannot check for channels of type "eeg" because '
+                       'info is None'):
+        'eeg' in ModK_
+    with pytest.raises(ValueError,
+                       match="Instance 'ModKMeans' attribute 'info' is None."):
+        ModK_.get_channel_types()
+
+    with pytest.raises(ValueError,
+                       match="Instance 'ModKMeans' attribute 'info' is None."):
+        ModK_.compensation_grade
+
+
+def test_montage_mixin():
+    """Test montage mixin class."""
+    ModK_ = ModK.copy()
+    montage = ModK.get_montage()
+    assert isinstance(montage, DigMontage)
+    assert montage.dig[-1]['r'][0] != 0
+    montage.dig[-1]['r'][0] = 0
+    ModK_.set_montage(montage)
+    montage_ = ModK.get_montage()
+    assert montage_.dig[-1]['r'][0] == 0
+
+    # test raise with non-fitted instance
+    ModK_ = ModKMeans(n_clusters=n_clusters, n_init=10, max_iter=40, tol=1e-4,
+                      random_state=1)
+    with pytest.raises(ValueError,
+                       match="Instance 'ModKMeans' attribute 'info' is None."):
+        ModK_.set_montage('standard_1020')
+
+    with pytest.raises(ValueError,
+                       match="Instance 'ModKMeans' attribute 'info' is None."):
+        ModK_.get_montage()
