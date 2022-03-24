@@ -12,6 +12,11 @@ class Foo(ContainsMixin, MontageMixin):
         self.info = info
 
 
+class Foo2(ContainsMixin, MontageMixin):
+    def __init__(self):
+        pass
+
+
 def test_contains_mixin():
     """Test ContainsMixin."""
     ch_types = ['eeg', 'eeg', 'grad', 'grad', 'mag']
@@ -34,16 +39,25 @@ def test_contains_mixin():
     # test with info equal to None
     foo = Foo(None)
     with pytest.raises(ValueError,
-                       match='Cannot check for channels of type "eeg" because '
-                       'info is None'):
+                       match="Instance 'Foo' attribute 'info' is None."):
         'eeg' in foo
-
     with pytest.raises(ValueError,
                        match="Instance 'Foo' attribute 'info' is None."):
         foo.get_channel_types()
-
     with pytest.raises(ValueError,
                        match="Instance 'Foo' attribute 'info' is None."):
+        foo.compensation_grade
+
+    # test without attribute info
+    foo = Foo2()
+    with pytest.raises(ValueError,
+                       match="Instance 'Foo2' is missing an attribute 'info'"):
+        'eeg' in foo
+    with pytest.raises(ValueError,
+                       match="Instance 'Foo2' is missing an attribute 'info'"):
+        foo.get_channel_types()
+    with pytest.raises(ValueError,
+                       match="Instance 'Foo2' is missing an attribute 'info'"):
         foo.compensation_grade
 
 
@@ -65,7 +79,15 @@ def test_montage_mixin():
     with pytest.raises(ValueError,
                        match="Instance 'Foo' attribute 'info' is None."):
         foo.set_montage('standard_1020')
-
     with pytest.raises(ValueError,
                        match="Instance 'Foo' attribute 'info' is None."):
+        foo.get_montage()
+
+    # test without attribute info
+    foo = Foo2()
+    with pytest.raises(ValueError,
+                       match="Instance 'Foo2' is missing an attribute 'info'"):
+        foo.set_montage('standard_1020')
+    with pytest.raises(ValueError,
+                       match="Instance 'Foo2' is missing an attribute 'info'"):
         foo.get_montage()

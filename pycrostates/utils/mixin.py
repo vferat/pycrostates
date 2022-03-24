@@ -3,6 +3,8 @@
 from mne.io.meas_info import ContainsMixin as MNEContainsMixin
 from mne.io.meas_info import MontageMixin as MNEMontageMixin
 
+from ._docs import copy_doc
+
 
 class ChannelsMixin():
     # TODO: Maybe some part are salvageable from mne.channels.channels:
@@ -12,6 +14,19 @@ class ChannelsMixin():
 
 
 class ContainsMixin(MNEContainsMixin):
+    @copy_doc(MNEContainsMixin.__contains__)
+    def __contains__(self, ch_type):
+        if not hasattr(self, 'info'):
+            raise ValueError(
+                f"Instance '{self.__class__.__name__}' is missing an "
+                "attribute 'info' required by 'in' operator.")
+        if self.info is None:
+            raise ValueError(
+                f"Instance '{self.__class__.__name__}' attribute 'info' "
+                "is None. An Info/ChInfo instance is required by 'in' "
+                "operator.")
+        return super().__contains__(ch_type)
+
     def __getattribute__(self, name):
         """Attribute getter."""
         # check if the attribute requies a .info to work
@@ -23,13 +38,12 @@ class ContainsMixin(MNEContainsMixin):
             if not hasattr(self, 'info'):
                 raise ValueError(
                     f"Instance '{self.__class__.__name__}' is missing an "
-                    f"attribute 'info' required by '{name}'."
-                    )
+                    f"attribute 'info' required by '{name}'.")
             if self.info is None:
                 raise ValueError(
                     f"Instance '{self.__class__.__name__}' attribute 'info' "
-                    f"is None. An Info/ChInfo instance is required by {name}'."
-                    )
+                    "is None. An Info/ChInfo instance is required by "
+                    f"'{name}'.")
 
         # disable method/attributes that pycrostates does not support
         # invalid attributes
@@ -58,13 +72,12 @@ class MontageMixin(MNEMontageMixin):
             if not hasattr(self, 'info'):
                 raise ValueError(
                     f"Instance '{self.__class__.__name__}' is missing an "
-                    f"attribute 'info' required by '{name}'."
-                    )
+                    f"attribute 'info' required by '{name}'.")
             if self.info is None:
                 raise ValueError(
                     f"Instance '{self.__class__.__name__}' attribute 'info' "
-                    f"is None. An Info/ChInfo instance is required by {name}'."
-                    )
+                    "is None. An Info/ChInfo instance is required by "
+                    f"'{name}'.")
 
         # disable method/attributes that pycrostates does not support
         # invalid attributes
