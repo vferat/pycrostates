@@ -10,6 +10,7 @@ from mne.io.pick import _picks_to_idx
 import numpy as np
 from scipy.signal import convolve2d
 
+from ..io import ChInfo
 from ..segmentation import RawSegmentation, EpochsSegmentation
 from ..utils import _corr_vectors, _compare_infos
 from ..utils._checks import _check_type, _check_value, _check_n_jobs
@@ -149,7 +150,7 @@ class _BaseCluster(ABC):
 
         # store picks and info
         self._picks = picks
-        self._info = pick_info(inst.info, picks)
+        self._info = ChInfo(info=pick_info(inst.info, picks))
         self._fitted_data = data
 
         return data
