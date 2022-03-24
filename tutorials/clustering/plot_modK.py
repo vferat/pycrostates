@@ -52,11 +52,6 @@ ModK.plot()
 ModK.cluster_centers_
 
 #%%
-# or as a :class:`mne.io.Raw` object:
-
-ModK.cluster_centers_raw
-
-#%%
 # Clusters centers can be reordered using :meth:`ModK.reorder_clusters`:
 
 ModK.reorder_clusters(order=[3, 2, 4, 0, 1])
