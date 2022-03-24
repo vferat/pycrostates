@@ -260,16 +260,14 @@ class ChInfo(Info):
 
     def __getattribute__(self, name):
         """Attribute getter."""
-        # invalid attributes/properties
+        # disable method/attributes that pycrostates does not support
+        # invalid attributes
         _inv_attributes = (
             )
-
-        # invalid methods
+        # invalid methods/properties
         _inv_methods = (
             'pick_channels'  # TODO: Can be removed when req. for MNE = 1.1.0
             )
-
-        # disable method/attributes that pycrostates does not support
         if name in _inv_attributes or name in _inv_methods:
             raise AttributeError(
                 f"'{self.__class__.__name__}' has not attribute '{name}'")

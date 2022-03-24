@@ -14,11 +14,11 @@ class ChannelsMixin():
 class ContainsMixin(MNEContainsMixin):
     def __getattribute__(self, name):
         """Attribute getter."""
+        # check if the attribute requies a .info to work
         _req_info = (
             'compensation_grade',
             'get_channel_types',
             )
-
         if name in _req_info:
             if not hasattr(self, 'info'):
                 raise ValueError(
@@ -31,15 +31,14 @@ class ContainsMixin(MNEContainsMixin):
                     f"is None. An Info/ChInfo instance is required by {name}'."
                     )
 
-        # invalid attributes/properties
+        # disable method/attributes that pycrostates does not support
+        # invalid attributes
         _inv_attributes = (
             )
-
-        # invalid methods
+        # invalid methods/properties
         _inv_methods = (
             )
 
-        # disable method/attributes that pycrostates does not support
         if name in _inv_attributes or name in _inv_methods:
             raise AttributeError(
                 f"'{self.__class__.__name__}' has not attribute '{name}'")
@@ -50,11 +49,11 @@ class ContainsMixin(MNEContainsMixin):
 class MontageMixin(MNEMontageMixin):
     def __getattribute__(self, name):
         """Attribute getter."""
+        # check if the attribute requies a .info to work
         _req_info = (
             'get_montage',
             'set_montage',
             )
-
         if name in _req_info:
             if not hasattr(self, 'info'):
                 raise ValueError(
@@ -67,15 +66,13 @@ class MontageMixin(MNEMontageMixin):
                     f"is None. An Info/ChInfo instance is required by {name}'."
                     )
 
-        # invalid attributes/properties
+        # disable method/attributes that pycrostates does not support
+        # invalid attributes
         _inv_attributes = (
             )
-
-        # invalid methods
+        # invalid methods/properties
         _inv_methods = (
             )
-
-        # disable method/attributes that pycrostates does not support
         if name in _inv_attributes or name in _inv_methods:
             raise AttributeError(
                 f"'{self.__class__.__name__}' has not attribute '{name}'")
