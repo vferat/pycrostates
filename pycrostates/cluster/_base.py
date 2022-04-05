@@ -228,7 +228,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             return
 
         self._cluster_names = [mapping[name] if name in mapping else name
-                                for name in self._cluster_names]
+                               for name in self._cluster_names]
 
     def reorder_clusters(self, mapping: dict = None,
                          order: Union[list, tuple] = None):
