@@ -100,7 +100,6 @@ def test_ModKMeans():
     _check_unfitted(ModK1)
     assert (ModK1._repr_html_())  # test _repr_html_
 
-
     # Test default clusters names
     assert ModK1.clusters_names == ['0', '1', '2', '3']
 
