@@ -12,7 +12,7 @@ set_log_level('INFO')
 logger.propagate = True
 
 
-def test_plot_cluster_centers(caplog):
+def test_plot_cluster_centers():
     """Test topographic plots for cluster_centers."""
     cluster_centers = np.array([[1.1, 1, 1.2], [0.4, 0.8, 0.7]])
     info = create_info(['Oz', 'Cz', 'Fpz'], sfreq=1, ch_types='eeg')
@@ -37,6 +37,12 @@ def test_plot_cluster_centers(caplog):
     plt.close('all')
     f, ax = plt.subplots(2, 1)
     plot_cluster_centers(cluster_centers, info, axes=ax)
+    plt.close('all')
+
+    # provide show
+    plot_cluster_centers(cluster_centers, info, show=True)
+    plt.close('all')
+    plot_cluster_centers(cluster_centers, info, show=False)
     plt.close('all')
 
     # invalid arguments
@@ -71,8 +77,6 @@ def test_plot_cluster_centers(caplog):
         plot_cluster_centers(cluster_centers, info=chinfo, axes=ax)
     plt.close('all')
 
-    # show provided as kwargs
-    caplog.clear()
-    plot_cluster_centers(cluster_centers, info, show=True)
-    plt.close('all')
-    assert "Argument 'show' can not be provided as kwargs" in caplog.text
+    # invalid show
+    with pytest.raises(TypeError, match="'show' must be an "):
+        plot_cluster_centers(cluster_centers, info, show=101)

@@ -68,10 +68,9 @@ def plot_cluster_centers(
             f = figs
         del figs
 
-    # remove show from kwargs, issue warning if it is present
-    if 'show' in kwargs:
-        logger.warning("Argument 'show' can not be provided as kwargs and "
-                       "will be ignored.")
+    # remove show from kwargs passed to topoplot
+    show = True if 'show' not in kwargs else kwargs['show']
+    _check_type(show, (bool, ), 'show')
     kwargs = {key: value for key, value in kwargs.items()
               if key not in ('show', )}
 
@@ -88,5 +87,6 @@ def plot_cluster_centers(
         plot_topomap(center, info, axes=ax, show=False, **kwargs)
         ax.set_title(name)
 
-    plt.show(block=block)
+    if show:
+        plt.show(block=block)
     return f
