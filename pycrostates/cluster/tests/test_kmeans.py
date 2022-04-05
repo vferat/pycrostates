@@ -42,7 +42,7 @@ def _check_fitted(ModK):
     """
     assert ModK.fitted
     assert ModK.n_clusters == n_clusters
-    assert len(ModK.clusters_names) == n_clusters
+    assert len(ModK.cluster_names) == n_clusters
     assert len(ModK.cluster_centers_) == n_clusters
     assert ModK.fitted_data is not None
     assert ModK.picks is not None
@@ -57,7 +57,7 @@ def _check_unfitted(ModK):
     """
     assert not ModK.fitted
     assert ModK.n_clusters == n_clusters
-    assert len(ModK.clusters_names) == n_clusters
+    assert len(ModK.cluster_names) == n_clusters
     assert ModK.cluster_centers_ is None
     assert ModK.fitted_data is None
     assert ModK.picks is None
@@ -100,7 +100,7 @@ def test_ModKMeans():
     _check_unfitted(ModK1)
 
     # Test default clusters names
-    assert ModK1.clusters_names == ['0', '1', '2', '3']
+    assert ModK1.cluster_names == ['0', '1', '2', '3']
 
     # Test fit on RAW
     ModK1.fit(raw, n_jobs=1)
@@ -222,20 +222,20 @@ def test_rename(caplog):
 
     # Test mapping
     ModK_ = ModK.copy()
-    mapping = {old: alphabet[k] for k, old in enumerate(ModK.clusters_names)}
+    mapping = {old: alphabet[k] for k, old in enumerate(ModK.cluster_names)}
     for key, value in mapping.items():
         assert isinstance(key, str)
         assert isinstance(value, str)
         assert key != value
     ModK_.rename_clusters(mapping=mapping)
-    assert ModK_.clusters_names == alphabet
-    assert ModK_.clusters_names != ModK.clusters_names
+    assert ModK_.cluster_names == alphabet
+    assert ModK_.cluster_names != ModK.cluster_names
 
     # Test new_names
     ModK_ = ModK.copy()
     ModK_.rename_clusters(new_names=alphabet)
-    assert ModK_.clusters_names == alphabet
-    assert ModK_.clusters_names != ModK.clusters_names
+    assert ModK_.cluster_names == alphabet
+    assert ModK_.cluster_names != ModK.cluster_names
 
     # Test invalid arguments
     ModK_ = ModK.copy()
@@ -243,10 +243,10 @@ def test_rename(caplog):
         ModK_.rename_clusters(mapping=101)
     with pytest.raises(ValueError, match="Invalid value for the 'old name'"):
         mapping = {old + '101': alphabet[k]
-                   for k, old in enumerate(ModK.clusters_names)}
+                   for k, old in enumerate(ModK.cluster_names)}
         ModK_.rename_clusters(mapping=mapping)
     with pytest.raises(TypeError, match="'new name' must be an instance of "):
-        mapping = {old: k for k, old in enumerate(ModK.clusters_names)}
+        mapping = {old: k for k, old in enumerate(ModK.cluster_names)}
         ModK_.rename_clusters(mapping=mapping)
     with pytest.raises(ValueError,
                        match="Argument 'new_names' should contain"):
@@ -258,7 +258,7 @@ def test_rename(caplog):
     with pytest.raises(ValueError,
                        match="Only one of 'mapping' or 'new_names'"):
         mapping = {old: alphabet[k] for
-                   k, old in enumerate(ModK.clusters_names)}
+                   k, old in enumerate(ModK.cluster_names)}
         ModK_.rename_clusters(mapping=mapping, new_names=alphabet)
 
     # Test unfitted
@@ -267,7 +267,7 @@ def test_rename(caplog):
     _check_unfitted(ModK_)
     with pytest.raises(RuntimeError, match='must be fitted before'):
         mapping = {old: alphabet[k]
-                   for k, old in enumerate(ModK.clusters_names)}
+                   for k, old in enumerate(ModK.cluster_names)}
         ModK_.rename_clusters(mapping=mapping)
     with pytest.raises(RuntimeError, match='must be fitted before'):
         ModK_.rename_clusters(new_names=alphabet)
@@ -282,8 +282,8 @@ def test_reorder(caplog):
         ModK.cluster_centers_[0, :], ModK_.cluster_centers_[1, :]).all()
     assert np.isclose(
         ModK.cluster_centers_[1, :], ModK_.cluster_centers_[0, :]).all()
-    assert ModK.clusters_names[0] == ModK_.clusters_names[1]
-    assert ModK.clusters_names[0] == ModK_.clusters_names[1]
+    assert ModK.cluster_names[0] == ModK_.cluster_names[1]
+    assert ModK.cluster_names[0] == ModK_.cluster_names[1]
 
     # Test order
     ModK_ = ModK.copy()
@@ -292,8 +292,8 @@ def test_reorder(caplog):
         ModK.cluster_centers_[0], ModK_.cluster_centers_[1]).all()
     assert np.isclose(
         ModK.cluster_centers_[1], ModK_.cluster_centers_[0]).all()
-    assert ModK.clusters_names[0] == ModK_.clusters_names[1]
-    assert ModK.clusters_names[0] == ModK_.clusters_names[1]
+    assert ModK.cluster_names[0] == ModK_.cluster_names[1]
+    assert ModK.cluster_names[0] == ModK_.cluster_names[1]
 
     ModK_ = ModK.copy()
     ModK_.reorder_clusters(order=np.array([1, 0, 2, 3]))
@@ -301,8 +301,8 @@ def test_reorder(caplog):
         ModK.cluster_centers_[0], ModK_.cluster_centers_[1]).all()
     assert np.isclose(
         ModK.cluster_centers_[1], ModK_.cluster_centers_[0]).all()
-    assert ModK.clusters_names[0] == ModK_.clusters_names[1]
-    assert ModK.clusters_names[0] == ModK_.clusters_names[1]
+    assert ModK.cluster_names[0] == ModK_.cluster_names[1]
+    assert ModK.cluster_names[0] == ModK_.cluster_names[1]
 
     # test .labels_ reordering
     x = ModK_.labels_[:20]
