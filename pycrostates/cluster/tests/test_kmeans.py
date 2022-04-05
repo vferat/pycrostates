@@ -63,7 +63,6 @@ def _check_unfitted(ModK):
     assert ModK.info is None
     assert ModK.GEV_ is None
     assert ModK.labels_ is None
-    assert (ModK._repr_html_())  # test _repr_html_
 
 
 def _check_fitted_data_raw(fitted_data, raw, picks, tmin, tmax,
@@ -98,7 +97,6 @@ def test_ModKMeans():
     assert ModK1.tol == 1e-4
     assert isinstance(ModK1.random_state, np.random.RandomState)
     _check_unfitted(ModK1)
-    assert (ModK1._repr_html_())  # test _repr_html_
 
     # Test default clusters names
     assert ModK1.clusters_names == ['0', '1', '2', '3']
@@ -143,8 +141,17 @@ def test_ModKMeans():
     assert expected == ModK1.__repr__()
     assert '<ModKMeans | not fitted>' == ModK2.__repr__()
 
+    # Test HTML representation
+    html = ModK1._repr_html_()
+    assert html is not None
+    assert 'not fitted' not in html
+    html = ModK2._repr_html_()
+    assert html is not None
+    assert 'not fitted' in html
+
     # Test plot
     f, ax = ModK1.plot(block=False)
+    plt.close('all')
     with pytest.raises(RuntimeError, match='must be fitted before'):
         f, ax = ModK2.plot(block=False)
     plt.close('all')
