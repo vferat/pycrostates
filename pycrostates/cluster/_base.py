@@ -347,20 +347,26 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             if invert[k]:
                 self._cluster_centers_[k] = - cluster
 
-    def plot(self, block=False):
+    def plot(self, axes=None, block=False):
         """
         Plot cluster centers as topographic maps.
 
+        Parameters
+        ----------
+        axes : None | Axes
+            Either none to create a new figure or axes (or an array of axes)
+            on which the topographic map should be plotted.
+        block : bool
+            Whether to halt program execution until the figure is closed.
+
         Returns
         -------
-        fig : Figure
+        f : Figure
             Matplotlib figure containing the topographic plots.
-        ax : :class:`matplotlib.axes.Axes`
-            Axis
         """
         self._check_fit()
         return plot_cluster_centers(self._cluster_centers_, self._info,
-                                    self._clusters_names, block)
+                                    self._clusters_names, axes, block)
 
     @verbose
     def predict(self, inst, factor=0, half_window_size=3, tol=10e-6,

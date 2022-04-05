@@ -5,6 +5,7 @@ import re
 from pathlib import Path
 
 from matplotlib import pyplot as plt
+from matplotlib.figure import Figure
 import mne
 from mne.channels import DigMontage
 from mne.datasets import testing
@@ -150,10 +151,10 @@ def test_ModKMeans():
     assert 'not fitted' in html
 
     # Test plot
-    f, ax = ModK1.plot(block=False)
-    plt.close('all')
+    f = ModK1.plot(block=False)
+    assert isinstance(f, Figure)
     with pytest.raises(RuntimeError, match='must be fitted before'):
-        f, ax = ModK2.plot(block=False)
+        ModK2.plot(block=False)
     plt.close('all')
 
 
