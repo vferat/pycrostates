@@ -5,7 +5,6 @@ from mne.viz import plot_topomap
 import numpy as np
 
 from ..utils._checks import _check_type, _check_axes
-from ..utils._logs import logger
 
 
 def plot_cluster_centers(
