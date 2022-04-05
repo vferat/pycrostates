@@ -1,6 +1,5 @@
 from typing import Tuple, Union
 
-import mne
 import numpy as np
 from mne import Evoked
 from mne.io import BaseRaw
@@ -10,17 +9,6 @@ from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
 
 from ..utils._checks import _check_type
-
-
-def plot_cluster_centers(cluster_centers, info, names, block):
-    n_clusters = len(cluster_centers)
-    fig, axs = plt.subplots(1, n_clusters)
-    for c, center in enumerate(cluster_centers):
-        mne.viz.plot_topomap(center, info, axes=axs[c], show=False)
-        axs[c].set_title(names[c])
-    plt.axis('off')
-    plt.show(block=block)
-    return fig, axs
 
 
 def plot_segmentation(
