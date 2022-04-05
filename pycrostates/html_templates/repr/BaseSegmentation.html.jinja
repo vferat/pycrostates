@@ -1,0 +1,16 @@
+
+<table class="table table-hover table-striped table-sm table-responsive small">
+    <tr>
+        <th>Segmentation</th>
+        <td>{{ name }}</td>
+    </tr>
+    <tr>
+        <th>Cluster centers</th>
+        <td>{{ n_clusters }}</td>
+    </tr>
+    <tr>
+        <th>Cluster centers names</th>
+        <td>{{ clusters_names|join(', ') }}</td>
+    </tr>
+{{ inst_repr | safe }}
+</table>

@@ -141,8 +141,17 @@ def test_ModKMeans():
     assert expected == ModK1.__repr__()
     assert '<ModKMeans | not fitted>' == ModK2.__repr__()
 
+    # Test HTML representation
+    html = ModK1._repr_html_()
+    assert html is not None
+    assert 'not fitted' not in html
+    html = ModK2._repr_html_()
+    assert html is not None
+    assert 'not fitted' in html
+
     # Test plot
     f, ax = ModK1.plot(block=False)
+    plt.close('all')
     with pytest.raises(RuntimeError, match='must be fitted before'):
         f, ax = ModK2.plot(block=False)
     plt.close('all')
