@@ -5,20 +5,22 @@ from typing import Union
 
 from mne import BaseEpochs, pick_info
 from mne.annotations import _annotations_starts_stops
-from mne.io import BaseRaw, Info, RawArray
+from mne.io import BaseRaw
 from mne.io.pick import _picks_to_idx
 import numpy as np
 from scipy.signal import convolve2d
 
+from ..io import ChInfo
 from ..segmentation import RawSegmentation, EpochsSegmentation
 from ..utils import _corr_vectors, _compare_infos
+from ..utils.mixin import ContainsMixin, MontageMixin, ChannelsMixin
 from ..utils._checks import _check_type, _check_value, _check_n_jobs
 from ..utils._docs import fill_doc
 from ..utils._logs import verbose, logger
 from ..viz import plot_cluster_centers
 
 
-class _BaseCluster(ABC):
+class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     """
     Base Class for Microstates Clustering algorithms.
     """
@@ -149,7 +151,7 @@ class _BaseCluster(ABC):
 
         # store picks and info
         self._picks = picks
-        self._info = pick_info(inst.info, picks)
+        self._info = ChInfo(info=pick_info(inst.info, picks))
         self._fitted_data = data
 
         return data
@@ -327,8 +329,8 @@ class _BaseCluster(ABC):
 
         Returns
         -------
-        fig : :class:`matplotlib.figure.Figure`
-            Figure
+        fig : Figure
+            Matplotlib figure containing the topographic plots.
         ax : :class:`matplotlib.axes.Axes`
             Axis
         """
@@ -664,33 +666,6 @@ class _BaseCluster(ABC):
         return self._cluster_centers_
 
     @property
-    def cluster_centers_raw(self):
-        """
-        Center of the clusters as a :class:`~mne.io.Raw` instance.
-        Returns None if cluster algorithm has not been fitted.
-        """
-        if self._cluster_centers_ is None:
-            assert not self._fitted  # sanity-check
-            logger.warning('Clustering algorithm has not been fitted.')
-            return None
-
-        # sanity-checks
-        assert self._info is not None and isinstance(self._info, Info)
-
-        # ---------------------------------------------------------------------
-        # TODO: I can't see the sfreq=-1 work well with .get_data() in the long
-        # run e.g. what happens if start, stop, tmin, tmax are provided?
-        # ---------------------------------------------------------------------
-        info = self._info.copy()
-        if hasattr(info, '_unlocked'):
-            with info._unlock():
-                info['sfreq'] = -1.
-        else:
-            info['sfreq'] = -1.
-
-        return RawArray(self._cluster_centers_.T, info)
-
-    @property
     def picks(self):
         """
         Picks selected when fitting the clustering algorithm.
@@ -721,9 +696,8 @@ class _BaseCluster(ABC):
         """
         Data array retrieved from MNE used to fit the clustering algorithm.
 
-        :type: `~numpy.array`
+        :type: `~numpy.array` shape (n_channels, n_samples)
         """
-        # TODO: Add shape of the numpy array to the docstring
         if self._fitted_data is None:
             assert not self._fitted  # sanity-check
             logger.warning('Clustering algorithm has not been fitted.')

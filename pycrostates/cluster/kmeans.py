@@ -107,8 +107,6 @@ class ModKMeans(_BaseCluster):
             self.fitted = False  # reset variables related to fit
             return  # break early
 
-        # TODO: look what are the scikit-learn names (GEV_, labels_, ...)
-        # and set properties name accordingly
         self._GEV_ = best_gev
         self._cluster_centers_ = best_maps
         self._labels_ = best_segmentation

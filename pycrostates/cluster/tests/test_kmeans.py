@@ -6,6 +6,7 @@ from pathlib import Path
 
 from matplotlib import pyplot as plt
 import mne
+from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io.pick import _picks_to_idx
 import numpy as np
@@ -358,10 +359,6 @@ def test_properties(caplog):
     assert 'Clustering algorithm has not been fitted.' in caplog.text
     caplog.clear()
 
-    ModK_.cluster_centers_raw
-    assert 'Clustering algorithm has not been fitted.' in caplog.text
-    caplog.clear()
-
     ModK_.picks
     assert 'Clustering algorithm has not been fitted.' in caplog.text
     caplog.clear()
@@ -381,10 +378,6 @@ def test_properties(caplog):
     assert 'Clustering algorithm has not been fitted.' not in caplog.text
     caplog.clear()
 
-    ModK_.cluster_centers_raw
-    assert 'Clustering algorithm has not been fitted.' not in caplog.text
-    caplog.clear()
-
     ModK_.picks
     assert 'Clustering algorithm has not been fitted.' not in caplog.text
     caplog.clear()
@@ -396,15 +389,6 @@ def test_properties(caplog):
     ModK_.fitted_data
     assert 'Clustering algorithm has not been fitted.' not in caplog.text
     caplog.clear()
-
-    # Test cluster_centers raw/numpy
-    cluster_centers_ = ModK_.cluster_centers_
-    cluster_centers_raw = ModK_.cluster_centers_raw
-    # -------------------------------------------------------------------------
-    # TODO: I can't see the sfreq=-1 work well with .get_data() in the long run
-    # e.g. what happens if start, stop, tmin, tmax are provided?
-    # -------------------------------------------------------------------------
-    assert np.isclose(cluster_centers_raw.get_data().T, cluster_centers_).all()
 
     # Test fitted property
     ModK_ = ModKMeans(n_clusters=n_clusters, n_init=10, max_iter=100, tol=1e-4,
@@ -853,3 +837,46 @@ def test_randomseed():
 
     assert np.isclose(ModK1.cluster_centers_, ModK2.cluster_centers_).all()
     assert not np.isclose(ModK1.cluster_centers_, ModK3.cluster_centers_).all()
+
+
+def test_contains_mixin():
+    """Test contains mixin class."""
+    assert 'eeg' in ModK
+    assert ModK.compensation_grade is None
+    assert ModK.get_channel_types() == ['eeg'] * ModK.info['nchan']
+
+    # test raise with non-fitted instance
+    ModK_ = ModKMeans(n_clusters=n_clusters, n_init=10, max_iter=40, tol=1e-4,
+                      random_state=1)
+    with pytest.raises(ValueError,
+                       match="Instance 'ModKMeans' attribute 'info' is None."):
+        'eeg' in ModK_
+    with pytest.raises(ValueError,
+                       match="Instance 'ModKMeans' attribute 'info' is None."):
+        ModK_.get_channel_types()
+    with pytest.raises(ValueError,
+                       match="Instance 'ModKMeans' attribute 'info' is None."):
+        ModK_.compensation_grade
+
+
+def test_montage_mixin():
+    """Test montage mixin class."""
+    ModK_ = ModK.copy()
+    montage = ModK.get_montage()
+    assert isinstance(montage, DigMontage)
+    assert montage.dig[-1]['r'][0] != 0
+    montage.dig[-1]['r'][0] = 0
+    ModK_.set_montage(montage)
+    montage_ = ModK.get_montage()
+    assert montage_.dig[-1]['r'][0] == 0
+
+    # test raise with non-fitted instance
+    ModK_ = ModKMeans(n_clusters=n_clusters, n_init=10, max_iter=40, tol=1e-4,
+                      random_state=1)
+    with pytest.raises(ValueError,
+                       match="Instance 'ModKMeans' attribute 'info' is None."):
+        ModK_.set_montage('standard_1020')
+
+    with pytest.raises(ValueError,
+                       match="Instance 'ModKMeans' attribute 'info' is None."):
+        ModK_.get_montage()
