@@ -5,13 +5,14 @@ from mne.viz import plot_topomap
 import numpy as  np
 
 from ..utils._checks import _check_type, _check_ax
+from ..utils._logs import logger
 
 
 def plot_cluster_centers(
         cluster_centers,
         info,
         cluster_names=None,
-        ax=None,
+        axes=None,
         block=False,
         **kwargs,
         ):
@@ -41,8 +42,8 @@ def plot_cluster_centers(
     _check_type(cluster_centers, (np.ndarray, ), 'cluster_centers')
     _check_type(info, (Info, ), 'info')
     _check_type(cluster_names, (None, list, tuple), 'cluster_names')
-    if ax is not None:
-        _check_ax(ax)
+    if axes is not None:
+        _check_ax(axes)
     _check_type(block, (bool, ), 'block')
 
     # check cluster_names
@@ -50,53 +51,55 @@ def plot_cluster_centers(
         cluster_names = [str(k) for k in range(1, cluster_centers.size + 1)]
     if len(cluster_names) != cluster_centers.size:
         raise ValueError(
-            "Argument 'cluster_centers' and 'cluste_names' should have the "
+            "Argument 'cluster_centers' and 'cluster_names' should have the "
             "same number of elements.")
 
     # create axes if needed, and retrieve figure
     n_clusters = cluster_centers.shape[0]
-    if ax is None:
-        f, ax = plt.subplots(1, n_clusters)
-        if isinstance(ax, Axes):
-            ax = np.array([ax])  # wrap in an array-like
+    if axes is None:
+        f, axes = plt.subplots(1, n_clusters)
+        if isinstance(axes, Axes):
+            axes = np.array([axes])  # wrap in an array-like
         # sanity-check
-        assert ax.ndim == 1
+        assert axes.ndim == 1
         # axes formatting
-        for a in ax:
-            a.set_axis_off()
+        for ax in axes:
+            ax.set_axis_off()
     else:
         # make sure we have enough ax to plot
-        if isinstance(ax, Axes) and n_clusters != 1:
+        if isinstance(axes, Axes) and n_clusters != 1:
             raise ValueError(
                 "Argument 'cluster_centers' and 'ax' must contain the same "
                 "number of clusters and Axes.")
-        elif ax.size != n_clusters:
+        elif axes.size != n_clusters:
             raise ValueError(
                 "Argument 'cluster_centers' and 'ax' must contain the same "
                 "number of clusters and Axes.")
-        figs = [a.get_figure() for a in ax]
+        figs = [ax.get_figure() for a in axes]
         if len(set(figs)) == 1:
             f = figs[0]
         else:
             f = figs
         del figs
 
-    # removea axes and show from kwargs
+    # remove axes and show from kwargs, issue warning if they are presen
+    if 'show' in kwargs:
+        logger.warning("Argument 'show' can not be provided as kwargs.")
     kwargs = {key: value for key, value in kwargs.items()
-              if key not in ('axes', 'show')}
+              if key not in ('show', )}
 
     # plot cluster centers
     for k, (center, name) in enumerate(zip(cluster_centers, cluster_names)):
         # select axes from ax
-        if ax.ndim == 1:
-            axes = ax[k]
+        if axes.ndim == 1:
+            ax = axes[k]
         else:
-            i = k // ax.shape[1]
-            j = k % ax.shape[1]
-            axes = ax[i, j]
+            i = k // axes.shape[1]
+            j = k % axes.shape[1]
+            ax = axes[i, j]
         # plot
-        plot_topomap(center, info, axes=axes, show=False, **kwargs)
-        axes.set_title(name)
+        plot_topomap(center, info, axes=ax, show=False, **kwargs)
+        ax.set_title(name)
 
     plt.show(block=block)
     return f
