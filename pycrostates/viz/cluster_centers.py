@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from mne.io import Info
 from mne.viz import plot_topomap
-import numpy as  np
+import numpy as np
 
 from ..utils._checks import _check_type, _check_axes
 from ..utils._logs import logger
