@@ -15,7 +15,8 @@ logger.propagate = True
 def test_plot_cluster_centers(caplog):
     """Test topographic plots for cluster_centers."""
     cluster_centers = np.array([[1.1, 1, 1.2], [0.4, 0.8, 0.7]])
-    info = create_info(['Cpz', 'Cz', 'Fpz'], sfreq=1, ch_types='eeg')
+    info = create_info(['Oz', 'Cz', 'Fpz'], sfreq=1, ch_types='eeg')
+    info.set_montage('standard_1020')
     chinfo = ChInfo(info)
 
     # plot with info
@@ -27,7 +28,7 @@ def test_plot_cluster_centers(caplog):
     plt.close('all')
 
     # provide cluster_names
-    plot_cluster_centers(cluster_centers, info, ['A', 'B', 'C'])
+    plot_cluster_centers(cluster_centers, info, ['A', 'B'])
     plt.close('all')
 
     # provide ax
@@ -54,6 +55,11 @@ def test_plot_cluster_centers(caplog):
         plot_cluster_centers(cluster_centers, info=chinfo, block=101)
     with pytest.raises(TypeError, match="'block' must be an "):
         plot_cluster_centers(cluster_centers, info=chinfo, block=0)
+
+    # info without montage
+    with pytest.raises(RuntimeError, match="No digitization points found"):
+        info_ = create_info(['Cpz', 'Cz', 'Fpz'], sfreq=1, ch_types='eeg')
+        plot_cluster_centers(cluster_centers, info_)
 
     # mismatch
     with pytest.raises(ValueError,

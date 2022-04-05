@@ -116,6 +116,6 @@ def test_check_ax():
     plt.close('all')
     _, ax = plt.subplots(10, 10)
     ax = ax.reshape((2, 5, 10))
-    with pytest.raises(ValueError, match="Argument 'ax' should be a"):
+    with pytest.raises(ValueError, match="Argument 'axes' should be a"):
         _check_axes(ax)
     plt.close('all')

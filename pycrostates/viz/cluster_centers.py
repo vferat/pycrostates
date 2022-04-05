@@ -33,8 +33,9 @@ def plot_cluster_centers(
 
     # check cluster_names
     if cluster_names is None:
-        cluster_names = [str(k) for k in range(1, cluster_centers.size + 1)]
-    if len(cluster_names) != cluster_centers.size:
+        cluster_names = [
+            str(k) for k in range(1, cluster_centers.shape[0] + 1)]
+    if len(cluster_names) != cluster_centers.shape[0]:
         raise ValueError(
             "Argument 'cluster_centers' and 'cluster_names' should have the "
             "same number of elements.")
@@ -60,7 +61,7 @@ def plot_cluster_centers(
             raise ValueError(
                 "Argument 'cluster_centers' and 'axes' must contain the same "
                 "number of clusters and Axes.")
-        figs = [ax.get_figure() for a in axes]
+        figs = [ax.get_figure() for ax in axes]
         if len(set(figs)) == 1:
             f = figs[0]
         else:
