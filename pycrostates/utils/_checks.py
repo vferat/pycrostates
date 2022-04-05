@@ -1,10 +1,12 @@
 """Utility functions for checking types and values. Inspired from MNE."""
 
+from itertools import product
 import os
 import operator
 from pathlib import Path
 
 import numpy as np
+from matplotlib.axes import Axes
 from mne.parallel import check_n_jobs
 from mne.utils import check_random_state
 
@@ -161,3 +163,24 @@ def _check_n_jobs(n_jobs):
 def _check_random_state(seed):
     """Turn seed into a numpy.random.mtrand.RandomState instance."""
     return check_random_state(seed)
+
+
+def _check_ax(ax):
+    """Check that ax is an Axes object or an array of Axes."""
+    _check_type(ax, (Axes, np.ndarray), 'ax')
+    if isinstance(ax, np.ndarray):
+        if ax.ndim == 1:
+            for a in ax:
+                _check_type(a, (Axes, ))
+                assert hasattr(a, 'plot')  # sanity-check
+        elif ax.ndim == 2:
+            for i, j in product(range(ax.shape[0]), range(ax.shape[1])):
+                _check_type(ax[i, j], (Axes, ))
+                assert hasattr(ax[i, j], 'plot')  # sanity-check
+        else:
+            raise ValueError("Argument 'ax' should be a matplotib axes or a "
+                             "1D or 2D numpy array of matplotlib axes.")
+    else:
+        # sanity-check
+        assert hasattr(ax, 'plot')
+    return ax
