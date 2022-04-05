@@ -165,22 +165,22 @@ def _check_random_state(seed):
     return check_random_state(seed)
 
 
-def _check_ax(ax):
+def _check_axes(axes):
     """Check that ax is an Axes object or an array of Axes."""
-    _check_type(ax, (Axes, np.ndarray), 'ax')
-    if isinstance(ax, np.ndarray):
-        if ax.ndim == 1:
-            for a in ax:
-                _check_type(a, (Axes, ))
-                assert hasattr(a, 'plot')  # sanity-check
-        elif ax.ndim == 2:
-            for i, j in product(range(ax.shape[0]), range(ax.shape[1])):
-                _check_type(ax[i, j], (Axes, ))
-                assert hasattr(ax[i, j], 'plot')  # sanity-check
+    _check_type(axes, (Axes, np.ndarray), 'axes')
+    if isinstance(axes, np.ndarray):
+        if axes.ndim == 1:
+            for ax in axes:
+                _check_type(ax, (Axes, ))
+                assert hasattr(ax, 'plot')  # sanity-check
+        elif axes.ndim == 2:
+            for i, j in product(range(axes.shape[0]), range(axes.shape[1])):
+                _check_type(axes[i, j], (Axes, ))
+                assert hasattr(axes[i, j], 'plot')  # sanity-check
         else:
-            raise ValueError("Argument 'ax' should be a matplotib axes or a "
+            raise ValueError("Argument 'axes' should be a matplotib axes or a "
                              "1D or 2D numpy array of matplotlib axes.")
     else:
         # sanity-check
-        assert hasattr(ax, 'plot')
-    return ax
+        assert hasattr(axes, 'plot')
+    return axes

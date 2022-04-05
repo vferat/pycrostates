@@ -4,7 +4,7 @@ from mne.io import Info
 from mne.viz import plot_topomap
 import numpy as  np
 
-from ..utils._checks import _check_type, _check_ax
+from ..utils._checks import _check_type, _check_axes
 from ..utils._logs import logger
 
 
@@ -28,7 +28,7 @@ def plot_cluster_centers(
     _check_type(info, (Info, ), 'info')
     _check_type(cluster_names, (None, list, tuple), 'cluster_names')
     if axes is not None:
-        _check_ax(axes)
+        _check_axes(axes)
     _check_type(block, (bool, ), 'block')
 
     # check cluster_names
@@ -54,11 +54,11 @@ def plot_cluster_centers(
         # make sure we have enough ax to plot
         if isinstance(axes, Axes) and n_clusters != 1:
             raise ValueError(
-                "Argument 'cluster_centers' and 'ax' must contain the same "
+                "Argument 'cluster_centers' and 'axes' must contain the same "
                 "number of clusters and Axes.")
         elif axes.size != n_clusters:
             raise ValueError(
-                "Argument 'cluster_centers' and 'ax' must contain the same "
+                "Argument 'cluster_centers' and 'axes' must contain the same "
                 "number of clusters and Axes.")
         figs = [ax.get_figure() for a in axes]
         if len(set(figs)) == 1:

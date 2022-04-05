@@ -11,7 +11,7 @@ import pytest
 
 from pycrostates.utils._checks import (
     _ensure_int, _check_type, _check_value, _check_n_jobs, _check_random_state,
-    _check_ax)
+    _check_axes)
 
 
 def test_ensure_int():
@@ -100,22 +100,22 @@ def test_check_ax():
     """Test _check_ax checker."""
     # test valid inputs
     _, ax = plt.subplots(1, 1)
-    _check_ax(ax)
+    _check_axes(ax)
     plt.close('all')
     _, ax = plt.subplots(1, 2)
-    _check_ax(ax)
+    _check_axes(ax)
     plt.close('all')
     _, ax = plt.subplots(2, 1)
-    _check_ax(ax)
+    _check_axes(ax)
     plt.close('all')
 
     # test invalid inputs
     f, ax = plt.subplots(1, 1)
     with pytest.raises(TypeError, match="must be an instance of"):
-        _check_ax(f)
+        _check_axes(f)
     plt.close('all')
     _, ax = plt.subplots(10, 10)
     ax = ax.reshape((2, 5, 10))
     with pytest.raises(ValueError, match="Argument 'ax' should be a"):
-        _check_ax(ax)
+        _check_axes(ax)
     plt.close('all')
