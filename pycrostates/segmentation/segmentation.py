@@ -118,6 +118,25 @@ class _BaseSegmentation(ABC):
         # sanity-check
         assert self._inst.times.size == self._labels.shape[-1]
 
+    def __repr__(self) -> str:
+        name = self.__class__.__name__
+        s = f'<{name} | n = {len(self._cluster_centers_)} cluster centers |'
+        s += f' {self._inst.__repr__()[1:-1]}>'
+        return s
+
+    def _repr_html_(self, caption=None):
+        from ..html_templates import repr_templates_env
+        t = repr_templates_env.get_template('BaseSegmentation.html.jinja')
+        name = self.__class__.__name__
+        n_clusters= len(self._cluster_centers_)
+        inst_repr = self._inst._repr_html_()
+        
+        html = t.render(
+            name=name,
+            n_clusters=n_clusters,
+            clusters_names=self._clusters_names,
+            inst_repr=inst_repr)
+        return html
     # --------------------------------------------------------------------
     @staticmethod
     def _check_labels(labels):
@@ -188,6 +207,7 @@ class RawSegmentation(_BaseSegmentation):
         super().__init__(*args, **kwargs)
         _check_type(self._inst, (BaseRaw, ), item_name='raw')
 
+    
     @fill_doc
     def plot(self, tmin=0.0, tmax=None):
         """
