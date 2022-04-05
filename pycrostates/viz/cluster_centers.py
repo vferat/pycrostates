@@ -68,9 +68,10 @@ def plot_cluster_centers(
             f = figs
         del figs
 
-    # remove axes and show from kwargs, issue warning if they are present
+    # remove show from kwargs, issue warning if it is present
     if 'show' in kwargs:
-        logger.warning("Argument 'show' can not be provided as kwargs.")
+        logger.warning("Argument 'show' can not be provided as kwargs and "
+                       "will be ignored.")
     kwargs = {key: value for key, value in kwargs.items()
               if key not in ('show', )}
 

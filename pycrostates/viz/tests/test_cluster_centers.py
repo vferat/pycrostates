@@ -75,4 +75,4 @@ def test_plot_cluster_centers(caplog):
     caplog.clear()
     plot_cluster_centers(cluster_centers, info, show=True)
     plt.close('all')
-    assert "Argument 'show' can not be provided as kwargs." in caplog.text
+    assert "Argument 'show' can not be provided as kwargs" in caplog.text
