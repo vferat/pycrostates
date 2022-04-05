@@ -35,19 +35,16 @@ inst : Raw | Epochs
 docdict['predict_inst'] = """
 inst : Raw | Epochs
     Instance containing data to predict."""
-
 docdict['n_clusters'] = """
 n_clusters : int
-    The number of clusters as well as the number
-    of centroids (i.e. Microstate topographies).
+    The number of clusters as well as the number of centroids (i.e.
+    Microstate topographies).
 """
-
 docdict['random_seed'] = """
 random_seed : float
     As estimation can be non-deterministic it can be useful to fix the
     random state to have reproducible results.
 """
-
 docdict['picks'] = """
 picks : str | list | slice | None
     Channels to include. Slices and lists of integers will be interpreted

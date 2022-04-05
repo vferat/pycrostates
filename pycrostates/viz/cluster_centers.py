@@ -17,27 +17,12 @@ def plot_cluster_centers(
         **kwargs,
         ):
     """
-    Create topographic plot for cluster_centers.
-
-    Parameters
-    ----------
-    cluster_centers : TYPE
-        DESCRIPTION.
-    info : TYPE
-        DESCRIPTION.
-    cluster_names : TYPE, optional
-        DESCRIPTION. The default is None.
-    ax : TYPE, optional
-        DESCRIPTION. The default is None.
-    block : TYPE, optional
-        DESCRIPTION. The default is False.
-    **kwargs : Extra keyword arguments are passed to
-        :func:`mne.viz.plot_topomap`.
+    Create topographic maps for cluster centers.
 
     Returns
     -------
-    fig : TYPE
-        DESCRIPTION.
+    fig : Figure
+        Matplotlib figure(s) on which topographic maps are plotted.
     """
     _check_type(cluster_centers, (np.ndarray, ), 'cluster_centers')
     _check_type(info, (Info, ), 'info')
