@@ -96,7 +96,7 @@ def test_check_random_state():
         _check_random_state([101])
 
 
-def test_check_ax():
+def test_check_axes():
     """Test _check_ax checker."""
     # test valid inputs
     _, ax = plt.subplots(1, 1)
