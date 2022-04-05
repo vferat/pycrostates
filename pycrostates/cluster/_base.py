@@ -327,12 +327,18 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         """
         Plot cluster centers as topographic maps.
 
+        Parameters
+        ----------
+        axes : None | Axes
+            Either none to create a new figure or axes (or an array of axes)
+            on which the topographic map should be plotted.
+        block : bool
+            Whether to halt program execution until the figure is closed.
+
         Returns
         -------
-        fig : Figure
+        f : Figure
             Matplotlib figure containing the topographic plots.
-        axes : Axes
-            Axes used.
         """
         self._check_fit()
         return plot_cluster_centers(self._cluster_centers_, self._info,
