@@ -25,6 +25,8 @@ ModK = ModKMeans(n_clusters=n_clusters)
 def test_RawSegmentation_compute_parameters():
     ModK.fit(raw, n_jobs=1)
     segmentation = ModK.predict(raw)
+    assert (segmentation.__repr__())
+    assert (segmentation._repr_html_())  # test _repr_html_
     d = segmentation.compute_parameters(norm_gfp=False)
     assert isinstance(d, dict)
 
@@ -42,5 +44,7 @@ def test_EpochsSegmentation_compute_metrics():
     epochs = epochs.pick('eeg')
     ModK.fit(epochs, n_jobs=1)
     segmentation = ModK.predict(epochs)
+    assert (segmentation.__repr__())
+    assert (segmentation._repr_html_())  # test _repr_html_
     d = segmentation.compute_parameters(norm_gfp=False)
     assert isinstance(d, dict)

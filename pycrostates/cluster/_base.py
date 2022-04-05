@@ -46,6 +46,30 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             s = f'<{name} | not fitted>'
         return s
 
+    def _repr_html_(self, caption=None):
+        from ..html_templates import repr_templates_env
+        t = repr_templates_env.get_template('BaseCluster.html.jinja')
+        name = self.__class__.__name__
+        if self.fitted:
+            n_samples = self._fitted_data.shape[-1]
+            ch_types, ch_counts = np.unique(self.get_channel_types(),
+                                            return_counts=True)
+            ch_repr = [f'{ch_count} {ch_type.upper()}'
+                       for ch_type, ch_count in zip(ch_types, ch_counts)]
+        else:
+            n_samples = None
+            ch_repr = None
+
+        html = t.render(
+            name=name,
+            n_clusters=self._n_clusters,
+            clusters_names=self._clusters_names,
+            fitted=self._fitted,
+            n_samples=n_samples,
+            ch_repr=ch_repr,
+            )
+        return html
+
     def copy(self, deep=True):
         """Returns a copy of the instance.
 
