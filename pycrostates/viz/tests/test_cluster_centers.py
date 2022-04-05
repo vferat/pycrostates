@@ -4,12 +4,7 @@ import numpy as np
 import pytest
 
 from pycrostates.io import ChInfo
-from pycrostates.utils._logs import logger, set_log_level
 from pycrostates.viz import plot_cluster_centers
-
-
-set_log_level('INFO')
-logger.propagate = True
 
 
 def test_plot_cluster_centers():
