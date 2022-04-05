@@ -57,8 +57,7 @@ class ModKMeans(_BaseCluster):
             ch_types, ch_counts = np.unique(self.get_channel_types(),
                                             return_counts=True)
             ch_repr = [f'{ch_count} {ch_type.upper()}'
-                       for ch_type, ch_count
-                       in zip(ch_types, ch_counts)]
+                       for ch_type, ch_count in zip(ch_types, ch_counts)]
             GEV = int(self._GEV_ * 100)
         else:
             n_samples = None
@@ -73,7 +72,8 @@ class ModKMeans(_BaseCluster):
             clusters_names=self._clusters_names,
             fitted=self._fitted,
             n_samples=n_samples,
-            ch_repr=ch_repr)
+            ch_repr=ch_repr,
+            )
         return html
 
     @copy_doc(_BaseCluster._check_fit)

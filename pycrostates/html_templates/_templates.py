@@ -1,9 +1,11 @@
 import jinja2
 
+
 autoescape = jinja2.select_autoescape(
     default=True,
     default_for_string=True
 )
+
 
 # For _html_repr_()
 repr_templates_env = jinja2.Environment(
