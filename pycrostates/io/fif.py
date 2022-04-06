@@ -278,7 +278,7 @@ def read_cluster(fname):
 
 
 def _check_fit_parameters_and_variables(fit_parameters, fit_variables):
-    """Check that we have all the keys we are looking for."""
+    """Check that we have all the keys we are looking for and return algo."""
     valids = {
         'ModKMeans':{
             'parameters': ['n_init', 'max_iter', 'tol'],
