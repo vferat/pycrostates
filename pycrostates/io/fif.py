@@ -77,7 +77,7 @@ def write_cluster(
         Channel information (name, type, montage, ..)
     algorithm : str
         Clustering algorithm used. Valids are:
-            'modKmeans'
+            'ModKMeans'
     cluster_names : list
         List of names for each of the clusters.
     fitted_data : array
@@ -85,7 +85,7 @@ def write_cluster(
     labels_ : array
         Array of labels for each sample of shape (n_samples, )
     """
-    # Error checking on input
+    # error checking on input
     _check_type(fname, ('path-like', ), 'fname')
     _check_type(cluster_centers_, (np.ndarray, ), 'cluster_centers_')
     if cluster_centers_.ndim != 2:
@@ -94,7 +94,7 @@ def write_cluster(
     if not isinstance(chinfo, ChInfo):
         chinfo = ChInfo(chinfo)  # convert to ChInfo if a MNE Info is provided
     _check_type(algorithm, (str, ), 'algorithm')
-    _check_value(algorithm, ('modKmeans', ), 'algorithm')
+    _check_value(algorithm, ('ModKMeans', ), 'algorithm')
     _check_type(cluster_names, (list, ), 'cluster_names')
     if len(cluster_names) != cluster_centers_.shape[0]:
         raise ValueError(
@@ -150,7 +150,7 @@ def write_cluster(
 def _prepare_kwargs(algorithm: str, kwargs: dict):
     """Prepare params to save from kwargs."""
     valids = {
-        'modKmeans':{
+        'ModKMeans':{
             'parameters': ['n_init', 'max_iter', 'tol'],
             'variables': ['GEV_'],
             },
@@ -191,38 +191,43 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
 
 
 def read_cluster(fname):
-    """Read clustering from disk."""
+    """Read clustering solution from disk.
+
+    Parameters
+    ----------
+    fname : path-like
+        Path to the .fif file where the clustering solution is saved.
+    """
+    # error checking on input
+    _check_type(fname, ('path-like', ), 'fname')
+
+    # logging
     logger.info('Reading clustering solution from %s...', fname)
+
+    # open file
     fid, tree, _ = fiff_open(fname)
     info = _read_meas_info(fid, tree)
     data_tree = dir_tree_find(tree, FIFF.FIFFB_MNE_ICA)
     if len(data_tree) == 0:
         fid.close()
-        raise ValueError('Could not find clustering solution data.')
+        raise RuntimeError('Could not find clustering solution data.')
 
     # init variables to search
-    parameters = dict()
-    fitted_parameters = dict()
+    cluster_centers_ = None
     cluster_names = None
     fitted_data = None
     labels_ = None
+    fit_parameters = None
+    fit_variables = None
 
     data_tree = data_tree[0]
     for data in data_tree['directory']:
         kind = data.kind
         pos = data.pos
-        # cluster_centers
+        # cluster_centers_
         if kind == FIFF.FIFF_MNE_ICA_MATRIX:
             tag = read_tag(fid, pos)
-            cluster_centers = tag.data.astype(np.float64)
-        # parameters
-        elif kind == FIFF.FIFF_MNE_ICA_INTERFACE_PARAMS:
-            tag = read_tag(fid, pos)
-            parameters = _deserialize(tag.data)
-        # fitted_parameters
-        elif kind == FIFF.FIFF_MNE_ICA_MISC_PARAMS:
-            tag = read_tag(fid, pos)
-            fitted_parameters = _deserialize(tag.data)
+            cluster_centers_ = tag.data.astype(np.float64)
         # cluster_names
         elif kind == FIFF.FIFF_MNE_ROW_NAMES:
             tag = read_tag(fid, pos)
@@ -235,33 +240,87 @@ def read_cluster(fname):
         elif kind == FIFF.FIFF_MNE_ICA_PCA_MEAN:
             tag = read_tag(fid, pos)
             labels_ = tag.data[:, 0].astype(np.int64)
+        # fit_parameters
+        elif kind == FIFF.FIFF_MNE_ICA_INTERFACE_PARAMS:
+            tag = read_tag(fid, pos)
+            fit_parameters = _deserialize(tag.data)
+        # fit_variables
+        elif kind == FIFF.FIFF_MNE_ICA_MISC_PARAMS:
+            tag = read_tag(fid, pos)
+            fit_variables = _deserialize(tag.data)
 
     fid.close()
 
-    # make sure we have all the information required
-    # TODO
+    # re-group variables and make sure we have all the information required
+    data = (
+        cluster_centers_,
+        info,
+        cluster_names,
+        fitted_data,
+        labels_,
+        fit_parameters,
+        fit_variables,
+        )
+    if any(elt is None for elt in data):
+        raise RuntimeError(
+            "One of the required tag was not found in .fif file.")
+    _check_fit_parameters_and_variables(fit_parameters, fit_variables)
 
-    # reconstruct clustering instance
-    if parameters['algorithm'] == 'modKmeans':
-        inst = ModKMeans(
-            cluster_centers.shape[0],
-            n_init=parameters['n_init'],
-            max_iter=parameters['max_iter'],
-            tol=parameters['tol'],
-            random_state=None,
-            )
-        inst._cluster_centers_ = cluster_centers
-        inst._info = info
-        inst._cluster_names = cluster_names
-        inst._fitted_data = fitted_data
-        inst._labels_ = labels_
-        inst._GEV_ = fitted_parameters['GEV_']
-        inst._fitted = True
-    else:
-        raise ValueError(
-            f"Algorithm '{parameters['algorithm']}' is not supported.")
+    # retrieve algorithm
+    algorithm = fit_parameters['algorithm']
+    del fit_parameters['algorithm']  # remove to use the rest as kwargs
 
-    return inst
+    # reconstruct cluster instance
+    function = {
+        'ModKMeans': _create_ModKMeans
+        }
+
+    return function[algorithm](
+        cluster_centers_, info, cluster_names, fitted_data, labels_,
+        **fit_parameters, **fit_variables)
+
+
+def _check_fit_parameters_and_variables(fit_parameters, fit_variables):
+    """Check that we have all the keys we are looking for."""
+    valids = {
+        'ModKMeans':{
+            'parameters': ['n_init', 'max_iter', 'tol'],
+            'variables': ['GEV_'],
+            },
+        }
+    if 'algorithm' not in fit_parameters:
+        raise ValueError("Key 'algorithm' is missing from .fif file.")
+    algorithm = fit_parameters['algorithm']
+    if algorithm not in valids:
+        raise ValueError(f"Algorithm '{algorithm}' is not supported.")
+    expected = set(reduce(operator.concat, valids[algorithm].values()))
+    diff = set(list(fit_parameters) + list(fit_variables)).difference(expected)
+    if len(diff) != 0:
+        raise RuntimeError("Unexpected parameters and variables in .fif file.")
+
+
+def _create_ModKMeans(
+        cluster_centers_,
+        info,
+        cluster_names,
+        fitted_data,
+        labels_,
+        n_init,
+        max_iter,
+        tol,
+        GEV_,
+        ):
+    """Create a ModKMeans cluster."""
+    cluster = ModKMeans(cluster_centers_.shape[0], n_init, max_iter, tol,
+                        random_state=None)
+    cluster._cluster_centers_ = cluster_centers_
+    cluster._info = info
+    cluster._cluster_names = cluster_names
+    cluster._fitted_data = fitted_data
+    cluster._labels_ = labels_
+    cluster._GEV_ = GEV_
+    cluster._fitted = True
+    return cluster
 
 
 # ----------------------------------------------------------------------------
