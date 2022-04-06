@@ -377,6 +377,7 @@ def _read_meas_info(fid, tree):
     Returns
     -------
     info : ChInfo
+        Channel information instance.
     """
     # Find the desired blocks
     meas = dir_tree_find(tree, FIFF.FIFFB_MEAS)
