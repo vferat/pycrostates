@@ -37,7 +37,7 @@ class ModKMeans(_BaseCluster):
 
         # k-means has a fix number of clusters defined at init
         self._n_clusters = _BaseCluster._check_n_clusters(n_clusters)
-        self._clusters_names = [str(k) for k in range(self.n_clusters)]
+        self._cluster_names = [str(k) for k in range(self.n_clusters)]
 
         # k-means settings
         self._n_init = ModKMeans._check_n_init(n_init)
@@ -69,7 +69,7 @@ class ModKMeans(_BaseCluster):
             n_clusters=self._n_clusters,
             n_init=self._n_init,
             GEV=GEV,
-            clusters_names=self._clusters_names,
+            cluster_names=self._cluster_names,
             fitted=self._fitted,
             n_samples=n_samples,
             ch_repr=ch_repr,

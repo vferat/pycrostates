@@ -28,7 +28,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     @abstractmethod
     def __init__(self):
         self._n_clusters = None
-        self._clusters_names = None
+        self._cluster_names = None
         self._cluster_centers_ = None
 
         # fit variables
@@ -63,7 +63,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         html = t.render(
             name=name,
             n_clusters=self._n_clusters,
-            clusters_names=self._clusters_names,
+            cluster_names=self._cluster_names,
             fitted=self._fitted,
             n_samples=n_samples,
             ch_repr=ch_repr,
@@ -202,7 +202,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         elif mapping is not None:
             _check_type(mapping, (dict, ), item_name='mapping')
             for key in mapping:
-                _check_value(key, self.clusters_names, item_name='old name')
+                _check_value(key, self.cluster_names, item_name='old name')
             for value in mapping.values():
                 _check_type(value, (str, ), item_name='new name')
 
@@ -215,11 +215,11 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                     f"Provided '{len(new_names)}'.")
 
             # sanity-check
-            assert len(self._clusters_names) == len(new_names)
+            assert len(self._cluster_names) == len(new_names)
 
             # convert to dict
             mapping = {old_name: new_names[k]
-                       for k, old_name in enumerate(self._clusters_names)}
+                       for k, old_name in enumerate(self._cluster_names)}
 
         else:
             logger.warning(
@@ -227,8 +227,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 "for method 'rename_clusters' to operate.")
             return
 
-        self._clusters_names = [mapping[name] if name in mapping else name
-                                for name in self._clusters_names]
+        self._cluster_names = [mapping[name] if name in mapping else name
+                               for name in self._cluster_names]
 
     def reorder_clusters(self, mapping: dict = None,
                          order: Union[list, tuple] = None):
@@ -302,7 +302,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
         # re-order
         self._cluster_centers_ = self._cluster_centers_[order]
-        self._clusters_names = [self._clusters_names[k] for k in order]
+        self._cluster_names = [self._cluster_names[k] for k in order]
         new_labels = np.full(self._labels_.shape, -1)
         for k in range(0, self.n_clusters):
             new_labels[self._labels_ == k] = order[k]
@@ -366,7 +366,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         """
         self._check_fit()
         return plot_cluster_centers(self._cluster_centers_, self._info,
-                                    self._clusters_names, axes, block)
+                                    self._cluster_names, axes, block)
 
     @verbose
     def predict(self, inst, factor=0, half_window_size=3, tol=10e-6,
@@ -500,7 +500,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return RawSegmentation(labels=segmentation,
                                inst=raw, picks=picks,
                                cluster_centers_=self._cluster_centers_,
-                               clusters_names=self._clusters_names)
+                               cluster_names=self._cluster_names)
 
     def _predict_epochs(self, epochs, picks, factor, tol, half_window_size,
                         min_segment_length, reject_edges):
@@ -523,7 +523,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return EpochsSegmentation(labels=np.array(segments),
                                   inst=epochs, picks=picks,
                                   cluster_centers_=self._cluster_centers_,
-                                  clusters_names=self._clusters_names)
+                                  cluster_names=self._cluster_names)
 
     # --------------------------------------------------------------------
     @staticmethod
@@ -674,13 +674,13 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return self._n_clusters
 
     @property
-    def clusters_names(self):
+    def cluster_names(self):
         """
         Name of the clusters.
 
         :type: `list`
         """
-        return self._clusters_names
+        return self._cluster_names
 
     @property
     def cluster_centers_(self):

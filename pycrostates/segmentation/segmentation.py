@@ -106,14 +106,14 @@ class _BaseSegmentation(ABC):
 
     @abstractmethod
     def __init__(self, labels, inst, picks, cluster_centers_,
-                 clusters_names=None):
+                 cluster_names=None):
         self._labels = _BaseSegmentation._check_labels(
             labels)
         self._inst = inst
         self._picks = picks
         self._cluster_centers_ = cluster_centers_
-        self._clusters_names = _BaseSegmentation._check_cluster_names(
-            clusters_names, cluster_centers_)
+        self._cluster_names = _BaseSegmentation._check_cluster_names(
+            cluster_names, cluster_centers_)
 
         # sanity-check
         assert self._inst.times.size == self._labels.shape[-1]
@@ -134,7 +134,7 @@ class _BaseSegmentation(ABC):
         html = t.render(
             name=name,
             n_clusters=n_clusters,
-            clusters_names=self._clusters_names,
+            cluster_names=self._cluster_names,
             inst_repr=inst_repr)
         return html
 
@@ -147,15 +147,15 @@ class _BaseSegmentation(ABC):
         return np.array(labels)
 
     @staticmethod
-    def _check_cluster_names(clusters_names, cluster_centers_):
+    def _check_cluster_names(cluster_names, cluster_centers_):
         """
         Checks that the argument 'cluster_names' is valid.
         """
-        if clusters_names is None:
+        if cluster_names is None:
             return [str(k) for k in range(1, len(cluster_centers_)+1)]
         else:
-            if len(cluster_centers_) == len(clusters_names):
-                return clusters_names
+            if len(cluster_centers_) == len(cluster_names):
+                return cluster_names
             else:
                 raise ValueError(
                     "The same number of cluster centers and cluster names "
@@ -190,13 +190,13 @@ class _BaseSegmentation(ABC):
         return self._cluster_centers_
 
     @property
-    def clusters_names(self):
+    def cluster_names(self):
         """
         Name of the clusters.
 
         :type: `list`
         """
-        return self._clusters_names
+        return self._cluster_names
 
 
 class RawSegmentation(_BaseSegmentation):
@@ -227,7 +227,7 @@ class RawSegmentation(_BaseSegmentation):
         """
         return plot_segmentation(
             labels=self._labels, inst=self.raw,
-            cluster_centers=self.cluster_centers_, names=self.clusters_names,
+            cluster_centers=self.cluster_centers_, names=self.cluster_names,
             tmin=tmin, tmax=tmax)
 
     def compute_parameters(self, norm_gfp=True):
@@ -276,7 +276,7 @@ class RawSegmentation(_BaseSegmentation):
         """
         return _compute_microstate_parameters(
             self.labels, self.raw.get_data(picks=self.picks),
-            self.cluster_centers_, self.clusters_names,
+            self.cluster_centers_, self.cluster_names,
             self.raw.info['sfreq'], norm_gfp=norm_gfp)
 
     # --------------------------------------------------------------------
@@ -351,7 +351,7 @@ class EpochsSegmentation(_BaseSegmentation):
         data = data.reshape(data.shape[0], -1)
         labels = self.labels.reshape(-1)
         return _compute_microstate_parameters(
-            labels, data, self.cluster_centers_, self.clusters_names,
+            labels, data, self.cluster_centers_, self.cluster_names,
             self.epochs.info['sfreq'], norm_gfp=norm_gfp)
 
     # --------------------------------------------------------------------
