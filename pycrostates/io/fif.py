@@ -19,6 +19,45 @@ from ..utils._logs import logger
 
 
 # ----------------------------------------------------------------------------
+"""
+To store a clustering solution, they FIFF tags for ICA are used.
+From the FIFF specification:
+
+    #
+    # 3601... values associated with ICA decomposition
+    #
+
+
+    mne_ica_interface_params    3601 ? "ICA interface parameters"
+    mne_ica_channel_names       3602 ? "ICA channel names"
+    mne_ica_whitener            3603 ? "ICA whitener"
+    mne_ica_pca_components      3604 ? "PCA components"
+    mne_ica_pca_explained_var   3605 ? "PCA explained variance"
+    mne_ica_pca_mean            3606 ? "PCA mean"
+    mne_ica_matrix              3607 ? "ICA unmixing matrix"
+    mne_ica_bads                3608 ? "ICA bad sources"
+    mne_ica_misc_params         3609 ? "ICA misc params"
+
+FIFF_MNE_ICA_MATRIX -> cluster_centers_
+
+TODO:
+    - Store fitted_data and labels in one of double-matrix tags:
+        FIFF_MNE_ICA_PCA_COMPONENTS
+        FIFF_MNE_ICA_PCA_MEAN
+        FIFF_MNE_ICA_PCA_EXPLAINED_VAR
+        FIFF_MNE_ICA_WHITENER
+
+    - Store as name list cluster_names in FIFF_MNE_ROW_NAMES
+
+    - Serialize and store n_init, max_iter, tol in one of:
+        FIFF_MNE_ICA_INTERFACE_PARAMS
+        FIFF_MNE_ICA_MISC_PARAMS
+
+    - Serialize and store GEV_ in one of:
+        FIFF_MNE_ICA_INTERFACE_PARAMS
+        FIFF_MNE_ICA_MISC_PARAMS
+"""
+
 def write_cluster(fname, cluster_centers, chinfo):
     """Save clustering to disk."""
     logger.info('Writing clustering solution to %s...', fname)
