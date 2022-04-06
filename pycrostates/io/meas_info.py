@@ -187,6 +187,7 @@ class ChInfo(Info):
         self['chs'] = info['chs']
         self['dig'] = info['dig']
         self['comps'] = info['comps']
+        self['projs'] = info['projs']
         self._update_redundant()
 
     def _init_from_channels(self, ch_names, ch_types):
@@ -252,6 +253,9 @@ class ChInfo(Info):
 
         # add empty compensation grades
         self['comps'] = list()
+
+        # add empty projs
+        self['projs'] = list()
 
         self._unlocked = False
 
