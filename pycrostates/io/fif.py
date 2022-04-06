@@ -104,7 +104,7 @@ def write_cluster(
     if fitted_data.ndim != 2:
         raise ValueError("Argument 'fitted_data' should be a 2D array.")
     _check_type(labels_, (np.ndarray, ), 'labels_')
-    if labels_.ndim != 2:
+    if labels_.ndim != 1:
         raise ValueError("Argument 'labels_' should be a 1D array.")
 
     # logging
@@ -264,11 +264,8 @@ def read_cluster(fname):
     if any(elt is None for elt in data):
         raise RuntimeError(
             "One of the required tag was not found in .fif file.")
-    _check_fit_parameters_and_variables(fit_parameters, fit_variables)
-
-    # retrieve algorithm
-    algorithm = fit_parameters['algorithm']
-    del fit_parameters['algorithm']  # remove to use the rest as kwargs
+    algorithm = _check_fit_parameters_and_variables(
+        fit_parameters, fit_variables)
 
     # reconstruct cluster instance
     function = {
@@ -293,10 +290,12 @@ def _check_fit_parameters_and_variables(fit_parameters, fit_variables):
     algorithm = fit_parameters['algorithm']
     if algorithm not in valids:
         raise ValueError(f"Algorithm '{algorithm}' is not supported.")
+    del fit_parameters['algorithm']
     expected = set(reduce(operator.concat, valids[algorithm].values()))
     diff = set(list(fit_parameters) + list(fit_variables)).difference(expected)
     if len(diff) != 0:
         raise RuntimeError("Unexpected parameters and variables in .fif file.")
+    return algorithm
 
 
 def _create_ModKMeans(
