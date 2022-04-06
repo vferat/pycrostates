@@ -13,8 +13,7 @@ from mne.io.tag import _rename_list, read_tag
 from mne.io.tree import dir_tree_find
 from mne.io.write import (
     start_and_end_file, start_block, end_block, write_id, write_int,
-    write_double_matrix, write_dig_points, write_name_list, write_string,
-    write_int_matrix)
+    write_double_matrix, write_dig_points, write_name_list, write_string)
 from mne.io._digitization import _read_dig_fif, _format_dig_points
 import numpy as np
 
@@ -49,8 +48,8 @@ FIFF_MNE_ICA_MATRIX -> cluster_centers_
 FIFF_MNE_ROW_NAMES -> cluster_names
 FIFF_MNE_ICA_WHITENER -> fitted_data
 FIFF_MNE_ICA_PCA_MEAN -> labels
-FIFF_MNE_ICA_INTERFACE_PARAMS -> algorithm + fitting parameters
-FIFF_MNE_ICA_MISC_PARAMS -> fitted variable (ending with '_')
+FIFF_MNE_ICA_INTERFACE_PARAMS -> algorithm + parameters
+FIFF_MNE_ICA_MISC_PARAMS -> fitted variables (ending with '_')
 """
 
 
@@ -96,8 +95,8 @@ def write_cluster(fname, cluster_centers, chinfo, algorithm, **kwargs):
             write_double_matrix(fid, FIFF.FIFF_MNE_ICA_WHITENER, fitted_data)
 
         # write labels
-        # if labels_ is not None:
-        #     write_int_matrix(fid, FIFF.FIFF_MNE_ICA_PCA_MEAN, labels_)
+        if labels_ is not None:
+            write_double_matrix(fid, FIFF.FIFF_MNE_ICA_PCA_MEAN, labels_)
 
         # close writing block
         end_block(fid, FIFF.FIFFB_MNE_ICA)
@@ -129,12 +128,12 @@ def _prepare_kwargs(kwargs: dict):
             _check_type(value, (np.ndarray, ), 'fitted_data')
             if value.ndim != 2:
                 raise ValueError("Fitted data should be a 2D array.")
-            fitted_data = value
+            fitted_data = value.astype(np.float64)
         elif key == 'labels_':
             _check_type(value, (np.ndarray, ), 'labels_')
             if value.ndim != 1:
                 raise ValueError('Labels data should be a 1D array.')
-            labels_ = value
+            labels_ = value.reshape(-1, 1).astype(np.float64)
 
         # ModKMeans
         elif key == 'n_init':
@@ -196,7 +195,7 @@ def read_cluster(fname):
         # labels
         elif kind == FIFF.FIFF_MNE_ICA_PCA_MEAN:
             tag = read_tag(fid, pos)
-            labels_ = tag.data.astype(np.int32)
+            labels_ = tag.data[:, 0].astype(np.int64)
 
     fid.close()
 
@@ -212,10 +211,11 @@ def read_cluster(fname):
             tol=parameters['tol'],
             random_state=None,
             )
+        inst._cluster_centers_ = cluster_centers
         inst._info = info
         inst._cluster_names = cluster_names
         inst._fitted_data = fitted_data
-        # inst._labels = labels_
+        inst._labels_ = labels_
         inst._GEV_ = fitted_parameters['GEV_']
         inst._fitted = True
     else:
