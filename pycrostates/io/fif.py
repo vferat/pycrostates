@@ -11,7 +11,7 @@ from mne.io.ctf_comp import write_ctf_comp, _read_ctf_comp
 from mne.io.meas_info import _write_ch_infos, _read_bad_channels
 from mne.io.open import fiff_open
 from mne.io.proj import _write_proj, _read_proj
-from mne.io.tag import _rename_list, read_tag
+from mne.io.tag import read_tag
 from mne.io.tree import dir_tree_find
 from mne.io.write import (
     start_and_end_file, start_block, end_block, write_id, write_int,
@@ -347,9 +347,8 @@ def _write_meas_info(fid, info, data_type=None, reset_range=True):
 
     # Bad channels
     if len(info['bads']) > 0:
-        bads = _rename_list(info['bads'], ch_names_mapping={})
         start_block(fid, FIFF.FIFFB_MNE_BAD_CHANNELS)
-        write_name_list(fid, FIFF.FIFF_MNE_CH_NAME_LIST, bads)
+        write_name_list(fid, FIFF.FIFF_MNE_CH_NAME_LIST, info['bads'])
         end_block(fid, FIFF.FIFFB_MNE_BAD_CHANNELS)
 
     # General
