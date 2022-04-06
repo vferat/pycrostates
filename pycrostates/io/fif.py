@@ -12,6 +12,7 @@ from mne.io.write import (
     start_and_end_file, start_block, end_block, write_id, write_int,
     write_double_matrix, write_dig_points, write_name_list)
 from mne.io._digitization import _read_dig_fif, _format_dig_points
+import numpy as np
 
 from . import ChInfo
 from ..utils._logs import logger
@@ -38,7 +39,24 @@ def read_cluster(fname):
     """Read clustering from disk."""
     logger.info('Reading clustering solution from %s...', fname)
     fid, tree, _ = fiff_open(fname)
-    info, _ = _read_meas_info(fid, tree, clean_bads=True)
+    info = _read_meas_info(fid, tree)
+    data_tree = dir_tree_find(tree, FIFF.FIFFB_MNE_ICA)
+    if len(data_tree) == 0:
+        fid.close()
+        raise ValueError('Could not find clustering solution data.')
+
+    data_tree = data_tree[0]
+    for data in data_tree['directory']:
+        kind = data.kind
+        pos = data.pos
+        if kind == FIFF.FIFF_MNE_ICA_MATRIX:
+            tag = read_tag(fid, pos)
+            cluster_centers = tag.data
+            cluster_centers = cluster_centers.astype(np.float64)
+
+    fid.close()
+
+    return cluster_centers, info
 
 
 # ----------------------------------------------------------------------------
