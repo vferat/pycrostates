@@ -1,4 +1,4 @@
-"""Montage for pycrostates data container with a .info attribute."""
+"""Mixins for pycrostates data container with a .info attribute."""
 
 from mne.io.meas_info import ContainsMixin as MNEContainsMixin
 from mne.io.meas_info import MontageMixin as MNEMontageMixin
