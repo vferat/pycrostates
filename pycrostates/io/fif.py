@@ -65,7 +65,26 @@ def write_cluster(
         labels_,
         **kwargs
         ):
-    """Save clustering to disk."""
+    """Save clustering solution to disk.
+
+    Parameters
+    ----------
+    fname : path-like
+        Path to the .fif file where the clustering solution is saved.
+    cluster_centers_ : array
+        Cluster centers as a numpy array of shape (n_clusters, n_channels).
+    chinfo : ChInfo
+        Channel information (name, type, montage, ..)
+    algorithm : str
+        Clustering algorithm used. Valids are:
+            'modKmeans'
+    cluster_names : list
+        List of names for each of the clusters.
+    fitted_data : array
+        Data array used for fitting of shape (n_channels, n_samples)
+    labels_ : array
+        Array of labels for each sample of shape (n_samples, )
+    """
     # Error checking on input
     _check_type(fname, ('path-like', ), 'fname')
     _check_type(cluster_centers_, (np.ndarray, ), 'cluster_centers_')
@@ -77,6 +96,10 @@ def write_cluster(
     _check_type(algorithm, (str, ), 'algorithm')
     _check_value(algorithm, ('modKmeans', ), 'algorithm')
     _check_type(cluster_names, (list, ), 'cluster_names')
+    if len(cluster_names) != cluster_centers_.shape[0]:
+        raise ValueError(
+            "Argument 'cluster_names' and 'cluster_centers_' shapes do not "
+            "match.")
     _check_type(fitted_data, (np.ndarray, ), 'fitted_data')
     if fitted_data.ndim != 2:
         raise ValueError("Argument 'fitted_data' should be a 2D array.")
