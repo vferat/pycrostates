@@ -1,4 +1,4 @@
-"""Contains I/O operation form and towards .fif format (MEGIN / MNE)."""
+"""Contains I/O operation from and towards .fif format (MEGIN / MNE)."""
 
 from functools import reduce
 import json
