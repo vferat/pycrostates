@@ -1,5 +1,8 @@
 """Contains I/O operation form and towards .fif format (MEGIN / MNE)."""
 
+import json
+from numbers import Integral
+
 from mne.io import Info
 from mne.io.constants import FIFF
 from mne.io.ctf_comp import write_ctf_comp, _read_ctf_comp
@@ -10,17 +13,20 @@ from mne.io.tag import _rename_list, read_tag
 from mne.io.tree import dir_tree_find
 from mne.io.write import (
     start_and_end_file, start_block, end_block, write_id, write_int,
-    write_double_matrix, write_dig_points, write_name_list)
+    write_double_matrix, write_dig_points, write_name_list, write_string,
+    write_int_matrix)
 from mne.io._digitization import _read_dig_fif, _format_dig_points
 import numpy as np
 
 from . import ChInfo
+from ..cluster import ModKMeans
+from ..utils._checks import _check_value, _check_type, _check_random_state
 from ..utils._logs import logger
 
 
 # ----------------------------------------------------------------------------
 """
-To store a clustering solution, they FIFF tags for ICA are used.
+To store a clustering solution, the FIFF tags for ICA are used.
 From the FIFF specification:
 
     #
@@ -38,29 +44,28 @@ From the FIFF specification:
     mne_ica_bads                3608 ? "ICA bad sources"
     mne_ica_misc_params         3609 ? "ICA misc params"
 
+
 FIFF_MNE_ICA_MATRIX -> cluster_centers_
-
-TODO:
-    - Store fitted_data and labels in one of double-matrix tags:
-        FIFF_MNE_ICA_PCA_COMPONENTS
-        FIFF_MNE_ICA_PCA_MEAN
-        FIFF_MNE_ICA_PCA_EXPLAINED_VAR
-        FIFF_MNE_ICA_WHITENER
-
-    - Store as name list cluster_names in FIFF_MNE_ROW_NAMES
-
-    - Serialize and store n_init, max_iter, tol in one of:
-        FIFF_MNE_ICA_INTERFACE_PARAMS
-        FIFF_MNE_ICA_MISC_PARAMS
-
-    - Serialize and store GEV_ in one of:
-        FIFF_MNE_ICA_INTERFACE_PARAMS
-        FIFF_MNE_ICA_MISC_PARAMS
+FIFF_MNE_ROW_NAMES -> cluster_names
+FIFF_MNE_ICA_WHITENER -> fitted_data
+FIFF_MNE_ICA_PCA_MEAN -> labels
+FIFF_MNE_ICA_INTERFACE_PARAMS -> algorithm + fitting parameters
+FIFF_MNE_ICA_MISC_PARAMS -> fitted variable (ending with '_')
 """
 
-def write_cluster(fname, cluster_centers, chinfo):
+
+def write_cluster(fname, cluster_centers, chinfo, algorithm, **kwargs):
     """Save clustering to disk."""
     logger.info('Writing clustering solution to %s...', fname)
+
+    # retrieve information to store from kwargs
+    cluster_names, fitted_data, labels_, parameters, fitted_parameters = \
+        _prepare_kwargs(kwargs)
+
+    # algorithm
+    _check_value(algorithm, ('modKmeans', ), 'algorithm')
+    parameters['algorithm'] = algorithm
+
     with start_and_end_file(fname) as fid:
         # write info
         start_block(fid, FIFF.FIFFB_MEAS)
@@ -68,10 +73,85 @@ def write_cluster(fname, cluster_centers, chinfo):
         _write_meas_info(fid, chinfo)
         end_block(fid, FIFF.FIFFB_MEAS)
 
-        # write data
+        # start writing block
         start_block(fid, FIFF.FIFFB_MNE_ICA)
+
+        # cluster-centers
         write_double_matrix(fid, FIFF.FIFF_MNE_ICA_MATRIX, cluster_centers)
+
+        # write parameters
+        write_string(fid, FIFF.FIFF_MNE_ICA_INTERFACE_PARAMS,
+                     _serialize(parameters))
+
+        # write fitted parameters
+        write_string(fid, FIFF.FIFF_MNE_ICA_MISC_PARAMS,
+                     _serialize(fitted_parameters))
+
+        # write cluster_names
+        if cluster_names is not None:
+            write_name_list(fid, FIFF.FIFF_MNE_ROW_NAMES, cluster_names)
+
+        # write fitted_data
+        if fitted_data is not None:
+            write_double_matrix(fid, FIFF.FIFF_MNE_ICA_WHITENER, fitted_data)
+
+        # write labels
+        # if labels_ is not None:
+        #     write_int_matrix(fid, FIFF.FIFF_MNE_ICA_PCA_MEAN, labels_)
+
+        # close writing block
         end_block(fid, FIFF.FIFFB_MNE_ICA)
+
+
+def _prepare_kwargs(kwargs: dict):
+    """Prepare params to save from kwargs."""
+    # defaults
+    cluster_names = None
+    fitted_data = None
+    labels_ = None
+
+    base_kwargs = ['cluster_names', 'fitted_data', 'labels_']
+    modkmeans_kwargs_params = ['n_init', 'max_iter', 'tol', 'random_state']
+    modkmeans_kwargs_fitted_params = ['GEV_']
+
+    parameters = {key: None for key in modkmeans_kwargs_params}
+    fitted_parameters = {key: None for key in modkmeans_kwargs_fitted_params}
+
+    for key, value in kwargs.items():
+        if key not in base_kwargs + list(parameters) + list(fitted_parameters):
+            continue
+
+        # base
+        elif key == 'cluster_names':
+            _check_type(value, (list, ), 'cluster_names')
+            cluster_names = value
+        elif key == 'fitted_data':
+            _check_type(value, (np.ndarray, ), 'fitted_data')
+            if value.ndim != 2:
+                raise ValueError("Fitted data should be a 2D array.")
+            fitted_data = value
+        elif key == 'labels_':
+            _check_type(value, (np.ndarray, ), 'labels_')
+            if value.ndim != 1:
+                raise ValueError('Labels data should be a 1D array.')
+            labels_ = value
+
+        # ModKMeans
+        elif key == 'n_init':
+            parameters['n_init'] = ModKMeans._check_n_init(value)
+        elif key == 'max_iter':
+            parameters['max_iter'] = ModKMeans._check_max_iter(value)
+        elif key == 'tol':
+            parameters['tol'] = ModKMeans._check_tol(value)
+        elif key == 'random_state':
+            parameters['random_state'] = _check_random_state(value)
+        elif key == 'GEV_':
+            _check_type(value, ('numeric', ), 'GEV_')
+            if value < 0 or 1 < value:
+                raise ValueError('GEV should be a percentage between 0 and 1.')
+            fitted_parameters['GEV_'] = value
+
+    return cluster_names, fitted_data, labels_, parameters, fitted_parameters
 
 
 def read_cluster(fname):
@@ -84,18 +164,67 @@ def read_cluster(fname):
         fid.close()
         raise ValueError('Could not find clustering solution data.')
 
+    # init variables to search
+    parameters = dict()
+    fitted_parameters = dict()
+    cluster_names = None
+    fitted_data = None
+    labels_ = None
+
     data_tree = data_tree[0]
     for data in data_tree['directory']:
         kind = data.kind
         pos = data.pos
+        # cluster_centers
         if kind == FIFF.FIFF_MNE_ICA_MATRIX:
             tag = read_tag(fid, pos)
-            cluster_centers = tag.data
-            cluster_centers = cluster_centers.astype(np.float64)
+            cluster_centers = tag.data.astype(np.float64)
+        # parameters
+        elif kind == FIFF.FIFF_MNE_ICA_INTERFACE_PARAMS:
+            tag = read_tag(fid, pos)
+            parameters = _deserialize(tag.data)
+        # fitted_parameters
+        elif kind == FIFF.FIFF_MNE_ICA_MISC_PARAMS:
+            tag = read_tag(fid, pos)
+            fitted_parameters = _deserialize(tag.data)
+        # cluster_names
+        elif kind == FIFF.FIFF_MNE_ROW_NAMES:
+            tag = read_tag(fid, pos)
+            cluster_names = tag.data.split(':')
+        # fitted_data
+        elif kind == FIFF.FIFF_MNE_ICA_WHITENER:
+            tag = read_tag(fid, pos)
+            fitted_data = tag.data.astype(np.float64)
+        # labels
+        elif kind == FIFF.FIFF_MNE_ICA_PCA_MEAN:
+            tag = read_tag(fid, pos)
+            labels_ = tag.data.astype(np.int32)
 
     fid.close()
 
-    return cluster_centers, info
+    # make sure we have all the information required
+    # TODO
+
+    # reconstruct clustering instance
+    if parameters['algorithm'] == 'modKmeans':
+        inst = ModKMeans(
+            cluster_centers.shape[0],
+            n_init=parameters['n_init'],
+            max_iter=parameters['max_iter'],
+            tol=parameters['tol'],
+            random_state=parameters['random_state'],
+            )
+        inst._info = info
+        inst._cluster_names = cluster_names
+        inst._fitted_data = fitted_data
+        # inst._labels = labels_
+        inst._GEV_ = fitted_parameters['GEV_']
+        inst._fitted = True
+    else:
+        raise ValueError(
+            f"Algorithm '{parameters['algorithm']}' is not supported.")
+
+    return inst
 
 
 # ----------------------------------------------------------------------------
@@ -222,3 +351,37 @@ def _read_meas_info(fid, tree):
     info._unlocked = False
 
     return ChInfo(info)
+
+
+# ----------------------------------------------------------------------------
+def _serialize(dict_, outer_sep=';', inner_sep=':'):
+    """Aux function."""
+    s = []
+    for key, value in dict_.items():
+        if callable(value):
+            value = value.__name__
+        elif isinstance(value, Integral):
+            value = int(value)
+        elif isinstance(value, dict):
+            # py35 json does not support numpy int64
+            for subkey, subvalue in value.items():
+                if isinstance(subvalue, list):
+                    if len(subvalue) > 0:
+                        if isinstance(subvalue[0], (int, np.integer)):
+                            value[subkey] = [int(i) for i in subvalue]
+
+        if isinstance(value, np.random.RandomState):
+            value = np.random.RandomState.__name__
+
+        s.append(key + inner_sep + json.dumps(value))
+
+    return outer_sep.join(s)
+
+
+def _deserialize(str_, outer_sep=';', inner_sep=':'):
+    """Aux Function."""
+    out = {}
+    for mapping in str_.split(outer_sep):
+        k, v = mapping.split(inner_sep, 1)
+        out[k] = json.loads(v)
+    return out
