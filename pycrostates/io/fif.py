@@ -150,7 +150,7 @@ def write_cluster(
 def _prepare_kwargs(algorithm: str, kwargs: dict):
     """Prepare params to save from kwargs."""
     valids = {
-        'ModKMeans':{
+        'ModKMeans': {
             'parameters': ['n_init', 'max_iter', 'tol'],
             'variables': ['GEV_'],
             },
@@ -280,7 +280,7 @@ def read_cluster(fname):
 def _check_fit_parameters_and_variables(fit_parameters, fit_variables):
     """Check that we have all the keys we are looking for and return algo."""
     valids = {
-        'ModKMeans':{
+        'ModKMeans': {
             'parameters': ['n_init', 'max_iter', 'tol'],
             'variables': ['GEV_'],
             },
