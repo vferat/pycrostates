@@ -1,7 +1,9 @@
 """Contains I/O operation form and towards .fif format (MEGIN / MNE)."""
 
+from functools import reduce
 import json
 from numbers import Integral
+import operator
 
 from mne.io import Info
 from mne.io.constants import FIFF
@@ -48,25 +50,48 @@ FIFF_MNE_ICA_MATRIX -> cluster_centers_
 FIFF_MNE_ROW_NAMES -> cluster_names
 FIFF_MNE_ICA_WHITENER -> fitted_data
 FIFF_MNE_ICA_PCA_MEAN -> labels
-FIFF_MNE_ICA_INTERFACE_PARAMS -> algorithm + parameters
-FIFF_MNE_ICA_MISC_PARAMS -> fitted variables (ending with '_')
+FIFF_MNE_ICA_INTERFACE_PARAMS -> algorithm + fit parameters
+FIFF_MNE_ICA_MISC_PARAMS -> fit variables (ending with '_')
 """
 
 
-def write_cluster(fname, cluster_centers, chinfo, algorithm, **kwargs):
+def write_cluster(
+        fname,
+        cluster_centers_,
+        chinfo,
+        algorithm,
+        cluster_names,
+        fitted_data,
+        labels_,
+        **kwargs
+        ):
     """Save clustering to disk."""
+    # Error checking on input
+    _check_type(fname, ('path-like', ), 'fname')
+    _check_type(cluster_centers_, (np.ndarray, ), 'cluster_centers_')
+    if cluster_centers_.ndim != 2:
+        raise ValueError("Argument 'cluster_centers_' should be a 2D array.")
+    _check_type(chinfo, (Info, ChInfo), 'chinfo')
+    if not isinstance(chinfo, ChInfo):
+        chinfo = ChInfo(chinfo)  # convert to ChInfo if a MNE Info is provided
+    _check_type(algorithm, (str, ), 'algorithm')
+    _check_value(algorithm, ('modKmeans', ), 'algorithm')
+    _check_type(cluster_names, (list, ), 'cluster_names')
+    _check_type(fitted_data, (np.ndarray, ), 'fitted_data')
+    if fitted_data.ndim != 2:
+        raise ValueError("Argument 'fitted_data' should be a 2D array.")
+    _check_type(labels_, (np.ndarray, ), 'labels_')
+    if labels_.ndim != 2:
+        raise ValueError("Argument 'labels_' should be a 1D array.")
+
+    # logging
     logger.info('Writing clustering solution to %s...', fname)
 
     # retrieve information to store from kwargs
-    cluster_names, fitted_data, labels_, parameters, fitted_parameters = \
-        _prepare_kwargs(kwargs)
-
-    # algorithm
-    _check_value(algorithm, ('modKmeans', ), 'algorithm')
-    parameters['algorithm'] = algorithm
+    fit_parameters, fit_variables = _prepare_kwargs(algorithm, kwargs)
 
     with start_and_end_file(fname) as fid:
-        # write info
+        # write channel info
         start_block(fid, FIFF.FIFFB_MEAS)
         write_id(fid, FIFF.FIFF_BLOCK_ID)
         _write_meas_info(fid, chinfo)
@@ -75,80 +100,71 @@ def write_cluster(fname, cluster_centers, chinfo, algorithm, **kwargs):
         # start writing block
         start_block(fid, FIFF.FIFFB_MNE_ICA)
 
-        # cluster-centers
-        write_double_matrix(fid, FIFF.FIFF_MNE_ICA_MATRIX, cluster_centers)
-
-        # write parameters
-        write_string(fid, FIFF.FIFF_MNE_ICA_INTERFACE_PARAMS,
-                     _serialize(parameters))
-
-        # write fitted parameters
-        write_string(fid, FIFF.FIFF_MNE_ICA_MISC_PARAMS,
-                     _serialize(fitted_parameters))
-
+        # ------------------------------------------------------------
+        # cluster_centers_
+        write_double_matrix(fid, FIFF.FIFF_MNE_ICA_MATRIX,
+                            cluster_centers_.astype(np.float64))
         # write cluster_names
-        if cluster_names is not None:
-            write_name_list(fid, FIFF.FIFF_MNE_ROW_NAMES, cluster_names)
-
+        write_name_list(fid, FIFF.FIFF_MNE_ROW_NAMES, cluster_names)
         # write fitted_data
-        if fitted_data is not None:
-            write_double_matrix(fid, FIFF.FIFF_MNE_ICA_WHITENER, fitted_data)
-
-        # write labels
-        if labels_ is not None:
-            write_double_matrix(fid, FIFF.FIFF_MNE_ICA_PCA_MEAN, labels_)
+        write_double_matrix(fid, FIFF.FIFF_MNE_ICA_WHITENER,
+                            fitted_data.astype(np.float64))
+        # write labels_
+        write_double_matrix(fid, FIFF.FIFF_MNE_ICA_PCA_MEAN,
+                            labels_.reshape(-1, 1).astype(np.float64))
+        # write fit_parameters
+        write_string(fid, FIFF.FIFF_MNE_ICA_INTERFACE_PARAMS,
+                     _serialize(fit_parameters))
+        # write fit_variables
+        write_string(fid, FIFF.FIFF_MNE_ICA_MISC_PARAMS,
+                     _serialize(fit_variables))
+        # ------------------------------------------------------------
 
         # close writing block
         end_block(fid, FIFF.FIFFB_MNE_ICA)
 
 
-def _prepare_kwargs(kwargs: dict):
+def _prepare_kwargs(algorithm: str, kwargs: dict):
     """Prepare params to save from kwargs."""
-    # defaults
-    cluster_names = None
-    fitted_data = None
-    labels_ = None
+    valids = {
+        'modKmeans':{
+            'parameters': ['n_init', 'max_iter', 'tol'],
+            'variables': ['GEV_'],
+            },
+        }
 
-    base_kwargs = ['cluster_names', 'fitted_data', 'labels_']
-    modkmeans_kwargs_params = ['n_init', 'max_iter', 'tol']
-    modkmeans_kwargs_fitted_params = ['GEV_']
+    # retrieve list of expected kwargs for this algorithm
+    expected = set(reduce(operator.concat, valids[algorithm].values()))
 
-    parameters = {key: None for key in modkmeans_kwargs_params}
-    fitted_parameters = {key: None for key in modkmeans_kwargs_fitted_params}
+    # check that we do have a value provided for each expected key
+    keys = set(key for key in kwargs if kwargs[key] is not None)
+    if len(keys.difference(expected)) != 0:
+        raise ValueError(
+            f"Wrong kwargs provided for algorithm '{algorithm}'. Expected: "
+            f"{', '.join(expected)} should not be None.")
 
+    fit_parameters = dict(algorithm=algorithm)
+    fit_variables = dict()
     for key, value in kwargs.items():
-        if key not in base_kwargs + list(parameters) + list(fitted_parameters):
+        if key not in expected:
             continue
-
-        # base
-        elif key == 'cluster_names':
-            _check_type(value, (list, ), 'cluster_names')
-            cluster_names = value
-        elif key == 'fitted_data':
-            _check_type(value, (np.ndarray, ), 'fitted_data')
-            if value.ndim != 2:
-                raise ValueError("Fitted data should be a 2D array.")
-            fitted_data = value.astype(np.float64)
-        elif key == 'labels_':
-            _check_type(value, (np.ndarray, ), 'labels_')
-            if value.ndim != 1:
-                raise ValueError('Labels data should be a 1D array.')
-            labels_ = value.reshape(-1, 1).astype(np.float64)
 
         # ModKMeans
         elif key == 'n_init':
-            parameters['n_init'] = ModKMeans._check_n_init(value)
+            fit_parameters['n_init'] = ModKMeans._check_n_init(value)
         elif key == 'max_iter':
-            parameters['max_iter'] = ModKMeans._check_max_iter(value)
+            fit_parameters['max_iter'] = ModKMeans._check_max_iter(value)
         elif key == 'tol':
-            parameters['tol'] = ModKMeans._check_tol(value)
+            fit_parameters['tol'] = ModKMeans._check_tol(value)
         elif key == 'GEV_':
             _check_type(value, ('numeric', ), 'GEV_')
             if value < 0 or 1 < value:
-                raise ValueError('GEV should be a percentage between 0 and 1.')
-            fitted_parameters['GEV_'] = value
+                raise ValueError(
+                    "Argument 'GEV_' should be a percentage between 0 and 1. "
+                    f"PRovided: '{value}'.")
+            fit_variables['GEV_'] = value
 
-    return cluster_names, fitted_data, labels_, parameters, fitted_parameters
+    return fit_parameters, fit_variables
 
 
 def read_cluster(fname):
