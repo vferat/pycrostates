@@ -20,7 +20,7 @@ import numpy as np
 
 from . import ChInfo
 from ..cluster import ModKMeans
-from ..utils._checks import _check_value, _check_type, _check_random_state
+from ..utils._checks import _check_value, _check_type
 from ..utils._logs import logger
 
 
@@ -111,7 +111,7 @@ def _prepare_kwargs(kwargs: dict):
     labels_ = None
 
     base_kwargs = ['cluster_names', 'fitted_data', 'labels_']
-    modkmeans_kwargs_params = ['n_init', 'max_iter', 'tol', 'random_state']
+    modkmeans_kwargs_params = ['n_init', 'max_iter', 'tol']
     modkmeans_kwargs_fitted_params = ['GEV_']
 
     parameters = {key: None for key in modkmeans_kwargs_params}
@@ -143,8 +143,6 @@ def _prepare_kwargs(kwargs: dict):
             parameters['max_iter'] = ModKMeans._check_max_iter(value)
         elif key == 'tol':
             parameters['tol'] = ModKMeans._check_tol(value)
-        elif key == 'random_state':
-            parameters['random_state'] = _check_random_state(value)
         elif key == 'GEV_':
             _check_type(value, ('numeric', ), 'GEV_')
             if value < 0 or 1 < value:
@@ -212,7 +210,7 @@ def read_cluster(fname):
             n_init=parameters['n_init'],
             max_iter=parameters['max_iter'],
             tol=parameters['tol'],
-            random_state=parameters['random_state'],
+            random_state=None,
             )
         inst._info = info
         inst._cluster_names = cluster_names
@@ -369,9 +367,6 @@ def _serialize(dict_, outer_sep=';', inner_sep=':'):
                     if len(subvalue) > 0:
                         if isinstance(subvalue[0], (int, np.integer)):
                             value[subkey] = [int(i) for i in subvalue]
-
-        if isinstance(value, np.random.RandomState):
-            value = np.random.RandomState.__name__
 
         s.append(key + inner_sep + json.dumps(value))
 
