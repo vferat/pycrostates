@@ -737,8 +737,30 @@ def test_predict(caplog):
     assert not np.isclose(segmentation2.labels,
                           segmentation3.labels).all()
 
+    # with raw and picks
+    raw_ = raw.copy()
+    raw_.info['bads'] = [raw.ch_names[k] for k in range(3)]
+    segmentation = ModK.predict(raw_, picks='eeg')
+    assert "channel EEG 053 was set as bads" in caplog.text
+    caplog.clear()
 
-def test_predict_invalid_arguments(caplog):
+    # with epochs and picks
+    epochs_ = epochs.copy()
+    epochs_.info['bads'] = [epochs.ch_names[k] for k in range(3)]
+    segmentation = ModK.predict(epochs_, picks='eeg')
+    assert "channel EEG 053 was set as bads" in caplog.text
+    caplog.clear()
+
+    # with raw and more than 1 bad channels during fitting
+    ModK_ = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4,
+                      random_state=1)
+    ModK_.fit(raw_, n_jobs=1)
+    raw_.info['bads'] = []
+    segmentation = ModK_.predict(raw_, picks='eeg')
+    assert "channels EEG 001, EEG 002, EEG 003 were set as bads" in caplog.text
+
+
+def test_predict_invalid_arguments():
     """Test invalid arguments passed to predict."""
     with pytest.raises(TypeError, match="'inst' must be an instance of "):
         ModK.predict(epochs.average())
@@ -758,13 +780,8 @@ def test_predict_invalid_arguments(caplog):
     with pytest.raises(TypeError,
                        match="'reject_by_annotation' must be an instance of "):
         ModK.predict(raw, reject_by_annotation=1)
-
-    # TODO: Shouldn't that be a raise ValueError?
-    caplog.clear()
-    ModK.predict(raw, reject_by_annotation='101')
-    assert "'reject_by_annotation' can be set to" in caplog.text
-    caplog.clear()
-
+    with pytest.raises(ValueError, match="'reject_by_annotation' can be"):
+        ModK.predict(raw, reject_by_annotation='101')
     raw_ = raw.copy().drop_channels([raw.ch_names[0]])
     with pytest.raises(ValueError, match='does not have the same channels'):
         ModK.predict(raw_)

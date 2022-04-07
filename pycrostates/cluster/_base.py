@@ -431,22 +431,28 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             if reject_by_annotation == 'omit':
                 reject_by_annotation = True
             else:
-                logger.warning(
-                    "'reject_by_annotation' can be set to 'True', 'False' or "
-                    "'omit' (True). '%s' is not supported. Setting to "
-                    "'False'.", reject_by_annotation)
-                reject_by_annotation = False
+                raise ValueError(
+                    "Argument 'reject_by_annotation' can be set to 'True', "
+                    f"'False' or 'omit' (True). '{reject_by_annotation}' is "
+                    "not supported.")
         elif reject_by_annotation is None:
             reject_by_annotation = False
 
         # check that the instance as the same channels (good + bads)
         _compare_infos(self.info, inst.info)
-        picks = _picks_to_idx(inst.info, picks, none='all', exclude='bads')
+        picks_ = _picks_to_idx(inst.info, picks, none='all', exclude='bads')
         ch_ = [ch for k, ch in enumerate(inst.info['ch_names'])
-               if k in picks and ch in self._info['bads']]
-        if len(ch_) != 0:
-            logger.warning(f"Picked channels '{', '.join(ch_)}' were set as "
-                           "bads during fitting.")
+               if k in picks_ and ch in self._info['bads']]
+        if 1 == len(ch_):
+            logger.warning(f"Picked channel {ch_[0]} was set as "
+                           "bads during fitting and will be ignored.")
+        elif 1 < len(ch_):
+            logger.warning(f"Picked channels {', '.join(ch_)} were set as "
+                           "bads during fitting and will be ignored.")
+
+        # remove channels that were bads during fitting from picks
+        inst = inst.copy().drop_channels(self._info['bads'])
+        picks = _picks_to_idx(inst.info, picks, none='all', exclude='bads')
 
         # logging messages
         if factor == 0:
@@ -475,7 +481,11 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     def _predict_raw(self, raw, picks, factor, tol, half_window_size,
                      min_segment_length, reject_edges, reject_by_annotation):
         """Create segmentation for raw."""
+        # retrieve data for picks
         data = raw.get_data(picks=picks)
+        # retrieve cluster_centers_ for picks
+        cluster_centers_ = deepcopy(self._cluster_centers_)
+        cluster_centers_ = cluster_centers_[:, picks]
 
         if reject_by_annotation:
             # retrieve onsets/ends for BAD annotations
@@ -492,16 +502,14 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
                 data_ = data[:, end:onset]
                 segment = _BaseCluster._segment(
-                    data_, deepcopy(self._cluster_centers_), factor, tol,
-                    half_window_size)
+                    data_, cluster_centers_, factor, tol, half_window_size)
                 if reject_edges:
                     segment = _BaseCluster._reject_edge_segments(segment)
                 segmentation[end:onset] = segment
 
         else:
             segmentation = _BaseCluster._segment(
-                data, deepcopy(self._cluster_centers_), factor, tol,
-                half_window_size)
+                data, cluster_centers_, factor, tol, half_window_size)
             if reject_edges:
                 segmentation = _BaseCluster._reject_edge_segments(segmentation)
 
@@ -517,12 +525,16 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     def _predict_epochs(self, epochs, picks, factor, tol, half_window_size,
                         min_segment_length, reject_edges):
         """Create segmentation for epochs."""
+        # retrieve data for picks
         data = epochs.get_data(picks=picks)
+        # retrieve cluster_centers_ for picks
+        cluster_centers_ = deepcopy(self._cluster_centers_)
+        cluster_centers_ = cluster_centers_[:, picks]
+
         segments = list()
         for epoch_data in data:
             segment = _BaseCluster._segment(
-                epoch_data, deepcopy(self._cluster_centers_),
-                factor, tol, half_window_size)
+                epoch_data, cluster_centers_, factor, tol, half_window_size)
 
             if 0 < min_segment_length:
                 segment = _BaseCluster._reject_short_segments(
