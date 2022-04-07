@@ -61,8 +61,6 @@ def _copy_info(inst, sfreq):
     return new_info
 
 
-# TODO: To update as a == method in ChInfo. Maybe we need support for comparing
-# ChInfo with mne Info?
 def _compare_infos(info1, info2):
     """
     Checks that both info have the same channels.

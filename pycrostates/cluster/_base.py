@@ -32,7 +32,6 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         self._cluster_centers_ = None
 
         # fit variables
-        self._picks = None
         self._info = None
         self._fitted_data = None
         self._labels_ = None
@@ -91,7 +90,6 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 f'{self.__class__.__name__}')
         # sanity-check
         assert self.cluster_centers_ is not None
-        assert self.picks is not None
         assert self.info is not None
         assert self.fitted_data is not None
         assert self.labels_ is not None
@@ -122,9 +120,9 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         n_jobs = _check_n_jobs(n_jobs)
 
         # picks
-        bads_inc = _picks_to_idx(inst.info, picks, none='all', exclude=[])
+        picks_bads_inc = _picks_to_idx(inst.info, picks, none='all', exclude=[])
         picks = _picks_to_idx(inst.info, picks, none='all', exclude='bads')
-        diff = set(bads_inc) - set(picks)
+        diff = set(picks_bads_inc) - set(picks)
         if len(diff) != 0:
             if len(diff) == 1:
                 msg = "Channel %s is set as bad and ignored. To include " + \
@@ -138,7 +136,6 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             logger.warning(
                 msg, ', '.join(inst.info['ch_names'][k] for k in diff))
             del msg
-        del bads_inc
         del diff
 
         # tmin/tmax
@@ -174,8 +171,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             data = data.reshape(data.shape[0], -1)
 
         # store picks and info
-        self._picks = picks
-        self._info = ChInfo(info=pick_info(inst.info, picks))
+        self._info = ChInfo(info=pick_info(inst.info, picks_bads_inc))
         self._fitted_data = data
 
         return data
@@ -369,15 +365,26 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                                     self._cluster_names, axes, block)
 
     @verbose
-    def predict(self, inst, factor=0, half_window_size=3, tol=10e-6,
-                min_segment_length=0, reject_edges=True,
-                reject_by_annotation=True, *, verbose=None):
+    def predict(
+            self,
+            inst,
+            picks='eeg',
+            factor: int = 0,
+            half_window_size: int = 3,
+            tol: Union[int, float] = 10e-6,
+            min_segment_length: int = 0,
+            reject_edges: bool = True,
+            reject_by_annotation: bool = True,
+            *,
+            verbose=None,
+            ):
         """Segment `~mne.io.Raw` or `~mne.Epochs` instance into microstate
         sequence.
 
         Parameters
         ----------
         %(predict_inst)s
+        %(picks_all)s
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing.
         half_window_size : int
@@ -427,14 +434,19 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         elif reject_by_annotation is None:
             reject_by_annotation = False
 
-        # check that the channels match
-        msg = 'Instance to segment into microstate sequence does not have ' + \
-              'the same channels as the instance used for fitting.'
-        try:
-            info = pick_info(inst.info, self._picks)
-        except IndexError:
-            raise ValueError(msg)
-        _compare_infos(self.info, info)
+        # check that the instance as the same channels (good + bads)
+        _compare_infos(self.info, inst.info)
+        picks = _picks_to_idx(inst.info, picks, none='all', exclude='bads')
+        ch_ = [ch for ch in inst.info['ch_names'][picks]
+               if ch in self.info['bads']]
+        if len(ch_) != 0:
+            logger.warning(f"Channels '{', '.join(ch_)}' were set as bads "
+                           "during fitting.")
+        ch_ = [ch for ch in self.info['ch_names'][picks]
+               if ch in inst.info['bads']]
+        if len(ch_) != 0:
+            logger.warning(f"Channels '{', '.join(ch_)}' were not set as bads "
+                           "during fitting.")
 
         # logging messages
         if factor == 0:
@@ -452,11 +464,11 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
         if isinstance(inst, BaseRaw):
             segmentation = self._predict_raw(
-                inst, self._picks, factor, tol, half_window_size,
+                inst, picks, factor, tol, half_window_size,
                 min_segment_length, reject_edges, reject_by_annotation)
         elif isinstance(inst, BaseEpochs):
             segmentation = self._predict_epochs(
-                inst, self._picks, factor, tol, half_window_size,
+                inst, picks, factor, tol, half_window_size,
                 min_segment_length, reject_edges)
         return segmentation
 
@@ -696,19 +708,6 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return self._cluster_centers_
 
     @property
-    def picks(self):
-        """
-        Picks selected when fitting the clustering algorithm.
-        The picks have been converted to IDx.
-
-        :type: `~numpy.array`
-        """
-        if self._picks is None:
-            assert not self._fitted  # sanity-check
-            logger.warning('Clustering algorithm has not been fitted.')
-        return self._picks
-
-    @property
     def info(self):
         """
         Info instance corresponding to the MNE object used to fit the
@@ -767,7 +766,6 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 "The clustering algorithm has already been fitted.")
         else:
             self._cluster_centers_ = None
-            self._picks = None
             self._info = None
             self._fitted_data = None
             self._labels_ = None
