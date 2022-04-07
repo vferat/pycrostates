@@ -140,6 +140,24 @@ class ModKMeans(_BaseCluster):
         self._labels_ = best_segmentation
         self._fitted = True
 
+    @copy_doc(_BaseCluster.save)
+    def save(self, fname):
+        super().save(fname)
+        from ..io.fiff import write_cluster
+        write_cluster(
+            fname,
+            self._cluster_centers_,
+            self._info,
+            'ModKMeans',
+            self._cluster_names,
+            self._fitted_data,
+            self._labels_,
+            n_init=self._n_init,
+            max_iter=self._max_iter,
+            tol=self._tol,
+            GEV_=self._GEV_
+            )
+
     # --------------------------------------------------------------------
     @staticmethod
     def _kmeans(data, n_clusters, max_iter, random_state, tol):

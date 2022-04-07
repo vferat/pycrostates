@@ -369,6 +369,19 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return plot_cluster_centers(self._cluster_centers_, info,
                                     self._cluster_names, axes, block)
 
+    @abstractmethod
+    def save(self, fname):
+        """
+        Save clustering solution to disk.
+
+        Parameters
+        ----------
+        fname : path-like
+            Path to the .fif file where the clustering solution is saved.
+        """
+        self._check_fit()
+        _check_type(fname, ('path-like', ), 'fname')
+
     @verbose
     def predict(
             self,
