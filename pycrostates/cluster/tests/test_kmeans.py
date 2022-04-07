@@ -45,7 +45,6 @@ def _check_fitted(ModK):
     assert len(ModK.cluster_names) == n_clusters
     assert len(ModK.cluster_centers_) == n_clusters
     assert ModK.fitted_data is not None
-    assert ModK.picks is not None
     assert ModK.info is not None
     assert ModK.GEV_ is not None
     assert ModK.labels_ is not None
@@ -60,7 +59,6 @@ def _check_unfitted(ModK):
     assert len(ModK.cluster_names) == n_clusters
     assert ModK.cluster_centers_ is None
     assert ModK.fitted_data is None
-    assert ModK.picks is None
     assert ModK.info is None
     assert ModK.GEV_ is None
     assert ModK.labels_ is None
@@ -369,10 +367,6 @@ def test_properties(caplog):
     assert 'Clustering algorithm has not been fitted.' in caplog.text
     caplog.clear()
 
-    ModK_.picks
-    assert 'Clustering algorithm has not been fitted.' in caplog.text
-    caplog.clear()
-
     ModK_.info
     assert 'Clustering algorithm has not been fitted.' in caplog.text
     caplog.clear()
@@ -605,8 +599,6 @@ def test_fit_with_bads(caplog):
     _check_fitted(ModK_)
     _check_fitted_data_raw(ModK_.fitted_data, raw_, 'eeg', None, None, 'omit')
     assert len(ModK_.info['bads']) == 0
-    assert len(ModK_.picks) == 60
-    assert ModK_.picks[0] == 0
     assert 'set as bad' not in caplog.text
     caplog.clear()
 
@@ -618,9 +610,7 @@ def test_fit_with_bads(caplog):
     ModK_.fit(raw_, n_jobs=1)
     _check_fitted(ModK_)
     _check_fitted_data_raw(ModK_.fitted_data, raw_, 'eeg', None, None, 'omit')
-    assert len(ModK_.info['bads']) == 0  # pick_info on picks
-    assert len(ModK_.picks) == 59
-    assert ModK_.picks[0] == 1
+    assert len(ModK_.info['bads']) == 0
     assert 'Channel EEG 001 is set as bad and ignored.' in caplog.text
     caplog.clear()
 
@@ -632,9 +622,7 @@ def test_fit_with_bads(caplog):
     ModK_.fit(raw_, n_jobs=1)
     _check_fitted(ModK_)
     _check_fitted_data_raw(ModK_.fitted_data, raw_, 'eeg', None, None, 'omit')
-    assert len(ModK_.info['bads']) == 0  # pick_info on picks
-    assert len(ModK_.picks) == 58
-    assert ModK_.picks[0] == 2
+    assert len(ModK_.info['bads']) == 0
     assert 'Channels EEG 001, EEG 002 are set as bads' in caplog.text
     caplog.clear()
 
@@ -646,9 +634,7 @@ def test_fit_with_bads(caplog):
     ModK_.fit(epochs_, n_jobs=1)
     _check_fitted(ModK_)
     _check_fitted_data_epochs(ModK_.fitted_data, epochs_, 'eeg', None, None)
-    assert len(ModK_.info['bads']) == 0  # pick_info on picks
-    assert len(ModK_.picks) == 58
-    assert ModK_.picks[0] == 2
+    assert len(ModK_.info['bads']) == 0
     assert 'Channels EEG 001, EEG 002 are set as bads' in caplog.text
     caplog.clear()
 
