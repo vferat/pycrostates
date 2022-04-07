@@ -1,9 +1,12 @@
 """Test _imports.py"""
 
 from collections import OrderedDict
+from pathlib import Path
 
 from mne import create_info
 from mne.channels import DigMontage
+from mne.datasets import testing
+from mne.io import read_raw_fif
 from mne.io.constants import FIFF
 import numpy as np
 import pytest
@@ -87,6 +90,13 @@ def test_create_from_info():
         assert ch['ch_name'] == ch_names[k]
         assert all(np.isnan(elt) for elt in ch['loc'])
 
+    # test with a file with projs
+    directory = Path(testing.data_path()) / 'MEG' / 'sample'
+    fname = directory / 'sample_audvis_trunc_raw.fif'
+    raw = read_raw_fif(fname, preload=True)
+    chinfo = ChInfo(info=raw.info)
+    assert chinfo['projs'] == raw.info['projs']
+
 
 def test_create_from_info_invalid_arguments():
     """Test creation of a ChInfo from an Info instance with invalid args."""
@@ -122,6 +132,7 @@ def test_create_from_channels():
     assert chinfo['dig'] is None
     assert chinfo['custom_ref_applied'] == FIFF.FIFFV_MNE_CUSTOM_REF_OFF
     assert chinfo['nchan'] == 3
+    assert chinfo['projs'] == []
 
     # test with multiple channel types
     ch_names = [f'MEG{n:03}' for n in range(1, 10)] + ['EOG001']
