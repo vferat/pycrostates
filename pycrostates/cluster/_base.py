@@ -120,11 +120,12 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         n_jobs = _check_n_jobs(n_jobs)
 
         # picks
-        picks_bads_inc = _picks_to_idx(inst.info, picks, none='all', exclude=[])
+        picks_bads_inc = _picks_to_idx(
+            inst.info, picks, none='all', exclude=[])
         picks = _picks_to_idx(inst.info, picks, none='all', exclude='bads')
-        diff = set(picks_bads_inc) - set(picks)
-        if len(diff) != 0:
-            if len(diff) == 1:
+        ch_not_used = set(picks_bads_inc) - set(picks)
+        if len(ch_not_used) != 0:
+            if len(ch_not_used) == 1:
                 msg = "Channel %s is set as bad and ignored. To include " + \
                       "it, either remove it from 'inst.info['bads'] or " + \
                       "provide its name explicitly in the 'picks' argument."
@@ -134,9 +135,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                       "'inst.info['bads'] or provide their names " + \
                       "explicitly in the 'picks' argument."
             logger.warning(
-                msg, ', '.join(inst.info['ch_names'][k] for k in diff))
+                msg, ', '.join(inst.info['ch_names'][k] for k in ch_not_used))
             del msg
-        del diff
 
         # tmin/tmax
         # check positiveness
@@ -172,6 +172,9 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
         # store picks and info
         self._info = ChInfo(info=pick_info(inst.info, picks_bads_inc))
+        # write channels not used for fitting in ['bads'] of clustering inst.
+        self._info['bads'] = [ch for k, ch in enumerate(self._info['ch_names'])
+                              if k in ch_not_used]
         self._fitted_data = data
 
         return data
@@ -361,7 +364,9 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             Matplotlib figure containing the topographic plots.
         """
         self._check_fit()
-        return plot_cluster_centers(self._cluster_centers_, self._info,
+        picks = _picks_to_idx(self._info, 'all', none='all', exclude='bads')
+        info = pick_info(self._info, picks)
+        return plot_cluster_centers(self._cluster_centers_, info,
                                     self._cluster_names, axes, block)
 
     @verbose
@@ -437,16 +442,11 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         # check that the instance as the same channels (good + bads)
         _compare_infos(self.info, inst.info)
         picks = _picks_to_idx(inst.info, picks, none='all', exclude='bads')
-        ch_ = [ch for ch in inst.info['ch_names'][picks]
-               if ch in self.info['bads']]
+        ch_ = [ch for k, ch in enumerate(inst.info['ch_names'])
+               if k in picks and ch in self._info['bads']]
         if len(ch_) != 0:
-            logger.warning(f"Channels '{', '.join(ch_)}' were set as bads "
-                           "during fitting.")
-        ch_ = [ch for ch in self.info['ch_names'][picks]
-               if ch in inst.info['bads']]
-        if len(ch_) != 0:
-            logger.warning(f"Channels '{', '.join(ch_)}' were not set as bads "
-                           "during fitting.")
+            logger.warning(f"Picked channels '{', '.join(ch_)}' were set as "
+                           "bads during fitting.")
 
         # logging messages
         if factor == 0:
