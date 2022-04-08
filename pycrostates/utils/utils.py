@@ -63,7 +63,7 @@ def _copy_info(inst, sfreq):
 
 def _compare_infos(cluster_info, inst_info):
     """
-    Checks that both info have the same channels.
+    Checks that the channels in cluster_info are all present in inst_info.
     """
     for ch in cluster_info['ch_names']:
         if ch not in inst_info['ch_names']:
@@ -80,7 +80,7 @@ def _compare_infos(cluster_info, inst_info):
         if ch['ch_name'] in cluster_info['ch_names']:
             inst_loc.append((ch['ch_name'], deepcopy(ch['loc'])))
     cluster_loc = [loc[1] for loc in sorted(cluster_loc, key=lambda x: x[0])]
-    inst_loc = [loc[1] for loc in sorted(cluster_loc, key=lambda x: x[0])]
+    inst_loc = [loc[1] for loc in sorted(inst_loc, key=lambda x: x[0])]
 
     # Compare loc
     assert len(cluster_loc) == len(inst_loc)  # sanity-check
