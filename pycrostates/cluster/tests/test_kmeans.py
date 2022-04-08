@@ -810,6 +810,7 @@ def test_predict(caplog):
     raw_.info['bads'] = [raw.info['ch_names'][k] for k in range(3)]
     picks = [ch for k, ch in enumerate(raw_.info['ch_names'])
              if k in range(2, raw_.info['nchan'] - 5)]
+    picks.pop(10)
     segmentation = ModK.predict(raw_, picks=picks)
 
 
