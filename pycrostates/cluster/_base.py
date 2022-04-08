@@ -461,8 +461,11 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                            "bads during fitting and will be ignored.")
 
         # remove channels that were bads during fitting from picks
-        inst = inst.copy().drop_channels(self._info['bads'])
-        picks = _picks_to_idx(inst.info, picks, none='all', exclude='bads')
+        picks_ = [ch for k, ch in enumerate(inst.info['ch_names'])
+                  if k in picks_ and ch not in self._info['bads']]
+        picks_data = _picks_to_idx(inst.info, picks_, none='all', exclude=[])
+        picks_cluster_centers = _picks_to_idx(self._info, picks_, none='all',
+                                              exclude=[])
 
         # logging messages
         if factor == 0:
@@ -480,22 +483,24 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
         if isinstance(inst, BaseRaw):
             segmentation = self._predict_raw(
-                inst, picks, factor, tol, half_window_size,
-                min_segment_length, reject_edges, reject_by_annotation)
+                inst, picks_data, picks_cluster_centers, factor, tol,
+                half_window_size, min_segment_length, reject_edges,
+                reject_by_annotation)
         elif isinstance(inst, BaseEpochs):
             segmentation = self._predict_epochs(
-                inst, picks, factor, tol, half_window_size,
-                min_segment_length, reject_edges)
+                inst, picks_data, picks_cluster_centers, factor, tol,
+                half_window_size, min_segment_length, reject_edges)
         return segmentation
 
-    def _predict_raw(self, raw, picks, factor, tol, half_window_size,
-                     min_segment_length, reject_edges, reject_by_annotation):
+    def _predict_raw(self, raw, picks_data, picks_cluster_centers, factor, tol,
+                     half_window_size, min_segment_length, reject_edges,
+                     reject_by_annotation):
         """Create segmentation for raw."""
         # retrieve data for picks
-        data = raw.get_data(picks=picks)
+        data = raw.get_data(picks=picks_data)
         # retrieve cluster_centers_ for picks
         cluster_centers_ = deepcopy(self._cluster_centers_)
-        cluster_centers_ = cluster_centers_[:, picks]
+        cluster_centers_ = cluster_centers_[:, picks_cluster_centers]
 
         if reject_by_annotation:
             # retrieve onsets/ends for BAD annotations
@@ -528,18 +533,19 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 segmentation, data, min_segment_length)
 
         return RawSegmentation(labels=segmentation,
-                               inst=raw, picks=picks,
+                               inst=raw, picks=picks_data,
                                cluster_centers_=self._cluster_centers_,
                                cluster_names=self._cluster_names)
 
-    def _predict_epochs(self, epochs, picks, factor, tol, half_window_size,
-                        min_segment_length, reject_edges):
+    def _predict_epochs(self, epochs, picks_data, picks_cluster_centers,
+                        factor, tol, half_window_size, min_segment_length,
+                        reject_edges):
         """Create segmentation for epochs."""
         # retrieve data for picks
-        data = epochs.get_data(picks=picks)
+        data = epochs.get_data(picks=picks_data)
         # retrieve cluster_centers_ for picks
         cluster_centers_ = deepcopy(self._cluster_centers_)
-        cluster_centers_ = cluster_centers_[:, picks]
+        cluster_centers_ = cluster_centers_[:, picks_cluster_centers]
 
         segments = list()
         for epoch_data in data:
@@ -555,7 +561,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             segments.append(segment)
 
         return EpochsSegmentation(labels=np.array(segments),
-                                  inst=epochs, picks=picks,
+                                  inst=epochs, picks=picks_data,
                                   cluster_centers_=self._cluster_centers_,
                                   cluster_names=self._cluster_names)
 

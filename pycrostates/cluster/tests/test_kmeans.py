@@ -6,9 +6,10 @@ from pathlib import Path
 
 from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
-import mne
+from mne import Annotations, Epochs, make_fixed_length_events
 from mne.channels import DigMontage
 from mne.datasets import testing
+from mne.io import read_raw_fif
 from mne.io.pick import _picks_to_idx
 import numpy as np
 import pytest
@@ -24,10 +25,13 @@ logger.propagate = True
 
 directory = Path(testing.data_path()) / 'MEG' / 'sample'
 fname = directory / 'sample_audvis_trunc_raw.fif'
-raw = mne.io.read_raw_fif(fname, preload=True)
+raw = read_raw_fif(fname, preload=True)
+raw_meg = raw.copy().pick_types(meg=True, eeg=True).crop(0, 10).apply_proj()
 raw.pick('eeg').crop(0, 10).apply_proj()
-events = mne.make_fixed_length_events(raw, duration=1)
-epochs = mne.Epochs(raw, events, tmin=0, tmax=0.5, baseline=None, preload=True)
+events = make_fixed_length_events(raw, duration=1)
+epochs_meg = Epochs(raw_meg, events, tmin=0, tmax=0.5, baseline=None,
+                    preload=True)
+epochs = Epochs(raw, events, tmin=0, tmax=0.5, baseline=None, preload=True)
 n_clusters = 4
 
 # Fit one for general purposes
@@ -536,7 +540,7 @@ def test_fit_data_shapes():
     # ---------------------
     # Reject by annotations
     # ---------------------
-    bad_annot = mne.Annotations([1], [2], 'bad')
+    bad_annot = Annotations([1], [2], 'bad')
     raw_ = raw.copy()
     raw_.set_annotations(bad_annot)
 
@@ -705,7 +709,7 @@ def test_predict(caplog):
     caplog.clear()
 
     # raw with reject_by_annotation
-    bad_annot = mne.Annotations([1], [2], 'bad')
+    bad_annot = Annotations([1], [2], 'bad')
     raw_ = raw.copy()
     raw_.set_annotations(bad_annot)
     segmentation_rej_True = ModK.predict(raw_, factor=0, reject_edges=True,
@@ -758,6 +762,31 @@ def test_predict(caplog):
     raw_.info['bads'] = []
     segmentation = ModK_.predict(raw_, picks='eeg')
     assert "channels EEG 001, EEG 002, EEG 003 were set as bads" in caplog.text
+    caplog.clear()
+
+    # with raw and different channel types
+    raw_meg_ = raw_meg.copy()
+    raw_meg_.info['bads'] = ['MEG 0113', 'MEG 0112', 'EEG 059', 'EEG 060']
+    ModK_meg = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4,
+                         random_state=1)
+    ModK_meg.fit(raw_meg_, picks='eeg', n_jobs=1)
+    assert 'Channels EEG 059, EEG 060 are set as bads' in caplog.text
+    caplog.clear()
+
+    raw_meg_.info['bads'] = []
+    ModK_meg.predict(raw_meg_, picks='eeg')
+    assert 'channels EEG 059, EEG 060 were set' in caplog.text
+    caplog.clear()
+
+    # Predict with different bad channels
+    raw_meg_.info['bads'] = ['MEG 0113', 'MEG 0112', 'EEG 001', 'EEG 060']
+    ModK.predict(raw_meg_, picks='eeg')
+    assert ' channel EEG 059 was set as bads' in caplog.text
+    caplog.clear()
+
+    # Predict with epochs
+    ModK.predict(epochs_meg, picks='eeg')
+    assert 'channels EEG 059, EEG 060 were set' in caplog.text
 
 
 def test_predict_invalid_arguments():
