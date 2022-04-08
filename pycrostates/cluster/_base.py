@@ -449,7 +449,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             reject_by_annotation = False
 
         # check that the instance as the same channels (good + bads)
-        _compare_infos(self.info, inst.info)
+        _compare_infos(cluster_info=self._info, inst_info=inst.info)
         picks_ = _picks_to_idx(inst.info, picks, none='all', exclude='bads')
         ch_ = [ch for k, ch in enumerate(inst.info['ch_names'])
                if k in picks_ and ch in self._info['bads']]

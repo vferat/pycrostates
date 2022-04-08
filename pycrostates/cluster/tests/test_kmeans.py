@@ -780,12 +780,12 @@ def test_predict(caplog):
 
     # with different bad channels types
     raw_meg_.info['bads'] = ['MEG 0113', 'MEG 0112', 'EEG 001', 'EEG 060']
-    ModK.predict(raw_meg_, picks='eeg')
+    ModK_meg.predict(raw_meg_, picks='eeg')
     assert ' channel EEG 059 was set as bads' in caplog.text
     caplog.clear()
 
     # with epochs and picks
-    ModK.predict(epochs_meg, picks='eeg')
+    ModK_meg.predict(epochs_meg, picks='eeg')
     assert 'channels EEG 059, EEG 060 were set' in caplog.text
 
     # with picks of non-extreme channels
@@ -797,6 +797,13 @@ def test_predict(caplog):
     ModK_.fit(raw_, n_jobs=1)
     raw_.info['bads'] = []
     segmentation = ModK_.predict(raw_, picks='eeg')
+    raw_.info['bads'] = [raw.ch_names[k] for k in range(1, 3)]
+    raw_.info['bads'] += [raw.ch_names[k] for k in range(42, 50)]
+    segmentation = ModK_.predict(raw_, picks='eeg')
+
+    # with different channels
+    with pytest.raises(ValueError, match="does not have the same channels"):
+        ModK.predict(raw_meg_, picks='eeg')
 
 
 def test_predict_invalid_arguments():
