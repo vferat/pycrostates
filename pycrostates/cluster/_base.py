@@ -172,9 +172,6 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
         # store picks and info
         self._info = ChInfo(info=pick_info(inst.info, picks_bads_inc))
-        # write channels not used for fitting in ['bads'] of clustering inst.
-        self._info['bads'] = [ch for k, ch in enumerate(self._info['ch_names'])
-                              if k in ch_not_used]
         self._fitted_data = data
 
         return data
