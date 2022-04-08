@@ -778,15 +778,25 @@ def test_predict(caplog):
     assert 'channels EEG 059, EEG 060 were set' in caplog.text
     caplog.clear()
 
-    # Predict with different bad channels
+    # with different bad channels types
     raw_meg_.info['bads'] = ['MEG 0113', 'MEG 0112', 'EEG 001', 'EEG 060']
     ModK.predict(raw_meg_, picks='eeg')
     assert ' channel EEG 059 was set as bads' in caplog.text
     caplog.clear()
 
-    # Predict with epochs
+    # with epochs and picks
     ModK.predict(epochs_meg, picks='eeg')
     assert 'channels EEG 059, EEG 060 were set' in caplog.text
+
+    # with picks of non-extreme channels
+    raw_ = raw.copy()
+    raw_.info['bads'] = [raw.ch_names[k] for k in range(2, 5)]
+    raw_.info['bads'] += [raw.ch_names[k] for k in range(20, 22)]
+    ModK_ = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4,
+                      random_state=1)
+    ModK_.fit(raw_, n_jobs=1)
+    raw_.info['bads'] = []
+    segmentation = ModK_.predict(raw_, picks='eeg')
 
 
 def test_predict_invalid_arguments():

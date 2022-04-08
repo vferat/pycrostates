@@ -464,8 +464,10 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         picks_ = [ch for k, ch in enumerate(inst.info['ch_names'])
                   if k in picks_ and ch not in self._info['bads']]
         picks_data = _picks_to_idx(inst.info, picks_, none='all', exclude=[])
-        picks_cluster_centers = _picks_to_idx(self._info, picks_, none='all',
-                                              exclude=[])
+        good_channels = [ch for ch in self._info['ch_names']
+                         if ch not in self._info['bads']]
+        picks_cluster_centers = np.array(
+            [good_channels.index(ch) for ch in picks_])
 
         # logging messages
         if factor == 0:
