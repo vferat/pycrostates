@@ -790,20 +790,27 @@ def test_predict(caplog):
 
     # with picks of non-extreme channels
     raw_ = raw.copy()
-    raw_.info['bads'] = [raw.ch_names[k] for k in range(2, 5)]
-    raw_.info['bads'] += [raw.ch_names[k] for k in range(20, 22)]
+    raw_.info['bads'] = [raw.info['ch_names'][k] for k in range(2, 5)]
+    raw_.info['bads'] += [raw.info['ch_names'][k] for k in range(20, 22)]
     ModK_ = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4,
                       random_state=1)
     ModK_.fit(raw_, n_jobs=1)
     raw_.info['bads'] = []
     segmentation = ModK_.predict(raw_, picks='eeg')
-    raw_.info['bads'] = [raw.ch_names[k] for k in range(1, 3)]
-    raw_.info['bads'] += [raw.ch_names[k] for k in range(42, 50)]
+    raw_.info['bads'] = [raw.info['ch_names'][k] for k in range(1, 3)]
+    raw_.info['bads'] += [raw.info['ch_names'][k] for k in range(42, 50)]
     segmentation = ModK_.predict(raw_, picks='eeg')
 
     # with different channels
     with pytest.raises(ValueError, match="does not have the same channels"):
         ModK.predict(raw_meg_, picks='eeg')
+
+    # test with an explicit set of channels in picks
+    raw_ = raw.copy()
+    raw_.info['bads'] = [raw.info['ch_names'][k] for k in range(3)]
+    picks = [ch for k, ch in enumerate(raw_.info['ch_names'])
+             if k in range(2, raw_.info['nchan'] - 5)]
+    segmentation = ModK.predict(raw_, picks=picks)
 
 
 def test_predict_invalid_arguments():
