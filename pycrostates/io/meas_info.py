@@ -287,6 +287,10 @@ class ChInfo(Info):
                 return False
             assert self['nchan'] == other['nchan']  # sanity-check
 
+            # compare channel types
+            if self.get_channel_types() != other.get_channel_types():
+                return False
+
             # compare montage
             m1 = self.get_montage()
             m2 = other.get_montage()
@@ -296,6 +300,8 @@ class ChInfo(Info):
                 return False
             elif m1 is not None and m2 is not None:
                 if any(dig not in m2.dig for dig in m1.dig):
+                    return False
+                if any(dig not in m1.dig for dig in m2.dig):
                     return False
 
             # compare custom ref
@@ -315,7 +321,7 @@ class ChInfo(Info):
 
     def __ne__(self, other):
         """Different != method."""
-        return not self.__eq__(self, other)
+        return not self.__eq__(other)
 
     # ------------------------------------------------------------------------
     def __setitem__(self, key, val):

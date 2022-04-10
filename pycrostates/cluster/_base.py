@@ -116,7 +116,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
     def __ne__(self, other):
         """Different != method."""
-        return not self.__eq__(self, other)
+        return not self.__eq__(other)
 
     def copy(self, deep=True):
         """Returns a copy of the instance.
