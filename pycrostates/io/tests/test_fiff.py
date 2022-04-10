@@ -5,11 +5,12 @@ from pathlib import Path
 
 from mne.datasets import testing
 from mne.io import read_raw_fif
+from mne.preprocessing import ICA
 import numpy as np
 import pytest
 
 from pycrostates.cluster import ModKMeans
-from pycrostates.io.fiff import write_cluster, read_cluster
+from pycrostates.io.fiff import write_cluster, read_cluster, _prepare_kwargs
 from pycrostates.utils._logs import logger, set_log_level
 
 
@@ -53,16 +54,16 @@ def test_write_and_read(tmp_path, caplog):
     caplog.clear()
     write_cluster(
         fname2,
-        ModK._cluster_centers_,
-        ModK._info,
+        ModK.cluster_centers_,
+        ModK.info,
         'ModKMeans',
-        ModK._cluster_names,
-        ModK._fitted_data,
-        ModK._labels_,
-        n_init=ModK._n_init,
-        max_iter=ModK._max_iter,
-        tol=ModK._tol,
-        GEV_=ModK._GEV_
+        ModK.cluster_names,
+        ModK.fitted_data,
+        ModK.labels_,
+        n_init=ModK.n_init,
+        max_iter=ModK.max_iter,
+        tol=ModK.tol,
+        GEV_=ModK.GEV_
         )
     assert 'Writing clustering solution' in caplog.text
 
@@ -90,3 +91,282 @@ def test_write_and_read(tmp_path, caplog):
     assert np.allclose(segmentation.labels, segmentation1.labels)
     assert np.allclose(segmentation.labels, segmentation2.labels)
     assert np.allclose(segmentation1.labels, segmentation2.labels)
+
+
+def test_invalid_write(tmp_path):
+    """Test invalid arguments provided to write."""
+    with pytest.raises(TypeError, match="'fname' must be an instance of"):
+        write_cluster(
+            101,
+            ModK._cluster_centers_,
+            ModK._info,
+            'ModKMeans',
+            ModK._cluster_names,
+            ModK._fitted_data,
+            ModK._labels_,
+            n_init=ModK._n_init,
+            max_iter=ModK._max_iter,
+            tol=ModK._tol,
+            GEV_=ModK._GEV_
+            )
+
+    with pytest.raises(TypeError,
+                       match="'cluster_centers_' must be an instance of"):
+        write_cluster(
+            tmp_path / 'cluster.fif',
+            list(ModK._cluster_centers_),
+            ModK._info,
+            'ModKMeans',
+            ModK._cluster_names,
+            ModK._fitted_data,
+            ModK._labels_,
+            n_init=ModK._n_init,
+            max_iter=ModK._max_iter,
+            tol=ModK._tol,
+            GEV_=ModK._GEV_
+            )
+
+    with pytest.raises(ValueError,
+                       match="Argument 'cluster_centers_' should be a 2D"):
+        write_cluster(
+            tmp_path / 'cluster.fif',
+            ModK._cluster_centers_.flatten(),
+            ModK._info,
+            'ModKMeans',
+            ModK._cluster_names,
+            ModK._fitted_data,
+            ModK._labels_,
+            n_init=ModK._n_init,
+            max_iter=ModK._max_iter,
+            tol=ModK._tol,
+            GEV_=ModK._GEV_
+            )
+
+    with pytest.raises(TypeError,
+                       match="'chinfo' must be an instance of"):
+        write_cluster(
+            tmp_path / 'cluster.fif',
+            ModK.cluster_centers_,
+            101,
+            'ModKMeans',
+            ModK.cluster_names,
+            ModK.fitted_data,
+            ModK.labels_,
+            n_init=ModK.n_init,
+            max_iter=ModK.max_iter,
+            tol=ModK.tol,
+            GEV_=ModK.GEV_
+            )
+
+    with pytest.raises(TypeError,
+                       match="'algorithm' must be an instance of"):
+        write_cluster(
+            tmp_path / 'cluster.fif',
+            ModK._cluster_centers_,
+            ModK._info,
+            101,
+            ModK._cluster_names,
+            ModK._fitted_data,
+            ModK._labels_,
+            n_init=ModK._n_init,
+            max_iter=ModK._max_iter,
+            tol=ModK._tol,
+            GEV_=ModK._GEV_
+            )
+
+    with pytest.raises(ValueError,
+                       match="Invalid value for the 'algorithm' parameter"):
+        write_cluster(
+            tmp_path / 'cluster.fif',
+            ModK._cluster_centers_,
+            ModK._info,
+            '101',
+            ModK._cluster_names,
+            ModK._fitted_data,
+            ModK._labels_,
+            n_init=ModK._n_init,
+            max_iter=ModK._max_iter,
+            tol=ModK._tol,
+            GEV_=ModK._GEV_
+            )
+
+    with pytest.raises(TypeError,
+                       match="'cluster_names' must be an instance of"):
+        write_cluster(
+            tmp_path / 'cluster.fif',
+            ModK._cluster_centers_,
+            ModK._info,
+            'ModKMeans',
+            tuple(ModK._cluster_names),
+            ModK._fitted_data,
+            ModK._labels_,
+            n_init=ModK._n_init,
+            max_iter=ModK._max_iter,
+            tol=ModK._tol,
+            GEV_=ModK._GEV_
+            )
+
+    with pytest.raises(
+            ValueError,
+            match="Argument 'cluster_names' and 'cluster_centers_'"):
+        write_cluster(
+            tmp_path / 'cluster.fif',
+            ModK._cluster_centers_,
+            ModK._info,
+            'ModKMeans',
+            ModK._cluster_names[0:-2],
+            ModK._fitted_data,
+            ModK._labels_,
+            n_init=ModK._n_init,
+            max_iter=ModK._max_iter,
+            tol=ModK._tol,
+            GEV_=ModK._GEV_
+            )
+
+    with pytest.raises(TypeError,
+                       match="'fitted_data' must be an instance of"):
+        write_cluster(
+            tmp_path / 'cluster.fif',
+            ModK._cluster_centers_,
+            ModK._info,
+            'ModKMeans',
+            ModK._cluster_names,
+            list(ModK._fitted_data),
+            ModK._labels_,
+            n_init=ModK._n_init,
+            max_iter=ModK._max_iter,
+            tol=ModK._tol,
+            GEV_=ModK._GEV_
+            )
+
+    with pytest.raises(ValueError,
+                       match="Argument 'fitted_data' should be a 2D"):
+        write_cluster(
+            tmp_path / 'cluster.fif',
+            ModK._cluster_centers_,
+            ModK._info,
+            'ModKMeans',
+            ModK._cluster_names,
+            ModK._fitted_data.flatten(),
+            ModK._labels_,
+            n_init=ModK._n_init,
+            max_iter=ModK._max_iter,
+            tol=ModK._tol,
+            GEV_=ModK._GEV_
+            )
+
+    with pytest.raises(TypeError,
+                       match="'labels_' must be an instance of"):
+        write_cluster(
+            tmp_path / 'cluster.fif',
+            ModK._cluster_centers_,
+            ModK._info,
+            'ModKMeans',
+            ModK._cluster_names,
+            ModK._fitted_data,
+            list(ModK._labels_),
+            n_init=ModK._n_init,
+            max_iter=ModK._max_iter,
+            tol=ModK._tol,
+            GEV_=ModK._GEV_
+            )
+
+    with pytest.raises(ValueError,
+                       match="Argument 'labels_' should be a 1D array."):
+        write_cluster(
+            tmp_path / 'cluster.fif',
+            ModK._cluster_centers_,
+            ModK._info,
+            'ModKMeans',
+            ModK._cluster_names,
+            ModK._fitted_data,
+            ModK._labels_.reshape(2, ModK._labels_.size // 2),
+            n_init=ModK._n_init,
+            max_iter=ModK._max_iter,
+            tol=ModK._tol,
+            GEV_=ModK._GEV_
+            )
+
+
+def test_prepare_kwargs():
+    """Test _prepare_kwargs."""
+    # working
+    kwargs = dict(
+        n_init=ModK._n_init,
+        max_iter=ModK._max_iter,
+        tol=ModK._tol,
+        GEV_=ModK._GEV_
+        )
+    _prepare_kwargs('ModKMeans', kwargs)
+
+    # remove one value
+    kwargs = dict(
+        max_iter=ModK._max_iter,
+        tol=ModK._tol,
+        GEV_=ModK._GEV_
+        )
+    with pytest.raises(ValueError, match="Wrong kwargs provided for"):
+        _prepare_kwargs('ModKMeans', kwargs)
+
+
+def test_prepare_kwargs_ModKMeans():
+    """Test invalid key/values for ModKMeans."""
+    kwargs = dict(
+        n_init=-101,
+        max_iter=ModK._max_iter,
+        tol=ModK._tol,
+        GEV_=ModK._GEV_
+        )
+    with pytest.raises(ValueError,
+                       match="initialization must be a positive integer"):
+        _prepare_kwargs('ModKMeans', kwargs)
+
+    kwargs = dict(
+        n_init=ModK._n_init,
+        max_iter=-101,
+        tol=ModK._tol,
+        GEV_=ModK._GEV_
+        )
+    with pytest.raises(ValueError,
+                       match="max iteration must be a positive"):
+        _prepare_kwargs('ModKMeans', kwargs)
+
+    kwargs = dict(
+        n_init=ModK._n_init,
+        max_iter=ModK.max_iter,
+        tol=-101,
+        GEV_=ModK._GEV_
+        )
+    with pytest.raises(ValueError,
+                       match="tolerance must be a positive number"):
+        _prepare_kwargs('ModKMeans', kwargs)
+
+    kwargs = dict(
+        n_init=ModK.n_init,
+        max_iter=ModK.max_iter,
+        tol=ModK.tol,
+        GEV_=101
+        )
+    with pytest.raises(ValueError,
+                       match="'GEV_' should be a percentage between 0 and 1"):
+        _prepare_kwargs('ModKMeans', kwargs)
+
+
+def test_invalid_read(tmp_path):
+    """Test invalid arguments provided to read."""
+    with pytest.raises(TypeError, match="'fname' must be an instance of"):
+        read_cluster(101)
+
+    fname = directory / 'sample_audvis_trunc_raw.fif'
+    with pytest.raises(RuntimeError,
+                       match="Could not find clustering solution data."):
+        read_cluster(fname)
+
+    # save an ICA
+    ica = ICA(n_components=5, method='infomax')
+    ica.fit(raw, picks='eeg')
+    ica.save(tmp_path / 'decomposition-ica.fif')
+    # try loading the ICA
+    with pytest.raises(RuntimeError,
+                       match="Could not find clustering solution data."):
+        read_cluster(fname)

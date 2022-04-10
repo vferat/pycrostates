@@ -161,7 +161,8 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
 
     # check that we do have a value provided for each expected key
     keys = set(key for key in kwargs if kwargs[key] is not None)
-    if len(keys.difference(expected)) != 0:
+    if len(keys.difference(expected)) != 0 or \
+        len(expected.difference(keys)) != 0:
         raise ValueError(
             f"Wrong kwargs provided for algorithm '{algorithm}'. Expected: "
             f"{', '.join(expected)} should not be None.")
@@ -220,36 +221,39 @@ def read_cluster(fname):
     fit_parameters = None
     fit_variables = None
 
-    data_tree = data_tree[0]
-    for data in data_tree['directory']:
-        kind = data.kind
-        pos = data.pos
-        # cluster_centers_
-        if kind == FIFF.FIFF_MNE_ICA_MATRIX:
-            tag = read_tag(fid, pos)
-            cluster_centers_ = tag.data.astype(np.float64)
-        # cluster_names
-        elif kind == FIFF.FIFF_MNE_ROW_NAMES:
-            tag = read_tag(fid, pos)
-            cluster_names = tag.data.split(':')
-        # fitted_data
-        elif kind == FIFF.FIFF_MNE_ICA_WHITENER:
-            tag = read_tag(fid, pos)
-            fitted_data = tag.data.astype(np.float64)
-        # labels
-        elif kind == FIFF.FIFF_MNE_ICA_PCA_MEAN:
-            tag = read_tag(fid, pos)
-            labels_ = tag.data[:, 0].astype(np.int64)
-        # fit_parameters
-        elif kind == FIFF.FIFF_MNE_ICA_INTERFACE_PARAMS:
-            tag = read_tag(fid, pos)
-            fit_parameters = _deserialize(tag.data)
-        # fit_variables
-        elif kind == FIFF.FIFF_MNE_ICA_MISC_PARAMS:
-            tag = read_tag(fid, pos)
-            fit_variables = _deserialize(tag.data)
-
-    fid.close()
+    try:
+        data_tree = data_tree[0]
+        for data in data_tree['directory']:
+            kind = data.kind
+            pos = data.pos
+            # cluster_centers_
+            if kind == FIFF.FIFF_MNE_ICA_MATRIX:
+                tag = read_tag(fid, pos)
+                cluster_centers_ = tag.data.astype(np.float64)
+            # cluster_names
+            elif kind == FIFF.FIFF_MNE_ROW_NAMES:
+                tag = read_tag(fid, pos)
+                cluster_names = tag.data.split(':')
+            # fitted_data
+            elif kind == FIFF.FIFF_MNE_ICA_WHITENER:
+                tag = read_tag(fid, pos)
+                fitted_data = tag.data.astype(np.float64)
+            # labels
+            elif kind == FIFF.FIFF_MNE_ICA_PCA_MEAN:
+                tag = read_tag(fid, pos)
+                labels_ = tag.data[:, 0].astype(np.int64)
+            # fit_parameters
+            elif kind == FIFF.FIFF_MNE_ICA_INTERFACE_PARAMS:
+                tag = read_tag(fid, pos)
+                fit_parameters = _deserialize(tag.data)
+            # fit_variables
+            elif kind == FIFF.FIFF_MNE_ICA_MISC_PARAMS:
+                tag = read_tag(fid, pos)
+                fit_variables = _deserialize(tag.data)
+    except Exception:
+        raise RuntimeError('Could not find clustering solution data.')
+    finally:
+        fid.close()
 
     # re-group variables and make sure we have all the information required
     data = (
