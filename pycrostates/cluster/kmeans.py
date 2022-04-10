@@ -76,6 +76,36 @@ class ModKMeans(_BaseCluster):
             )
         return html
 
+    @copy_doc(_BaseCluster.__eq__)
+    def __eq__(self, other):
+        if isinstance(other, ModKMeans):
+            if not super().__eq__(other):
+                return False
+
+            attributes = (
+                '_n_init',
+                '_max_iter',
+                '_tol',
+                # '_random_state',
+                # TODO: think about comparison and I/O for random states
+                '_GEV_')
+            for attribute in attributes:
+                try:
+                    attr1 = self.__getattribute__(attribute)
+                    attr2 = other.__getattribute__(attribute)
+                except AttributeError:
+                    return False
+                if attr1 != attr2:
+                    return False
+
+            return True
+        else:
+            return False
+
+    @copy_doc(_BaseCluster.__ne__)
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     @copy_doc(_BaseCluster._check_fit)
     def _check_fit(self):
         super()._check_fit()

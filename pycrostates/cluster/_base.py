@@ -96,9 +96,9 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 return False
             if not np.allclose(self._fitted_data, other._fitted_data):
                 return False
-            if self._labels.shape != other._labels.shape:
+            if self._labels_.shape != other._labels_.shape:
                 return False
-            if not np.allclose(self._labels, other._labels):
+            if not np.allclose(self._labels_, other._labels_):
                 return False
 
             # check cluster names
@@ -497,7 +497,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         elif reject_by_annotation is None:
             reject_by_annotation = False
 
-        # check that the instance as the same channels (good + bads)
+        # check that the instance as the required channels (good + bads)
+        # inst_info must have all the channels present in cluster_info
         _compare_infos(cluster_info=self._info, inst_info=inst.info)
         picks_ = _picks_to_idx(inst.info, picks, none='all', exclude='bads')
         ch_ = [ch for k, ch in enumerate(inst.info['ch_names'])

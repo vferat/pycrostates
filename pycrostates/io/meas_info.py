@@ -308,9 +308,7 @@ class ChInfo(Info):
             if self['custom_ref_applied'] != other['custom_ref_applied']:
                 return False
 
-            # compare projs
-            if self['projs'] != other['projs']:
-                return False
+            # TODO: Compare projs and compensation grades.
 
             if self['bads'] != other['bads']:
                 logger.warning("Both info do not have the same bad channels.")

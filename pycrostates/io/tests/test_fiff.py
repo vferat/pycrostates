@@ -5,6 +5,7 @@ from pathlib import Path
 
 from mne.datasets import testing
 from mne.io import read_raw_fif
+import numpy as np
 import pytest
 
 from pycrostates.cluster import ModKMeans
@@ -86,4 +87,6 @@ def test_write_and_read(tmp_path, caplog):
     segmentation1 = ModK1.predict(raw2, picks='eeg')
     segmentation2 = ModK2.predict(raw2, picks='eeg')
 
-    # TODO: Add comparison between segmentations
+    assert np.allclose(segmentation.labels, segmentation1.labels)
+    assert np.allclose(segmentation.labels, segmentation2.labels)
+    assert np.allclose(segmentation1.labels, segmentation2.labels)

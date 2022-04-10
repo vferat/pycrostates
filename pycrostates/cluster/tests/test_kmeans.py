@@ -17,6 +17,7 @@ import numpy as np
 import pytest
 
 from pycrostates.cluster import ModKMeans
+from pycrostates.io.fiff import read_cluster
 from pycrostates.segmentation import RawSegmentation, EpochsSegmentation
 from pycrostates.utils._logs import logger, set_log_level
 
@@ -28,8 +29,11 @@ logger.propagate = True
 directory = Path(testing.data_path()) / 'MEG' / 'sample'
 fname = directory / 'sample_audvis_trunc_raw.fif'
 raw = read_raw_fif(fname, preload=True)
-raw_meg = raw.copy().pick_types(meg=True, eeg=True).crop(0, 10).apply_proj()
+raw_meg = raw.copy().pick_types(meg=True, eeg=True, exclude='bads')
+raw_meg.crop(0, 10).apply_proj()
+# 59 EEG channels in raw_meg: 1 EEG channel has been removed
 raw.pick('eeg').crop(0, 10).apply_proj()
+# 60 EEG channels in raw
 events = make_fixed_length_events(raw, duration=1)
 epochs_meg = Epochs(raw_meg, events, tmin=0, tmax=0.5, baseline=None,
                     preload=True)
@@ -945,3 +949,37 @@ def test_montage_mixin():
     with pytest.raises(ValueError,
                        match="Instance 'ModKMeans' attribute 'info' is None."):
         ModK_.get_montage()
+
+
+def test_save(tmp_path):
+    """Test .save() method."""
+    # writing to .fif
+    fname1 = tmp_path / 'cluster.fif'
+    ModK.save(fname1)
+
+    # writing to .gz (compression)
+    fname2 = tmp_path / 'cluster.fif.gz'
+    ModK.save(fname2)
+
+    # re-load
+    ModK1 = read_cluster(fname1)
+    ModK2 = read_cluster(fname2)
+
+    # compare
+    assert ModK == ModK1
+    assert ModK == ModK2
+    assert ModK1 == ModK2  # sanity-check
+
+    # test prediction
+    segmentation = ModK.predict(raw, picks='eeg')
+    segmentation1 = ModK1.predict(raw, picks='eeg')
+    segmentation2 = ModK2.predict(raw, picks='eeg')
+
+    assert np.allclose(segmentation.labels, segmentation1.labels)
+    assert np.allclose(segmentation.labels, segmentation2.labels)
+    assert np.allclose(segmentation1.labels, segmentation2.labels)
+
+
+def test_comparison():
+    """Test == and != methods."""
+    pass

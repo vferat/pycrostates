@@ -363,14 +363,6 @@ def test_comparison(caplog):
     chinfo2 = ChInfo(ch_names=['Cz', 'Oz'], ch_types='misc')
     assert chinfo1 != chinfo2
 
-    # with projs
-    chinfo1 = ChInfo(raw.info)
-    chinfo2 = ChInfo(raw.info)
-    assert chinfo1 == chinfo2
-    with chinfo2._unlock():
-        chinfo2['projs'] = []
-    assert chinfo1 != chinfo2
-
     # with different ref
     chinfo1 = ChInfo(raw.info)
     chinfo2 = ChInfo(raw.info)
