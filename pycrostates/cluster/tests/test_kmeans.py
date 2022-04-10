@@ -981,11 +981,12 @@ def test_save(tmp_path):
     assert np.allclose(segmentation1.labels, segmentation2.labels)
 
 
-def test_comparison():
+def test_comparison(caplog):
     """Test == and != methods."""
     ModK1 = ModK.copy()
     ModK2 = ModK.copy()
     assert ModK1 == ModK2
+
     # with different modkmeans variables
     ModK1.fitted = False
     assert ModK1 != ModK2
@@ -1001,8 +1002,10 @@ def test_comparison():
     ModK1 = ModK.copy()
     ModK1._GEV_ = 0.101
     assert ModK1 != ModK2
+
     # with different object
     assert ModK1 != 101
+
     # with different base variables
     ModK1 = ModK.copy()
     ModK2 = ModK.copy()
@@ -1021,3 +1024,14 @@ def test_comparison():
     ModK1 = ModK.copy()
     ModK1._fitted_data = ModK1._fitted_data[:, ::-1]
     assert ModK1 != ModK2
+
+    # different cluster names
+    ModK1 = ModK.copy()
+    ModK2 = ModK.copy()
+    caplog.clear()
+    assert ModK1 == ModK2
+    assert "Cluster names differ between both clustering" not in caplog.text
+    ModK1._cluster_names = ModK1._cluster_names[::-1]
+    caplog.clear()
+    assert ModK1 == ModK2
+    assert "Cluster names differ between both clustering" in caplog.text

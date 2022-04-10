@@ -88,7 +88,8 @@ class ModKMeans(_BaseCluster):
                 '_tol',
                 # '_random_state',
                 # TODO: think about comparison and I/O for random states
-                '_GEV_')
+                '_GEV_',
+                )
             for attribute in attributes:
                 try:
                     attr1 = self.__getattribute__(attribute)

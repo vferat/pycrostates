@@ -80,26 +80,35 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             if self._fitted + other._fitted == 1:  # One False
                 return False
 
-            # check cluster centers
-            if self._n_clusters != other._n_clusters:
-                return False  # sanity-check, duplicate of the shape
-            if self._cluster_centers_.shape != other._cluster_centers_.shape:
-                return False
-            if not np.allclose(self._cluster_centers_,
-                               other._cluster_centers_):
-                return False
+            attributes = (
+                '_n_clusters',
+                '_info',
+                )
 
-            # check fit variables
-            if self._info != other._info:
-                return False
-            if self._fitted_data.shape != other._fitted_data.shape:
-                return False
-            if not np.allclose(self._fitted_data, other._fitted_data):
-                return False
-            if self._labels_.shape != other._labels_.shape:
-                return False
-            if not np.allclose(self._labels_, other._labels_):
-                return False
+            for attribute in attributes:
+                try:
+                    attr1 = self.__getattribute__(attribute)
+                    attr2 = other.__getattribute__(attribute)
+                except AttributeError:
+                    return False
+                if attr1 != attr2:
+                    return False
+
+            array_attributes = (
+                '_cluster_centers_',
+                '_fitted_data',
+                '_labels_',
+                )
+            for attribute in array_attributes:
+                try:
+                    attr1 = self.__getattribute__(attribute)
+                    attr2 = other.__getattribute__(attribute)
+                except AttributeError:
+                    return False
+                if attr1.shape != attr2.shape:
+                    return False
+                if not np.allclose(attr1, attr2):
+                    return False
 
             # check cluster names
             assert len(self._cluster_names) == self._n_clusters
