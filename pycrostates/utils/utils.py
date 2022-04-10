@@ -61,6 +61,7 @@ def _copy_info(inst, sfreq):
     return new_info
 
 
+# TODO: To be implemented as a <= and >= between infos.
 def _compare_infos(cluster_info, inst_info):
     """
     Checks that the channels in cluster_info are all present in inst_info.

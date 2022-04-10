@@ -75,3 +75,15 @@ def test_write_and_read(tmp_path, caplog):
     caplog.clear()
     ModK2 = read_cluster(fname2)
     assert 'Reading clustering solution' in caplog.text
+
+    # compare
+    assert ModK == ModK1
+    assert ModK == ModK2
+    assert ModK1 == ModK2  # sanity-check
+
+    # test prediction
+    segmentation = ModK.predict(raw2, picks='eeg')
+    segmentation1 = ModK1.predict(raw2, picks='eeg')
+    segmentation2 = ModK2.predict(raw2, picks='eeg')
+
+    # TODO: Add comparison between segmentations

@@ -69,6 +69,55 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             )
         return html
 
+    def __eq__(self, other):
+        """Equality == method."""
+        if isinstance(other, _BaseCluster):
+            # check fit
+            if self._fitted + other._fitted == 0:  # Both False
+                raise RuntimeError(
+                    "Clustering algorithms must be fitted before using '==' "
+                    "comparison.")
+            if self._fitted + other._fitted == 1:  # One False
+                return False
+
+            # check cluster centers
+            if self._n_clusters != other._n_clusters:
+                return False  # sanity-check, duplicate of the shape
+            if self._cluster_centers_.shape != other._cluster_centers_.shape:
+                return False
+            if not np.allclose(self._cluster_centers_,
+                               other._cluster_centers_):
+                return False
+
+            # check fit variables
+            if self._info != other._info:
+                return False
+            if self._fitted_data.shape != other._fitted_data.shape:
+                return False
+            if not np.allclose(self._fitted_data, other._fitted_data):
+                return False
+            if self._labels.shape != other._labels.shape:
+                return False
+            if not np.allclose(self._labels, other._labels):
+                return False
+
+            # check cluster names
+            assert len(self._cluster_names) == self._n_clusters
+            assert len(other._cluster_names) == other._n_clusters
+            if self._cluster_names != other._cluster_names:
+                logger.warning(
+                    "Cluster names differ between both clustering solution. "
+                    "Consider using '.rename_clusters' to change the cluster "
+                    "names.")
+
+            return True
+        else:
+            return False
+
+    def __ne__(self, other):
+        """Different != method."""
+        return not self.__eq__(self, other)
+
     def copy(self, deep=True):
         """Returns a copy of the instance.
 
