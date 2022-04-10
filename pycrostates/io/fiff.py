@@ -161,8 +161,11 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
 
     # check that we do have a value provided for each expected key
     keys = set(key for key in kwargs if kwargs[key] is not None)
-    if len(keys.difference(expected)) != 0 or \
-        len(expected.difference(keys)) != 0:
+    conditions = (
+        len(keys.difference(expected)) != 0,
+        len(expected.difference(keys)) != 0,
+        )
+    if any(conditions):
         raise ValueError(
             f"Wrong kwargs provided for algorithm '{algorithm}'. Expected: "
             f"{', '.join(expected)} should not be None.")
