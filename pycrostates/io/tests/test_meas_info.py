@@ -369,3 +369,6 @@ def test_comparison(caplog):
     with chinfo2._unlock():
         chinfo2['custom_ref_applied'] = FIFF.FIFFV_MNE_CUSTOM_REF_ON
     assert chinfo1 != chinfo2
+
+    # with different object
+    assert chinfo1 != 101

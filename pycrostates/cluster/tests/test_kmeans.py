@@ -17,6 +17,7 @@ import numpy as np
 import pytest
 
 from pycrostates.cluster import ModKMeans
+from pycrostates.io import ChInfo
 from pycrostates.io.fiff import read_cluster
 from pycrostates.segmentation import RawSegmentation, EpochsSegmentation
 from pycrostates.utils._logs import logger, set_log_level
@@ -982,4 +983,41 @@ def test_save(tmp_path):
 
 def test_comparison():
     """Test == and != methods."""
-    pass
+    ModK1 = ModK.copy()
+    ModK2 = ModK.copy()
+    assert ModK1 == ModK2
+    # with different modkmeans variables
+    ModK1.fitted = False
+    assert ModK1 != ModK2
+    ModK1 = ModK.copy()
+    ModK1._n_init = 101
+    assert ModK1 != ModK2
+    ModK1 = ModK.copy()
+    ModK1._max_iter = 101
+    assert ModK1 != ModK2
+    ModK1 = ModK.copy()
+    ModK1._tol = 0.101
+    assert ModK1 != ModK2
+    ModK1 = ModK.copy()
+    ModK1._GEV_ = 0.101
+    assert ModK1 != ModK2
+    # with different object
+    assert ModK1 != 101
+    # with different base variables
+    ModK1 = ModK.copy()
+    ModK2 = ModK.copy()
+    assert ModK1 == ModK2
+    ModK1 = ModK.copy()
+    ModK1._n_clusters = 101
+    assert ModK1 != ModK2
+    ModK1 = ModK.copy()
+    ModK1._info = ChInfo(
+        ch_names=[str(k) for k in range(ModK1.cluster_centers_.shape[1])],
+        ch_types=['eeg'] * ModK1.cluster_centers_.shape[1])
+    assert ModK1 != ModK2
+    ModK1 = ModK.copy()
+    ModK1._labels_ = ModK1._labels_[::-1]
+    assert ModK1 != ModK2
+    ModK1 = ModK.copy()
+    ModK1._fitted_data = ModK1._fitted_data[:, ::-1]
+    assert ModK1 != ModK2
