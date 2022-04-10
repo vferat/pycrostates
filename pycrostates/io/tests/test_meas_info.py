@@ -1,4 +1,4 @@
-"""Test _imports.py"""
+"""Test meas_info.py"""
 
 from collections import OrderedDict
 from pathlib import Path

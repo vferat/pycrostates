@@ -184,7 +184,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
             if value < 0 or 1 < value:
                 raise ValueError(
                     "Argument 'GEV_' should be a percentage between 0 and 1. "
-                    f"PRovided: '{value}'.")
+                    f"Provided: '{value}'.")
             fit_variables['GEV_'] = value
 
     return fit_parameters, fit_variables

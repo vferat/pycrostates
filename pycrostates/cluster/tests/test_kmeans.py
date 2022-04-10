@@ -1,3 +1,5 @@
+"""Test ModKMeans."""
+
 from copy import deepcopy
 from itertools import groupby
 import logging
