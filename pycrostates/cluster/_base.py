@@ -10,7 +10,6 @@ from mne.io.pick import _picks_to_idx
 import numpy as np
 from scipy.signal import convolve2d
 
-from ..io import ChInfo
 from ..segmentation import RawSegmentation, EpochsSegmentation
 from ..utils import _corr_vectors, _compare_infos
 from ..utils.mixin import ContainsMixin, MontageMixin, ChannelsMixin
@@ -169,6 +168,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         %(reject_by_annotation_raw)s
         %(n_jobs)s
         """
+        from ..io import ChInfo
+
         # TODO: Maybe those parameters should be moved here instead of docdict?
         _check_type(inst, (BaseRaw, BaseEpochs), item_name='inst')
         _check_type(tmin, (None, 'numeric'), item_name='tmin')
