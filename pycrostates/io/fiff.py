@@ -202,7 +202,7 @@ def _read_cluster(fname):
     ----------
     fname : path-like
         Path to the .fif file where the clustering solution is saved.
-        
+
     Returns
     -------
     cluster : _BaseCluster

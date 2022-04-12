@@ -24,7 +24,7 @@ def read_cluster(fname):
     ext = ''.join(fname.suffixes)
     if ext in readers:
         cluster, version = readers[ext](fname)
-        logger.info("Cluster solution loaded was saved with pycrostates '%s'.", 
+        logger.info("Cluster solution loaded was saved with pycrostates '%s'.",
                     version)
         return cluster
     else:
