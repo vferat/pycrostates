@@ -106,7 +106,7 @@ class _BaseSegmentation(ABC):
 
     @abstractmethod
     def __init__(self, labels, inst, picks, cluster_centers_,
-                 cluster_names=None):
+                 cluster_names=None, predict_parameters=None):
         self._labels = _BaseSegmentation._check_labels(
             labels)
         self._inst = inst
@@ -114,7 +114,7 @@ class _BaseSegmentation(ABC):
         self._cluster_centers_ = cluster_centers_
         self._cluster_names = _BaseSegmentation._check_cluster_names(
             cluster_names, cluster_centers_)
-
+        self._predict_parameters = predict_parameters
         # sanity-check
         assert self._inst.times.size == self._labels.shape[-1]
 
@@ -197,6 +197,15 @@ class _BaseSegmentation(ABC):
         :type: `list`
         """
         return self._cluster_names
+    
+    @property
+    def predict_parameters(self):
+        """
+        Parameters used to predict the current segmentation.
+
+        :type: `dict`
+        """
+        return self._predict_parameters
 
 
 class RawSegmentation(_BaseSegmentation):

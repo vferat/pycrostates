@@ -463,8 +463,13 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     def _predict_raw(self, raw, picks, factor, tol, half_window_size,
                      min_segment_length, reject_edges, reject_by_annotation):
         """Create segmentation for raw."""
+        predict_parameters = {'factor': factor,
+                              'tol': tol,
+                              'half_window_size': half_window_size,
+                              'min_segment_length': min_segment_length,
+                              'reject_edges': reject_edges,
+                              'reject_by_annotation': reject_by_annotation}
         data = raw.get_data(picks=picks)
-
         if reject_by_annotation:
             # retrieve onsets/ends for BAD annotations
             onsets, ends = _annotations_starts_stops(raw, ['BAD'])
@@ -500,11 +505,18 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return RawSegmentation(labels=segmentation,
                                inst=raw, picks=picks,
                                cluster_centers_=self._cluster_centers_,
-                               cluster_names=self._cluster_names)
+                               cluster_names=self._cluster_names,
+                               predict_parameters=predict_parameters)
 
     def _predict_epochs(self, epochs, picks, factor, tol, half_window_size,
                         min_segment_length, reject_edges):
         """Create segmentation for epochs."""
+        predict_parameters = {'factor': factor,
+                              'tol': tol,
+                              'half_window_size': half_window_size,
+                              'min_segment_length': min_segment_length,
+                              'reject_edges': reject_edges}
+
         data = epochs.get_data(picks=picks)
         segments = list()
         for epoch_data in data:
@@ -523,7 +535,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return EpochsSegmentation(labels=np.array(segments),
                                   inst=epochs, picks=picks,
                                   cluster_centers_=self._cluster_centers_,
-                                  cluster_names=self._cluster_names)
+                                  cluster_names=self._cluster_names,
+                                  predict_parameters=predict_parameters)
 
     # --------------------------------------------------------------------
     @staticmethod
