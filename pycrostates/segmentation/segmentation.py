@@ -205,7 +205,12 @@ class _BaseSegmentation(ABC):
 
         :type: `dict`
         """
-        return self._predict_parameters.copy()
+        if self._predict_parameters:
+            return self._predict_parameters.copy()
+        else:
+            logger.info('predict_parameters not provided when creating instance.'
+                        'Returning nothing.')
+            return(None)
 
 
 class RawSegmentation(_BaseSegmentation):
