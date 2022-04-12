@@ -205,7 +205,7 @@ class _BaseSegmentation(ABC):
 
         :type: `dict`
         """
-        return self._predict_parameters
+        return self._predict_parameters.copy()
 
 
 class RawSegmentation(_BaseSegmentation):
