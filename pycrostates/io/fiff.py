@@ -20,6 +20,7 @@ from mne.io._digitization import _read_dig_fif, _format_dig_points
 import numpy as np
 
 from . import ChInfo
+from .. import __version__
 from ..cluster import ModKMeans
 from ..utils._checks import _check_value, _check_type
 from ..utils._logs import logger
@@ -50,7 +51,7 @@ FIFF_MNE_ICA_MATRIX -> cluster_centers_
 FIFF_MNE_ROW_NAMES -> cluster_names
 FIFF_MNE_ICA_WHITENER -> fitted_data
 FIFF_MNE_ICA_PCA_MEAN -> labels
-FIFF_MNE_ICA_INTERFACE_PARAMS -> algorithm + fit parameters
+FIFF_MNE_ICA_INTERFACE_PARAMS -> algorithm + version + fit parameters
 FIFF_MNE_ICA_MISC_PARAMS -> fit variables (ending with '_')
 """
 
@@ -170,7 +171,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
             f"Wrong kwargs provided for algorithm '{algorithm}'. Expected: "
             f"{', '.join(expected)} should not be None.")
 
-    fit_parameters = dict(algorithm=algorithm)
+    fit_parameters = dict(algorithm=algorithm, version=__version__)
     fit_variables = dict()
     for key, value in kwargs.items():
         if key not in expected:
@@ -201,6 +202,13 @@ def _read_cluster(fname):
     ----------
     fname : path-like
         Path to the .fif file where the clustering solution is saved.
+        
+    Returns
+    -------
+    cluster : _BaseCluster
+        Loaded cluster solution.
+    version : str
+        pycrostates version used to save the cluster solution.
     """
     # error checking on input
     _check_type(fname, ('path-like', ), 'fname')
@@ -273,6 +281,8 @@ def _read_cluster(fname):
             "One of the required tag was not found in .fif file.")
     algorithm = _check_fit_parameters_and_variables(
         fit_parameters, fit_variables)
+    version = fit_parameters['version']  # retrieve pycrostates version
+    del fit_parameters['version']
 
     # reconstruct cluster instance
     function = {
@@ -281,7 +291,7 @@ def _read_cluster(fname):
 
     return function[algorithm](
         cluster_centers_, info, cluster_names, fitted_data, labels_,
-        **fit_parameters, **fit_variables)
+        **fit_parameters, **fit_variables), version
 
 
 def _check_fit_parameters_and_variables(fit_parameters, fit_variables):
@@ -294,10 +304,13 @@ def _check_fit_parameters_and_variables(fit_parameters, fit_variables):
         }
     if 'algorithm' not in fit_parameters:
         raise ValueError("Key 'algorithm' is missing from .fif file.")
+    if 'version' not in fit_parameters:
+        raise ValueError("Key 'version' is missing from .fif file.")
     algorithm = fit_parameters['algorithm']
     if algorithm not in valids:
         raise ValueError(f"Algorithm '{algorithm}' is not supported.")
     del fit_parameters['algorithm']
+    del fit_parameters['version']
     expected = set(reduce(operator.concat, valids[algorithm].values()))
     diff = set(list(fit_parameters) + list(fit_variables)).difference(expected)
     if len(diff) != 0:

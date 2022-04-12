@@ -2,6 +2,7 @@ from pathlib import Path
 
 from .fiff import _read_cluster as _read_cluster_fif
 from ..utils._checks import _check_type
+from ..utils._logs import logger
 
 
 def read_cluster(fname):
@@ -22,6 +23,9 @@ def read_cluster(fname):
 
     ext = ''.join(fname.suffixes)
     if ext in readers:
-        return readers[ext](fname)
+        cluster, version = readers[ext](fname)
+        logger.info("Cluster solution loaded was saved with pycrostates '%s'.", 
+                    version)
+        return cluster
     else:
         raise ValueError("File format is not supported.")

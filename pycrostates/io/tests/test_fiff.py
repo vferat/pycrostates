@@ -9,6 +9,7 @@ from mne.preprocessing import ICA
 import numpy as np
 import pytest
 
+from pycrostates import __version__
 from pycrostates.cluster import ModKMeans
 from pycrostates.io.fiff import _write_cluster, _read_cluster, _prepare_kwargs
 from pycrostates.utils._logs import logger, set_log_level
@@ -72,11 +73,13 @@ def test_write_and_read(tmp_path, caplog):
 
     # re-load the 2 saved files
     caplog.clear()
-    ModK1 = _read_cluster(fname1)
+    ModK1, version = _read_cluster(fname1)
     assert 'Reading clustering solution' in caplog.text
+    assert version == __version__
     caplog.clear()
-    ModK2 = _read_cluster(fname2)
+    ModK2, version = _read_cluster(fname2)
     assert 'Reading clustering solution' in caplog.text
+    assert version == __version__
 
     # compare
     assert ModK == ModK1
