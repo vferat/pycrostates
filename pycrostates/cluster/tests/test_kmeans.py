@@ -16,9 +16,10 @@ from mne.io.pick import _picks_to_idx
 import numpy as np
 import pytest
 
+from pycrostates import __version__
 from pycrostates.cluster import ModKMeans
-from pycrostates.io import ChInfo
-from pycrostates.io.fiff import read_cluster
+from pycrostates.io import ChInfo, read_cluster
+from pycrostates.io.fiff import _read_cluster
 from pycrostates.segmentation import RawSegmentation, EpochsSegmentation
 from pycrostates.utils._logs import logger, set_log_level
 
@@ -952,7 +953,7 @@ def test_montage_mixin():
         ModK_.get_montage()
 
 
-def test_save(tmp_path):
+def test_save(tmp_path, caplog):
     """Test .save() method."""
     # writing to .fif
     fname1 = tmp_path / 'cluster.fif'
@@ -963,8 +964,13 @@ def test_save(tmp_path):
     ModK.save(fname2)
 
     # re-load
+    caplog.clear()
     ModK1 = read_cluster(fname1)
-    ModK2 = read_cluster(fname2)
+    assert __version__ in caplog.text
+    caplog.clear()
+    ModK2, version = _read_cluster(fname2)
+    assert version == __version__
+    assert __version__ not in caplog.text
 
     # compare
     assert ModK == ModK1
