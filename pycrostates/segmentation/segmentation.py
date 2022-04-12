@@ -9,7 +9,7 @@ from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..viz import plot_segmentation
-
+from ..utils._logs import logger
 
 def _compute_microstate_parameters(labels, data, maps, maps_names, sfreq,
                                    norm_gfp=True):
@@ -208,7 +208,8 @@ class _BaseSegmentation(ABC):
         if self._predict_parameters:
             return self._predict_parameters.copy()
         else:
-            logger.info('predict_parameters not provided when creating instance.'
+            logger.info('predict_parameters not provided'
+                        ' when creating instance.'
                         'Returning nothing.')
             return(None)
 
