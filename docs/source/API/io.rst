@@ -13,3 +13,4 @@ IO
    :toctree: generated/
    
    ChInfo
+   read_cluster
