@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from .fiff import read_cluster as read_cluster_fif
+from .fiff import _read_cluster as _read_cluster_fif
 from ..utils._checks import _check_type
 
 
@@ -16,8 +16,8 @@ def read_cluster(fname):
     fname = Path(fname)
 
     readers = {
-        '.fif': read_cluster_fif,
-        '.fif.gz': read_cluster_fif,
+        '.fif': _read_cluster_fif,
+        '.fif.gz': _read_cluster_fif,
         }
 
     ext = ''.join(fname.suffixes)

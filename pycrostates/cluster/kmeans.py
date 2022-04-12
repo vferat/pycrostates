@@ -174,8 +174,10 @@ class ModKMeans(_BaseCluster):
     @copy_doc(_BaseCluster.save)
     def save(self, fname):
         super().save(fname)
-        from ..io.fiff import write_cluster
-        write_cluster(
+        # TODO: to be replaced by a general writer than infers the writer from
+        # the file extension.
+        from ..io.fiff import _write_cluster
+        _write_cluster(
             fname,
             self._cluster_centers_,
             self._info,

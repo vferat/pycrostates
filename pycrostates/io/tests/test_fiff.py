@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 
 from pycrostates.cluster import ModKMeans
-from pycrostates.io.fiff import write_cluster, read_cluster, _prepare_kwargs
+from pycrostates.io.fiff import _write_cluster, _read_cluster, _prepare_kwargs
 from pycrostates.utils._logs import logger, set_log_level
 
 
@@ -34,7 +34,7 @@ def test_write_and_read(tmp_path, caplog):
     # writing to .fif
     fname1 = tmp_path / 'cluster.fif'
     caplog.clear()
-    write_cluster(
+    _write_cluster(
         fname1,
         ModK._cluster_centers_,
         ModK._info,
@@ -52,7 +52,7 @@ def test_write_and_read(tmp_path, caplog):
     # writing to .gz (compression)
     fname2 = tmp_path / 'cluster.fif.gz'
     caplog.clear()
-    write_cluster(
+    _write_cluster(
         fname2,
         ModK.cluster_centers_,
         ModK.info,
@@ -72,10 +72,10 @@ def test_write_and_read(tmp_path, caplog):
 
     # re-load the 2 saved files
     caplog.clear()
-    ModK1 = read_cluster(fname1)
+    ModK1 = _read_cluster(fname1)
     assert 'Reading clustering solution' in caplog.text
     caplog.clear()
-    ModK2 = read_cluster(fname2)
+    ModK2 = _read_cluster(fname2)
     assert 'Reading clustering solution' in caplog.text
 
     # compare
@@ -96,7 +96,7 @@ def test_write_and_read(tmp_path, caplog):
 def test_invalid_write(tmp_path):
     """Test invalid arguments provided to write."""
     with pytest.raises(TypeError, match="'fname' must be an instance of"):
-        write_cluster(
+        _write_cluster(
             101,
             ModK._cluster_centers_,
             ModK._info,
@@ -112,7 +112,7 @@ def test_invalid_write(tmp_path):
 
     with pytest.raises(TypeError,
                        match="'cluster_centers_' must be an instance of"):
-        write_cluster(
+        _write_cluster(
             tmp_path / 'cluster.fif',
             list(ModK._cluster_centers_),
             ModK._info,
@@ -128,7 +128,7 @@ def test_invalid_write(tmp_path):
 
     with pytest.raises(ValueError,
                        match="Argument 'cluster_centers_' should be a 2D"):
-        write_cluster(
+        _write_cluster(
             tmp_path / 'cluster.fif',
             ModK._cluster_centers_.flatten(),
             ModK._info,
@@ -144,7 +144,7 @@ def test_invalid_write(tmp_path):
 
     with pytest.raises(TypeError,
                        match="'chinfo' must be an instance of"):
-        write_cluster(
+        _write_cluster(
             tmp_path / 'cluster.fif',
             ModK.cluster_centers_,
             101,
@@ -160,7 +160,7 @@ def test_invalid_write(tmp_path):
 
     with pytest.raises(TypeError,
                        match="'algorithm' must be an instance of"):
-        write_cluster(
+        _write_cluster(
             tmp_path / 'cluster.fif',
             ModK._cluster_centers_,
             ModK._info,
@@ -176,7 +176,7 @@ def test_invalid_write(tmp_path):
 
     with pytest.raises(ValueError,
                        match="Invalid value for the 'algorithm' parameter"):
-        write_cluster(
+        _write_cluster(
             tmp_path / 'cluster.fif',
             ModK._cluster_centers_,
             ModK._info,
@@ -192,7 +192,7 @@ def test_invalid_write(tmp_path):
 
     with pytest.raises(TypeError,
                        match="'cluster_names' must be an instance of"):
-        write_cluster(
+        _write_cluster(
             tmp_path / 'cluster.fif',
             ModK._cluster_centers_,
             ModK._info,
@@ -209,7 +209,7 @@ def test_invalid_write(tmp_path):
     with pytest.raises(
             ValueError,
             match="Argument 'cluster_names' and 'cluster_centers_'"):
-        write_cluster(
+        _write_cluster(
             tmp_path / 'cluster.fif',
             ModK._cluster_centers_,
             ModK._info,
@@ -225,7 +225,7 @@ def test_invalid_write(tmp_path):
 
     with pytest.raises(TypeError,
                        match="'fitted_data' must be an instance of"):
-        write_cluster(
+        _write_cluster(
             tmp_path / 'cluster.fif',
             ModK._cluster_centers_,
             ModK._info,
@@ -241,7 +241,7 @@ def test_invalid_write(tmp_path):
 
     with pytest.raises(ValueError,
                        match="Argument 'fitted_data' should be a 2D"):
-        write_cluster(
+        _write_cluster(
             tmp_path / 'cluster.fif',
             ModK._cluster_centers_,
             ModK._info,
@@ -257,7 +257,7 @@ def test_invalid_write(tmp_path):
 
     with pytest.raises(TypeError,
                        match="'labels_' must be an instance of"):
-        write_cluster(
+        _write_cluster(
             tmp_path / 'cluster.fif',
             ModK._cluster_centers_,
             ModK._info,
@@ -273,7 +273,7 @@ def test_invalid_write(tmp_path):
 
     with pytest.raises(ValueError,
                        match="Argument 'labels_' should be a 1D array."):
-        write_cluster(
+        _write_cluster(
             tmp_path / 'cluster.fif',
             ModK._cluster_centers_,
             ModK._info,
@@ -355,12 +355,12 @@ def test_prepare_kwargs_ModKMeans():
 def test_invalid_read(tmp_path):
     """Test invalid arguments provided to read."""
     with pytest.raises(TypeError, match="'fname' must be an instance of"):
-        read_cluster(101)
+        _read_cluster(101)
 
     fname = directory / 'sample_audvis_trunc_raw.fif'
     with pytest.raises(RuntimeError,
                        match="Could not find clustering solution data."):
-        read_cluster(fname)
+        _read_cluster(fname)
 
     # save an ICA
     ica = ICA(n_components=5, method='infomax')
@@ -369,4 +369,4 @@ def test_invalid_read(tmp_path):
     # try loading the ICA
     with pytest.raises(RuntimeError,
                        match="Could not find clustering solution data."):
-        read_cluster(fname)
+        _read_cluster(fname)

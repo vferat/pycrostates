@@ -55,7 +55,7 @@ FIFF_MNE_ICA_MISC_PARAMS -> fit variables (ending with '_')
 """
 
 
-def write_cluster(
+def _write_cluster(
         fname,
         cluster_centers_,
         chinfo,
@@ -194,7 +194,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
     return fit_parameters, fit_variables
 
 
-def read_cluster(fname):
+def _read_cluster(fname):
     """Read clustering solution from disk.
 
     Parameters
