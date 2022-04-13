@@ -15,20 +15,20 @@ raw = raw.pick('eeg').crop(0, 10).filter(0, 40).apply_proj()
 events = mne.make_fixed_length_events(raw, 1)
 epochs = mne.epochs.Epochs(raw, events, preload=True)
 
-n_clusters = 4
-ModK = ModKMeans(n_clusters=n_clusters)
+ModK_raw = ModKMeans(n_clusters=4)
+ModK_epochs = ModKMeans(n_clusters=4)
+ModK_raw.fit(raw, n_jobs=1)
+ModK_epochs(epochs, n_jobs=1)
 
 
 def test_RawSegmentation_plot_cluster_centers():
-    ModK.fit(raw, n_jobs=1)
-    segmentation = ModK.predict(raw)
+    segmentation = ModK_raw.predict(raw)
     segmentation.plot_cluster_centers()
     plt.close('all')
 
 
 def test_RawSegmentation_plot():
-    ModK.fit(raw, n_jobs=1)
-    segmentation = ModK.predict(raw)
+    segmentation = ModK_raw.predict(raw)
     segmentation.plot()
     plt.close('all')
     segmentation.plot(tmin=0, tmax=5)
@@ -36,16 +36,15 @@ def test_RawSegmentation_plot():
     segmentation.plot(cmap='plasma')
     plt.close('all')
     f, ax = plt.subplots(1, 1)
-    segmentation.plot(ax=ax)
+    segmentation.plot(axes=ax)
     plt.close('all')
     f, ax = plt.subplots(1, 1)
-    segmentation.plot(cbar_ax=ax)
+    segmentation.plot(cbar_axes=ax)
     plt.close('all')
 
 
 def test_RawSegmentation_compute_parameters():
-    ModK.fit(raw, n_jobs=1)
-    segmentation = ModK.predict(raw)
+    segmentation = ModK_raw.predict(raw)
     assert (segmentation.__repr__())
     assert (segmentation._repr_html_())  # test _repr_html_
     d = segmentation.compute_parameters(norm_gfp=False)
@@ -53,15 +52,13 @@ def test_RawSegmentation_compute_parameters():
 
 
 def test_RawSegmentation_compute_metrics_norm_gfp():
-    ModK.fit(raw, n_jobs=1)
-    segmentation = ModK.predict(raw)
+    segmentation = ModK_raw.predict(raw)
     d = segmentation.compute_parameters(norm_gfp=True)
     assert isinstance(d, dict)
 
 
 def test_EpochsSegmentation_compute_metrics():
-    ModK.fit(epochs, n_jobs=1)
-    segmentation = ModK.predict(epochs)
+    segmentation = ModK_epochs.predict(epochs)
     assert (segmentation.__repr__())
     assert (segmentation._repr_html_())  # test _repr_html_
     d = segmentation.compute_parameters(norm_gfp=False)
@@ -69,15 +66,14 @@ def test_EpochsSegmentation_compute_metrics():
 
 
 def test_EpochsSegmentation_plot():
-    ModK.fit(raw, n_jobs=1)
-    segmentation = ModK.predict(epochs)
+    segmentation = ModK_raw.predict(epochs)
     segmentation.plot()
     plt.close('all')
     segmentation.plot(cmap='plasma')
     plt.close('all')
     f, ax = plt.subplots(1, 1)
-    segmentation.plot(ax=ax)
+    segmentation.plot(axes=ax)
     plt.close('all')
     f, ax = plt.subplots(1, 1)
-    segmentation.plot(cbar_ax=ax)
+    segmentation.plot(cbar_axes=ax)
     plt.close('all')
