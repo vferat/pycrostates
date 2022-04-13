@@ -10,7 +10,6 @@ from mne.io.pick import _picks_to_idx
 import numpy as np
 from scipy.signal import convolve2d
 
-from ..io import ChInfo
 from ..segmentation import RawSegmentation, EpochsSegmentation
 from ..utils import _corr_vectors, _compare_infos
 from ..utils.mixin import ContainsMixin, MontageMixin, ChannelsMixin
@@ -32,7 +31,6 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         self._cluster_centers_ = None
 
         # fit variables
-        self._picks = None
         self._info = None
         self._fitted_data = None
         self._labels_ = None
@@ -70,6 +68,64 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             )
         return html
 
+    def __eq__(self, other):
+        """Equality == method."""
+        if isinstance(other, _BaseCluster):
+            # check fit
+            if self._fitted + other._fitted == 0:  # Both False
+                raise RuntimeError(
+                    "Clustering algorithms must be fitted before using '==' "
+                    "comparison.")
+            if self._fitted + other._fitted == 1:  # One False
+                return False
+
+            attributes = (
+                '_n_clusters',
+                '_info',
+                )
+
+            for attribute in attributes:
+                try:
+                    attr1 = self.__getattribute__(attribute)
+                    attr2 = other.__getattribute__(attribute)
+                except AttributeError:
+                    return False
+                if attr1 != attr2:
+                    return False
+
+            array_attributes = (
+                '_cluster_centers_',
+                '_fitted_data',
+                '_labels_',
+                )
+            for attribute in array_attributes:
+                try:
+                    attr1 = self.__getattribute__(attribute)
+                    attr2 = other.__getattribute__(attribute)
+                except AttributeError:
+                    return False
+                if attr1.shape != attr2.shape:
+                    return False
+                if not np.allclose(attr1, attr2):
+                    return False
+
+            # check cluster names
+            assert len(self._cluster_names) == self._n_clusters
+            assert len(other._cluster_names) == other._n_clusters
+            if self._cluster_names != other._cluster_names:
+                logger.warning(
+                    "Cluster names differ between both clustering solution. "
+                    "Consider using '.rename_clusters' to change the cluster "
+                    "names.")
+
+            return True
+        else:
+            return False
+
+    def __ne__(self, other):
+        """Different != method."""
+        return not self.__eq__(other)
+
     def copy(self, deep=True):
         """Returns a copy of the instance.
 
@@ -91,7 +147,6 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 f'{self.__class__.__name__}')
         # sanity-check
         assert self.cluster_centers_ is not None
-        assert self.picks is not None
         assert self.info is not None
         assert self.fitted_data is not None
         assert self.labels_ is not None
@@ -113,6 +168,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         %(reject_by_annotation_raw)s
         %(n_jobs)s
         """
+        from ..io import ChInfo
+
         # TODO: Maybe those parameters should be moved here instead of docdict?
         _check_type(inst, (BaseRaw, BaseEpochs), item_name='inst')
         _check_type(tmin, (None, 'numeric'), item_name='tmin')
@@ -122,11 +179,12 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         n_jobs = _check_n_jobs(n_jobs)
 
         # picks
-        bads_inc = _picks_to_idx(inst.info, picks, none='all', exclude=[])
+        picks_bads_inc = _picks_to_idx(
+            inst.info, picks, none='all', exclude=[])
         picks = _picks_to_idx(inst.info, picks, none='all', exclude='bads')
-        diff = set(bads_inc) - set(picks)
-        if len(diff) != 0:
-            if len(diff) == 1:
+        ch_not_used = set(picks_bads_inc) - set(picks)
+        if len(ch_not_used) != 0:
+            if len(ch_not_used) == 1:
                 msg = "Channel %s is set as bad and ignored. To include " + \
                       "it, either remove it from 'inst.info['bads'] or " + \
                       "provide its name explicitly in the 'picks' argument."
@@ -136,10 +194,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                       "'inst.info['bads'] or provide their names " + \
                       "explicitly in the 'picks' argument."
             logger.warning(
-                msg, ', '.join(inst.info['ch_names'][k] for k in diff))
+                msg, ', '.join(inst.info['ch_names'][k] for k in ch_not_used))
             del msg
-        del bads_inc
-        del diff
 
         # tmin/tmax
         # check positiveness
@@ -174,8 +230,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             data = data.reshape(data.shape[0], -1)
 
         # store picks and info
-        self._picks = picks
-        self._info = ChInfo(info=pick_info(inst.info, picks))
+        self._info = ChInfo(info=pick_info(inst.info, picks_bads_inc))
         self._fitted_data = data
 
         return data
@@ -365,19 +420,45 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             Matplotlib figure containing the topographic plots.
         """
         self._check_fit()
-        return plot_cluster_centers(self._cluster_centers_, self._info,
+        picks = _picks_to_idx(self._info, 'all', none='all', exclude='bads')
+        info = pick_info(self._info, picks)
+        return plot_cluster_centers(self._cluster_centers_, info,
                                     self._cluster_names, axes, block)
 
+    @abstractmethod
+    def save(self, fname):
+        """
+        Save clustering solution to disk.
+
+        Parameters
+        ----------
+        fname : path-like
+            Path to the .fif file where the clustering solution is saved.
+        """
+        self._check_fit()
+        _check_type(fname, ('path-like', ), 'fname')
+
     @verbose
-    def predict(self, inst, factor=0, half_window_size=3, tol=10e-6,
-                min_segment_length=0, reject_edges=True,
-                reject_by_annotation=True, *, verbose=None):
+    def predict(
+            self,
+            inst,
+            picks='eeg',
+            factor: int = 0,
+            half_window_size: int = 3,
+            tol: Union[int, float] = 10e-6,
+            min_segment_length: int = 0,
+            reject_edges: bool = True,
+            reject_by_annotation: bool = True,
+            *,
+            verbose=None,
+            ):
         """Segment `~mne.io.Raw` or `~mne.Epochs` instance into microstate
         sequence.
 
         Parameters
         ----------
         %(predict_inst)s
+        %(picks_all)s
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing.
         half_window_size : int
@@ -419,22 +500,34 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             if reject_by_annotation == 'omit':
                 reject_by_annotation = True
             else:
-                logger.warning(
-                    "'reject_by_annotation' can be set to 'True', 'False' or "
-                    "'omit' (True). '%s' is not supported. Setting to "
-                    "'False'.", reject_by_annotation)
-                reject_by_annotation = False
+                raise ValueError(
+                    "Argument 'reject_by_annotation' can be set to 'True', "
+                    f"'False' or 'omit' (True). '{reject_by_annotation}' is "
+                    "not supported.")
         elif reject_by_annotation is None:
             reject_by_annotation = False
 
-        # check that the channels match
-        msg = 'Instance to segment into microstate sequence does not have ' + \
-              'the same channels as the instance used for fitting.'
-        try:
-            info = pick_info(inst.info, self._picks)
-        except IndexError:
-            raise ValueError(msg)
-        _compare_infos(self.info, info)
+        # check that the instance as the required channels (good + bads)
+        # inst_info must have all the channels present in cluster_info
+        _compare_infos(cluster_info=self._info, inst_info=inst.info)
+        picks_ = _picks_to_idx(inst.info, picks, none='all', exclude='bads')
+        ch_ = [ch for k, ch in enumerate(inst.info['ch_names'])
+               if k in picks_ and ch in self._info['bads']]
+        if 1 == len(ch_):
+            logger.warning(f"Picked channel {ch_[0]} was set as "
+                           "bads during fitting and will be ignored.")
+        elif 1 < len(ch_):
+            logger.warning(f"Picked channels {', '.join(ch_)} were set as "
+                           "bads during fitting and will be ignored.")
+
+        # remove channels that were bads during fitting from picks
+        picks_ = [ch for k, ch in enumerate(inst.info['ch_names'])
+                  if k in picks_ and ch not in self._info['bads']]
+        picks_data = _picks_to_idx(inst.info, picks_, none='all', exclude=[])
+        good_channels = [ch for ch in self._info['ch_names']
+                         if ch not in self._info['bads']]
+        picks_cluster_centers = np.array(
+            [good_channels.index(ch) for ch in picks_])
 
         # logging messages
         if factor == 0:
@@ -452,16 +545,18 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
         if isinstance(inst, BaseRaw):
             segmentation = self._predict_raw(
-                inst, self._picks, factor, tol, half_window_size,
-                min_segment_length, reject_edges, reject_by_annotation)
+                inst, picks_data, picks_cluster_centers, factor, tol,
+                half_window_size, min_segment_length, reject_edges,
+                reject_by_annotation)
         elif isinstance(inst, BaseEpochs):
             segmentation = self._predict_epochs(
-                inst, self._picks, factor, tol, half_window_size,
-                min_segment_length, reject_edges)
+                inst, picks_data, picks_cluster_centers, factor, tol,
+                half_window_size, min_segment_length, reject_edges)
         return segmentation
 
-    def _predict_raw(self, raw, picks, factor, tol, half_window_size,
-                     min_segment_length, reject_edges, reject_by_annotation):
+    def _predict_raw(self, raw, picks_data, picks_cluster_centers, factor, tol,
+                     half_window_size, min_segment_length, reject_edges,
+                     reject_by_annotation):
         """Create segmentation for raw."""
         predict_parameters = {'factor': factor,
                               'tol': tol,
@@ -469,7 +564,13 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                               'min_segment_length': min_segment_length,
                               'reject_edges': reject_edges,
                               'reject_by_annotation': reject_by_annotation}
-        data = raw.get_data(picks=picks)
+
+        # retrieve data for picks
+        data = raw.get_data(picks=picks_data)
+        # retrieve cluster_centers_ for picks
+        cluster_centers_ = deepcopy(self._cluster_centers_)
+        cluster_centers_ = cluster_centers_[:, picks_cluster_centers]
+
         if reject_by_annotation:
             # retrieve onsets/ends for BAD annotations
             onsets, ends = _annotations_starts_stops(raw, ['BAD'])
@@ -485,16 +586,14 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
                 data_ = data[:, end:onset]
                 segment = _BaseCluster._segment(
-                    data_, deepcopy(self._cluster_centers_), factor, tol,
-                    half_window_size)
+                    data_, cluster_centers_, factor, tol, half_window_size)
                 if reject_edges:
                     segment = _BaseCluster._reject_edge_segments(segment)
                 segmentation[end:onset] = segment
 
         else:
             segmentation = _BaseCluster._segment(
-                data, deepcopy(self._cluster_centers_), factor, tol,
-                half_window_size)
+                data, cluster_centers_, factor, tol, half_window_size)
             if reject_edges:
                 segmentation = _BaseCluster._reject_edge_segments(segmentation)
 
@@ -503,26 +602,32 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 segmentation, data, min_segment_length)
 
         return RawSegmentation(labels=segmentation,
-                               inst=raw, picks=picks,
+                               inst=raw, picks=picks_data,
                                cluster_centers_=self._cluster_centers_,
                                cluster_names=self._cluster_names,
                                predict_parameters=predict_parameters)
 
-    def _predict_epochs(self, epochs, picks, factor, tol, half_window_size,
-                        min_segment_length, reject_edges):
+    def _predict_epochs(self, epochs, picks_data, picks_cluster_centers,
+                        factor, tol, half_window_size, min_segment_length,
+                        reject_edges):
         """Create segmentation for epochs."""
+
         predict_parameters = {'factor': factor,
                               'tol': tol,
                               'half_window_size': half_window_size,
                               'min_segment_length': min_segment_length,
                               'reject_edges': reject_edges}
 
-        data = epochs.get_data(picks=picks)
+        # retrieve data for picks
+        data = epochs.get_data(picks=picks_data)
+        # retrieve cluster_centers_ for picks
+        cluster_centers_ = deepcopy(self._cluster_centers_)
+        cluster_centers_ = cluster_centers_[:, picks_cluster_centers]
+
         segments = list()
         for epoch_data in data:
             segment = _BaseCluster._segment(
-                epoch_data, deepcopy(self._cluster_centers_),
-                factor, tol, half_window_size)
+                epoch_data, cluster_centers_, factor, tol, half_window_size)
 
             if 0 < min_segment_length:
                 segment = _BaseCluster._reject_short_segments(
@@ -533,7 +638,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             segments.append(segment)
 
         return EpochsSegmentation(labels=np.array(segments),
-                                  inst=epochs, picks=picks,
+                                  inst=epochs, picks=picks_data,
                                   cluster_centers_=self._cluster_centers_,
                                   cluster_names=self._cluster_names,
                                   predict_parameters=predict_parameters)
@@ -709,19 +814,6 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return self._cluster_centers_
 
     @property
-    def picks(self):
-        """
-        Picks selected when fitting the clustering algorithm.
-        The picks have been converted to IDx.
-
-        :type: `~numpy.array`
-        """
-        if self._picks is None:
-            assert not self._fitted  # sanity-check
-            logger.warning('Clustering algorithm has not been fitted.')
-        return self._picks
-
-    @property
     def info(self):
         """
         Info instance corresponding to the MNE object used to fit the
@@ -780,7 +872,6 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 "The clustering algorithm has already been fitted.")
         else:
             self._cluster_centers_ = None
-            self._picks = None
             self._info = None
             self._fitted_data = None
             self._labels_ = None

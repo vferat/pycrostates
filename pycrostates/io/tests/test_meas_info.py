@@ -1,9 +1,12 @@
-"""Test _imports.py"""
+"""Test meas_info.py"""
 
 from collections import OrderedDict
+from pathlib import Path
 
 from mne import create_info
 from mne.channels import DigMontage
+from mne.datasets import testing
+from mne.io import read_raw_fif
 from mne.io.constants import FIFF
 import numpy as np
 import pytest
@@ -11,8 +14,14 @@ import pytest
 from pycrostates.io import ChInfo
 from pycrostates.utils._logs import logger, set_log_level
 
+
 set_log_level('INFO')
 logger.propagate = True
+
+
+directory = Path(testing.data_path()) / 'MEG' / 'sample'
+fname = directory / 'sample_audvis_trunc_raw.fif'
+raw = read_raw_fif(fname, preload=True)
 
 
 def test_create_from_info():
@@ -87,6 +96,13 @@ def test_create_from_info():
         assert ch['ch_name'] == ch_names[k]
         assert all(np.isnan(elt) for elt in ch['loc'])
 
+    # test with a file with projs
+    directory = Path(testing.data_path()) / 'MEG' / 'sample'
+    fname = directory / 'sample_audvis_trunc_raw.fif'
+    raw = read_raw_fif(fname, preload=True)
+    chinfo = ChInfo(info=raw.info)
+    assert chinfo['projs'] == raw.info['projs']
+
 
 def test_create_from_info_invalid_arguments():
     """Test creation of a ChInfo from an Info instance with invalid args."""
@@ -122,6 +138,7 @@ def test_create_from_channels():
     assert chinfo['dig'] is None
     assert chinfo['custom_ref_applied'] == FIFF.FIFFV_MNE_CUSTOM_REF_OFF
     assert chinfo['nchan'] == 3
+    assert chinfo['projs'] == []
 
     # test with multiple channel types
     ch_names = [f'MEG{n:03}' for n in range(1, 10)] + ['EOG001']
@@ -315,3 +332,43 @@ def test_invalid_attributes():
     with pytest.raises(AttributeError,
                        match="'ChInfo' has not attribute 'pick_channels'"):
         chinfo.pick_channels(['1'])
+
+
+def test_comparison(caplog):
+    """Test == and != methods."""
+    # simple info without montage
+    info1 = create_info(ch_names=3, sfreq=1, ch_types='eeg')
+    info2 = create_info(ch_names=3, sfreq=1, ch_types='eeg')
+    chinfo1 = ChInfo(info1)
+    chinfo2 = ChInfo(info2)
+    assert chinfo1 == chinfo2
+    chinfo1['bads'] = [chinfo1['ch_names'][0]]
+    caplog.clear()
+    assert chinfo1 == chinfo2
+    assert "Both info do not have the same bad channels." in caplog.text
+    info3 = create_info(ch_names=4, sfreq=1, ch_types='eeg')
+    chinfo3 = ChInfo(info3)
+    assert chinfo2 != chinfo3
+
+    # with montage
+    chinfo1 = ChInfo(ch_names=['Cz', 'Oz'], ch_types='eeg')
+    chinfo1.set_montage('standard_1020')
+    chinfo2 = chinfo1.copy()
+    assert chinfo1 == chinfo2
+    chinfo2 = ChInfo(ch_names=['Cz', 'Oz'], ch_types='eeg')
+    assert chinfo1 != chinfo2
+
+    # with different channel types
+    chinfo1 = ChInfo(ch_names=['Cz', 'Oz'], ch_types='eeg')
+    chinfo2 = ChInfo(ch_names=['Cz', 'Oz'], ch_types='misc')
+    assert chinfo1 != chinfo2
+
+    # with different ref
+    chinfo1 = ChInfo(raw.info)
+    chinfo2 = ChInfo(raw.info)
+    with chinfo2._unlock():
+        chinfo2['custom_ref_applied'] = FIFF.FIFFV_MNE_CUSTOM_REF_ON
+    assert chinfo1 != chinfo2
+
+    # with different object
+    assert chinfo1 != 101

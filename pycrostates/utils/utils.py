@@ -61,28 +61,30 @@ def _copy_info(inst, sfreq):
     return new_info
 
 
-# TODO: To update as a == method in ChInfo. Maybe we need support for comparing
-# ChInfo with mne Info?
-def _compare_infos(info1, info2):
+def _compare_infos(cluster_info, inst_info):
     """
-    Checks that both info have the same channels.
+    Checks that the channels in cluster_info are all present in inst_info.
     """
-    if not info1['ch_names'] == info2['ch_names']:
-        raise ValueError(
-            'Instance to segment into microstates sequence does not have '
-            'the same channels as the instance used for fitting.')
+    for ch in cluster_info['ch_names']:
+        if ch not in inst_info['ch_names']:
+            raise ValueError(
+                'Instance to segment into microstates sequence does not have '
+                'the same channels as the instance used for fitting.')
 
     # Extract loc arrays
-    loc1 = list()
-    for ch in info1['chs']:
-        loc1.append(deepcopy(ch['loc']))
-    loc2 = list()
-    for ch in info2['chs']:
-        loc2.append(deepcopy(ch['loc']))
+    cluster_loc = list()
+    for ch in cluster_info['chs']:
+        cluster_loc.append((ch['ch_name'], deepcopy(ch['loc'])))
+    inst_loc = list()
+    for ch in inst_info['chs']:
+        if ch['ch_name'] in cluster_info['ch_names']:
+            inst_loc.append((ch['ch_name'], deepcopy(ch['loc'])))
+    cluster_loc = [loc[1] for loc in sorted(cluster_loc, key=lambda x: x[0])]
+    inst_loc = [loc[1] for loc in sorted(inst_loc, key=lambda x: x[0])]
 
     # Compare loc
-    assert len(loc1) == len(loc2)  # sanity-check
-    for l1, l2 in zip(loc1, loc2):
+    assert len(cluster_loc) == len(inst_loc)  # sanity-check
+    for l1, l2 in zip(cluster_loc, inst_loc):
         if not np.allclose(l1, l2, equal_nan=True):
             logger.warning(
                 'Instance to segment into microstates sequence does not have '
@@ -90,18 +92,48 @@ def _compare_infos(info1, info2):
             break
 
     # Compare attributes in chs
-    if not all(ch1['kind'] == ch2['kind']
-               for ch1, ch2 in zip(info1['chs'], info2['chs'])):
+    cluster_kinds = list()
+    cluster_units = list()
+    cluster_coord_frame = list()
+    for ch in cluster_info['chs']:
+        cluster_kinds.append((ch['ch_name'], ch['kind']))
+        cluster_units.append((ch['ch_name'], ch['unit']))
+        cluster_coord_frame.append((ch['ch_name'], ch['coord_frame']))
+
+    inst_kinds = list()
+    inst_units = list()
+    inst_coord_frames = list()
+    for ch in inst_info['chs']:
+        if ch['ch_name'] in cluster_info['ch_names']:
+            inst_kinds.append((ch['ch_name'], ch['kind']))
+            inst_units.append((ch['ch_name'], ch['unit']))
+            inst_coord_frames.append((ch['ch_name'], ch['coord_frame']))
+
+    cluster_kinds = [
+        elt[1] for elt in sorted(cluster_kinds, key=lambda x: x[0])]
+    cluster_units = [
+        elt[1] for elt in sorted(cluster_units, key=lambda x: x[0])]
+    cluster_coord_frame = [
+        elt[1] for elt in sorted(cluster_coord_frame, key=lambda x: x[0])]
+    inst_kinds = [
+        elt[1] for elt in sorted(inst_kinds, key=lambda x: x[0])]
+    inst_units = [
+        elt[1] for elt in sorted(inst_units, key=lambda x: x[0])]
+    inst_coord_frames = [
+        elt[1] for elt in sorted(inst_coord_frames, key=lambda x: x[0])]
+
+    if not all(kind1 == kind2
+               for kind1, kind2 in zip(cluster_kinds, inst_kinds)):
         logger.warning(
             'Instance to segment into microstates sequence does not have '
             'the same channels kinds as the instance used for fitting. ')
-    if not all(ch1['unit'] == ch2['unit']
-               for ch1, ch2 in zip(info1['chs'], info2['chs'])):
+    if not all(unit1 == unit2
+               for unit1, unit2 in zip(cluster_units, inst_units)):
         logger.warning(
             'Instance to segment into microstates sequence does not have '
             'the same channels units as the instance used for fitting. ')
-    if not all(ch1['coord_frame'] == ch2['coord_frame']
-               for ch1, ch2 in zip(info1['chs'], info2['chs'])):
+    if not all(f1 == f2
+               for f1, f2 in zip(cluster_coord_frame, inst_coord_frames)):
         logger.warning(
             'Instance to segment into microstates sequence does not have '
             'the same coordinate frames as the instance used for fitting. ')
