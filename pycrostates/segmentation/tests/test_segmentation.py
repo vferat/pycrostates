@@ -70,7 +70,7 @@ def test_EpochsSegmentation_compute_metrics():
 
 def test_EpochsSegmentation_plot():
     ModK.fit(raw, n_jobs=1)
-    segmentation = ModK.predict(raw)
+    segmentation = ModK.predict(epochs)
     segmentation.plot()
     plt.close('all')
     segmentation.plot(cmap='plasma')
