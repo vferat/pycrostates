@@ -46,8 +46,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
     def _repr_html_(self, caption=None):
         from ..html_templates import repr_templates_env
-        t = repr_templates_env.get_template('BaseCluster.html.jinja')
-        name = self.__class__.__name__
+        template = repr_templates_env.get_template('BaseCluster.html.jinja')
         if self.fitted:
             n_samples = self._fitted_data.shape[-1]
             ch_types, ch_counts = np.unique(self.get_channel_types(),
@@ -58,15 +57,14 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             n_samples = None
             ch_repr = None
 
-        html = t.render(
-            name=name,
+        return template.render(
+            name=self.__class__.__name__,
             n_clusters=self._n_clusters,
             cluster_names=self._cluster_names,
             fitted=self._fitted,
             n_samples=n_samples,
             ch_repr=ch_repr,
             )
-        return html
 
     def __eq__(self, other):
         """Equality == method."""

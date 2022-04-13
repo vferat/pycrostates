@@ -150,17 +150,14 @@ class _BaseSegmentation(ABC):
 
     def _repr_html_(self, caption=None):
         from ..html_templates import repr_templates_env
-        t = repr_templates_env.get_template('BaseSegmentation.html.jinja')
-        name = self.__class__.__name__
-        n_clusters = len(self._cluster_centers_)
-        inst_repr = self._inst._repr_html_()
-
-        html = t.render(
-            name=name,
-            n_clusters=n_clusters,
+        template = repr_templates_env.get_template(
+            'BaseSegmentation.html.jinja')
+        return template.render(
+            name=self.__class__.__name__,
+            n_clusters=len(self._cluster_centers_),
             cluster_names=self._cluster_names,
-            inst_repr=inst_repr)
-        return html
+            inst_repr=self._inst._repr_html_(),
+            )
 
     def plot_cluster_centers(self, axes=None, block=False):
         """
