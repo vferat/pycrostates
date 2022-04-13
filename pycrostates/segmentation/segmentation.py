@@ -2,19 +2,24 @@ from abc import ABC, abstractmethod
 import itertools
 
 import numpy as np
-from mne.io import BaseRaw
 from mne import BaseEpochs, pick_info
+from mne.io import BaseRaw
 
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
-from ..viz import (plot_raw_segmentation,
-                   plot_epoch_segmentation,
-                   plot_cluster_centers)
 from ..utils._logs import logger
+from ..viz import (
+    plot_raw_segmentation, plot_epoch_segmentation, plot_cluster_centers)
 
-def _compute_microstate_parameters(labels, data, maps, maps_names, sfreq,
-                                   norm_gfp=True):
+
+def _compute_microstate_parameters(
+        labels,
+        data,
+        maps,
+        maps_names,
+        sfreq,
+        norm_gfp:bool = True):
     """
     Compute microstate parameters.
 
@@ -160,7 +165,7 @@ class _BaseSegmentation(ABC):
         info = pick_info(self._inst.info, self._picks)
         return plot_cluster_centers(self._cluster_centers_, info,
                                     self._cluster_names, axes, block)
-        
+
     # --------------------------------------------------------------------
     @staticmethod
     def _check_labels(labels):
@@ -183,7 +188,7 @@ class _BaseSegmentation(ABC):
                 raise ValueError(
                     "The same number of cluster centers and cluster names "
                     f"should be provided. There are {len(cluster_centers_)} "
-                    "cluster centers and '{len(cluster_names)}' provided.")
+                    f"cluster centers and '{len(cluster_names)}' provided.")
 
     # --------------------------------------------------------------------
     @property
@@ -220,7 +225,7 @@ class _BaseSegmentation(ABC):
         :type: `list`
         """
         return self._cluster_names
-    
+
     @property
     def predict_parameters(self):
         """
@@ -231,10 +236,10 @@ class _BaseSegmentation(ABC):
         if self._predict_parameters:
             return self._predict_parameters.copy()
         else:
-            logger.info('predict_parameters not provided'
-                        ' when creating instance.'
-                        'Returning nothing.')
-            return(None)
+            logger.info(
+                'predict_parameters not provided when creating instance. '
+                'Returning None.')
+            return None
 
 
 class RawSegmentation(_BaseSegmentation):
@@ -262,7 +267,8 @@ class RawSegmentation(_BaseSegmentation):
             Either none to create a new figure or axes (or an array of axes)
             on which the topographic map should be plotted.
         cbar_ax : Axes
-            Axes in which to draw the colorbar, otherwise take space from the main Axes.
+            Axes in which to draw the colorbar, otherwise take space from the
+            main Axes.
         block : bool
             Whether to halt program execution until the figure is closed.
 
@@ -274,10 +280,10 @@ class RawSegmentation(_BaseSegmentation):
         return plot_raw_segmentation(
             labels=self._labels, inst=self.raw,
             cluster_centers=self.cluster_centers_, names=self.cluster_names,
-            tmin=tmin, tmax=tmax, cmap=None,
-            ax=None, cbar_ax=None, block=False)
+            tmin=tmin, tmax=tmax, cmap=None, ax=None, cbar_ax=None,
+            block=False)
 
-    def compute_parameters(self, norm_gfp=True):
+    def compute_parameters(self, norm_gfp:bool = True):
         """
         Compute microstate parameters.
 
@@ -347,7 +353,7 @@ class EpochsSegmentation(_BaseSegmentation):
         # sanity-check
         assert len(self._inst) == self._labels.shape[0]
 
-    def compute_parameters(self, norm_gfp=True):
+    def compute_parameters(self, norm_gfp:bool = True):
         """
         Compute microstate parameters.
 
@@ -428,7 +434,7 @@ class EpochsSegmentation(_BaseSegmentation):
             labels=self._labels, inst=self.epochs,
             cluster_centers=self.cluster_centers_, names=self.cluster_names,
             cmap=None, ax=None, cbar_ax=None, block=False)
-        
+
     # --------------------------------------------------------------------
     @property
     def epochs(self):
