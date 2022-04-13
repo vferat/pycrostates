@@ -100,7 +100,7 @@ def test_plot_raw_segmentation():
 def test_plot_epoch_segmentation():
     """Test topographic plots for cluster_centers."""
     data = epochs.get_data()
-    cluster_centers = np.random.randint(-10, 10, (data.shape[1],4))
+    cluster_centers = np.random.randint(-10, 10, (4, data.shape[1]))
     labels = np.random.choice([-1,0,1,2,3], (data.shape[0],data.shape[-1]))
 
     plot_epoch_segmentation(
