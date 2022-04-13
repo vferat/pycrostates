@@ -215,7 +215,8 @@ class _BaseSegmentation(ABC):
             'reject_edges',
             'reject_by_annotation',
             )
-        # Let the door open for custom prediction with different keys
+        # Let the door open for custom prediction with different keys, so log
+        # a warning instead of raising.
         for key in predict_parameters.keys():
             if key not in valid_keys:
                 logger.warning(
