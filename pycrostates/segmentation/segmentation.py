@@ -112,10 +112,30 @@ class _BaseSegmentation(ABC):
     """
 
     @abstractmethod
-    def __init__(self, labels, inst, picks, cluster_centers_,
-                 cluster_names=None, predict_parameters=None):
-        self._labels = _BaseSegmentation._check_labels(
-            labels)
+    def __init__(
+            self,
+            labels,
+            inst,
+            picks,
+            cluster_centers_,
+            cluster_names=None,
+            predict_parameters=None,
+            ):
+        # check input
+        _check_type(labels, (np.ndarray, ), 'labels')
+        if labels.ndim != 1:
+            raise ValueError("Argument 'labels' should be a 1D array.")
+        _check_type(picks, (np.ndarray, ), 'picks')
+        if picks.ndim != 1:
+            raise ValueError("Argument 'picks' should be a 1D array.")
+        _check_type(cluster_centers_, (np.ndarray, ), 'cluster_centers_')
+        if cluster_centers_.ndim != 2:
+            raise ValueError(
+                "Argument 'cluster_centers_' should be a 1D array.")
+        _check_type(cluster_names, (tuple, list, None), 'cluster_names')
+        _check_type(predict_parameters, (dict, None), 'predict_parameters')
+
+        self._labels = labels
         self._inst = inst
         self._picks = picks
         self._cluster_centers_ = cluster_centers_
@@ -167,13 +187,6 @@ class _BaseSegmentation(ABC):
                                     self._cluster_names, axes, block)
 
     # --------------------------------------------------------------------
-    @staticmethod
-    def _check_labels(labels):
-        """
-        Checks that the argument 'labels' is valid.
-        """
-        return np.array(labels)
-
     @staticmethod
     def _check_cluster_names(cluster_names, cluster_centers_):
         """
@@ -237,14 +250,24 @@ class _BaseSegmentation(ABC):
             return self._predict_parameters.copy()
         else:
             logger.info(
-                'predict_parameters not provided when creating instance. '
-                'Returning None.')
+                'predict_parameters was not provided when creating the '
+                'segmentation. Returning None.')
             return None
 
 
+# TODO: Parameters to be added to docdict
 class RawSegmentation(_BaseSegmentation):
     """
     Contains the segmentation for a raw instance.
+
+    Parameters
+    ----------
+    labels : array
+    inst : Raw
+    picks : array
+    cluster_centers_ : array
+    cluster_names : list
+    predict_parameters : dict
     """
 
     def __init__(self, *args,  **kwargs):
@@ -252,10 +275,17 @@ class RawSegmentation(_BaseSegmentation):
         _check_type(self._inst, (BaseRaw, ), item_name='raw')
 
     @fill_doc
-    def plot(self, tmin=0.0, tmax=None, cmap=None,
-             ax=None, cbar_ax=None, block=False):
+    def plot(
+            self,
+            tmin=0.0,  # TODO: Should be None by default
+            tmax=None,
+            cmap=None,
+            axes=None,
+            cbar_axes=None,
+            block: bool = False,
+            ):
         """
-        Plot segmentation.
+        Plot the segmentation.
 
         Parameters
         ----------
@@ -263,35 +293,45 @@ class RawSegmentation(_BaseSegmentation):
         %(tmax_raw)s
         cmap : matplotlib colormap name
             The mapping from label name to color space.
-        ax : None | Axes
-            Either none to create a new figure or axes (or an array of axes)
-            on which the topographic map should be plotted.
-        cbar_ax : Axes
-            Axes in which to draw the colorbar, otherwise take space from the
-            main Axes.
+        axes : None | Axes
+            Either none to create a new figure or axes on which the
+            segmentation is plotted.
+        cbar_axes : None | Axes
+            Axes on which to draw the colorbar, otherwise the colormap takes
+            space from the main axes.
         block : bool
             Whether to halt program execution until the figure is closed.
 
         Returns
         -------
         fig : Figure
-            Matplotlib figure on which segmentation is plotted.
+            Matplotlib figure containing the segmentation.
         """
+        # Error checking on the input is performed in the viz function.
         return plot_raw_segmentation(
-            labels=self._labels, inst=self.raw,
-            cluster_centers=self.cluster_centers_, names=self.cluster_names,
-            tmin=tmin, tmax=tmax, cmap=None, ax=None, cbar_ax=None,
-            block=False)
+            labels=self._labels,
+            inst=self.raw,
+            cluster_centers=self.cluster_centers_,
+            names=self.cluster_names,
+            tmin=tmin,
+            tmax=tmax,
+            cmap=cmap,
+            axes=axes,
+            cbar_axes=cbar_axes,
+            block=block,
+            )
 
-    def compute_parameters(self, norm_gfp: bool = True):
+    def compute_parameters(
+            self,
+            norm_gfp: bool = True
+            ):
         """
         Compute microstate parameters.
 
         Parameters
         ----------
-        norm_gfp: bool
+        norm_gfp : bool
             Either or not to normalized global field power.
-            Defaults to True.
 
         Returns
         -------
@@ -301,19 +341,18 @@ class RawSegmentation(_BaseSegmentation):
 
             Available parameters are list below:
             'dist_corr': Distribution of correlations
-                Correlation values of each time point
-                assigned to a given state.
+                Correlation values of each time point assigned to a given
+                state.
             'mean_corr': Mean correlation
-                Mean correlation value of each time point
-                assigned to a given state.
+                Mean correlation value of each time point assigned to a given
+                state.
             'dist_gev': Distribution of global explained variances
-                Global explained variance values of each time point
-                assigned to a given state.
+                Global explained variance values of each time point assigned to
+                a given state.
             'gev':  Global explained variance
                 Total explained variance expressed by a given state.
                 It is the sum of global explained variance values of each
-                time point assigned to a given
-                state.
+                time point assigned to a given state.
             'timecov': Time coverage
                 The proportion of time during which a given state is active.
                 This metric is expressed in percentage (%%).
@@ -328,9 +367,13 @@ class RawSegmentation(_BaseSegmentation):
                 This metrics is expressed in segment per second ( . / s).
         """
         return _compute_microstate_parameters(
-            self.labels, self.raw.get_data(picks=self.picks),
-            self.cluster_centers_, self.cluster_names,
-            self.raw.info['sfreq'], norm_gfp=norm_gfp)
+            self.labels,
+            self.raw.get_data(picks=self.picks),
+            self.cluster_centers_,
+            self.cluster_names,
+            self.raw.info['sfreq'],
+            norm_gfp=norm_gfp,
+            )
 
     # --------------------------------------------------------------------
     @property
@@ -341,9 +384,19 @@ class RawSegmentation(_BaseSegmentation):
         return self._inst
 
 
+# TODO: Parameters to be added to docdict
 class EpochsSegmentation(_BaseSegmentation):
     """
     Contains the segmentation for an epoch instance.
+
+    Parameters
+    ----------
+    labels : array
+    inst : Raw
+    picks : array
+    cluster_centers_ : array
+    cluster_names : list
+    predict_parameters : dict
     """
 
     def __init__(self, *args,  **kwargs):
@@ -353,15 +406,17 @@ class EpochsSegmentation(_BaseSegmentation):
         # sanity-check
         assert len(self._inst) == self._labels.shape[0]
 
-    def compute_parameters(self, norm_gfp: bool = True):
+    def compute_parameters(
+            self,
+            norm_gfp: bool = True
+            ):
         """
         Compute microstate parameters.
 
         Parameters
         ----------
-        norm_gfp: bool
+        norm_gfp : bool
             Either or not to normalized global field power.
-            Defaults to True.
 
         Returns
         -------
@@ -404,12 +459,24 @@ class EpochsSegmentation(_BaseSegmentation):
         data = data.reshape(data.shape[0], -1)
         labels = self.labels.reshape(-1)
         return _compute_microstate_parameters(
-            labels, data, self.cluster_centers_, self.cluster_names,
-            self.epochs.info['sfreq'], norm_gfp=norm_gfp)
+            labels,
+            data,
+            self.cluster_centers_,
+            self.cluster_names,
+            self.epochs.info['sfreq'],
+            norm_gfp=norm_gfp,
+            )
 
     @fill_doc
-    def plot(self, tmin=0.0, tmax=None, cmap=None,
-             ax=None, cbar_ax=None, block=False):
+    def plot(
+            self,
+            tmin=0.0,  # TODO: Should be None by default
+            tmax=None,
+            cmap=None,
+            axes=None,
+            cbar_axes=None,
+            block: bool = False
+            ):
         """
         Plot segmentation.
 
@@ -417,24 +484,31 @@ class EpochsSegmentation(_BaseSegmentation):
         ----------
         cmap : matplotlib colormap name
             The mapping from label name to color space.
-        ax : None | Axes
-            Either none to create a new figure or axes (or an array of axes)
-            on which the topographic map should be plotted.
-        cbar_ax : Axes
-            Axes in which to draw the colorbar, otherwise take space from the
-            main Axes.
+        axes : None | Axes
+            Either none to create a new figure or axes on which the
+            segmentation is plotted.
+        cbar_axes : None | Axes
+            Axes on which to draw the colorbar, otherwise the colormap takes
+            space from the main axes.
         block : bool
             Whether to halt program execution until the figure is closed.
 
         Returns
         -------
         fig : Figure
-            Matplotlib figure on which segmentation is plotted.
+            Matplotlib figure containing the segmentation.
         """
+        # Error checking on the input is performed in the viz function.
         return plot_epoch_segmentation(
-            labels=self._labels, inst=self.epochs,
-            cluster_centers=self.cluster_centers_, names=self.cluster_names,
-            cmap=None, ax=None, cbar_ax=None, block=False)
+            labels=self._labels,
+            inst=self.epochs,
+            cluster_centers=self.cluster_centers_,
+            names=self.cluster_names,
+            cmap=cmap,
+            axes=axes,
+            cbar_axes=cbar_axes,
+            block=block
+            )
 
     # --------------------------------------------------------------------
     @property

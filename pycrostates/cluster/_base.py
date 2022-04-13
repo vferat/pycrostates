@@ -402,7 +402,11 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             if invert[k]:
                 self._cluster_centers_[k] = - cluster
 
-    def plot(self, axes=None, block=False):
+    def plot(
+            self,
+            axes=None,
+            block: bool = False,
+            ):
         """
         Plot cluster centers as topographic maps.
 
@@ -558,12 +562,14 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                      half_window_size, min_segment_length, reject_edges,
                      reject_by_annotation):
         """Create segmentation for raw."""
-        predict_parameters = {'factor': factor,
-                              'tol': tol,
-                              'half_window_size': half_window_size,
-                              'min_segment_length': min_segment_length,
-                              'reject_edges': reject_edges,
-                              'reject_by_annotation': reject_by_annotation}
+        predict_parameters = {
+            'factor': factor,
+            'tol': tol,
+            'half_window_size': half_window_size,
+            'min_segment_length': min_segment_length,
+            'reject_edges': reject_edges,
+            'reject_by_annotation': reject_by_annotation,
+            }
 
         # retrieve data for picks
         data = raw.get_data(picks=picks_data)
@@ -612,11 +618,13 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                         reject_edges):
         """Create segmentation for epochs."""
 
-        predict_parameters = {'factor': factor,
-                              'tol': tol,
-                              'half_window_size': half_window_size,
-                              'min_segment_length': min_segment_length,
-                              'reject_edges': reject_edges}
+        predict_parameters = {
+            'factor': factor,
+            'tol': tol,
+            'half_window_size': half_window_size,
+            'min_segment_length': min_segment_length,
+            'reject_edges': reject_edges,
+            }
 
         # retrieve data for picks
         data = epochs.get_data(picks=picks_data)
