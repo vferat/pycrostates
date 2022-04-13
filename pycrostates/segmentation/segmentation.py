@@ -130,8 +130,6 @@ class _BaseSegmentation(ABC):
         if cluster_centers_.ndim != 2:
             raise ValueError(
                 "Argument 'cluster_centers_' should be a 1D array.")
-        _check_type(cluster_names, (tuple, list, None), 'cluster_names')
-        _check_type(predict_parameters, (dict, None), 'predict_parameters')
 
         self._labels = labels
         self._inst = inst
@@ -139,7 +137,8 @@ class _BaseSegmentation(ABC):
         self._cluster_centers_ = cluster_centers_
         self._cluster_names = _BaseSegmentation._check_cluster_names(
             cluster_names, cluster_centers_)
-        self._predict_parameters = predict_parameters
+        self._predict_parameters = _BaseSegmentation._check_predict_parameters(
+            predict_parameters)
         # sanity-check
         assert self._inst.times.size == self._labels.shape[-1]
 
@@ -190,6 +189,7 @@ class _BaseSegmentation(ABC):
         """
         Checks that the argument 'cluster_names' is valid.
         """
+        _check_type(cluster_names, (list, None), 'cluster_names')
         if cluster_names is None:
             return [str(k) for k in range(0, len(cluster_centers_))]
         else:
@@ -200,6 +200,31 @@ class _BaseSegmentation(ABC):
                     "The same number of cluster centers and cluster names "
                     f"should be provided. There are {len(cluster_centers_)} "
                     f"cluster centers and '{len(cluster_names)}' provided.")
+
+    @staticmethod
+    def _check_predict_parameters(predict_parameters):
+        """
+        Checks that the argument 'predict_parameters' is valid.
+        """
+        _check_type(predict_parameters, (dict, None), 'predict_parameters')
+        if predict_parameters is None:
+            return None
+        # valid keys from pycrostates prediction
+        valid_keys = (
+            'factor',
+            'tol',
+            'half_window_size',
+            'min_segment_length',
+            'reject_edges',
+            'reject_by_annotation',
+            )
+        # Let the door open for custom prediction with different keys
+        for key in predict_parameters.keys():
+            if key not in valid_keys:
+                logger.warning(
+                    f"The key '{key}' in predict_parameters is not part of "
+                    "the default set of keys supported by pycrostates.")
+        return predict_parameters
 
     # --------------------------------------------------------------------
     @property
