@@ -10,6 +10,7 @@ from mne.io.tag import _ch_coord_dict
 import numpy as np
 
 from ..utils._checks import _check_type, _IntLike
+from ..utils._logs import logger
 
 
 class ChInfo(Info):
@@ -187,6 +188,7 @@ class ChInfo(Info):
         self['chs'] = info['chs']
         self['dig'] = info['dig']
         self['comps'] = info['comps']
+        self['projs'] = info['projs']
         self._update_redundant()
 
     def _init_from_channels(self, ch_names, ch_types):
@@ -253,6 +255,9 @@ class ChInfo(Info):
         # add empty compensation grades
         self['comps'] = list()
 
+        # add empty projs
+        self['projs'] = list()
+
         self._unlocked = False
 
         # add ch_names and nchan
@@ -273,6 +278,48 @@ class ChInfo(Info):
                 f"'{self.__class__.__name__}' has not attribute '{name}'")
         else:
             return super().__getattribute__(name)
+
+    def __eq__(self, other):
+        """Equality == method."""
+        if isinstance(other, Info):
+            # compare channel names
+            if self['ch_names'] != other['ch_names']:
+                return False
+            assert self['nchan'] == other['nchan']  # sanity-check
+
+            # compare channel types
+            if self.get_channel_types() != other.get_channel_types():
+                return False
+
+            # compare montage
+            m1 = self.get_montage()
+            m2 = other.get_montage()
+            if m1 is None and m2 is not None:
+                return False
+            elif m1 is not None and m2 is None:
+                return False
+            elif m1 is not None and m2 is not None:
+                if any(dig not in m2.dig for dig in m1.dig):
+                    return False
+                if any(dig not in m1.dig for dig in m2.dig):
+                    return False
+
+            # compare custom ref
+            if self['custom_ref_applied'] != other['custom_ref_applied']:
+                return False
+
+            # TODO: Compare projs and compensation grades.
+
+            if self['bads'] != other['bads']:
+                logger.warning("Both info do not have the same bad channels.")
+
+            return True
+        else:
+            return False
+
+    def __ne__(self, other):
+        """Different != method."""
+        return not self.__eq__(other)
 
     # ------------------------------------------------------------------------
     def __setitem__(self, key, val):

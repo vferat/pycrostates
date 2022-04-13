@@ -76,6 +76,37 @@ class ModKMeans(_BaseCluster):
             )
         return html
 
+    @copy_doc(_BaseCluster.__eq__)
+    def __eq__(self, other):
+        if isinstance(other, ModKMeans):
+            if not super().__eq__(other):
+                return False
+
+            attributes = (
+                '_n_init',
+                '_max_iter',
+                '_tol',
+                # '_random_state',
+                # TODO: think about comparison and I/O for random states
+                '_GEV_',
+                )
+            for attribute in attributes:
+                try:
+                    attr1 = self.__getattribute__(attribute)
+                    attr2 = other.__getattribute__(attribute)
+                except AttributeError:
+                    return False
+                if attr1 != attr2:
+                    return False
+
+            return True
+        else:
+            return False
+
+    @copy_doc(_BaseCluster.__ne__)
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     @copy_doc(_BaseCluster._check_fit)
     def _check_fit(self):
         super()._check_fit()
@@ -139,6 +170,26 @@ class ModKMeans(_BaseCluster):
         self._cluster_centers_ = best_maps
         self._labels_ = best_segmentation
         self._fitted = True
+
+    @copy_doc(_BaseCluster.save)
+    def save(self, fname):
+        super().save(fname)
+        # TODO: to be replaced by a general writer than infers the writer from
+        # the file extension.
+        from ..io.fiff import _write_cluster
+        _write_cluster(
+            fname,
+            self._cluster_centers_,
+            self._info,
+            'ModKMeans',
+            self._cluster_names,
+            self._fitted_data,
+            self._labels_,
+            n_init=self._n_init,
+            max_iter=self._max_iter,
+            tol=self._tol,
+            GEV_=self._GEV_
+            )
 
     # --------------------------------------------------------------------
     @staticmethod

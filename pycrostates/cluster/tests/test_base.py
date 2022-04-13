@@ -1,4 +1,4 @@
-"""Test staticmethod from base class."""
+"""Test staticmethod from base cluster class."""
 
 import numpy as np
 import pytest
