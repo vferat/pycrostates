@@ -1,11 +1,8 @@
-from typing import Tuple, Union
-
 import numpy as np
 from mne import Epochs
 from mne.io import BaseRaw
 from matplotlib import colors
 from matplotlib.axes import Axes
-from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
 
 from ..utils._checks import _check_type, _check_axes
@@ -17,7 +14,7 @@ def plot_raw_segmentation(
         cluster_centers,
         cluster_names=None,
         tmin=0.0,
-        tmax= None,
+        tmax=None,
         cmap=None,
         ax=None,
         cbar_ax=None,
@@ -75,7 +72,8 @@ def plot_raw_segmentation(
     n_colors = 1 + len(cluster_centers)
     state_labels = [-1] + list(range(len(cluster_centers)))
     if not cluster_names:
-        cluster_names = ['unlabeled'] + [str(k) for k in range(len(cluster_centers))]
+        cluster_names = \
+            ['unlabeled'] + [str(k) for k in range(len(cluster_centers))]
     else:
         cluster_names = ['unlabeled'] + cluster_names
 
@@ -90,7 +88,7 @@ def plot_raw_segmentation(
         x[a] = 1
         x = x.astype(bool)
         ax.fill_between(times, gfp, color=color, where=x, step=None,
-                         interpolate=False)
+                        interpolate=False)
     ax.set_xlabel('Time (s)')
     ax.set_title('Segmentation')
     ax.autoscale(tight=True)
@@ -98,7 +96,8 @@ def plot_raw_segmentation(
     norm = colors.Normalize(vmin=0, vmax=n_colors)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
-    colorbar = plt.colorbar(sm, cax=cbar_ax, ax=ax, ticks=[i + 0.5 for i in range(n_colors)])
+    colorbar = plt.colorbar(sm, cax=cbar_ax, ax=ax,
+                            ticks=[i + 0.5 for i in range(n_colors)])
     colorbar.ax.set_yticklabels(cluster_names)
 
     if show:
@@ -168,15 +167,16 @@ def plot_epoch_segmentation(
     gfp = np.std(data_, axis=0)
 
     ts = np.arange(0, data_.shape[-1])
-    
+
     x_ticks = np.linspace(0, data_.shape[-1], len(inst)+1)
     x_ticks += int(data.shape[-1] / 2)
     x_tick_labels = [str(i) for i in range(len(inst))] + ['']
-    
+
     n_colors = 1 + len(cluster_centers)
     state_labels = [-1] + list(range(len(cluster_centers)))
     if not cluster_names:
-        cluster_names = ['unlabeled'] + [str(k) for k in range(len(cluster_centers))]
+        cluster_names = \
+            ['unlabeled'] + [str(k) for k in range(len(cluster_centers))]
     else:
         cluster_names = ['unlabeled'] + cluster_names
 
@@ -199,13 +199,14 @@ def plot_epoch_segmentation(
     # Epoch lines
     x = np.linspace(0, data_.shape[-1], data.shape[0]+1)
     ax.vlines(x, 0, gfp.max(), linestyles='dashed', colors='black')
-    
+
     ax.autoscale(tight=True)
     # Color bar
     norm = colors.Normalize(vmin=0, vmax=n_colors)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
-    colorbar = plt.colorbar(sm, cax=cbar_ax, ax=ax, ticks=[i + 0.5 for i in range(n_colors)])
+    colorbar = plt.colorbar(sm, cax=cbar_ax, ax=ax,
+                            ticks=[i + 0.5 for i in range(n_colors)])
     colorbar.ax.set_yticklabels(cluster_names)
 
     if show:

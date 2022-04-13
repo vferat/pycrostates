@@ -19,7 +19,7 @@ def _compute_microstate_parameters(
         maps,
         maps_names,
         sfreq,
-        norm_gfp:bool = True):
+        norm_gfp: bool = True):
     """
     Compute microstate parameters.
 
@@ -283,7 +283,7 @@ class RawSegmentation(_BaseSegmentation):
             tmin=tmin, tmax=tmax, cmap=None, ax=None, cbar_ax=None,
             block=False)
 
-    def compute_parameters(self, norm_gfp:bool = True):
+    def compute_parameters(self, norm_gfp: bool = True):
         """
         Compute microstate parameters.
 
@@ -353,7 +353,7 @@ class EpochsSegmentation(_BaseSegmentation):
         # sanity-check
         assert len(self._inst) == self._labels.shape[0]
 
-    def compute_parameters(self, norm_gfp:bool = True):
+    def compute_parameters(self, norm_gfp: bool = True):
         """
         Compute microstate parameters.
 
@@ -421,7 +421,8 @@ class EpochsSegmentation(_BaseSegmentation):
             Either none to create a new figure or axes (or an array of axes)
             on which the topographic map should be plotted.
         cbar_ax : Axes
-            Axes in which to draw the colorbar, otherwise take space from the main Axes.
+            Axes in which to draw the colorbar, otherwise take space from the
+            main Axes.
         block : bool
             Whether to halt program execution until the figure is closed.
 
