@@ -18,7 +18,7 @@ epochs = mne.epochs.Epochs(raw, events, preload=True)
 ModK_raw = ModKMeans(n_clusters=4)
 ModK_epochs = ModKMeans(n_clusters=4)
 ModK_raw.fit(raw, n_jobs=1)
-ModK_epochs(epochs, n_jobs=1)
+ModK_epochs.fit(epochs, n_jobs=1)
 
 
 def test_RawSegmentation_plot_cluster_centers():

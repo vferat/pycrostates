@@ -123,8 +123,6 @@ class _BaseSegmentation(ABC):
             ):
         # check input
         _check_type(labels, (np.ndarray, ), 'labels')
-        if labels.ndim != 1:
-            raise ValueError("Argument 'labels' should be a 1D array.")
         _check_type(picks, (np.ndarray, ), 'picks')
         if picks.ndim != 1:
             raise ValueError("Argument 'picks' should be a 1D array.")
@@ -273,6 +271,8 @@ class RawSegmentation(_BaseSegmentation):
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
         _check_type(self._inst, (BaseRaw, ), item_name='raw')
+        if self.labels.ndim != 1:
+            raise ValueError("Argument 'labels' should be a 1D array.")
 
     @fill_doc
     def plot(
@@ -402,6 +402,8 @@ class EpochsSegmentation(_BaseSegmentation):
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
         _check_type(self._inst, (BaseEpochs, ), 'epochs')
+        if self.labels.ndim != 2:
+            raise ValueError("Argument 'labels' should be a 2D array.")
 
         # sanity-check
         assert len(self._inst) == self._labels.shape[0]
