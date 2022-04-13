@@ -15,8 +15,10 @@ raw = raw.pick('eeg').crop(0, 10).filter(0, 40).apply_proj()
 events = mne.make_fixed_length_events(raw, 1)
 epochs = mne.epochs.Epochs(raw, events, preload=True)
 
-ModK_raw = ModKMeans(n_clusters=4)
-ModK_epochs = ModKMeans(n_clusters=4)
+ModK_raw = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4,
+                     random_state=1)
+ModK_epochs = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4,
+                        random_state=1)
 ModK_raw.fit(raw, n_jobs=1)
 ModK_epochs.fit(epochs, n_jobs=1)
 
