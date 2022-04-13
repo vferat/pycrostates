@@ -235,8 +235,7 @@ class _BaseSegmentation(ABC):
     @property
     def picks(self):
         """
-        Picks used to fit the clustering algorithm and to predict the
-        segmentation.
+        Picks used to predict the segmentation.
 
         :type: `~numpy.array`
         """
@@ -333,9 +332,9 @@ class RawSegmentation(_BaseSegmentation):
         # Error checking on the input is performed in the viz function.
         return plot_raw_segmentation(
             labels=self._labels,
-            inst=self.raw,
-            cluster_centers=self.cluster_centers_,
-            names=self.cluster_names,
+            raw=self.raw,
+            n_clusters=self.cluster_centers_.shape[0],
+            cluster_names=self.cluster_names,
             tmin=tmin,
             tmax=tmax,
             cmap=cmap,
@@ -526,9 +525,9 @@ class EpochsSegmentation(_BaseSegmentation):
         # Error checking on the input is performed in the viz function.
         return plot_epoch_segmentation(
             labels=self._labels,
-            inst=self.epochs,
-            cluster_centers=self.cluster_centers_,
-            names=self.cluster_names,
+            epochs=self.epochs,
+            n_clusters=self.cluster_centers_.shape[0],
+            cluster_names=self.cluster_names,
             cmap=cmap,
             axes=axes,
             cbar_axes=cbar_axes,

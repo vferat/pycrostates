@@ -68,10 +68,12 @@ def plot_cluster_centers(
         del figs
 
     # remove show from kwargs passed to topoplot
-    show = True if 'show' not in kwargs else kwargs['show']
-    _check_type(show, (bool, ), 'show')
-    kwargs = {key: value for key, value in kwargs.items()
-              if key not in ('show', )}
+    if 'show' in kwargs:
+        show = kwargs['show']
+        _check_type(show, (bool, ), 'show')
+        del kwargs['show']
+    else:
+        show = True
 
     # plot cluster centers
     for k, (center, name) in enumerate(zip(cluster_centers, cluster_names)):
