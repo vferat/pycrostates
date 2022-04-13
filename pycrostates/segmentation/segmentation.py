@@ -8,7 +8,7 @@ import numpy as np
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
-from ..viz import plot_segmentation
+from ..viz import plot_raw_segmentation, plot_epoch_segmentation
 from ..utils._logs import logger
 
 def _compute_microstate_parameters(labels, data, maps, maps_names, sfreq,
@@ -224,7 +224,8 @@ class RawSegmentation(_BaseSegmentation):
         _check_type(self._inst, (BaseRaw, ), item_name='raw')
 
     @fill_doc
-    def plot(self, tmin=0.0, tmax=None):
+    def plot(self, tmin=0.0, tmax=None, cmap=None,
+             ax=None, cbar_ax=None, block=False):
         """
         Plot segmentation.
 
@@ -232,18 +233,26 @@ class RawSegmentation(_BaseSegmentation):
         ----------
         %(tmin_raw)s
         %(tmax_raw)s
+        cmap : matplotlib colormap name
+            The mapping from label name to color space.
+        ax : None | Axes
+            Either none to create a new figure or axes (or an array of axes)
+            on which the topographic map should be plotted.
+        cbar_ax : Axes
+            Axes in which to draw the colorbar, otherwise take space from the main Axes.
+        block : bool
+            Whether to halt program execution until the figure is closed.
 
         Returns
         -------
-        fig : :class:`matplotlib.figure.Figure`
-            Figure
-        ax : :class:`matplotlib.axes.Axes`
-            Axis
+        fig : Figure
+            Matplotlib figure on which segmentation is plotted.
         """
-        return plot_segmentation(
+        return plot_raw_segmentation(
             labels=self._labels, inst=self.raw,
             cluster_centers=self.cluster_centers_, names=self.cluster_names,
-            tmin=tmin, tmax=tmax)
+            tmin=tmin, tmax=tmax, cmap=None,
+            ax=None, cbar_ax=None, block=False)
 
     def compute_parameters(self, norm_gfp=True):
         """
@@ -369,6 +378,34 @@ class EpochsSegmentation(_BaseSegmentation):
             labels, data, self.cluster_centers_, self.cluster_names,
             self.epochs.info['sfreq'], norm_gfp=norm_gfp)
 
+    @fill_doc
+    def plot(self, tmin=0.0, tmax=None, cmap=None,
+             ax=None, cbar_ax=None, block=False):
+        """
+        Plot segmentation.
+
+        Parameters
+        ----------
+        cmap : matplotlib colormap name
+            The mapping from label name to color space.
+        ax : None | Axes
+            Either none to create a new figure or axes (or an array of axes)
+            on which the topographic map should be plotted.
+        cbar_ax : Axes
+            Axes in which to draw the colorbar, otherwise take space from the main Axes.
+        block : bool
+            Whether to halt program execution until the figure is closed.
+
+        Returns
+        -------
+        fig : Figure
+            Matplotlib figure on which segmentation is plotted.
+        """
+        return plot_epoch_segmentation(
+            labels=self._labels, inst=self.epochs,
+            cluster_centers=self.cluster_centers_, names=self.cluster_names,
+            cmap=None, ax=None, cbar_ax=None, block=False)
+        
     # --------------------------------------------------------------------
     @property
     def epochs(self):

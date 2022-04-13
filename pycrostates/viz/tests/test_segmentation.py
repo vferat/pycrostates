@@ -66,7 +66,7 @@ def test_plot_raw_segmentation():
 
     # provide ax and cbar_ax
     f, axes = plt.subplots(1, 2)
-    plot_epoch_segmentation(
+    plot_raw_segmentation(
             labels=labels,
             inst=raw,
             cluster_centers=cluster_centers,
@@ -108,9 +108,62 @@ def test_plot_epoch_segmentation():
             inst=epochs,
             cluster_centers=cluster_centers,
             cluster_names=None,
-            tmin=0.0,
-            tmax= None,
             cmap=None,
+            ax=None,
+            cbar_ax=None,
+            block=False
+            )
+    plt.close('all')
+
+    # provide ax
+    f, ax = plt.subplots(1, 1)
+    plot_epoch_segmentation(
+            labels=labels,
+            inst=epochs,
+            cluster_centers=cluster_centers,
+            cluster_names=None,
+            cmap=None,
+            ax=ax,
+            cbar_ax=None,
+            block=False
+            )
+    plt.close('all')
+
+    # provide cbar_ax
+    f, cbar_ax = plt.subplots(1, 1)
+    plot_epoch_segmentation(
+            labels=labels,
+            inst=epochs,
+            cluster_centers=cluster_centers,
+            cluster_names=None,
+            cmap=None,
+            ax=None,
+            cbar_ax=cbar_ax,
+            block=False
+            )
+    plt.close('all')
+
+    # provide ax and cbar_ax
+    f, axes = plt.subplots(1, 2)
+    plot_epoch_segmentation(
+            labels=labels,
+            inst=epochs,
+            cluster_centers=cluster_centers,
+            cluster_names=None,
+            cmap=None,
+            ax=axes[0],
+            cbar_ax=axes[1],
+            block=False
+            )
+    plt.close('all')
+
+    # provide cmap
+    plot_epoch_segmentation(
+            labels=labels,
+            inst=epochs,
+            cluster_centers=cluster_centers,
+            cluster_names=None,
+            cmap='plasma',
             ax=None,
             cbar_ax=None,
             block=False
