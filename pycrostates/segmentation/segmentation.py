@@ -1,14 +1,16 @@
 from abc import ABC, abstractmethod
 import itertools
 
-from mne import BaseEpochs
-from mne.io import BaseRaw
 import numpy as np
+from mne.io import BaseRaw
+from mne import BaseEpochs, pick_info
 
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
-from ..viz import plot_raw_segmentation, plot_epoch_segmentation
+from ..viz import (plot_raw_segmentation,
+                   plot_epoch_segmentation,
+                   plot_cluster_centers)
 from ..utils._logs import logger
 
 def _compute_microstate_parameters(labels, data, maps, maps_names, sfreq,
@@ -138,6 +140,27 @@ class _BaseSegmentation(ABC):
             inst_repr=inst_repr)
         return html
 
+    def plot_cluster_centers(self, axes=None, block=False):
+        """
+        Plot cluster centers as topographic maps.
+
+        Parameters
+        ----------
+        axes : None | Axes
+            Either none to create a new figure or axes (or an array of axes)
+            on which the topographic map should be plotted.
+        block : bool
+            Whether to halt program execution until the figure is closed.
+
+        Returns
+        -------
+        f : Figure
+            Matplotlib figure containing the topographic plots.
+        """
+        info = pick_info(self._inst.info, self._picks)
+        return plot_cluster_centers(self._cluster_centers_, info,
+                                    self._cluster_names, axes, block)
+        
     # --------------------------------------------------------------------
     @staticmethod
     def _check_labels(labels):
@@ -152,7 +175,7 @@ class _BaseSegmentation(ABC):
         Checks that the argument 'cluster_names' is valid.
         """
         if cluster_names is None:
-            return [str(k) for k in range(1, len(cluster_centers_)+1)]
+            return [str(k) for k in range(0, len(cluster_centers_))]
         else:
             if len(cluster_centers_) == len(cluster_names):
                 return cluster_names

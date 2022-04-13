@@ -20,6 +20,12 @@ epochs = mne.epochs.Epochs(raw, events, preload=True)
 n_clusters = 4
 ModK = ModKMeans(n_clusters=n_clusters)
 
+def test_RawSegmentation_plot_cluster_centers():
+    ModK.fit(raw, n_jobs=1)
+    segmentation = ModK.predict(raw)
+    segmentation.plot_cluster_centers()
+    plt.close('all')
+
 def test_RawSegmentation_plot():
     ModK.fit(raw, n_jobs=1)
     segmentation = ModK.predict(raw)
