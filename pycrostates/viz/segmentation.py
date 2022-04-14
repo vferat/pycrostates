@@ -6,7 +6,7 @@ from matplotlib.axes import Axes
 from matplotlib import pyplot as plt
 
 from ..utils._checks import _check_type
-
+from ..utils._logs import _set_verbose, logger
 
 # TODO: Add parameters to the docstring.
 def plot_raw_segmentation(
@@ -20,6 +20,7 @@ def plot_raw_segmentation(
         axes=None,
         cbar_axes=None,
         block=False,
+        verbose=None,
         **kwargs,
         ):
     """
@@ -64,6 +65,7 @@ def plot_raw_segmentation(
         cmap,
         axes,
         cbar_axes,
+        verbose=verbose,
         **kwargs,
         )
 
@@ -85,6 +87,7 @@ def plot_epoch_segmentation(
         axes=None,
         cbar_axes=None,
         block=False,
+        verbose=None,
         **kwargs,
         ):
     """
@@ -122,6 +125,7 @@ def plot_epoch_segmentation(
         cmap,
         axes,
         cbar_axes,
+        verbose=verbose,
         **kwargs,
         )
 
@@ -151,8 +155,11 @@ def _plot_segmentation(
         cmap=None,
         axes=None,
         cbar_axes=None,
+        verbose=None,
         **kwargs,
         ):
+    
+    _set_verbose(verbose)
     """Common code snippet to plot segmentation for raw and epochs."""
     _check_type(labels, (np.ndarray, ), 'labels')  # 1D array (n_times, )
     _check_type(gfp, (np.ndarray, ), 'gfp')  # 1D array (n_times, )
@@ -202,10 +209,18 @@ def _plot_segmentation(
     # plot
     axes.plot(times, gfp, **kwargs)
     for state, color in zip(state_labels, cmap.colors):
+        pos = np.where(labels == state)[0]
+        pos = np.unique([pos, pos + 1])
         x = np.zeros(labels.shape).astype(bool)
-        x[np.where(labels == state)[0]] = 1
+        if pos[-1] == labels.size:
+            pos = pos[:-1]
+        x[pos] = True
         axes.fill_between(times, gfp, color=color, where=x, step=None,
                           interpolate=False)
+    logger.info("For visualization purposes, "
+                "the last segment appears truncated by 1 sample. "
+                "In the case where the last segment is 1 sample long, "
+                "it does not appear.")
 
     # commonm formatting
     axes.set_title('Segmentation')

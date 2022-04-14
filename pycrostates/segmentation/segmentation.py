@@ -305,6 +305,7 @@ class RawSegmentation(_BaseSegmentation):
             axes=None,
             cbar_axes=None,
             block: bool = False,
+            verbose=None
             ):
         """
         Plot the segmentation.
@@ -323,7 +324,8 @@ class RawSegmentation(_BaseSegmentation):
             space from the main axes.
         block : bool
             Whether to halt program execution until the figure is closed.
-
+        %(verbose)s
+        
         Returns
         -------
         fig : Figure
@@ -341,6 +343,7 @@ class RawSegmentation(_BaseSegmentation):
             axes=axes,
             cbar_axes=cbar_axes,
             block=block,
+            verbose=verbose
             )
 
     def compute_parameters(
@@ -499,7 +502,8 @@ class EpochsSegmentation(_BaseSegmentation):
             cmap=None,
             axes=None,
             cbar_axes=None,
-            block: bool = False
+            block: bool = False,
+            verbose=None
             ):
         """
         Plot segmentation.
@@ -516,6 +520,7 @@ class EpochsSegmentation(_BaseSegmentation):
             space from the main axes.
         block : bool
             Whether to halt program execution until the figure is closed.
+        %(verbose)s
 
         Returns
         -------
@@ -531,7 +536,8 @@ class EpochsSegmentation(_BaseSegmentation):
             cmap=cmap,
             axes=axes,
             cbar_axes=cbar_axes,
-            block=block
+            block=block,
+            verbose=verbose
             )
 
     # --------------------------------------------------------------------
