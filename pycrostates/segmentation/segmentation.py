@@ -136,7 +136,7 @@ class _BaseSegmentation(ABC):
         self._picks = picks
         self._cluster_centers_ = cluster_centers_
         self._cluster_names = _BaseSegmentation._check_cluster_names(
-            cluster_names, cluster_centers_)
+            cluster_names, self._cluster_centers_)
         self._predict_parameters = _BaseSegmentation._check_predict_parameters(
             predict_parameters)
         # sanity-check
@@ -226,11 +226,35 @@ class _BaseSegmentation(ABC):
 
     # --------------------------------------------------------------------
     @property
+    def picks(self):
+        """
+        Picks used to predict the segmentation.
+
+        :type: `~numpy.array`
+        """
+        return self._picks
+
+    @property
+    def predict_parameters(self):
+        """
+        Parameters used to predict the current segmentation.
+
+        :type: `dict`
+        """
+        if self._predict_parameters:
+            return self._predict_parameters.copy()
+        else:
+            logger.info(
+                'predict_parameters was not provided when creating the '
+                'segmentation. Returning None.')
+            return None
+
+    @property
     def labels(self):
         """
         Segmentation predicted.
         """
-        return self._labels
+        return self._labels.copy()
 
     @property
     def picks(self):
@@ -248,7 +272,7 @@ class _BaseSegmentation(ABC):
 
         :type: `~numpy.array`
         """
-        return self._cluster_centers_
+        return self._cluster_centers_.copy()
 
     @property
     def cluster_names(self):
@@ -257,23 +281,7 @@ class _BaseSegmentation(ABC):
 
         :type: `list`
         """
-        return self._cluster_names
-
-    @property
-    def predict_parameters(self):
-        """
-        Parameters used to predict the current segmentation.
-
-        :type: `dict`
-        """
-        if self._predict_parameters:
-            return self._predict_parameters.copy()
-        else:
-            logger.info(
-                'predict_parameters was not provided when creating the '
-                'segmentation. Returning None.')
-            return None
-
+        return self._cluster_names.copy()
 
 # TODO: Parameters to be added to docdict
 class RawSegmentation(_BaseSegmentation):
@@ -293,7 +301,7 @@ class RawSegmentation(_BaseSegmentation):
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
         _check_type(self._inst, (BaseRaw, ), item_name='raw')
-        if self.labels.ndim != 1:
+        if self._labels.ndim != 1:
             raise ValueError("Argument 'labels' should be a 1D array.")
 
     @fill_doc
@@ -335,8 +343,8 @@ class RawSegmentation(_BaseSegmentation):
         return plot_raw_segmentation(
             labels=self._labels,
             raw=self.raw,
-            n_clusters=self.cluster_centers_.shape[0],
-            cluster_names=self.cluster_names,
+            n_clusters=self._cluster_centers_.shape[0],
+            cluster_names=self._cluster_names,
             tmin=tmin,
             tmax=tmax,
             cmap=cmap,
@@ -392,10 +400,10 @@ class RawSegmentation(_BaseSegmentation):
                 This metrics is expressed in segment per second ( . / s).
         """
         return _compute_microstate_parameters(
-            self.labels,
+            self._labels,
             self.raw.get_data(picks=self.picks),
-            self.cluster_centers_,
-            self.cluster_names,
+            self._cluster_centers_,
+            self._cluster_names,
             self.raw.info['sfreq'],
             norm_gfp=norm_gfp,
             )
@@ -427,7 +435,7 @@ class EpochsSegmentation(_BaseSegmentation):
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
         _check_type(self._inst, (BaseEpochs, ), 'epochs')
-        if self.labels.ndim != 2:
+        if self._labels.ndim != 2:
             raise ValueError("Argument 'labels' should be a 2D array.")
 
         # sanity-check
@@ -484,12 +492,12 @@ class EpochsSegmentation(_BaseSegmentation):
         data = self.epochs.get_data(picks=self.picks)
         data = np.swapaxes(data, 0, 1)
         data = data.reshape(data.shape[0], -1)
-        labels = self.labels.reshape(-1)
+        labels = self._labels.copy().reshape(-1)
         return _compute_microstate_parameters(
             labels,
             data,
-            self.cluster_centers_,
-            self.cluster_names,
+            self._cluster_centers_,
+            self._cluster_names,
             self.epochs.info['sfreq'],
             norm_gfp=norm_gfp,
             )
@@ -531,8 +539,8 @@ class EpochsSegmentation(_BaseSegmentation):
         return plot_epoch_segmentation(
             labels=self._labels,
             epochs=self.epochs,
-            n_clusters=self.cluster_centers_.shape[0],
-            cluster_names=self.cluster_names,
+            n_clusters=self._cluster_centers_.shape[0],
+            cluster_names=self._cluster_names,
             cmap=cmap,
             axes=axes,
             cbar_axes=cbar_axes,
