@@ -6,45 +6,34 @@ from pycrostates.viz import plot_raw_segmentation, plot_epoch_segmentation
 
 
 folder = mne.datasets.sample.data_path() / 'MEG' / 'sample'
-raw = mne.io.read_raw(folder / 'sample_audvis_filt-0-40_raw.fif', preload=True)
-raw.pick_types(meg=False, eeg=True)
-raw.crop(tmin=0, tmax=10, include_tmax=True)
+fname = folder / 'sample_audvis_filt-0-40_raw.fif'
+raw = mne.io.read_raw(fname, preload=False)
+raw.pick_types(eeg=True).crop(tmin=0, tmax=10, include_tmax=True)
+raw.load_data()
 events = mne.make_fixed_length_events(raw, duration=1)
 epochs = mne.Epochs(raw, events, tmin=0, tmax=0.5, baseline=None, preload=True)
 
 
 def test_plot_raw_segmentation():
     """Test topographic plots for cluster_centers."""
-    data = raw.get_data()
-    cluster_centers = np.random.randint(-10, 10, (4, data.shape[0]))
-    labels = np.random.choice([-1, 0, 1, 2, 3], data.shape[-1])
+    n_clusters = 4
+    labels = np.random.choice([-1, 0, 1, 2, 3], raw.times.size)
 
-    plot_raw_segmentation(
-            labels=labels,
-            inst=raw,
-            cluster_centers=cluster_centers,
-            cluster_names=None,
-            tmin=0.0,
-            tmax=None,
-            cmap=None,
-            ax=None,
-            cbar_ax=None,
-            block=False
-            )
+    plot_raw_segmentation(labels=labels, raw=raw, n_clusters=n_clusters)
     plt.close('all')
 
     # provide ax
     f, ax = plt.subplots(1, 1)
     plot_raw_segmentation(
             labels=labels,
-            inst=raw,
-            cluster_centers=cluster_centers,
+            raw=raw,
+            n_clusters=n_clusters,
             cluster_names=None,
-            tmin=0.0,
+            tmin=None,
             tmax=None,
             cmap=None,
-            ax=ax,
-            cbar_ax=None,
+            axes=ax,
+            cbar_axes=None,
             block=False
             )
     plt.close('all')
@@ -53,14 +42,14 @@ def test_plot_raw_segmentation():
     f, cbar_ax = plt.subplots(1, 1)
     plot_raw_segmentation(
             labels=labels,
-            inst=raw,
-            cluster_centers=cluster_centers,
+            raw=raw,
+            n_clusters=n_clusters,
             cluster_names=None,
-            tmin=0.0,
+            tmin=None,
             tmax=None,
             cmap=None,
-            ax=None,
-            cbar_ax=cbar_ax,
+            axes=None,
+            cbar_axes=cbar_ax,
             block=False
             )
     plt.close('all')
@@ -69,14 +58,14 @@ def test_plot_raw_segmentation():
     f, axes = plt.subplots(1, 2)
     plot_raw_segmentation(
             labels=labels,
-            inst=raw,
-            cluster_centers=cluster_centers,
+            raw=raw,
+            n_clusters=n_clusters,
             cluster_names=None,
-            tmin=0.0,
+            tmin=None,
             tmax=None,
             cmap=None,
-            ax=axes[0],
-            cbar_ax=axes[1],
+            axes=axes[0],
+            cbar_axes=axes[1],
             block=False
             )
     plt.close('all')
@@ -85,14 +74,14 @@ def test_plot_raw_segmentation():
     f, axes = plt.subplots(1, 2)
     plot_raw_segmentation(
             labels=labels,
-            inst=raw,
-            cluster_centers=cluster_centers,
+            raw=raw,
+            n_clusters=n_clusters,
             cluster_names=None,
-            tmin=0.0,
+            tmin=None,
             tmax=None,
             cmap='plasma',
-            ax=None,
-            cbar_ax=None,
+            axes=None,
+            cbar_axes=None,
             block=False
             )
     plt.close('all')
@@ -100,19 +89,18 @@ def test_plot_raw_segmentation():
 
 def test_plot_epoch_segmentation():
     """Test topographic plots for cluster_centers."""
-    data = epochs.get_data()
-    cluster_centers = np.random.randint(-10, 10, (4, data.shape[1]))
+    n_clusters = 4
     labels = np.random.choice(
-        [-1, 0, 1, 2, 3], (data.shape[0], data.shape[-1]))
+        [-1, 0, 1, 2, 3], (len(epochs), epochs.times.size))
 
     plot_epoch_segmentation(
             labels=labels,
-            inst=epochs,
-            cluster_centers=cluster_centers,
+            epochs=epochs,
+            n_clusters=n_clusters,
             cluster_names=None,
             cmap=None,
-            ax=None,
-            cbar_ax=None,
+            axes=None,
+            cbar_axes=None,
             block=False
             )
     plt.close('all')
@@ -121,12 +109,12 @@ def test_plot_epoch_segmentation():
     f, ax = plt.subplots(1, 1)
     plot_epoch_segmentation(
             labels=labels,
-            inst=epochs,
-            cluster_centers=cluster_centers,
+            epochs=epochs,
+            n_clusters=n_clusters,
             cluster_names=None,
             cmap=None,
-            ax=ax,
-            cbar_ax=None,
+            axes=ax,
+            cbar_axes=None,
             block=False
             )
     plt.close('all')
@@ -135,12 +123,12 @@ def test_plot_epoch_segmentation():
     f, cbar_ax = plt.subplots(1, 1)
     plot_epoch_segmentation(
             labels=labels,
-            inst=epochs,
-            cluster_centers=cluster_centers,
+            epochs=epochs,
+            n_clusters=n_clusters,
             cluster_names=None,
             cmap=None,
-            ax=None,
-            cbar_ax=cbar_ax,
+            axes=None,
+            cbar_axes=cbar_ax,
             block=False
             )
     plt.close('all')
@@ -149,12 +137,12 @@ def test_plot_epoch_segmentation():
     f, axes = plt.subplots(1, 2)
     plot_epoch_segmentation(
             labels=labels,
-            inst=epochs,
-            cluster_centers=cluster_centers,
+            epochs=epochs,
+            n_clusters=n_clusters,
             cluster_names=None,
             cmap=None,
-            ax=axes[0],
-            cbar_ax=axes[1],
+            axes=axes[0],
+            cbar_axes=axes[1],
             block=False
             )
     plt.close('all')
@@ -162,12 +150,12 @@ def test_plot_epoch_segmentation():
     # provide cmap
     plot_epoch_segmentation(
             labels=labels,
-            inst=epochs,
-            cluster_centers=cluster_centers,
+            epochs=epochs,
+            n_clusters=n_clusters,
             cluster_names=None,
             cmap='plasma',
-            ax=None,
-            cbar_ax=None,
+            axes=None,
+            cbar_axes=None,
             block=False
             )
     plt.close('all')
