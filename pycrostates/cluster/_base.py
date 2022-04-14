@@ -878,7 +878,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             logger.warning('Clustering algorithm has not been fitted.')
             return(None)
         return self._labels_.copy()
-    
+
     @property
     def cluster_names(self):
         """
@@ -887,6 +887,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         :type: `list`
         """
         return self._cluster_names.copy()
+
     # --------------------------------------------------------------------
     @staticmethod
     def _check_n_clusters(n_clusters: int):

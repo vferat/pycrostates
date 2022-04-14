@@ -566,7 +566,8 @@ def test_fit_data_shapes():
     assert np.isclose(ModK_reject_omit._fitted_data,
                       ModK_reject_True._fitted_data).all()
     assert np.isclose(ModK_reject_omit.GEV_, ModK_reject_True.GEV_)
-    assert np.isclose(ModK_reject_omit._labels_, ModK_reject_True._labels_).all()
+    assert np.isclose(ModK_reject_omit._labels_,
+                      ModK_reject_True._labels_).all()
     assert np.isclose(ModK_reject_omit._cluster_centers_,
                       ModK_reject_True._cluster_centers_).all()
 
@@ -906,8 +907,10 @@ def test_randomseed():
                       random_state=2)
     ModK3.fit(raw, n_jobs=1)
 
-    assert np.isclose(ModK1._cluster_centers_, ModK2._cluster_centers_).all()
-    assert not np.isclose(ModK1._cluster_centers_, ModK3._cluster_centers_).all()
+    assert np.isclose(ModK1._cluster_centers_,
+                      ModK2._cluster_centers_).all()
+    assert not np.isclose(ModK1._cluster_centers_,
+                          ModK3._cluster_centers_).all()
 
 
 def test_contains_mixin():

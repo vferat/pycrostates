@@ -56,7 +56,6 @@ def _compute_microstate_parameters(
         'occurrences' : occurrences
             Mean number of segment assigned to a given state per second.
             This metrics is expressed in segment per second ( . / s).
-        
         If return_dist is set to True, also return the following distributions:
         'dist_corr': Distribution of correlations
             Correlation values of each time point assigned to a given
@@ -100,20 +99,20 @@ def _compute_microstate_parameters(
             d[f'{state_name}_timecov'] = timecov
 
             dist_durs = s_segments / sfreq
-            
+
             d[f'{state_name}_meandurs'] = np.mean(dist_durs)
             if return_dist:
                 d[f'{state_name}_dist_corr'] = dist_corr
                 d[f'{state_name}_dist_gev'] = dist_gev
                 d[f'{state_name}_dist_durs'] = dist_durs
-                
+
         else:
             d[f'{state_name}_mean_corr'] = 0
             d[f'{state_name}_gev'] = 0
             d[f'{state_name}_timecov'] = 0
             d[f'{state_name}_meandurs'] = 0
             d[f'{state_name}_occurrences'] = 0
-            
+
             if return_dist:
                 d[f'{state_name}_dist_corr'] = np.array([])
                 d[f'{state_name}_dist_gev'] = np.array([])
@@ -276,6 +275,7 @@ class _BaseSegmentation(ABC):
         """
         return self._cluster_names.copy()
 
+
 # TODO: Parameters to be added to docdict
 class RawSegmentation(_BaseSegmentation):
     """
@@ -325,7 +325,7 @@ class RawSegmentation(_BaseSegmentation):
         block : bool
             Whether to halt program execution until the figure is closed.
         %(verbose)s
-        
+
         Returns
         -------
         fig : Figure

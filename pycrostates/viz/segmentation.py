@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 from ..utils._checks import _check_type
 from ..utils._logs import _set_verbose, logger
 
+
 # TODO: Add parameters to the docstring.
 def plot_raw_segmentation(
         labels,
@@ -158,7 +159,7 @@ def _plot_segmentation(
         verbose=None,
         **kwargs,
         ):
-    
+
     _set_verbose(verbose)
     """Common code snippet to plot segmentation for raw and epochs."""
     _check_type(labels, (np.ndarray, ), 'labels')  # 1D array (n_times, )
@@ -217,7 +218,7 @@ def _plot_segmentation(
                 pos = pos[:-1]
             x[pos] = True
             axes.fill_between(times, gfp, color=color, where=x, step=None,
-                            interpolate=False)
+                              interpolate=False)
     logger.info("For visualization purposes, "
                 "the last segment appears truncated by 1 sample. "
                 "In the case where the last segment is 1 sample long, "

@@ -30,12 +30,13 @@ def test_RawSegmentation_properties():
     assert isinstance(segmentation.cluster_names, list)
     assert isinstance(segmentation.labels, np.ndarray)
     plt.close('all')
-    
-    
+
+
 def test_RawSegmentation_plot_cluster_centers():
     segmentation = ModK_raw.predict(raw)
     segmentation.plot_cluster_centers()
     plt.close('all')
+
 
 def test_RawSegmentation_plot():
     segmentation = ModK_raw.predict(raw)
