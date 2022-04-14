@@ -54,12 +54,12 @@ def _check_fitted(ModK):
     """
     assert ModK.fitted
     assert ModK.n_clusters == n_clusters
-    assert len(ModK.cluster_names) == n_clusters
-    assert len(ModK.cluster_centers_) == n_clusters
-    assert ModK.fitted_data is not None
+    assert len(ModK._cluster_names) == n_clusters
+    assert len(ModK._cluster_centers_) == n_clusters
+    assert ModK._fitted_data is not None
     assert ModK.info is not None
     assert ModK.GEV_ is not None
-    assert ModK.labels_ is not None
+    assert ModK._labels_ is not None
 
 
 def _check_unfitted(ModK):
@@ -68,12 +68,12 @@ def _check_unfitted(ModK):
     """
     assert not ModK.fitted
     assert ModK.n_clusters == n_clusters
-    assert len(ModK.cluster_names) == n_clusters
-    assert ModK.cluster_centers_ is None
-    assert ModK.fitted_data is None
+    assert len(ModK._cluster_names) == n_clusters
+    assert ModK._cluster_centers_ is None
+    assert ModK._fitted_data is None
     assert ModK.info is None
     assert ModK.GEV_ is None
-    assert ModK.labels_ is None
+    assert ModK._labels_ is None
 
 
 def _check_fitted_data_raw(fitted_data, raw, picks, tmin, tmax,
@@ -110,12 +110,12 @@ def test_ModKMeans():
     _check_unfitted(ModK1)
 
     # Test default clusters names
-    assert ModK1.cluster_names == ['0', '1', '2', '3']
+    assert ModK1._cluster_names == ['0', '1', '2', '3']
 
     # Test fit on RAW
     ModK1.fit(raw, n_jobs=1)
     _check_fitted(ModK1)
-    assert ModK1.cluster_centers_.shape == \
+    assert ModK1._cluster_centers_.shape == \
         (n_clusters, len(raw.info['ch_names']) - len(raw.info['bads']))
 
     # Test reset
@@ -125,24 +125,24 @@ def test_ModKMeans():
     # Test fit on Epochs
     ModK1.fit(epochs, n_jobs=1)
     _check_fitted(ModK1)
-    assert ModK1.cluster_centers_.shape == \
+    assert ModK1._cluster_centers_.shape == \
         (n_clusters, len(epochs.info['ch_names']) - len(epochs.info['bads']))
 
     # Test copy
     ModK2 = ModK1.copy()
     _check_fitted(ModK2)
-    assert np.isclose(ModK2.cluster_centers_, ModK1.cluster_centers_).all()
+    assert np.isclose(ModK2._cluster_centers_, ModK1._cluster_centers_).all()
     assert np.isclose(ModK2.GEV_, ModK1.GEV_)
-    assert np.isclose(ModK2.labels_, ModK1.labels_).all()
+    assert np.isclose(ModK2._labels_, ModK1._labels_).all()
     ModK2.fitted = False
     _check_fitted(ModK1)
     _check_unfitted(ModK2)
 
     ModK3 = ModK1.copy(deep=False)
     _check_fitted(ModK3)
-    assert np.isclose(ModK3.cluster_centers_, ModK1.cluster_centers_).all()
+    assert np.isclose(ModK3._cluster_centers_, ModK1._cluster_centers_).all()
     assert np.isclose(ModK3.GEV_, ModK1.GEV_)
-    assert np.isclose(ModK3.labels_, ModK1.labels_).all()
+    assert np.isclose(ModK3._labels_, ModK1._labels_).all()
     ModK3.fitted = False
     _check_fitted(ModK1)
     _check_unfitted(ModK3)
@@ -172,42 +172,42 @@ def test_invert_polarity():
     """Test invert polarity method."""
     # list/tuple
     ModK_ = ModK.copy()
-    cluster_centers_ = deepcopy(ModK_.cluster_centers_)
+    cluster_centers_ = deepcopy(ModK_._cluster_centers_)
     ModK_.invert_polarity([True, False, True, False])
     assert np.isclose(
-        ModK_.cluster_centers_[0, :], -cluster_centers_[0, :]).all()
+        ModK_._cluster_centers_[0, :], -cluster_centers_[0, :]).all()
     assert np.isclose(
-        ModK_.cluster_centers_[1, :], cluster_centers_[1, :]).all()
+        ModK_._cluster_centers_[1, :], cluster_centers_[1, :]).all()
     assert np.isclose(
-        ModK_.cluster_centers_[2, :], -cluster_centers_[2, :]).all()
+        ModK_._cluster_centers_[2, :], -cluster_centers_[2, :]).all()
     assert np.isclose(
-        ModK_.cluster_centers_[3, :], cluster_centers_[3, :]).all()
+        ModK_._cluster_centers_[3, :], cluster_centers_[3, :]).all()
 
     # bool
     ModK_ = ModK.copy()
-    cluster_centers_ = deepcopy(ModK_.cluster_centers_)
+    cluster_centers_ = deepcopy(ModK_._cluster_centers_)
     ModK_.invert_polarity(True)
     assert np.isclose(
-        ModK_.cluster_centers_[0, :], -cluster_centers_[0, :]).all()
+        ModK_._cluster_centers_[0, :], -cluster_centers_[0, :]).all()
     assert np.isclose(
-        ModK_.cluster_centers_[1, :], -cluster_centers_[1, :]).all()
+        ModK_._cluster_centers_[1, :], -cluster_centers_[1, :]).all()
     assert np.isclose(
-        ModK_.cluster_centers_[2, :], -cluster_centers_[2, :]).all()
+        ModK_._cluster_centers_[2, :], -cluster_centers_[2, :]).all()
     assert np.isclose(
-        ModK_.cluster_centers_[3, :], -cluster_centers_[3, :]).all()
+        ModK_._cluster_centers_[3, :], -cluster_centers_[3, :]).all()
 
     # np.array
     ModK_ = ModK.copy()
-    cluster_centers_ = deepcopy(ModK_.cluster_centers_)
+    cluster_centers_ = deepcopy(ModK_._cluster_centers_)
     ModK_.invert_polarity(np.array([True, False, True, False]))
     assert np.isclose(
-        ModK_.cluster_centers_[0, :], -cluster_centers_[0, :]).all()
+        ModK_._cluster_centers_[0, :], -cluster_centers_[0, :]).all()
     assert np.isclose(
-        ModK_.cluster_centers_[1, :], cluster_centers_[1, :]).all()
+        ModK_._cluster_centers_[1, :], cluster_centers_[1, :]).all()
     assert np.isclose(
-        ModK_.cluster_centers_[2, :], -cluster_centers_[2, :]).all()
+        ModK_._cluster_centers_[2, :], -cluster_centers_[2, :]).all()
     assert np.isclose(
-        ModK_.cluster_centers_[3, :], cluster_centers_[3, :]).all()
+        ModK_._cluster_centers_[3, :], cluster_centers_[3, :]).all()
 
     # Test invalid arguments
     with pytest.raises(ValueError, match="not a 2D iterable"):
@@ -232,20 +232,20 @@ def test_rename(caplog):
 
     # Test mapping
     ModK_ = ModK.copy()
-    mapping = {old: alphabet[k] for k, old in enumerate(ModK.cluster_names)}
+    mapping = {old: alphabet[k] for k, old in enumerate(ModK._cluster_names)}
     for key, value in mapping.items():
         assert isinstance(key, str)
         assert isinstance(value, str)
         assert key != value
     ModK_.rename_clusters(mapping=mapping)
-    assert ModK_.cluster_names == alphabet
-    assert ModK_.cluster_names != ModK.cluster_names
+    assert ModK_._cluster_names == alphabet
+    assert ModK_._cluster_names != ModK._cluster_names
 
     # Test new_names
     ModK_ = ModK.copy()
     ModK_.rename_clusters(new_names=alphabet)
-    assert ModK_.cluster_names == alphabet
-    assert ModK_.cluster_names != ModK.cluster_names
+    assert ModK_._cluster_names == alphabet
+    assert ModK_._cluster_names != ModK._cluster_names
 
     # Test invalid arguments
     ModK_ = ModK.copy()
@@ -253,10 +253,10 @@ def test_rename(caplog):
         ModK_.rename_clusters(mapping=101)
     with pytest.raises(ValueError, match="Invalid value for the 'old name'"):
         mapping = {old + '101': alphabet[k]
-                   for k, old in enumerate(ModK.cluster_names)}
+                   for k, old in enumerate(ModK._cluster_names)}
         ModK_.rename_clusters(mapping=mapping)
     with pytest.raises(TypeError, match="'new name' must be an instance of "):
-        mapping = {old: k for k, old in enumerate(ModK.cluster_names)}
+        mapping = {old: k for k, old in enumerate(ModK._cluster_names)}
         ModK_.rename_clusters(mapping=mapping)
     with pytest.raises(ValueError,
                        match="Argument 'new_names' should contain"):
@@ -268,7 +268,7 @@ def test_rename(caplog):
     with pytest.raises(ValueError,
                        match="Only one of 'mapping' or 'new_names'"):
         mapping = {old: alphabet[k] for
-                   k, old in enumerate(ModK.cluster_names)}
+                   k, old in enumerate(ModK._cluster_names)}
         ModK_.rename_clusters(mapping=mapping, new_names=alphabet)
 
     # Test unfitted
@@ -277,7 +277,7 @@ def test_rename(caplog):
     _check_unfitted(ModK_)
     with pytest.raises(RuntimeError, match='must be fitted before'):
         mapping = {old: alphabet[k]
-                   for k, old in enumerate(ModK.cluster_names)}
+                   for k, old in enumerate(ModK._cluster_names)}
         ModK_.rename_clusters(mapping=mapping)
     with pytest.raises(RuntimeError, match='must be fitted before'):
         ModK_.rename_clusters(new_names=alphabet)
@@ -289,36 +289,36 @@ def test_reorder(caplog):
     ModK_ = ModK.copy()
     ModK_.reorder_clusters(mapping={0: 1})
     assert np.isclose(
-        ModK.cluster_centers_[0, :], ModK_.cluster_centers_[1, :]).all()
+        ModK._cluster_centers_[0, :], ModK_._cluster_centers_[1, :]).all()
     assert np.isclose(
-        ModK.cluster_centers_[1, :], ModK_.cluster_centers_[0, :]).all()
-    assert ModK.cluster_names[0] == ModK_.cluster_names[1]
-    assert ModK.cluster_names[0] == ModK_.cluster_names[1]
+        ModK._cluster_centers_[1, :], ModK_._cluster_centers_[0, :]).all()
+    assert ModK._cluster_names[0] == ModK_._cluster_names[1]
+    assert ModK._cluster_names[0] == ModK_._cluster_names[1]
 
     # Test order
     ModK_ = ModK.copy()
     ModK_.reorder_clusters(order=[1, 0, 2, 3])
     assert np.isclose(
-        ModK.cluster_centers_[0], ModK_.cluster_centers_[1]).all()
+        ModK._cluster_centers_[0], ModK_._cluster_centers_[1]).all()
     assert np.isclose(
-        ModK.cluster_centers_[1], ModK_.cluster_centers_[0]).all()
-    assert ModK.cluster_names[0] == ModK_.cluster_names[1]
-    assert ModK.cluster_names[0] == ModK_.cluster_names[1]
+        ModK._cluster_centers_[1], ModK_._cluster_centers_[0]).all()
+    assert ModK._cluster_names[0] == ModK_._cluster_names[1]
+    assert ModK._cluster_names[0] == ModK_._cluster_names[1]
 
     ModK_ = ModK.copy()
     ModK_.reorder_clusters(order=np.array([1, 0, 2, 3]))
     assert np.isclose(
-        ModK.cluster_centers_[0], ModK_.cluster_centers_[1]).all()
+        ModK._cluster_centers_[0], ModK_._cluster_centers_[1]).all()
     assert np.isclose(
-        ModK.cluster_centers_[1], ModK_.cluster_centers_[0]).all()
-    assert ModK.cluster_names[0] == ModK_.cluster_names[1]
-    assert ModK.cluster_names[0] == ModK_.cluster_names[1]
+        ModK._cluster_centers_[1], ModK_._cluster_centers_[0]).all()
+    assert ModK._cluster_names[0] == ModK_._cluster_names[1]
+    assert ModK._cluster_names[0] == ModK_._cluster_names[1]
 
-    # test .labels_ reordering
-    x = ModK_.labels_[:20]
+    # test ._labels_ reordering
+    x = ModK_._labels_[:20]
     # x: before re-order:
     # x = [3, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
-    # y: expected re-ordered labels
+    # y: expected re-ordered _labels
     y = [3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]
     assert np.all(x == y)
 
@@ -507,43 +507,43 @@ def test_fit_data_shapes():
     _check_unfitted(ModK_)
     ModK_.fit(raw, n_jobs=1, picks='eeg', tmin=5, tmax=None,
               reject_by_annotation=False)
-    _check_fitted_data_raw(ModK_.fitted_data, raw, 'eeg', 5, None, None)
+    _check_fitted_data_raw(ModK_._fitted_data, raw, 'eeg', 5, None, None)
     # save for later
-    fitted_data_5_end = deepcopy(ModK_.fitted_data)
+    fitted_data_5_end = deepcopy(ModK_._fitted_data)
 
     ModK_.fitted = False
     _check_unfitted(ModK_)
     ModK_.fit(epochs, n_jobs=1, picks='eeg', tmin=0.2, tmax=None,
               reject_by_annotation=False)
-    _check_fitted_data_epochs(ModK_.fitted_data, epochs, 'eeg', 0.2, None)
+    _check_fitted_data_epochs(ModK_._fitted_data, epochs, 'eeg', 0.2, None)
 
     # tmax
     ModK_.fitted = False
     _check_unfitted(ModK_)
     ModK_.fit(raw, n_jobs=1, picks='eeg', tmin=None, tmax=5,
               reject_by_annotation=False)
-    _check_fitted_data_raw(ModK_.fitted_data, raw, 'eeg', None, 5, None)
+    _check_fitted_data_raw(ModK_._fitted_data, raw, 'eeg', None, 5, None)
     # save for later
-    fitted_data_0_5 = deepcopy(ModK_.fitted_data)
+    fitted_data_0_5 = deepcopy(ModK_._fitted_data)
 
     ModK_.fitted = False
     _check_unfitted(ModK_)
     ModK_.fit(epochs, n_jobs=1, picks='eeg', tmin=None, tmax=0.3,
               reject_by_annotation=False)
-    _check_fitted_data_epochs(ModK_.fitted_data, epochs, 'eeg', None, 0.3)
+    _check_fitted_data_epochs(ModK_._fitted_data, epochs, 'eeg', None, 0.3)
 
     # tmin, tmax
     ModK_.fitted = False
     _check_unfitted(ModK_)
     ModK_.fit(raw, n_jobs=1, picks='eeg', tmin=2, tmax=8,
               reject_by_annotation=False)
-    _check_fitted_data_raw(ModK_.fitted_data, raw, 'eeg', 2, 8, None)
+    _check_fitted_data_raw(ModK_._fitted_data, raw, 'eeg', 2, 8, None)
 
     ModK_.fitted = False
     _check_unfitted(ModK_)
     ModK_.fit(epochs, n_jobs=1, picks='eeg', tmin=0.1, tmax=0.4,
               reject_by_annotation=False)
-    _check_fitted_data_epochs(ModK_.fitted_data, epochs, 'eeg', 0.1, 0.4)
+    _check_fitted_data_epochs(ModK_._fitted_data, epochs, 'eeg', 0.1, 0.4)
 
     # ---------------------
     # Reject by annotations
@@ -563,22 +563,22 @@ def test_fit_data_shapes():
     ModK_reject_omit.fit(raw_, n_jobs=1, reject_by_annotation='omit')
 
     # Compare 'omit' and True
-    assert np.isclose(ModK_reject_omit.fitted_data,
-                      ModK_reject_True.fitted_data).all()
+    assert np.isclose(ModK_reject_omit._fitted_data,
+                      ModK_reject_True._fitted_data).all()
     assert np.isclose(ModK_reject_omit.GEV_, ModK_reject_True.GEV_)
-    assert np.isclose(ModK_reject_omit.labels_, ModK_reject_True.labels_).all()
-    assert np.isclose(ModK_reject_omit.cluster_centers_,
-                      ModK_reject_True.cluster_centers_).all()
+    assert np.isclose(ModK_reject_omit._labels_, ModK_reject_True._labels_).all()
+    assert np.isclose(ModK_reject_omit._cluster_centers_,
+                      ModK_reject_True._cluster_centers_).all()
 
     # Make sure there is a shape diff between True and False
-    assert ModK_reject_True.fitted_data.shape != \
-        ModK_no_reject.fitted_data.shape
+    assert ModK_reject_True._fitted_data.shape != \
+        ModK_no_reject._fitted_data.shape
 
     # Check fitted data
     _check_fitted_data_raw(
-        ModK_reject_True.fitted_data, raw_, 'eeg', None, None, 'omit')
+        ModK_reject_True._fitted_data, raw_, 'eeg', None, None, 'omit')
     _check_fitted_data_raw(
-        ModK_no_reject.fitted_data, raw_, 'eeg', None, None, None)
+        ModK_no_reject._fitted_data, raw_, 'eeg', None, None, None)
 
     # Check with reject with tmin/tmax
     ModK_rej_0_5 = ModK_.copy()
@@ -589,11 +589,11 @@ def test_fit_data_shapes():
     _check_fitted(ModK_rej_0_5)
     _check_fitted(ModK_rej_5_end)
     _check_fitted_data_raw(
-        ModK_rej_0_5.fitted_data, raw_, 'eeg', None, 5, 'omit')
+        ModK_rej_0_5._fitted_data, raw_, 'eeg', None, 5, 'omit')
     _check_fitted_data_raw(
-        ModK_rej_5_end.fitted_data, raw_, 'eeg', 5, None, 'omit')
-    assert ModK_rej_0_5.fitted_data.shape != fitted_data_0_5.shape
-    assert np.isclose(fitted_data_5_end, ModK_rej_5_end.fitted_data).all()
+        ModK_rej_5_end._fitted_data, raw_, 'eeg', 5, None, 'omit')
+    assert ModK_rej_0_5._fitted_data.shape != fitted_data_0_5.shape
+    assert np.isclose(fitted_data_5_end, ModK_rej_5_end._fitted_data).all()
 
 
 def test_fit_with_bads(caplog):
@@ -605,7 +605,7 @@ def test_fit_with_bads(caplog):
                       random_state=1)
     ModK_.fit(raw_, n_jobs=1)
     _check_fitted(ModK_)
-    _check_fitted_data_raw(ModK_.fitted_data, raw_, 'eeg', None, None, 'omit')
+    _check_fitted_data_raw(ModK_._fitted_data, raw_, 'eeg', None, None, 'omit')
     assert len(ModK_.info['bads']) == 0
     assert 'set as bad' not in caplog.text
     caplog.clear()
@@ -617,7 +617,7 @@ def test_fit_with_bads(caplog):
                       random_state=1)
     ModK_.fit(raw_, n_jobs=1)
     _check_fitted(ModK_)
-    _check_fitted_data_raw(ModK_.fitted_data, raw_, 'eeg', None, None, 'omit')
+    _check_fitted_data_raw(ModK_._fitted_data, raw_, 'eeg', None, None, 'omit')
     assert len(ModK_.info['bads']) == 1
     assert 'Channel EEG 001 is set as bad and ignored.' in caplog.text
     caplog.clear()
@@ -629,7 +629,7 @@ def test_fit_with_bads(caplog):
                       random_state=1)
     ModK_.fit(raw_, n_jobs=1)
     _check_fitted(ModK_)
-    _check_fitted_data_raw(ModK_.fitted_data, raw_, 'eeg', None, None, 'omit')
+    _check_fitted_data_raw(ModK_._fitted_data, raw_, 'eeg', None, None, 'omit')
     assert len(ModK_.info['bads']) == 2
     assert 'Channels EEG 001, EEG 002 are set as bads' in caplog.text
     caplog.clear()
@@ -641,7 +641,7 @@ def test_fit_with_bads(caplog):
                       random_state=1)
     ModK_.fit(epochs_, n_jobs=1)
     _check_fitted(ModK_)
-    _check_fitted_data_epochs(ModK_.fitted_data, epochs_, 'eeg', None, None)
+    _check_fitted_data_epochs(ModK_._fitted_data, epochs_, 'eeg', None, None)
     assert len(ModK_.info['bads']) == 2
     assert 'Channels EEG 001, EEG 002 are set as bads' in caplog.text
     caplog.clear()
@@ -658,16 +658,16 @@ def test_predict(caplog):
     # raw, no smoothing, with edge rejection
     segmentation = ModK.predict(raw, factor=0, reject_edges=True)
     assert isinstance(segmentation, RawSegmentation)
-    assert segmentation.labels[0] == -1
-    assert segmentation.labels[-1] == -1
+    assert segmentation._labels[0] == -1
+    assert segmentation._labels[-1] == -1
     assert 'Rejecting first and last segments.' in caplog.text
     caplog.clear()
 
     # raw, with smoothing
     segmentation = ModK.predict(raw, factor=3, reject_edges=True)
     assert isinstance(segmentation, RawSegmentation)
-    assert segmentation.labels[0] == -1
-    assert segmentation.labels[-1] == -1
+    assert segmentation._labels[0] == -1
+    assert segmentation._labels[-1] == -1
     assert 'Segmenting data with factor 3' in caplog.text
     caplog.clear()
 
@@ -676,7 +676,7 @@ def test_predict(caplog):
                                 min_segment_length=5)
     assert isinstance(segmentation, RawSegmentation)
     segment_lengths = [len(list(group))
-                       for _, group in groupby(segmentation.labels)]
+                       for _, group in groupby(segmentation._labels)]
     assert all(5 <= size for size in segment_lengths[1:-1])
     assert 'Rejecting segments shorter than' in caplog.text
     caplog.clear()
@@ -690,7 +690,7 @@ def test_predict(caplog):
     # epochs, no smoothing, with edge rejection
     segmentation = ModK.predict(epochs, factor=0, reject_edges=True)
     assert isinstance(segmentation, EpochsSegmentation)
-    for epoch_labels in segmentation.labels:
+    for epoch_labels in segmentation._labels:
         assert epoch_labels[0] == -1
         assert epoch_labels[-1] == -1
     assert 'Rejecting first and last segments.' in caplog.text
@@ -699,7 +699,7 @@ def test_predict(caplog):
     # epochs, with smoothing
     segmentation = ModK.predict(epochs, factor=3, reject_edges=True)
     assert isinstance(segmentation, EpochsSegmentation)
-    for epoch_labels in segmentation.labels:
+    for epoch_labels in segmentation._labels:
         assert epoch_labels[0] == -1
         assert epoch_labels[-1] == -1
     assert 'Segmenting data with factor 3' in caplog.text
@@ -709,7 +709,7 @@ def test_predict(caplog):
     segmentation = ModK.predict(epochs, factor=0, reject_edges=False,
                                 min_segment_length=5)
     assert isinstance(segmentation, EpochsSegmentation)
-    for epoch_labels in segmentation.labels:
+    for epoch_labels in segmentation._labels:
         segment_lengths = [len(list(group))
                            for _, group in groupby(epoch_labels)]
         assert all(5 <= size for size in segment_lengths[1:-1])
@@ -728,12 +728,12 @@ def test_predict(caplog):
                                          reject_by_annotation=None)
     segmentation_no_annot = ModK.predict(raw, factor=0, reject_edges=True,
                                          reject_by_annotation='omit')
-    assert not np.isclose(segmentation_rej_True.labels,
-                          segmentation_rej_False.labels).all()
-    assert np.isclose(segmentation_no_annot.labels,
-                      segmentation_rej_False.labels).all()
-    assert np.isclose(segmentation_rej_None.labels,
-                      segmentation_rej_False.labels).all()
+    assert not np.isclose(segmentation_rej_True._labels,
+                          segmentation_rej_False._labels).all()
+    assert np.isclose(segmentation_no_annot._labels,
+                      segmentation_rej_False._labels).all()
+    assert np.isclose(segmentation_rej_None._labels,
+                      segmentation_rej_False._labels).all()
 
     # test different half_window_size
     segmentation1 = ModK.predict(raw, factor=3, reject_edges=False,
@@ -742,12 +742,12 @@ def test_predict(caplog):
                                  half_window_size=60)
     segmentation3 = ModK.predict(raw, factor=0, reject_edges=False,
                                  half_window_size=3)
-    assert not np.isclose(segmentation1.labels,
-                          segmentation2.labels).all()
-    assert not np.isclose(segmentation1.labels,
-                          segmentation3.labels).all()
-    assert not np.isclose(segmentation2.labels,
-                          segmentation3.labels).all()
+    assert not np.isclose(segmentation1._labels,
+                          segmentation2._labels).all()
+    assert not np.isclose(segmentation1._labels,
+                          segmentation3._labels).all()
+    assert not np.isclose(segmentation2._labels,
+                          segmentation3._labels).all()
 
     # with raw and picks
     raw_ = raw.copy()
@@ -855,9 +855,9 @@ def test_n_jobs():
                       random_state=1)
     ModK_.fit(raw, n_jobs=2)
     _check_fitted(ModK_)
-    assert np.isclose(ModK_.cluster_centers_, ModK.cluster_centers_).all()
+    assert np.isclose(ModK_._cluster_centers_, ModK._cluster_centers_).all()
     assert np.isclose(ModK_.GEV_, ModK.GEV_)
-    assert np.isclose(ModK_.labels_, ModK.labels_).all()
+    assert np.isclose(ModK_._labels_, ModK._labels_).all()
 
 
 def test_fit_not_converged(caplog):
@@ -906,8 +906,8 @@ def test_randomseed():
                       random_state=2)
     ModK3.fit(raw, n_jobs=1)
 
-    assert np.isclose(ModK1.cluster_centers_, ModK2.cluster_centers_).all()
-    assert not np.isclose(ModK1.cluster_centers_, ModK3.cluster_centers_).all()
+    assert np.isclose(ModK1._cluster_centers_, ModK2._cluster_centers_).all()
+    assert not np.isclose(ModK1._cluster_centers_, ModK3._cluster_centers_).all()
 
 
 def test_contains_mixin():
@@ -982,9 +982,9 @@ def test_save(tmp_path, caplog):
     segmentation1 = ModK1.predict(raw, picks='eeg')
     segmentation2 = ModK2.predict(raw, picks='eeg')
 
-    assert np.allclose(segmentation.labels, segmentation1.labels)
-    assert np.allclose(segmentation.labels, segmentation2.labels)
-    assert np.allclose(segmentation1.labels, segmentation2.labels)
+    assert np.allclose(segmentation._labels, segmentation1._labels)
+    assert np.allclose(segmentation._labels, segmentation2._labels)
+    assert np.allclose(segmentation1._labels, segmentation2._labels)
 
 
 def test_comparison(caplog):
@@ -1021,8 +1021,8 @@ def test_comparison(caplog):
     assert ModK1 != ModK2
     ModK1 = ModK.copy()
     ModK1._info = ChInfo(
-        ch_names=[str(k) for k in range(ModK1.cluster_centers_.shape[1])],
-        ch_types=['eeg'] * ModK1.cluster_centers_.shape[1])
+        ch_names=[str(k) for k in range(ModK1._cluster_centers_.shape[1])],
+        ch_types=['eeg'] * ModK1._cluster_centers_.shape[1])
     assert ModK1 != ModK2
     ModK1 = ModK.copy()
     ModK1._labels_ = ModK1._labels_[::-1]

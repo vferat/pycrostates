@@ -144,10 +144,10 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 'Clustering algorithm must be fitted before using '
                 f'{self.__class__.__name__}')
         # sanity-check
-        assert self.cluster_centers_ is not None
+        assert self._cluster_centers_ is not None
         assert self.info is not None
-        assert self.fitted_data is not None
-        assert self.labels_ is not None
+        assert self._fitted_data is not None
+        assert self._labels_ is not None
 
     @abstractmethod
     @fill_doc
@@ -255,7 +255,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         elif mapping is not None:
             _check_type(mapping, (dict, ), item_name='mapping')
             for key in mapping:
-                _check_value(key, self.cluster_names, item_name='old name')
+                _check_value(key, self._cluster_names, item_name='old name')
             for value in mapping.values():
                 _check_type(value, (str, ), item_name='new name')
 
@@ -798,28 +798,6 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return self._n_clusters
 
     @property
-    def cluster_names(self):
-        """
-        Name of the clusters.
-
-        :type: `list`
-        """
-        return self._cluster_names
-
-    @property
-    def cluster_centers_(self):
-        """
-        Center of the clusters. Returns None if cluster algorithm has not been
-        fitted.
-
-        :type: `~numpy.array`
-        """
-        if self._cluster_centers_ is None:
-            assert not self._fitted  # sanity-check
-            logger.warning('Clustering algorithm has not been fitted.')
-        return self._cluster_centers_
-
-    @property
     def info(self):
         """
         Info instance corresponding to the MNE object used to fit the
@@ -831,28 +809,6 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             assert not self._fitted  # sanity-check
             logger.warning('Clustering algorithm has not been fitted.')
         return self._info
-
-    @property
-    def fitted_data(self):
-        """
-        Data array retrieved from MNE used to fit the clustering algorithm.
-
-        :type: `~numpy.array` shape (n_channels, n_samples)
-        """
-        if self._fitted_data is None:
-            assert not self._fitted  # sanity-check
-            logger.warning('Clustering algorithm has not been fitted.')
-        return self._fitted_data
-
-    @property
-    def labels_(self):
-        """
-        labels fit variable.
-        """
-        if self._labels_ is None:
-            assert not self._fitted  # sanity-check
-            logger.warning('Clustering algorithm has not been fitted.')
-        return self._labels_
 
     @property
     def fitted(self):
@@ -883,6 +839,52 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             self._labels_ = None
             self._fitted = False
 
+    @property
+    def cluster_centers_(self):
+        """
+        Center of the clusters. Returns None if cluster algorithm has not been
+        fitted.
+
+        :type: `~numpy.array`
+        """
+        if self._cluster_centers_ is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+            return(None)
+        return self._cluster_centers_.copy()
+
+    @property
+    def fitted_data(self):
+        """
+        Data array retrieved from MNE used to fit the clustering algorithm.
+
+        :type: `~numpy.array` shape (n_channels, n_samples)
+        """
+        if self._fitted_data is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+            return(None)
+        return self._fitted_data.copy()
+
+    @property
+    def labels_(self):
+        """
+        labels fit variable.
+        """
+        if self._labels_ is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+            return(None)
+        return self._labels_.copy()
+    
+    @property
+    def cluster_names(self):
+        """
+        Name of the clusters.
+
+        :type: `list`
+        """
+        return self._cluster_names.copy()
     # --------------------------------------------------------------------
     @staticmethod
     def _check_n_clusters(n_clusters: int):
