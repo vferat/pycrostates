@@ -210,13 +210,14 @@ def _plot_segmentation(
     axes.plot(times, gfp, **kwargs)
     for state, color in zip(state_labels, cmap.colors):
         pos = np.where(labels == state)[0]
-        pos = np.unique([pos, pos + 1])
-        x = np.zeros(labels.shape).astype(bool)
-        if pos[-1] == labels.size:
-            pos = pos[:-1]
-        x[pos] = True
-        axes.fill_between(times, gfp, color=color, where=x, step=None,
-                          interpolate=False)
+        if len(pos):
+            pos = np.unique([pos, pos + 1])
+            x = np.zeros(labels.shape).astype(bool)
+            if pos[-1] == labels.size:
+                pos = pos[:-1]
+            x[pos] = True
+            axes.fill_between(times, gfp, color=color, where=x, step=None,
+                            interpolate=False)
     logger.info("For visualization purposes, "
                 "the last segment appears truncated by 1 sample. "
                 "In the case where the last segment is 1 sample long, "
