@@ -2,12 +2,12 @@ from abc import ABC, abstractmethod
 import itertools
 
 import numpy as np
-from mne import BaseEpochs, pick_info
+from mne import BaseEpochs
 from mne.io import BaseRaw
 
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
-from ..utils._docs import fill_doc
+from ..utils._docs import fill_doc, copy_doc
 from ..utils._logs import logger
 from ..viz import (
     plot_raw_segmentation, plot_epoch_segmentation, plot_cluster_centers)
@@ -19,41 +19,54 @@ def _compute_microstate_parameters(
         maps,
         maps_names,
         sfreq,
-        norm_gfp: bool = True):
+        norm_gfp: bool = True,
+        return_dist: bool = False):
     """
     Compute microstate parameters.
 
+    Parameters
+    ----------
+    norm_gfp : bool
+        Either or not to normalized global field power.
+        Default to True.
+    return_dist : bool
+        Either or not to return parameter distributions.
+        Default to False.
+
     Returns
     -------
-    dict : list of dict
-        Dictionaries containing microstate metrics.
+    dict : dict
+        Dictionaries containing microstate parameters as key/value pairs.
+        Keys are named as follow: '{microstate name}_{parameter}'.
 
-    Attributes
-    ----------
-    'dist_corr': Distribution of correlations
-        Correlation values of each time point assigned to a given state.
-    'mean_corr': Mean correlation
-        Mean correlation value of each time point assigned to a given state.
-    'dist_gev': Distribution of global explained variances
-        Global explained variance values of each time point assigned to a given
-        state.
-    'gev':  Global explained variance
-        Total explained variance expressed by a given state. It is the sum of
-        global explained variance values of each time point assigned to a given
-        state.
-    'timecov': Time coverage
-        The proportion of time during which a given state is active. This
-        metric is expressed in percentage (%%).
-    'dist_durs': Distribution of durations.
-        Duration of each segments assigned to a given state. Each value is
-        expressed in seconds (s).
-    'meandurs': Mean duration
-        Mean temporal duration segments assigned to a given state. This metric
-        is expressed in seconds (s).
-    'occurrences' : occurrences
-        Mean number of segment assigned to a given state per second. This
-        metrics is expressed in segment per second ( . / s).
-
+        Available parameters are list below:
+        'mean_corr': Mean correlation
+            Mean correlation value of each time point assigned to a given
+            state.
+        'gev':  Global explained variance
+            Total explained variance expressed by a given state.
+            It is the sum of global explained variance values of each
+            time point assigned to a given state.
+        'timecov': Time coverage
+            The proportion of time during which a given state is active.
+            This metric is expressed in percentage (%%).
+        'meandurs': Mean duration
+            Mean temporal duration segments assigned to a given state.
+            This metric is expressed in seconds (s).
+        'occurrences' : occurrences
+            Mean number of segment assigned to a given state per second.
+            This metrics is expressed in segment per second ( . / s).
+        
+        If return_dist is set to True, also return the following distributions:
+        'dist_corr': Distribution of correlations
+            Correlation values of each time point assigned to a given
+            state.
+        'dist_gev': Distribution of global explained variances
+            Global explained variance values of each time point assigned to
+            a given state.
+        'dist_durs': Distribution of durations.
+            Duration of each segments assigned to a given state.
+            Each value is expressed in seconds (s).
     """
     gfp = np.std(data, axis=0)
     if norm_gfp:
@@ -71,37 +84,41 @@ def _compute_microstate_parameters(
             labeled_gfp = gfp[arg_where][:, 0]
             state_array = np.array([state]*len(arg_where)).transpose()
 
-            corr = _corr_vectors(state_array, labeled_tp)
-            d[f'{state_name}_dist_corr'] = corr
-            d[f'{state_name}_mean_corr'] = np.mean(np.abs(corr))
-
-            gev = (labeled_gfp * corr) ** 2 / np.sum(gfp ** 2)
-            d[f'{state_name}_dist_gev'] = gev
-            d[f'{state_name}_gev'] = np.sum(gev)
+            dist_corr = _corr_vectors(state_array, labeled_tp)
+            d[f'{state_name}_mean_corr'] = np.mean(np.abs(dist_corr))
+            dist_gev = (labeled_gfp * dist_corr) ** 2 / np.sum(gfp ** 2)
+            d[f'{state_name}_gev'] = np.sum(dist_gev)
 
             s_segments = np.array(
                 [len(group) for s_, group in segments if s_ == s])
             occurrences = (len(s_segments)
                            / len(np.where(labels != -1)[0])
                            * sfreq)
-
             d[f'{state_name}_occurrences'] = occurrences
 
             timecov = np.sum(s_segments) / len(np.where(labels != -1)[0])
             d[f'{state_name}_timecov'] = timecov
 
-            durs = s_segments / sfreq
-            d[f'{state_name}_dist_durs'] = durs
-            d[f'{state_name}_meandurs'] = np.mean(durs)
+            dist_durs = s_segments / sfreq
+            
+            d[f'{state_name}_meandurs'] = np.mean(dist_durs)
+            if return_dist:
+                d[f'{state_name}_dist_corr'] = dist_corr
+                d[f'{state_name}_dist_gev'] = dist_gev
+                d[f'{state_name}_dist_durs'] = dist_durs
+                
         else:
-            d[f'{state_name}_dist_corr'] = 0
             d[f'{state_name}_mean_corr'] = 0
-            d[f'{state_name}_dist_gev'] = 0
             d[f'{state_name}_gev'] = 0
             d[f'{state_name}_timecov'] = 0
-            d[f'{state_name}_dist_durs'] = 0
             d[f'{state_name}_meandurs'] = 0
             d[f'{state_name}_occurrences'] = 0
+            
+            if return_dist:
+                d[f'{state_name}_dist_corr'] = np.array([])
+                d[f'{state_name}_dist_gev'] = np.array([])
+                d[f'{state_name}_dist_durs'] = np.array([])
+
     d['unlabeled'] = len(np.argwhere(labels == -1)) / len(gfp)
     return d
 
@@ -329,51 +346,13 @@ class RawSegmentation(_BaseSegmentation):
             verbose=verbose
             )
 
+    @copy_doc(_compute_microstate_parameters)
     def compute_parameters(
             self,
-            norm_gfp: bool = True
+            norm_gfp: bool = True,
+            return_dist: bool = False
             ):
-        """
-        Compute microstate parameters.
 
-        Parameters
-        ----------
-        norm_gfp : bool
-            Either or not to normalized global field power.
-
-        Returns
-        -------
-        dict : dict
-            Dictionaries containing microstate parameters as key/value pairs.
-            Keys are named as follow: '{microstate name}_{parameter}'.
-
-            Available parameters are list below:
-            'dist_corr': Distribution of correlations
-                Correlation values of each time point assigned to a given
-                state.
-            'mean_corr': Mean correlation
-                Mean correlation value of each time point assigned to a given
-                state.
-            'dist_gev': Distribution of global explained variances
-                Global explained variance values of each time point assigned to
-                a given state.
-            'gev':  Global explained variance
-                Total explained variance expressed by a given state.
-                It is the sum of global explained variance values of each
-                time point assigned to a given state.
-            'timecov': Time coverage
-                The proportion of time during which a given state is active.
-                This metric is expressed in percentage (%%).
-            'dist_durs': Distribution of durations.
-                Duration of each segments assigned to a given state.
-                Each value is expressed in seconds (s).
-            'meandurs': Mean duration
-                Mean temporal duration segments assigned to a given state.
-                This metric is expressed in seconds (s).
-            'occurrences' : occurrences
-                Mean number of segment assigned to a given state per second.
-                This metrics is expressed in segment per second ( . / s).
-        """
         return _compute_microstate_parameters(
             self._labels,
             self._inst.get_data(),
@@ -381,6 +360,7 @@ class RawSegmentation(_BaseSegmentation):
             self._cluster_names,
             self.raw.info['sfreq'],
             norm_gfp=norm_gfp,
+            return_dist=return_dist
             )
 
     # --------------------------------------------------------------------
@@ -415,54 +395,12 @@ class EpochsSegmentation(_BaseSegmentation):
         # sanity-check
         assert len(self._inst) == self._labels.shape[0]
 
+    @copy_doc(_compute_microstate_parameters)
     def compute_parameters(
             self,
-            norm_gfp: bool = True
+            norm_gfp: bool = True,
+            return_dist: bool = False
             ):
-        """
-        Compute microstate parameters.
-
-        Parameters
-        ----------
-        norm_gfp : bool
-            Either or not to normalized global field power.
-
-        Returns
-        -------
-        dict : dict
-            Dictionaries containing microstate parameters
-            as key/value pairs.
-            Keys are following named as follow:
-            '{microstate name}_{parameter}'.
-            Available parameters are list below:
-
-            'dist_corr': Distribution of correlations
-                Correlation values of each time point
-                assigned to a given state.
-            'mean_corr': Mean correlation
-                Mean correlation value of each time point
-                assigned to a given state.
-            'dist_gev': Distribution of global explained variances
-                Global explained variance values of each time point
-                assigned to a given state.
-            'gev':  Global explained variance
-                Total explained variance expressed by a given state.
-                It is the sum of global explained variance values of each
-                time point assigned to a given
-                state.
-            'timecov': Time coverage
-                The proportion of time during which a given state is active.
-                This metric is expressed in percentage (%%).
-            'dist_durs': Distribution of durations.
-                Duration of each segments assigned to a given state.
-                Each value is expressed in seconds (s).
-            'meandurs': Mean duration
-                Mean temporal duration segments assigned to a given state.
-                This metric is expressed in seconds (s).
-            'occurrences' : occurrences
-                Mean number of segment assigned to a given state per second.
-                This metrics is expressed in segment per second ( . / s).
-        """
         data = self._inst.get_data()
         data = np.swapaxes(data, 0, 1)
         data = data.reshape(data.shape[0], -1)
@@ -474,6 +412,7 @@ class EpochsSegmentation(_BaseSegmentation):
             self._cluster_names,
             self.epochs.info['sfreq'],
             norm_gfp=norm_gfp,
+            return_dist=return_dist
             )
 
     @fill_doc
