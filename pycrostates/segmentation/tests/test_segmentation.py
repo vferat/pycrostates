@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 import mne
 from mne.datasets import testing
 
@@ -23,6 +24,14 @@ ModK_raw.fit(raw, n_jobs=1)
 ModK_epochs.fit(epochs, n_jobs=1)
 
 
+def test_RawSegmentation_properties():
+    segmentation = ModK_raw.predict(raw)
+    assert isinstance(segmentation.cluster_centers_, np.ndarray)
+    assert isinstance(segmentation.cluster_names, list)
+    assert isinstance(segmentation.labels, np.ndarray)
+    plt.close('all')
+    
+    
 def test_RawSegmentation_plot_cluster_centers():
     segmentation = ModK_raw.predict(raw)
     segmentation.plot_cluster_centers()
