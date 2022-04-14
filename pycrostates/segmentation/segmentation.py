@@ -116,16 +116,12 @@ class _BaseSegmentation(ABC):
             self,
             labels,
             inst,
-            picks,
             cluster_centers_,
             cluster_names=None,
             predict_parameters=None,
             ):
         # check input
         _check_type(labels, (np.ndarray, ), 'labels')
-        _check_type(picks, (np.ndarray, ), 'picks')
-        if picks.ndim != 1:
-            raise ValueError("Argument 'picks' should be a 1D array.")
         _check_type(cluster_centers_, (np.ndarray, ), 'cluster_centers_')
         if cluster_centers_.ndim != 2:
             raise ValueError(
@@ -133,7 +129,6 @@ class _BaseSegmentation(ABC):
 
         self._labels = labels
         self._inst = inst
-        self._picks = picks
         self._cluster_centers_ = cluster_centers_
         self._cluster_names = _BaseSegmentation._check_cluster_names(
             cluster_names, self._cluster_centers_)
@@ -176,8 +171,7 @@ class _BaseSegmentation(ABC):
         f : Figure
             Matplotlib figure containing the topographic plots.
         """
-        info = pick_info(self._inst.info, self._picks)
-        return plot_cluster_centers(self._cluster_centers_, info,
+        return plot_cluster_centers(self._cluster_centers_, self._inst.info,
                                     self._cluster_names, axes, block)
 
     # --------------------------------------------------------------------
@@ -226,15 +220,6 @@ class _BaseSegmentation(ABC):
 
     # --------------------------------------------------------------------
     @property
-    def picks(self):
-        """
-        Picks used to predict the segmentation.
-
-        :type: `~numpy.array`
-        """
-        return self._picks
-
-    @property
     def predict_parameters(self):
         """
         Parameters used to predict the current segmentation.
@@ -255,15 +240,6 @@ class _BaseSegmentation(ABC):
         Segmentation predicted.
         """
         return self._labels.copy()
-
-    @property
-    def picks(self):
-        """
-        Picks used to predict the segmentation.
-
-        :type: `~numpy.array`
-        """
-        return self._picks
 
     @property
     def cluster_centers_(self):
@@ -292,7 +268,6 @@ class RawSegmentation(_BaseSegmentation):
     ----------
     labels : array
     inst : Raw
-    picks : array
     cluster_centers_ : array
     cluster_names : list
     predict_parameters : dict
@@ -401,7 +376,7 @@ class RawSegmentation(_BaseSegmentation):
         """
         return _compute_microstate_parameters(
             self._labels,
-            self.raw.get_data(picks=self.picks),
+            self._inst.get_data(),
             self._cluster_centers_,
             self._cluster_names,
             self.raw.info['sfreq'],
@@ -425,8 +400,7 @@ class EpochsSegmentation(_BaseSegmentation):
     Parameters
     ----------
     labels : array
-    inst : Raw
-    picks : array
+    inst : Epochs
     cluster_centers_ : array
     cluster_names : list
     predict_parameters : dict
@@ -489,7 +463,7 @@ class EpochsSegmentation(_BaseSegmentation):
                 Mean number of segment assigned to a given state per second.
                 This metrics is expressed in segment per second ( . / s).
         """
-        data = self.epochs.get_data(picks=self.picks)
+        data = self._inst.get_data()
         data = np.swapaxes(data, 0, 1)
         data = data.reshape(data.shape[0], -1)
         labels = self._labels.copy().reshape(-1)
@@ -505,8 +479,6 @@ class EpochsSegmentation(_BaseSegmentation):
     @fill_doc
     def plot(
             self,
-            tmin=0.0,  # TODO: Should be None by default
-            tmax=None,
             cmap=None,
             axes=None,
             cbar_axes=None,

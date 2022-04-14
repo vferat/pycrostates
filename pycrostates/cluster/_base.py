@@ -605,8 +605,9 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             segmentation = _BaseCluster._reject_short_segments(
                 segmentation, data, min_segment_length)
 
+        raw = raw.copy().pick(picks_data)
         return RawSegmentation(labels=segmentation,
-                               inst=raw, picks=picks_data,
+                               inst=raw,
                                cluster_centers_=self._cluster_centers_,
                                cluster_names=self._cluster_names,
                                predict_parameters=predict_parameters)
@@ -643,8 +644,9 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
             segments.append(segment)
 
+        epochs = epochs.copy().pick(picks_data)
         return EpochsSegmentation(labels=np.array(segments),
-                                  inst=epochs, picks=picks_data,
+                                  inst=epochs,
                                   cluster_centers_=self._cluster_centers_,
                                   cluster_names=self._cluster_names,
                                   predict_parameters=predict_parameters)
