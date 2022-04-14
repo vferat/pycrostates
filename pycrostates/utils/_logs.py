@@ -110,7 +110,7 @@ class LoggerFormatter(logging.Formatter):
     Format string Syntax for pycrostates.
     """
     # Format string syntax for the different Log levels
-    _formatters = dict()
+    _formatters = {}
     _formatters[logging.DEBUG] = logging.Formatter(
         fmt="[%(module)s:%(funcName)s:%(lineno)d] %(levelname)s: %(message)s "
             "(%(asctime)s)")
@@ -134,12 +134,11 @@ class LoggerFormatter(logging.Formatter):
         """
         if record.levelno <= logging.DEBUG:
             return self._formatters[logging.DEBUG].format(record)
-        elif record.levelno <= logging.INFO:
+        if record.levelno <= logging.INFO:
             return self._formatters[logging.INFO].format(record)
-        elif record.levelno <= logging.WARNING:
+        if record.levelno <= logging.WARNING:
             return self._formatters[logging.WARNING].format(record)
-        else:
-            return self._formatters[logging.ERROR].format(record)
+        return self._formatters[logging.ERROR].format(record)
 
 
 # Provide help for static type checkers:

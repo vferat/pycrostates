@@ -134,8 +134,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         """
         if deep:
             return deepcopy(self)
-        else:
-            return copy(self)
+        return copy(self)
 
     def _check_fit(self):
         """Check if the cluster is fitted."""
@@ -166,9 +165,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         %(reject_by_annotation_raw)s
         %(n_jobs)s
         """
-        from ..io import ChInfo
-
         # TODO: Maybe those parameters should be moved here instead of docdict?
+        from ..io import ChInfo
         _check_type(inst, (BaseRaw, BaseEpochs), item_name='inst')
         _check_type(tmin, (None, 'numeric'), item_name='tmin')
         _check_type(tmax, (None, 'numeric'), item_name='tmax')
@@ -252,7 +250,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             raise ValueError(
                 "Only one of 'mapping' or 'new_names' must be provided.")
 
-        elif mapping is not None:
+        if mapping is not None:
             _check_type(mapping, (dict, ), item_name='mapping')
             for key in mapping:
                 _check_value(key, self._cluster_names, item_name='old name')
@@ -302,7 +300,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             raise ValueError(
                 "Only one of 'mapping' or 'order' must be provided.")
 
-        elif mapping is not None:
+        if mapping is not None:
             _check_type(mapping, (dict, ), item_name='mapping')
             valids = tuple(range(self._n_clusters))
             for key in mapping:
@@ -516,11 +514,13 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         ch_ = [ch for k, ch in enumerate(inst.info['ch_names'])
                if k in picks_ and ch in self._info['bads']]
         if 1 == len(ch_):
-            logger.warning(f"Picked channel {ch_[0]} was set as "
-                           "bads during fitting and will be ignored.")
+            logger.warning("Picked channel %s was set as "
+                           "bads during fitting and will be ignored.",
+                           ch_[0])
         elif 1 < len(ch_):
-            logger.warning(f"Picked channels {', '.join(ch_)} were set as "
-                           "bads during fitting and will be ignored.")
+            logger.warning("Picked channels %s were set as "
+                           "bads during fitting and will be ignored.",
+                           ', '.join(ch_))
 
         # remove channels that were bads during fitting from picks
         picks_ = [ch for k, ch in enumerate(inst.info['ch_names'])
@@ -631,7 +631,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         cluster_centers_ = deepcopy(self._cluster_centers_)
         cluster_centers_ = cluster_centers_[:, picks_cluster_centers]
 
-        segments = list()
+        segments = []
         for epoch_data in data:
             segment = _BaseCluster._segment(
                 epoch_data, cluster_centers_, factor, tol, half_window_size)

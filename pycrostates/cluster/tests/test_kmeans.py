@@ -601,7 +601,7 @@ def test_fit_with_bads(caplog):
     """Test log messages emitted when fitting with bad channels."""
     # 0 bads
     raw_ = raw.copy()
-    raw_.info['bads'] = list()
+    raw_.info['bads'] = []
     ModK_ = ModKMeans(n_clusters=n_clusters, n_init=10, max_iter=100, tol=1e-4,
                       random_state=1)
     ModK_.fit(raw_, n_jobs=1)

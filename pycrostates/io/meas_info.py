@@ -166,8 +166,8 @@ class ChInfo(Info):
         if all(arg is None for arg in (info, ch_names, ch_types)):
             raise RuntimeError(
                 "Either 'info' or 'ch_names' and 'ch_types' must not be None.")
-        elif info is None and all(arg is not None
-                                  for arg in (ch_names, ch_types)):
+        if info is None and all(arg is not None
+                                for arg in (ch_names, ch_types)):
             _check_type(ch_names, (None, 'int', str, list, tuple),  'ch_names')
             _check_type(ch_types, (None, str, list, tuple), 'ch_types')
             self._init_from_channels(ch_names, ch_types)
@@ -219,10 +219,10 @@ class ChInfo(Info):
         self['custom_ref_applied'] = FIFF.FIFFV_MNE_CUSTOM_REF_OFF
 
         # init empty bads
-        self['bads'] = list()  # mutable, as this can be changed by the user
+        self['bads'] = []  # mutable, as this can be changed by the user
 
         # create chs information
-        self['chs'] = list()
+        self['chs'] = []
         ch_types_dict = get_channel_type_constants(include_defaults=True)
         for ci, (ch_name, ch_type) in enumerate(zip(ch_names, ch_types)):
             _check_type(ch_name, (str, ))
@@ -253,10 +253,10 @@ class ChInfo(Info):
         self['dig'] = None
 
         # add empty compensation grades
-        self['comps'] = list()
+        self['comps'] = []
 
         # add empty projs
-        self['projs'] = list()
+        self['projs'] = []
 
         self._unlocked = False
 
@@ -276,8 +276,7 @@ class ChInfo(Info):
         if name in _inv_attributes or name in _inv_methods:
             raise AttributeError(
                 f"'{self.__class__.__name__}' has not attribute '{name}'")
-        else:
-            return super().__getattribute__(name)
+        return super().__getattribute__(name)
 
     def __eq__(self, other):
         """Equality == method."""
@@ -296,9 +295,9 @@ class ChInfo(Info):
             m2 = other.get_montage()
             if m1 is None and m2 is not None:
                 return False
-            elif m1 is not None and m2 is None:
+            if m1 is not None and m2 is None:
                 return False
-            elif m1 is not None and m2 is not None:
+            if m1 is not None and m2 is not None:
                 if any(dig not in m2.dig for dig in m1.dig):
                     return False
                 if any(dig not in m1.dig for dig in m2.dig):
@@ -348,7 +347,7 @@ class ChInfo(Info):
             # chs is roughly half the time but most are immutable
             if k == 'chs':
                 # dict shallow copy is fast, so use it then overwrite
-                result[k] = list()
+                result[k] = []
                 for ch in v:
                     ch = ch.copy()  # shallow
                     ch['loc'] = ch['loc'].copy()
@@ -372,9 +371,9 @@ class ChInfo(Info):
         if len(self['ch_names']) != len(chs) or any(
                 ch_1 != ch_2 for ch_1, ch_2 in zip(self['ch_names'], chs)) or \
                 self['nchan'] != len(chs):
-            raise RuntimeError('%sinfo channel name inconsistency detected, '
-                               'please notify developers.'
-                               % (prepend_error,))
+            raise RuntimeError(f'{(prepend_error,)} info channel '
+                               f'name inconsistency detected, '
+                               f'please notify developers.')
 
         for pi, proj in enumerate(self.get('projs', [])):
             _check_type(proj, (Projection, ), f'info["projs"][{pi}]')
@@ -388,20 +387,20 @@ class ChInfo(Info):
             ch_name = ch['ch_name']
             if not isinstance(ch_name, str):
                 raise TypeError(
-                    'Bad info: info["chs"][%d]["ch_name"] is not a string, '
-                    'got type %s' % (ci, type(ch_name)))
+                    f'Bad info: info["chs"][{ci}]["ch_name"] is not a string, '
+                    f'got type (ci, {type(ch_name)}')
             for key in ('scanno', 'logno', 'kind', 'range', 'cal', 'coil_type',
                         'unit', 'unit_mul', 'coord_frame'):
                 val = ch.get(key, 1)
                 if not isinstance(val, Number):
                     raise TypeError(
-                        'Bad info: info["chs"][%d][%r] = %s is type %s, must '
-                        'be float or int' % (ci, key, val, type(val)))
+                        f'Bad info: info["chs"][{ci}][{key}] = {val} is type '
+                        f'{type(val)} must be float or int')
             loc = ch['loc']
             if not (isinstance(loc, np.ndarray) and loc.shape == (12,)):
                 raise TypeError(
-                    'Bad info: info["chs"][%d]["loc"] must be ndarray with '
-                    '12 elements, got %r' % (ci, loc))
+                    f'Bad info: info["chs"][{ci}]["loc"] must be ndarray '
+                    f'with 12 elements, got {loc}')
 
         # make sure channel names are unique
         with self._unlock():

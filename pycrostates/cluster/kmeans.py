@@ -98,8 +98,7 @@ class ModKMeans(_BaseCluster):
                     return False
 
             return True
-        else:
-            return False
+        return False
 
     @copy_doc(_BaseCluster.__ne__)
     def __ne__(self, other):
