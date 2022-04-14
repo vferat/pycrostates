@@ -188,7 +188,7 @@ class _BaseSegmentation(ABC):
         """
         _check_type(cluster_names, (list, None), 'cluster_names')
         if cluster_names is None:
-            return [str(k) for k in range(0, len(cluster_centers_))]
+            return [str(k) for k in range(1, len(cluster_centers_) + 1)]
         else:
             if len(cluster_centers_) == len(cluster_names):
                 return cluster_names

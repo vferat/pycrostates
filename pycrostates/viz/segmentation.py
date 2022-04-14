@@ -47,8 +47,13 @@ def plot_raw_segmentation(
         tmin + gfp.size / raw.info['sfreq'],
         1 / raw.info['sfreq'],
         )
+    labels = labels[(times * raw.info['sfreq']).astype(int)]
 
-    # TODO: Add error checking on shape of labels and data that have to match.
+    # make sure shapes are correct
+    if data.shape[1] != labels.size:
+        raise ValueError(
+            "Argument 'labels' and 'raw' do not have the same number of "
+            "samples.")
 
     fig, axes, show = _plot_segmentation(
         labels,
@@ -96,14 +101,17 @@ def plot_epoch_segmentation(
     _check_type(epochs, (Epochs, ), 'epochs')
     _check_type(block, (bool, ), 'block')
 
-    # TODO: Add error checking on shape of labels and epochs data, that ahve to
-    # match.
-
     data = epochs.get_data().swapaxes(0, 1)
     data = data.reshape(data.shape[0], -1)
     gfp = np.std(data, axis=0)
     times = np.arange(0, data.shape[-1])
     labels = labels.reshape(-1)
+
+    # make sure shapes are correct
+    if data.shape[1] != labels.size:
+        raise ValueError(
+            "Argument 'labels' and 'raw' do not have the same number of "
+            "samples.")
 
     fig, axes, show = _plot_segmentation(
         labels,
