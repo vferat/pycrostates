@@ -5,7 +5,7 @@ from matplotlib import colors
 from matplotlib.axes import Axes
 from matplotlib import pyplot as plt
 
-from ..utils._checks import _check_type, _check_axes
+from ..utils._checks import _check_type
 
 
 # TODO: Add parameters to the docstring.
@@ -153,14 +153,10 @@ def _plot_segmentation(
     if n_clusters <= 0:
         raise ValueError("The number of clusters must be strictly positive.")
     _check_type(cluster_names, (None, list, tuple), 'cluster_names')
-    _check_type(axes, (None, Axes, tuple), 'ax')
-    _check_type(cbar_axes, (None, Axes, tuple), 'cbar_ax')
-    _check_type(cmap, (None, str), 'cmap')
     # TODO: Add more option for cmap: list of colors, dict name/color?
-    if axes is not None:
-        _check_axes(axes)
-    if cbar_axes is not None:
-        _check_axes(cbar_axes)
+    _check_type(cmap, (None, str), 'cmap')
+    _check_type(axes, (None, Axes), 'ax')
+    _check_type(cbar_axes, (None, Axes), 'cbar_ax')
 
     # check cluster_names
     if cluster_names is None:
@@ -191,22 +187,15 @@ def _plot_segmentation(
 
     # define states and colors
     state_labels = [-1] + list(range(n_clusters))
-    if not cluster_names:
-        cluster_names = ['unlabeled'] + [str(k) for k in range(n_clusters)]
-    else:
-        cluster_names = ['unlabeled'] + cluster_names
-
+    cluster_names = ['unlabeled'] + cluster_names
     n_colors = n_clusters + 1
     cmap = plt.cm.get_cmap(cmap, n_colors)
 
     # plot
     axes.plot(times, gfp, **kwargs)
     for state, color in zip(state_labels, cmap.colors):
-        w = np.where(labels[1:] == state)
-        a = np.sort(np.append(w, np.add(w, 1)))
-        x = np.zeros(labels.shape)
-        x[a] = 1
-        x = x.astype(bool)
+        x = np.zeros(labels.shape).astype(bool)
+        x[np.where(labels == state)[0]] = 1
         axes.fill_between(times, gfp, color=color, where=x, step=None,
                           interpolate=False)
 
