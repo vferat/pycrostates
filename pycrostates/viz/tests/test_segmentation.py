@@ -15,147 +15,60 @@ epochs = mne.Epochs(raw, events, tmin=0, tmax=0.5, baseline=None, preload=True)
 
 
 def test_plot_raw_segmentation():
-    """Test topographic plots for cluster_centers."""
+    """Test segmentation plots for raw."""
     n_clusters = 4
     labels = np.random.choice([-1, 0, 1, 2, 3], raw.times.size)
 
-    plot_raw_segmentation(labels=labels, raw=raw, n_clusters=n_clusters)
+    plot_raw_segmentation(labels, raw, n_clusters)
     plt.close('all')
 
     # provide ax
     f, ax = plt.subplots(1, 1)
-    plot_raw_segmentation(
-            labels=labels,
-            raw=raw,
-            n_clusters=n_clusters,
-            cluster_names=None,
-            tmin=None,
-            tmax=None,
-            cmap=None,
-            axes=ax,
-            cbar_axes=None,
-            block=False
-            )
+    plot_raw_segmentation(labels, raw, n_clusters, axes=ax)
     plt.close('all')
 
     # provide cbar_ax
     f, cbar_ax = plt.subplots(1, 1)
-    plot_raw_segmentation(
-            labels=labels,
-            raw=raw,
-            n_clusters=n_clusters,
-            cluster_names=None,
-            tmin=None,
-            tmax=None,
-            cmap=None,
-            axes=None,
-            cbar_axes=cbar_ax,
-            block=False
-            )
+    plot_raw_segmentation(labels, raw, n_clusters, cbar_axes=cbar_ax)
     plt.close('all')
 
     # provide ax and cbar_ax
     f, axes = plt.subplots(1, 2)
-    plot_raw_segmentation(
-            labels=labels,
-            raw=raw,
-            n_clusters=n_clusters,
-            cluster_names=None,
-            tmin=None,
-            tmax=None,
-            cmap=None,
-            axes=axes[0],
-            cbar_axes=axes[1],
-            block=False
-            )
+    plot_raw_segmentation(labels, raw, n_clusters, axes=axes[0],
+                          cbar_axes=axes[1])
     plt.close('all')
 
     # provide cmap
     f, axes = plt.subplots(1, 2)
-    plot_raw_segmentation(
-            labels=labels,
-            raw=raw,
-            n_clusters=n_clusters,
-            cluster_names=None,
-            tmin=None,
-            tmax=None,
-            cmap='plasma',
-            axes=None,
-            cbar_axes=None,
-            block=False
-            )
+    plot_raw_segmentation(labels, raw, n_clusters, cmap='plasma')
     plt.close('all')
 
 
 def test_plot_epoch_segmentation():
-    """Test topographic plots for cluster_centers."""
+    """Test segmentation plots for epochs."""
     n_clusters = 4
     labels = np.random.choice(
         [-1, 0, 1, 2, 3], (len(epochs), epochs.times.size))
 
-    plot_epoch_segmentation(
-            labels=labels,
-            epochs=epochs,
-            n_clusters=n_clusters,
-            cluster_names=None,
-            cmap=None,
-            axes=None,
-            cbar_axes=None,
-            block=False
-            )
+    plot_epoch_segmentation(labels, epochs, n_clusters)
     plt.close('all')
 
     # provide ax
     f, ax = plt.subplots(1, 1)
-    plot_epoch_segmentation(
-            labels=labels,
-            epochs=epochs,
-            n_clusters=n_clusters,
-            cluster_names=None,
-            cmap=None,
-            axes=ax,
-            cbar_axes=None,
-            block=False
-            )
+    plot_epoch_segmentation(labels, epochs, n_clusters, axes=ax)
     plt.close('all')
 
     # provide cbar_ax
     f, cbar_ax = plt.subplots(1, 1)
-    plot_epoch_segmentation(
-            labels=labels,
-            epochs=epochs,
-            n_clusters=n_clusters,
-            cluster_names=None,
-            cmap=None,
-            axes=None,
-            cbar_axes=cbar_ax,
-            block=False
-            )
+    plot_epoch_segmentation(labels, epochs, n_clusters, cbar_axes=cbar_ax)
     plt.close('all')
 
     # provide ax and cbar_ax
     f, axes = plt.subplots(1, 2)
-    plot_epoch_segmentation(
-            labels=labels,
-            epochs=epochs,
-            n_clusters=n_clusters,
-            cluster_names=None,
-            cmap=None,
-            axes=axes[0],
-            cbar_axes=axes[1],
-            block=False
-            )
+    plot_epoch_segmentation(labels, epochs, n_clusters, axes=axes[0],
+                            cbar_axes=axes[1])
     plt.close('all')
 
     # provide cmap
-    plot_epoch_segmentation(
-            labels=labels,
-            epochs=epochs,
-            n_clusters=n_clusters,
-            cluster_names=None,
-            cmap='plasma',
-            axes=None,
-            cbar_axes=None,
-            block=False
-            )
+    plot_epoch_segmentation(labels, epochs, n_clusters, cmap='plasma')
     plt.close('all')
