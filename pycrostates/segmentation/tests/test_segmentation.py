@@ -23,10 +23,10 @@ ModK_epochs = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4,
 ModK_raw.fit(raw, n_jobs=1)
 ModK_epochs.fit(epochs, n_jobs=1)
 
-
+# pylint: disable=protected-access
 def test_RawSegmentation_properties():
     segmentation = ModK_raw.predict(raw)
-    assert isinstance(segmentation.raw, mne.io.RawArray)
+    assert isinstance(segmentation.raw, mne.io.BaseRaw)
     assert isinstance(segmentation.cluster_centers_, np.ndarray)
     assert isinstance(segmentation.cluster_names, list)
     assert isinstance(segmentation.labels, np.ndarray)
@@ -57,8 +57,8 @@ def test_RawSegmentation_plot():
 
 def test_RawSegmentation_compute_parameters():
     segmentation = ModK_raw.predict(raw)
-    assert (segmentation.__repr__())
-    assert (segmentation._repr_html_())  # test _repr_html_
+    assert segmentation.__repr__()
+    assert segmentation._repr_html_()  # test _repr_html_
     d = segmentation.compute_parameters(norm_gfp=False)
     assert isinstance(d, dict)
     assert '1_dist_corr' not in d.keys()
@@ -66,7 +66,7 @@ def test_RawSegmentation_compute_parameters():
 
 def test_RawSegmentation_compute_metrics_norm_gfp():
     segmentation = ModK_raw.predict(raw)
-    assert segmentation.labels.ndim == 1
+    assert segmentation._labels.ndim == 1
     d = segmentation.compute_parameters(norm_gfp=True)
     assert isinstance(d, dict)
 
@@ -80,8 +80,8 @@ def test_RawSegmentation_compute_metrics_return_dist():
 
 def test_EpochsSegmentation_compute_parameters():
     segmentation = ModK_epochs.predict(epochs)
-    assert (segmentation.__repr__())
-    assert (segmentation._repr_html_())  # test _repr_html_
+    assert segmentation.__repr__()
+    assert segmentation._repr_html_()  # test _repr_html_
     d = segmentation.compute_parameters(norm_gfp=False)
     assert isinstance(d, dict)
 
@@ -92,7 +92,7 @@ def test_EpochsSegmentation_properties():
     assert isinstance(segmentation.cluster_centers_, np.ndarray)
     assert isinstance(segmentation.cluster_names, list)
     assert isinstance(segmentation.labels, np.ndarray)
-    assert segmentation.labels.ndim == 2
+    assert segmentation._labels.ndim == 2
     assert isinstance(segmentation.predict_parameters, dict)
 
 

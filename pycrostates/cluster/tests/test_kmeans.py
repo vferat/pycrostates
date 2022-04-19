@@ -47,7 +47,7 @@ ModK = ModKMeans(n_clusters=n_clusters, n_init=10, max_iter=100, tol=1e-4,
                  random_state=1)
 ModK.fit(raw, n_jobs=1)
 
-
+# pylint: disable=protected-access
 def _check_fitted(ModK):
     """
     Checks that the ModK is fitted.
