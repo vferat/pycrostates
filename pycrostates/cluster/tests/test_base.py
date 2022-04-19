@@ -5,6 +5,7 @@ import pytest
 
 from pycrostates.cluster._base import _BaseCluster
 
+
 # pylint: disable=protected-access
 def test_check_n_clusters():
     """Test the checker for n_clusters argument."""

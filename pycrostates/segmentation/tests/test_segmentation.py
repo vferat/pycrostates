@@ -23,6 +23,7 @@ ModK_epochs = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4,
 ModK_raw.fit(raw, n_jobs=1)
 ModK_epochs.fit(epochs, n_jobs=1)
 
+
 # pylint: disable=protected-access
 def test_RawSegmentation_properties():
     segmentation = ModK_raw.predict(raw)
