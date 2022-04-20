@@ -371,9 +371,9 @@ class ChInfo(Info):
         if len(self['ch_names']) != len(chs) or any(
                 ch_1 != ch_2 for ch_1, ch_2 in zip(self['ch_names'], chs)) or \
                 self['nchan'] != len(chs):
-            raise RuntimeError(f'{(prepend_error,)} info channel '
-                               f'name inconsistency detected, '
-                               f'please notify developers.')
+            raise RuntimeError(
+                f'{prepend_error}info channel name inconsistency detected, '
+                'please notify developers.')
 
         for pi, proj in enumerate(self.get('projs', [])):
             _check_type(proj, (Projection, ), f'info["projs"][{pi}]')
@@ -388,19 +388,19 @@ class ChInfo(Info):
             if not isinstance(ch_name, str):
                 raise TypeError(
                     f'Bad info: info["chs"][{ci}]["ch_name"] is not a string, '
-                    f'got type (ci, {type(ch_name)}')
+                    f'got type {type(ch_name)}.')
             for key in ('scanno', 'logno', 'kind', 'range', 'cal', 'coil_type',
                         'unit', 'unit_mul', 'coord_frame'):
                 val = ch.get(key, 1)
                 if not isinstance(val, Number):
                     raise TypeError(
                         f'Bad info: info["chs"][{ci}][{key}] = {val} is type '
-                        f'{type(val)} must be float or int')
+                        f'{type(val)}, must be float or int.')
             loc = ch['loc']
             if not (isinstance(loc, np.ndarray) and loc.shape == (12,)):
                 raise TypeError(
                     f'Bad info: info["chs"][{ci}]["loc"] must be ndarray '
-                    f'with 12 elements, got {loc}')
+                    f'with 12 elements, got {loc}.')
 
         # make sure channel names are unique
         with self._unlock():

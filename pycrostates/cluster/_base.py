@@ -605,12 +605,14 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             segmentation = _BaseCluster._reject_short_segments(
                 segmentation, data, min_segment_length)
 
-        raw = raw.copy().pick(picks_data)
-        return RawSegmentation(labels=segmentation,
-                               inst=raw,
-                               cluster_centers_=self._cluster_centers_,
-                               cluster_names=self._cluster_names,
-                               predict_parameters=predict_parameters)
+        # Provide properties to copy the arrays
+        return RawSegmentation(
+            labels=segmentation,
+            inst=raw.copy().pick(picks_data),
+            cluster_centers_=self.cluster_centers_,
+            cluster_names=self.cluster_names,
+            predict_parameters=predict_parameters,
+            )
 
     def _predict_epochs(self, epochs, picks_data, picks_cluster_centers,
                         factor, tol, half_window_size, min_segment_length,
@@ -644,12 +646,14 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
             segments.append(segment)
 
-        epochs = epochs.copy().pick(picks_data)
-        return EpochsSegmentation(labels=np.array(segments),
-                                  inst=epochs,
-                                  cluster_centers_=self._cluster_centers_,
-                                  cluster_names=self._cluster_names,
-                                  predict_parameters=predict_parameters)
+        # Provide properties to copy the arrays
+        return EpochsSegmentation(
+            labels=np.array(segments),
+            inst=epochs.copy().pick(picks_data),
+            cluster_centers_=self.cluster_centers_,
+            cluster_names=self.cluster_names,
+            predict_parameters=predict_parameters,
+            )
 
     # --------------------------------------------------------------------
     @staticmethod
@@ -802,10 +806,9 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     @property
     def info(self):
         """
-        Info instance corresponding to the MNE object used to fit the
-        clustering algorithm.
+        Info instance with the channel information used to fit the instance.
 
-        :type: `mne.io.Info`
+        :type: `~pycrostates.io.ChInfo`
         """
         if self._info is None:
             assert not self._fitted  # sanity-check

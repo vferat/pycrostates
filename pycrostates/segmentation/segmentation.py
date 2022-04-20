@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 import itertools
+from typing import Union
 
-import numpy as np
 from mne import BaseEpochs
 from mne.io import BaseRaw
+import numpy as np
 
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
@@ -18,9 +19,10 @@ def _compute_microstate_parameters(
         data,
         maps,
         maps_names,
-        sfreq,
+        sfreq: Union[int, float],
         norm_gfp: bool = True,
-        return_dist: bool = False):
+        return_dist: bool = False
+        ):
     """
     Compute microstate parameters.
 
@@ -74,7 +76,8 @@ def _compute_microstate_parameters(
     gfp = np.std(data, axis=0)
     segments = [(s, list(group))
                 for s, group in itertools.groupby(labels)]
-    d = dict()
+
+    d = {}
     for s, state in enumerate(maps):
         state_name = maps_names[s]
         arg_where = np.argwhere(labels == s)
@@ -90,17 +93,16 @@ def _compute_microstate_parameters(
 
             s_segments = np.array(
                 [len(group) for s_, group in segments if s_ == s])
-            occurrences = (len(s_segments)
-                           / len(np.where(labels != -1)[0])
-                           * sfreq)
+            occurrences = \
+                len(s_segments) / len(np.where(labels != -1)[0]) * sfreq
             d[f'{state_name}_occurrences'] = occurrences
 
             timecov = np.sum(s_segments) / len(np.where(labels != -1)[0])
             d[f'{state_name}_timecov'] = timecov
 
             dist_durs = s_segments / sfreq
-
             d[f'{state_name}_meandurs'] = np.mean(dist_durs)
+
             if return_dist:
                 d[f'{state_name}_dist_corr'] = dist_corr
                 d[f'{state_name}_dist_gev'] = dist_gev
@@ -125,6 +127,14 @@ def _compute_microstate_parameters(
 class _BaseSegmentation(ABC):
     """
     Base class for a Microstates segmentation.
+
+    Parameters
+    ----------
+    labels : array
+    inst : Raw | Epochs
+    cluster_centers_ : array
+    cluster_names : list
+    predict_parameters : dict
     """
 
     @abstractmethod
@@ -141,7 +151,14 @@ class _BaseSegmentation(ABC):
         _check_type(cluster_centers_, (np.ndarray, ), 'cluster_centers_')
         if cluster_centers_.ndim != 2:
             raise ValueError(
-                "Argument 'cluster_centers_' should be a 1D array.")
+                "Argument 'cluster_centers_' should be a 1D array. The "
+                f"provided array shape is {cluster_centers_.shape} which has "
+                f"{cluster_centers_.ndim} dimensions.")
+        if inst.times.size != labels.shape[-1]:
+            raise ValueError(
+                "Provided MNE instance and labels do not have the same number "
+                f"of samples. The 'MNE instance' has {inst.times.size} "
+                f"samples, while the 'labels' has {labels.shape[-1]} samples.")
 
         self._labels = labels
         self._inst = inst
@@ -150,8 +167,6 @@ class _BaseSegmentation(ABC):
             cluster_names, self._cluster_centers_)
         self._predict_parameters = _BaseSegmentation._check_predict_parameters(
             predict_parameters)
-        # sanity-check
-        assert self._inst.times.size == self._labels.shape[-1]
 
     def __repr__(self) -> str:
         name = self.__class__.__name__
@@ -170,7 +185,11 @@ class _BaseSegmentation(ABC):
             inst_repr=self._inst._repr_html_(),
             )
 
-    def plot_cluster_centers(self, axes=None, block=False):
+    def plot_cluster_centers(
+            self,
+            axes=None,
+            block: bool = False
+            ):
         """
         Plot cluster centers as topographic maps.
 
@@ -187,8 +206,13 @@ class _BaseSegmentation(ABC):
         f : Figure
             Matplotlib figure containing the topographic plots.
         """
-        return plot_cluster_centers(self._cluster_centers_, self._inst.info,
-                                    self._cluster_names, axes, block)
+        return plot_cluster_centers(
+            self._cluster_centers_,
+            self._inst.info,
+            self._cluster_names,
+            axes,
+            block
+            )
 
     # --------------------------------------------------------------------
     @staticmethod
@@ -246,8 +270,8 @@ class _BaseSegmentation(ABC):
             return self._predict_parameters.copy()
         else:
             logger.info(
-                'predict_parameters was not provided when creating the '
-                'segmentation. Returning None.')
+                "Argument 'predict_parameters' was not provided when creating "
+                "the segmentation.")
             return None
 
     @property
@@ -294,12 +318,15 @@ class RawSegmentation(_BaseSegmentation):
         super().__init__(*args, **kwargs)
         _check_type(self._inst, (BaseRaw, ), item_name='raw')
         if self._labels.ndim != 1:
-            raise ValueError("Argument 'labels' should be a 1D array.")
+            raise ValueError(
+                "Argument 'labels' should be a 1D array. The provided array "
+                f"shape is {self._labels.shape} which has {self._labels.ndim} "
+                "dimensions.")
 
     @fill_doc
     def plot(
             self,
-            tmin=0.0,  # TODO: Should be None by default
+            tmin=None,
             tmax=None,
             cmap=None,
             axes=None,
@@ -352,7 +379,6 @@ class RawSegmentation(_BaseSegmentation):
             norm_gfp: bool = True,
             return_dist: bool = False
             ):
-
         return _compute_microstate_parameters(
             self._labels,
             self._inst.get_data(),
@@ -360,7 +386,7 @@ class RawSegmentation(_BaseSegmentation):
             self._cluster_names,
             self._inst.info['sfreq'],
             norm_gfp=norm_gfp,
-            return_dist=return_dist
+            return_dist=return_dist,
             )
 
     # --------------------------------------------------------------------
@@ -390,10 +416,15 @@ class EpochsSegmentation(_BaseSegmentation):
         super().__init__(*args, **kwargs)
         _check_type(self._inst, (BaseEpochs, ), 'epochs')
         if self._labels.ndim != 2:
-            raise ValueError("Argument 'labels' should be a 2D array.")
-
-        # sanity-check
-        assert len(self._inst) == self._labels.shape[0]
+            raise ValueError(
+                "Argument 'labels' should be a 2D array. The provided array "
+                f"shape is {self._labels.shape} which has {self._labels.ndim} "
+                "dimensions.")
+        if len(self._inst) != self._labels.shape[0]:
+            raise ValueError(
+                "Provided MNE instance and labels do not have the same number "
+                f"of epochs. The 'MNE instance' has {len(self._inst)} epochs, "
+                f"while the 'labels' has {self._labels.shape[0]} epochs.")
 
     @copy_doc(_compute_microstate_parameters)
     def compute_parameters(
@@ -412,7 +443,7 @@ class EpochsSegmentation(_BaseSegmentation):
             self._cluster_names,
             self._epochs.info['sfreq'],
             norm_gfp=norm_gfp,
-            return_dist=return_dist
+            return_dist=return_dist,
             )
 
     @fill_doc
@@ -456,7 +487,7 @@ class EpochsSegmentation(_BaseSegmentation):
             axes=axes,
             cbar_axes=cbar_axes,
             block=block,
-            verbose=verbose
+            verbose=verbose,
             )
 
     # --------------------------------------------------------------------
