@@ -69,11 +69,13 @@ def _compute_microstate_parameters(
             Duration of each segments assigned to a given state.
             Each value is expressed in seconds (s).
     """
-    gfp = np.std(data, axis=0)
-    if norm_gfp:
-        gfp = gfp / np.linalg.norm(gfp)
+    _check_type(norm_gfp, (bool, ), 'norm_gfp')
+    _check_type(return_dist, (bool, ), 'return_dist')
 
     gfp = np.std(data, axis=0)
+    if norm_gfp:
+        gfp /= np.linalg.norm(gfp)
+
     segments = [(s, list(group))
                 for s, group in itertools.groupby(labels)]
 
@@ -266,13 +268,12 @@ class _BaseSegmentation(ABC):
 
         :type: `dict`
         """
-        if self._predict_parameters:
-            return self._predict_parameters.copy()
-        else:
+        if self._predict_parameters is None:
             logger.info(
                 "Argument 'predict_parameters' was not provided when creating "
                 "the segmentation.")
             return None
+        return self._predict_parameters.copy()
 
     @property
     def labels(self):

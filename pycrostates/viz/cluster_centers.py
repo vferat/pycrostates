@@ -55,12 +55,14 @@ def plot_cluster_centers(
         if isinstance(axes, Axes) and n_clusters != 1:
             raise ValueError(
                 "Argument 'cluster_centers' and 'axes' must contain the same "
-                "number of clusters and Axes.")
+                f"number of clusters and Axes. Provided: {n_clusters} "
+                "microstates maps and only 1 axes.")
         elif axes.size != n_clusters:
             raise ValueError(
                 "Argument 'cluster_centers' and 'axes' must contain the same "
-                "number of clusters and Axes.")
-        figs = [ax.get_figure() for ax in axes]
+                f"number of clusters and Axes. Provided: {n_clusters} "
+                "microstates maps and {axes.size} axes.")
+        figs = [ax.get_figure() for ax in axes.flatten()]
         if len(set(figs)) == 1:
             f = figs[0]
         else:
