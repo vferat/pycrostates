@@ -334,7 +334,7 @@ class RawSegmentation(_BaseSegmentation):
         # Error checking on the input is performed in the viz function.
         return plot_raw_segmentation(
             labels=self._labels,
-            raw=self.raw,
+            raw=self._inst,
             n_clusters=self._cluster_centers_.shape[0],
             cluster_names=self._cluster_names,
             tmin=tmin,
@@ -358,7 +358,7 @@ class RawSegmentation(_BaseSegmentation):
             self._inst.get_data(),
             self._cluster_centers_,
             self._cluster_names,
-            self.raw.info['sfreq'],
+            self._inst.info['sfreq'],
             norm_gfp=norm_gfp,
             return_dist=return_dist
             )
@@ -369,7 +369,7 @@ class RawSegmentation(_BaseSegmentation):
         """
         Raw instance.
         """
-        return self._inst
+        return self._inst.copy()
 
 
 # TODO: Parameters to be added to docdict
@@ -410,7 +410,7 @@ class EpochsSegmentation(_BaseSegmentation):
             data,
             self._cluster_centers_,
             self._cluster_names,
-            self.epochs.info['sfreq'],
+            self._epochs.info['sfreq'],
             norm_gfp=norm_gfp,
             return_dist=return_dist
             )
@@ -449,7 +449,7 @@ class EpochsSegmentation(_BaseSegmentation):
         # Error checking on the input is performed in the viz function.
         return plot_epoch_segmentation(
             labels=self._labels,
-            epochs=self.epochs,
+            epochs=self._epochs,
             n_clusters=self._cluster_centers_.shape[0],
             cluster_names=self._cluster_names,
             cmap=cmap,
@@ -465,4 +465,4 @@ class EpochsSegmentation(_BaseSegmentation):
         """
         Epochs instance.
         """
-        return self._inst
+        return self._inst.copy()

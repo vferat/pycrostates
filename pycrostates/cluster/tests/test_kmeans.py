@@ -58,7 +58,7 @@ def _check_fitted(ModK):
     assert len(ModK._cluster_names) == n_clusters
     assert len(ModK._cluster_centers_) == n_clusters
     assert ModK._fitted_data is not None
-    assert ModK.info is not None
+    assert ModK._info is not None
     assert ModK.GEV_ is not None
     assert ModK._labels_ is not None
 
@@ -72,7 +72,7 @@ def _check_unfitted(ModK):
     assert len(ModK._cluster_names) == n_clusters
     assert ModK._cluster_centers_ is None
     assert ModK._fitted_data is None
-    assert ModK.info is None
+    assert ModK._info is None
     assert ModK.GEV_ is None
     assert ModK._labels_ is None
 
@@ -608,7 +608,7 @@ def test_fit_with_bads(caplog):
     ModK_.fit(raw_, n_jobs=1)
     _check_fitted(ModK_)
     _check_fitted_data_raw(ModK_._fitted_data, raw_, 'eeg', None, None, 'omit')
-    assert len(ModK_.info['bads']) == 0
+    assert len(ModK_._info['bads']) == 0
     assert 'set as bad' not in caplog.text
     caplog.clear()
 
@@ -620,7 +620,7 @@ def test_fit_with_bads(caplog):
     ModK_.fit(raw_, n_jobs=1)
     _check_fitted(ModK_)
     _check_fitted_data_raw(ModK_._fitted_data, raw_, 'eeg', None, None, 'omit')
-    assert len(ModK_.info['bads']) == 1
+    assert len(ModK_._info['bads']) == 1
     assert 'Channel EEG 001 is set as bad and ignored.' in caplog.text
     caplog.clear()
 
@@ -632,7 +632,7 @@ def test_fit_with_bads(caplog):
     ModK_.fit(raw_, n_jobs=1)
     _check_fitted(ModK_)
     _check_fitted_data_raw(ModK_._fitted_data, raw_, 'eeg', None, None, 'omit')
-    assert len(ModK_.info['bads']) == 2
+    assert len(ModK_._info['bads']) == 2
     assert 'Channels EEG 001, EEG 002 are set as bads' in caplog.text
     caplog.clear()
 
@@ -644,7 +644,7 @@ def test_fit_with_bads(caplog):
     ModK_.fit(epochs_, n_jobs=1)
     _check_fitted(ModK_)
     _check_fitted_data_epochs(ModK_._fitted_data, epochs_, 'eeg', None, None)
-    assert len(ModK_.info['bads']) == 2
+    assert len(ModK_._info['bads']) == 2
     assert 'Channels EEG 001, EEG 002 are set as bads' in caplog.text
     caplog.clear()
 
@@ -918,7 +918,7 @@ def test_contains_mixin():
     """Test contains mixin class."""
     assert 'eeg' in ModK
     assert ModK.compensation_grade is None
-    assert ModK.get_channel_types() == ['eeg'] * ModK.info['nchan']
+    assert ModK.get_channel_types() == ['eeg'] * ModK._info['nchan']
 
     # test raise with non-fitted instance
     ModK_ = ModKMeans(n_clusters=n_clusters, n_init=10, max_iter=40, tol=1e-4,

@@ -144,7 +144,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 f'{self.__class__.__name__}')
         # sanity-check
         assert self._cluster_centers_ is not None
-        assert self.info is not None
+        assert self._info is not None
         assert self._fitted_data is not None
         assert self._labels_ is not None
 
@@ -810,7 +810,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         if self._info is None:
             assert not self._fitted  # sanity-check
             logger.warning('Clustering algorithm has not been fitted.')
-        return self._info
+            return None
+        return self._info.copy()
 
     @property
     def fitted(self):
@@ -852,7 +853,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         if self._cluster_centers_ is None:
             assert not self._fitted  # sanity-check
             logger.warning('Clustering algorithm has not been fitted.')
-            return(None)
+            return None
         return self._cluster_centers_.copy()
 
     @property
@@ -865,7 +866,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         if self._fitted_data is None:
             assert not self._fitted  # sanity-check
             logger.warning('Clustering algorithm has not been fitted.')
-            return(None)
+            return None
         return self._fitted_data.copy()
 
     @property
@@ -876,7 +877,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         if self._labels_ is None:
             assert not self._fitted  # sanity-check
             logger.warning('Clustering algorithm has not been fitted.')
-            return(None)
+            return None
         return self._labels_.copy()
 
     @property

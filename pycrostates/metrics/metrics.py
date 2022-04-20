@@ -47,8 +47,8 @@ def silhouette(modK):  # lower the better
        <https://doi.org/10.1016/0377-0427(87)90125-7>`_
     """
     modK._check_fit()
-    data = modK.fitted_data_
-    labels = modK.labels_
+    data = modK._fitted_data_
+    labels = modK._labels_
     keep = np.linalg.norm(data.T, axis=1) != 0
     data = data[:, keep]
     labels = labels[keep]
@@ -119,8 +119,8 @@ def davies_bouldin(modK):  # lower the better
        <https://doi.org/10.1109/TPAMI.1979.4766909>`_
     """
     modK._check_fit()
-    data = modK.fitted_data_
-    labels = modK.labels_
+    data = modK._fitted_data_
+    labels = modK._labels_
     keep = np.linalg.norm(data.T, axis=1) != 0
     data = data[:, keep]
     labels = labels[keep]
@@ -158,8 +158,8 @@ def calinski_harabasz(modK):  # lower the better
        <https://doi.org/10.1080/03610927408827101>`_
     """
     modK._check_fit()
-    data = modK.fitted_data_
-    labels = modK.labels_
+    data = modK._fitted_data_
+    labels = modK._labels_
     keep = np.linalg.norm(data.T, axis=1) != 0
     data = data[:, keep]
     labels = labels[keep]
@@ -232,8 +232,8 @@ def dunn(modK):  # lower the better
        <https://doi.org/10.1080/01969727408546059>`_
     """
     modK._check_fit()
-    data = modK.fitted_data_
-    labels = modK.labels_
+    data = modK._fitted_data_
+    labels = modK._labels_
     keep = np.linalg.norm(data.T, axis=1) != 0
     data = data[:, keep]
     labels = labels[keep]

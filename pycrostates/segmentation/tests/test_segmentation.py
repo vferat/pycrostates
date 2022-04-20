@@ -27,10 +27,10 @@ ModK_epochs.fit(epochs, n_jobs=1)
 # pylint: disable=protected-access
 def test_RawSegmentation_properties():
     segmentation = ModK_raw.predict(raw)
-    assert isinstance(segmentation.raw, mne.io.BaseRaw)
-    assert isinstance(segmentation.cluster_centers_, np.ndarray)
-    assert isinstance(segmentation.cluster_names, list)
-    assert isinstance(segmentation.labels, np.ndarray)
+    assert isinstance(segmentation._raw, mne.io.BaseRaw)
+    assert isinstance(segmentation._cluster_centers_, np.ndarray)
+    assert isinstance(segmentation._cluster_names, list)
+    assert isinstance(segmentation._labels, np.ndarray)
     assert isinstance(segmentation.predict_parameters, dict)
 
 
@@ -89,10 +89,10 @@ def test_EpochsSegmentation_compute_parameters():
 
 def test_EpochsSegmentation_properties():
     segmentation = ModK_raw.predict(epochs)
-    assert isinstance(segmentation.epochs, mne.Epochs)
-    assert isinstance(segmentation.cluster_centers_, np.ndarray)
-    assert isinstance(segmentation.cluster_names, list)
-    assert isinstance(segmentation.labels, np.ndarray)
+    assert isinstance(segmentation._epochs, mne.Epochs)
+    assert isinstance(segmentation._cluster_centers_, np.ndarray)
+    assert isinstance(segmentation._cluster_names, list)
+    assert isinstance(segmentation._labels, np.ndarray)
     assert segmentation._labels.ndim == 2
     assert isinstance(segmentation.predict_parameters, dict)
 
