@@ -22,10 +22,10 @@ Installation instructions can be found [here](https://pycrostates.readthedocs.io
 ---
 <p float="left">
     <a href="https://www.unige.ch/medecine/neuf/en/researc/grecherche/christoph-michel/">
-        <img src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/FBMLAB_logo.png" width="200" />
+        <img src="./docs//_static/img/FBMLAB_logo.png" width="200" />
     </a>
     <a href="https://www.unige.ch/en/university/presentation/">
-        <img src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/UNIGE_logo.png" width="300" />
+        <img src="./docs/_static/img/UNIGE_logo.png" width="300" />
     </a>
 </p>
 
