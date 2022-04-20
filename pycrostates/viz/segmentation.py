@@ -1,9 +1,9 @@
-import numpy as np
 from mne import Epochs
 from mne.io import BaseRaw
 from matplotlib import colors
-from matplotlib.axes import Axes
 from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
+import numpy as np
 
 from ..utils._checks import _check_type
 from ..utils._logs import _set_verbose, logger
@@ -34,7 +34,7 @@ def plot_raw_segmentation(
     """
     _check_type(labels, (np.ndarray, ), 'labels')  # 1D array (n_times, )
     if labels.ndim != 1:
-        raise ValueError("Argument labels should be a 1D array.")
+        raise ValueError("Argument 'labels' should be a 1D array.")
     _check_type(raw, (BaseRaw, ), 'raw')
     _check_type(block, (bool, ), 'block')
 
@@ -114,7 +114,7 @@ def plot_epoch_segmentation(
     # make sure shapes are correct
     if data.shape[1] != labels.size:
         raise ValueError(
-            "Argument 'labels' and 'raw' do not have the same number of "
+            "Argument 'labels' and 'epochs' do not have the same number of "
             "samples.")
 
     fig, axes, show = _plot_segmentation(
@@ -131,15 +131,21 @@ def plot_epoch_segmentation(
         )
 
     # format
-    x_ticks = np.linspace(0, data.shape[-1], len(epochs) + 1)
-    x_ticks += int(data.shape[-1] / 2)
-    x_ticks = x_ticks[:-1]
+    x_ticks = np.linspace(
+        epochs.times.size // 2,
+        data.shape[-1] - epochs.times.size // 2,
+        len(epochs),
+        )
     x_tick_labels = [str(i) for i in range(1, len(epochs) + 1)]
     axes.set_xticks(x_ticks, x_tick_labels)
     axes.set_xlabel('Epochs')
 
-    # add poch lines
-    x = np.linspace(0, data.shape[-1], data.shape[0] + 1)
+    # add epoch lines
+    x = np.linspace(
+        epochs.times.size,
+        data.shape[-1] - epochs.times.size,
+        len(epochs) - 1,
+        )
     axes.vlines(x, 0, gfp.max(), linestyles='dashed', colors='black')
 
     if show:
@@ -159,15 +165,16 @@ def _plot_segmentation(
         verbose=None,
         **kwargs,
         ):
-
-    _set_verbose(verbose)
     """Common code snippet to plot segmentation for raw and epochs."""
+    _set_verbose(verbose)
     _check_type(labels, (np.ndarray, ), 'labels')  # 1D array (n_times, )
     _check_type(gfp, (np.ndarray, ), 'gfp')  # 1D array (n_times, )
     _check_type(times, (np.ndarray, ), 'times')  # 1D array (n_times, )
     _check_type(n_clusters, ('int', ), 'n_clusters')
     if n_clusters <= 0:
-        raise ValueError("The number of clusters must be strictly positive.")
+        raise ValueError(
+            f"Provided number of clusters {n_clusters} is invalid. The number "
+            "of clusters must be strictly positive.")
     _check_type(cluster_names, (None, list, tuple), 'cluster_names')
     # TODO: Add more option for cmap: list of colors, dict name/color?
     _check_type(cmap, (None, str), 'cmap')
@@ -179,8 +186,8 @@ def _plot_segmentation(
         cluster_names = [str(k) for k in range(1, n_clusters + 1)]
     if len(cluster_names) != n_clusters:
         raise ValueError(
-            "Argument 'cluster_centers' and 'cluster_names' should have the "
-            "same number of elements.")
+            "Argument 'cluster_names' should have the 'n_clusters' elements. "
+            f"Provided: {len(cluster_names)} names for {n_clusters} clusters.")
 
     if axes is None:
         fig, axes = plt.subplots(1, 1)

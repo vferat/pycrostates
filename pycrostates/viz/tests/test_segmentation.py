@@ -39,7 +39,6 @@ def test_plot_raw_segmentation():
     plt.close('all')
 
     # provide cmap
-    f, axes = plt.subplots(1, 2)
     plot_raw_segmentation(labels, raw, n_clusters, cmap='plasma')
     plt.close('all')
 
