@@ -75,3 +75,19 @@ def test_plot_cluster_centers():
     # invalid show
     with pytest.raises(TypeError, match="'show' must be an "):
         plot_cluster_centers(cluster_centers, info, show=101)
+
+
+def test_with_grid_layout():
+    """Test topographic plots for cluster centers with grid-like layout."""
+    cluster_centers = np.array([
+        [1.1, 1, 1.2],
+        [0.4, 0.8, 0.7],
+        [0.4, 0.8, 0.9],
+        [0.5, 0.4, 0.7],
+        ])
+    info = create_info(['Oz', 'Cz', 'Fpz'], sfreq=1, ch_types='eeg')
+    info.set_montage('standard_1020')
+
+    f, ax = plt.subplots(2, 2)
+    plot_cluster_centers(cluster_centers, info, axes=ax)
+    plt.close('all')
