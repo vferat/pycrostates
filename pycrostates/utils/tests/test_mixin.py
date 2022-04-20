@@ -9,11 +9,7 @@ from pycrostates.utils.mixin import ContainsMixin, MontageMixin
 
 class Foo(ContainsMixin, MontageMixin):
     def __init__(self, info):
-        self._info = info
-
-    @property
-    def info(self):
-        return self._info.copy()
+        self.info = info
 
 
 class Foo2(ContainsMixin, MontageMixin):
@@ -71,9 +67,9 @@ def test_montage_mixin():
     assert info.get_montage() is None
 
     foo = Foo(info)
-    assert foo._info['dig'] is None
+    assert foo.info['dig'] is None
     foo.set_montage('standard_1020')
-    assert foo._info['dig'] is not None
+    assert foo.info['dig'] is not None
 
     montage = foo.get_montage()
     assert isinstance(montage, DigMontage)
