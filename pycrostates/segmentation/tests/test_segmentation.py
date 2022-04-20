@@ -1,10 +1,9 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import mne
-from mne import Epochs
+from mne import BaseEpochs, Epochs, make_fixed_length_events
 from mne.datasets import testing
-from mne.io import BaseRaw
+from mne.io import BaseRaw, read_raw_fif
 import numpy as np
 import pytest
 
@@ -19,11 +18,11 @@ logger.propagate = True
 
 dir_ = Path(testing.data_path()) / 'MEG' / 'sample'
 fname_raw_testing = dir_ / 'sample_audvis_trunc_raw.fif'
-raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+raw = read_raw_fif(fname_raw_testing, preload=True)
 raw = raw.pick('eeg').crop(0, 10).filter(0, 40).apply_proj()
 
-events = mne.make_fixed_length_events(raw, 1)
-epochs = mne.epochs.Epochs(raw, events, preload=True)
+events = make_fixed_length_events(raw, 1)
+epochs = Epochs(raw, events, preload=True)
 
 ModK_raw = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4,
                      random_state=1)
@@ -41,7 +40,7 @@ ModK_epochs.fit(epochs, n_jobs=1)
 def test_properties(ModK, inst, caplog):
     """Test properties from segmentation."""
     segmentation = ModK.predict(inst)
-    type_ = BaseRaw if isinstance(inst, BaseRaw) else Epochs
+    type_ = BaseRaw if isinstance(inst, BaseRaw) else BaseEpochs
     assert isinstance(segmentation._inst, type_)
     assert isinstance(segmentation._cluster_centers_, np.ndarray)
     assert isinstance(segmentation._cluster_names, list)
@@ -59,13 +58,14 @@ def test_properties(ModK, inst, caplog):
     assert isinstance(cluster_centers_, np.ndarray)
     assert isinstance(cluster_names, list)
     assert isinstance(labels, np.ndarray)
-    assert labels.ndim == 1
+    ndim = 1 if isinstance(inst, BaseRaw) else 2
+    assert labels.ndim == ndim
     assert isinstance(predict_parameters, dict)
 
     cluster_centers_ -= 10
-    assert cluster_centers_ == segmentation._cluster_centers_ - 10
+    assert np.allclose(cluster_centers_, segmentation._cluster_centers_ - 10)
     labels -= 10
-    assert labels == segmentation._labels - 10
+    assert np.allclose(labels, segmentation._labels - 10)
     predict_parameters['test'] = 10
     assert 'test' not in segmentation._predict_parameters
 
@@ -75,10 +75,10 @@ def test_properties(ModK, inst, caplog):
         assert isinstance(raw_, BaseRaw)
         raw_.drop_channels(raw_.ch_names[:3])
         assert raw_.ch_names == segmentation._inst.ch_names[3:]
-    if isinstance(inst, Epochs):
+    if isinstance(inst, BaseEpochs):
         epochs_ = segmentation.epochs
-        assert isinstance(epochs_, Epochs)
-        epochs_.drop_channels(raw_.ch_names[:3])
+        assert isinstance(epochs_, BaseEpochs)
+        epochs_.drop_channels(epochs_.ch_names[:3])
         assert epochs_.ch_names == segmentation._inst.ch_names[3:]
 
     # test without predict_parameters
@@ -87,7 +87,7 @@ def test_properties(ModK, inst, caplog):
     caplog.clear()
     params = segmentation.predict_parameters
     assert params is None
-    assert "predict_parameters' was noprovided when creating" in caplog.text
+    assert "predict_parameters' was not provided when creating" in caplog.text
 
     # test that properties can not be set
     segmentation = ModK.predict(inst)
@@ -105,7 +105,7 @@ def test_properties(ModK, inst, caplog):
     with pytest.raises(AttributeError, match="can't set attribute"):
         if isinstance(inst, BaseRaw):
             segmentation.raw = raw
-        if isinstance(inst, Epochs):
+        if isinstance(inst, BaseEpochs):
             segmentation.epochs = epochs
 
 
@@ -222,18 +222,29 @@ def test_invalid_segmentation(Segmentation, inst, bad_inst, caplog):
     with pytest.raises(ValueError, match='should be a 2D array'):
         Segmentation(labels, inst, cluster_centers.flatten(), cluster_names,
                      None)
-    with pytest.raises(ValueError, match='instance and labels do not have'):
-        Segmentation(labels[:10], inst, cluster_centers, cluster_names, None)
 
-    # raw specific
+    # raw/epochs specific
+    with pytest.raises(ValueError, match='and labels do not have'):
+        if isinstance(inst, BaseRaw):
+            Segmentation(labels[:10], inst, cluster_centers, cluster_names,
+                         None)
+        if isinstance(inst, BaseEpochs):
+            Segmentation(np.zeros((2, 10)), inst, cluster_centers,
+                         cluster_names, None)
+
     with pytest.raises(ValueError, match="'labels' should be"):
         if isinstance(inst, BaseRaw):
-            Segmentation(labels, inst, cluster_centers, cluster_names, None)
-        if isinstance(inst, Epochs):
-            Segmentation(np.zeros((len(inst), inst.times.size)), inst,
+            Segmentation(np.zeros((2, inst.times.size)), inst,
                          cluster_centers, cluster_names, None)
+        if isinstance(inst, BaseEpochs):
+            Segmentation(labels, inst, cluster_centers, cluster_names, None)
 
     # unsupported predict_parameters
     caplog.clear()
-    Segmentation(labels, inst, cluster_centers, cluster_names, dict(test=101))
+    if isinstance(inst, BaseRaw):
+        Segmentation(labels, inst, cluster_centers, cluster_names,
+                     dict(test=101))
+    if isinstance(inst, BaseEpochs):
+        Segmentation(np.zeros((len(inst), inst.times.size)), inst,
+                     cluster_centers, cluster_names, dict(test=101))
     assert "key 'test' in predict_parameters" in caplog.text

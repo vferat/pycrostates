@@ -156,11 +156,6 @@ class _BaseSegmentation(ABC):
                 "Argument 'cluster_centers_' should be a 2D array. The "
                 f"provided array shape is {cluster_centers_.shape} which has "
                 f"{cluster_centers_.ndim} dimensions.")
-        if inst.times.size != labels.shape[-1]:
-            raise ValueError(
-                "Provided MNE instance and labels do not have the same number "
-                f"of samples. The 'MNE instance' has {inst.times.size} "
-                f"samples, while the 'labels' has {labels.shape[-1]} samples.")
 
         self._labels = labels
         self._inst = inst
@@ -213,7 +208,7 @@ class _BaseSegmentation(ABC):
             self._inst.info,
             self._cluster_names,
             axes,
-            block
+            block,
             )
 
     # --------------------------------------------------------------------
@@ -324,6 +319,12 @@ class RawSegmentation(_BaseSegmentation):
                 f"shape is {self._labels.shape} which has {self._labels.ndim} "
                 "dimensions.")
 
+        if self._inst.times.size != self._labels.shape[-1]:
+            raise ValueError(
+                "Provided MNE raw and labels do not have the same number "
+                f"of samples. The 'raw' has {self._inst.times.size} samples, "
+                f"while the 'labels' has {self._labels.shape[-1]} samples.")
+
     @fill_doc
     def plot(
             self,
@@ -416,6 +417,7 @@ class EpochsSegmentation(_BaseSegmentation):
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
         _check_type(self._inst, (BaseEpochs, ), 'epochs')
+
         if self._labels.ndim != 2:
             raise ValueError(
                 "Argument 'labels' should be a 2D array. The provided array "
@@ -426,6 +428,12 @@ class EpochsSegmentation(_BaseSegmentation):
                 "Provided MNE instance and labels do not have the same number "
                 f"of epochs. The 'MNE instance' has {len(self._inst)} epochs, "
                 f"while the 'labels' has {self._labels.shape[0]} epochs.")
+        if self._inst.times.size != self._labels.shape[-1]:
+            raise ValueError(
+                "Provided MNE epochs and labels do not have the same number "
+                f"of samples. The 'epochs' have {self._inst.times.size} "
+                f"samples, while the 'labels' has {self._labels.shape[-1]} "
+                "samples.")
 
     @copy_doc(_compute_microstate_parameters)
     def compute_parameters(
@@ -442,7 +450,7 @@ class EpochsSegmentation(_BaseSegmentation):
             data,
             self._cluster_centers_,
             self._cluster_names,
-            self._epochs.info['sfreq'],
+            self._inst.info['sfreq'],
             norm_gfp=norm_gfp,
             return_dist=return_dist,
             )
@@ -481,7 +489,7 @@ class EpochsSegmentation(_BaseSegmentation):
         # Error checking on the input is performed in the viz function.
         return plot_epoch_segmentation(
             labels=self._labels,
-            epochs=self._epochs,
+            epochs=self._inst,
             n_clusters=self._cluster_centers_.shape[0],
             cluster_names=self._cluster_names,
             cmap=cmap,
