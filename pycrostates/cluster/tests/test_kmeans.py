@@ -942,7 +942,7 @@ def test_montage_mixin():
     assert montage.dig[-1]['r'][0] != 0
     montage.dig[-1]['r'][0] = 0
     ModK_.set_montage(montage)
-    montage_ = ModK.get_montage()
+    montage_ = ModK_.get_montage()
     assert montage_.dig[-1]['r'][0] == 0
 
     # test raise with non-fitted instance

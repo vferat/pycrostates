@@ -190,7 +190,7 @@ def test_plot_segmentation(ModK, inst):
         plt.close('all')
 
 
-@pytest.mark.parametrize('ModK, inst, bad_inst', [
+@pytest.mark.parametrize('Segmentation, inst, bad_inst', [
     (RawSegmentation, raw, epochs),
     (EpochsSegmentation, epochs, raw),
     ])

@@ -814,7 +814,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             assert not self._fitted  # sanity-check
             logger.warning('Clustering algorithm has not been fitted.')
             return None
-        return self._info.copy()
+        return self._info
 
     @property
     def fitted(self):

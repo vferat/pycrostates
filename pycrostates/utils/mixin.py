@@ -20,7 +20,7 @@ class ContainsMixin(MNEContainsMixin):
             raise ValueError(
                 f"Instance '{self.__class__.__name__}' is missing an "
                 "attribute 'info' required by 'in' operator.")
-        if self._info is None:
+        if self.info is None:
             raise ValueError(
                 f"Instance '{self.__class__.__name__}' attribute 'info' "
                 "is None. An Info/ChInfo instance is required by 'in' "
@@ -39,7 +39,7 @@ class ContainsMixin(MNEContainsMixin):
                 raise ValueError(
                     f"Instance '{self.__class__.__name__}' is missing an "
                     f"attribute 'info' required by '{name}'.")
-            if self._info is None:
+            if self.info is None:
                 raise ValueError(
                     f"Instance '{self.__class__.__name__}' attribute 'info' "
                     "is None. An Info/ChInfo instance is required by "
@@ -72,7 +72,7 @@ class MontageMixin(MNEMontageMixin):
                 raise ValueError(
                     f"Instance '{self.__class__.__name__}' is missing an "
                     f"attribute 'info' required by '{name}'.")
-            if self._info is None:
+            if self.info is None:
                 raise ValueError(
                     f"Instance '{self.__class__.__name__}' attribute 'info' "
                     "is None. An Info/ChInfo instance is required by "
