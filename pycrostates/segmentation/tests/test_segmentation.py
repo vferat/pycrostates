@@ -34,33 +34,34 @@ ModK_epochs.fit(epochs, n_jobs=1)
 
 
 # pylint: disable=protected-access
-def test_properties(caplog):
+@pytest.mark.parametrize('ModK, inst', [
+    (ModK_raw, raw),
+    (ModK_epochs, epochs),
+    ])
+def test_properties(ModK, inst, caplog):
     """Test properties from segmentation."""
-    # test for raw
-    segmentation = ModK_raw.predict(raw)
-    assert isinstance(segmentation._inst, BaseRaw)
+    segmentation = ModK.predict(inst)
+    type_ = BaseRaw if isinstance(inst, BaseRaw) else Epochs
+    assert isinstance(segmentation._inst, type_)
     assert isinstance(segmentation._cluster_centers_, np.ndarray)
     assert isinstance(segmentation._cluster_names, list)
     assert isinstance(segmentation._labels, np.ndarray)
-    assert segmentation._labels.ndim == 1
+    ndim = 1 if isinstance(inst, BaseRaw) else 2
+    assert segmentation._labels.ndim == ndim
     assert isinstance(segmentation._predict_parameters, dict)
 
     # test that we do get copies
-    raw_ = segmentation.raw
     cluster_centers_ = segmentation.cluster_centers_
     cluster_names = segmentation.cluster_names
     labels = segmentation.labels
     predict_parameters = segmentation.predict_parameters
 
-    assert isinstance(raw_, BaseRaw)
     assert isinstance(cluster_centers_, np.ndarray)
     assert isinstance(cluster_names, list)
     assert isinstance(labels, np.ndarray)
     assert labels.ndim == 1
     assert isinstance(predict_parameters, dict)
 
-    raw_.drop_channels(raw_.ch_names[:3])
-    assert raw_.ch_names == segmentation._inst.ch_names[3:]
     cluster_centers_ -= 10
     assert cluster_centers_ == segmentation._cluster_centers_ - 10
     labels -= 10
@@ -68,50 +69,28 @@ def test_properties(caplog):
     predict_parameters['test'] = 10
     assert 'test' not in segmentation._predict_parameters
 
-    # test for epochs
-    segmentation = ModK_epochs.predict(epochs)
-    assert isinstance(segmentation._inst, Epochs)
-    assert isinstance(segmentation._cluster_centers_, np.ndarray)
-    assert isinstance(segmentation._cluster_names, list)
-    assert isinstance(segmentation._labels, np.ndarray)
-    assert segmentation._labels.ndim == 2
-    assert isinstance(segmentation._predict_parameters, dict)
-
-    # test that we do get copies
-    epochs_ = segmentation.epochs
-    cluster_centers_ = segmentation.cluster_centers_
-    cluster_names = segmentation.cluster_names
-    labels = segmentation.labels
-    predict_parameters = segmentation.predict_parameters
-
-    assert isinstance(raw_, Epochs)
-    assert isinstance(cluster_centers_, np.ndarray)
-    assert isinstance(cluster_names, list)
-    assert isinstance(labels, np.ndarray)
-    assert labels.ndim == 2
-    assert isinstance(predict_parameters, dict)
-
-    epochs_.drop_channels(raw_.ch_names[:3])
-    assert epochs_.ch_names == segmentation._inst.ch_names[3:]
-    cluster_centers_ -= 10
-    assert cluster_centers_ == segmentation._cluster_centers_ - 10
-    labels -= 10
-    assert labels == segmentation._labels - 10
-    predict_parameters['test'] = 10
-    assert 'test' not in segmentation._predict_parameters
+    # test raw/epochs specific
+    if isinstance(inst, BaseRaw):
+        raw_ = segmentation.raw
+        assert isinstance(raw_, BaseRaw)
+        raw_.drop_channels(raw_.ch_names[:3])
+        assert raw_.ch_names == segmentation._inst.ch_names[3:]
+    if isinstance(inst, Epochs):
+        epochs_ = segmentation.epochs
+        assert isinstance(epochs_, Epochs)
+        epochs_.drop_channels(raw_.ch_names[:3])
+        assert epochs_.ch_names == segmentation._inst.ch_names[3:]
 
     # test without predict_parameters
-    segmentation = ModK_raw.predict(raw)
+    segmentation = ModK.predict(inst)
     segmentation._predict_parameters = None
     caplog.clear()
     params = segmentation.predict_parameters
     assert params is None
-    assert "predict_parameters' was not provided when creating" in caplog.text
+    assert "predict_parameters' was noprovided when creating" in caplog.text
 
-    # test that properties can not be set with raw instance
-    segmentation = ModK_raw.predict(raw)
-    with pytest.raises(AttributeError, match="can't set attribute"):
-        segmentation.raw = raw
+    # test that properties can not be set
+    segmentation = ModK.predict(inst)
     with pytest.raises(AttributeError, match="can't set attribute"):
         segmentation.predict_parameters = dict()
     with pytest.raises(AttributeError, match="can't set attribute"):
@@ -120,21 +99,14 @@ def test_properties(caplog):
         segmentation.cluster_names = ['1', '0', '2', '3']
     with pytest.raises(AttributeError, match="can't set attribute"):
         segmentation.cluster_centers_ = \
-            np.zeros((4, len(raw.ch_names) - len(raw.info['bads'])))
+            np.zeros((4, len(inst.ch_names) - len(inst.info['bads'])))
 
-    # test that properties can not be set with epoch instance
-    segmentation = ModK_epochs.predict(epochs)
+    # test raw/epochs specific
     with pytest.raises(AttributeError, match="can't set attribute"):
-        segmentation.epochs = epochs
-    with pytest.raises(AttributeError, match="can't set attribute"):
-        segmentation.predict_parameters = dict()
-    with pytest.raises(AttributeError, match="can't set attribute"):
-        segmentation.labels = np.zeros((raw.times.size, ))
-    with pytest.raises(AttributeError, match="can't set attribute"):
-        segmentation.cluster_names = ['1', '0', '2', '3']
-    with pytest.raises(AttributeError, match="can't set attribute"):
-        segmentation.cluster_centers_ = \
-            np.zeros((4, len(raw.ch_names) - len(raw.info['bads'])))
+        if isinstance(inst, BaseRaw):
+            segmentation.raw = raw
+        if isinstance(inst, Epochs):
+            segmentation.epochs = epochs
 
 
 @pytest.mark.parametrize('ModK, inst', [
