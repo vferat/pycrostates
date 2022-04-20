@@ -153,7 +153,7 @@ class _BaseSegmentation(ABC):
         _check_type(cluster_centers_, (np.ndarray, ), 'cluster_centers_')
         if cluster_centers_.ndim != 2:
             raise ValueError(
-                "Argument 'cluster_centers_' should be a 1D array. The "
+                "Argument 'cluster_centers_' should be a 2D array. The "
                 f"provided array shape is {cluster_centers_.shape} which has "
                 f"{cluster_centers_.ndim} dimensions.")
         if inst.times.size != labels.shape[-1]:

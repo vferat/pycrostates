@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 
 from pycrostates.cluster import ModKMeans
+from pycrostates.segmentation import RawSegmentation, EpochsSegmentation
 from pycrostates.utils._logs import logger, set_log_level
 
 
@@ -116,9 +117,10 @@ def test_properties(caplog):
     with pytest.raises(AttributeError, match="can't set attribute"):
         segmentation.labels = np.zeros((raw.times.size, ))
     with pytest.raises(AttributeError, match="can't set attribute"):
-        segmentation.cluster_names = ['1', '0', '1']
+        segmentation.cluster_names = ['1', '0', '2', '3']
     with pytest.raises(AttributeError, match="can't set attribute"):
-        segmentation.cluster_centers_ = np.zeros((3, len(raw.ch_names)))
+        segmentation.cluster_centers_ = \
+            np.zeros((4, len(raw.ch_names) - len(raw.info['bads'])))
 
     # test that properties can not be set with epoch instance
     segmentation = ModK_epochs.predict(epochs)
@@ -129,9 +131,10 @@ def test_properties(caplog):
     with pytest.raises(AttributeError, match="can't set attribute"):
         segmentation.labels = np.zeros((raw.times.size, ))
     with pytest.raises(AttributeError, match="can't set attribute"):
-        segmentation.cluster_names = ['1', '0', '1']
+        segmentation.cluster_names = ['1', '0', '2', '3']
     with pytest.raises(AttributeError, match="can't set attribute"):
-        segmentation.cluster_centers_ = np.zeros((3, len(raw.ch_names)))
+        segmentation.cluster_centers_ = \
+            np.zeros((4, len(raw.ch_names) - len(raw.info['bads'])))
 
 
 @pytest.mark.parametrize('ModK, inst', [
@@ -213,3 +216,52 @@ def test_plot_segmentation(ModK, inst):
     if isinstance(inst, BaseRaw):
         segmentation.plot(tmin=0, tmax=5)
         plt.close('all')
+
+
+@pytest.mark.parametrize('ModK, inst, bad_inst', [
+    (RawSegmentation, raw, epochs),
+    (EpochsSegmentation, epochs, raw),
+    ])
+def test_invalid_segmentation(Segmentation, inst, bad_inst, caplog):
+    """Test that we can not create an invalid segmentation."""
+    labels = np.zeros((inst.times.size))
+    cluster_centers = \
+        np.zeros((4, len(inst.ch_names) - len(inst.info['bads'])))
+    cluster_names = ['a', 'b', 'c', 'd']
+
+    # types
+    with pytest.raises(TypeError, match='must be an instance of'):
+        Segmentation(list(labels), inst, cluster_centers, cluster_names, None)
+    with pytest.raises(TypeError, match='must be an instance of'):
+        Segmentation(labels, 101, cluster_centers, cluster_names, None)
+    with pytest.raises(TypeError, match='must be an instance of'):
+        Segmentation(labels, bad_inst, cluster_centers, cluster_names, None)
+    with pytest.raises(TypeError, match='must be an instance of'):
+        Segmentation(labels, inst, list(cluster_centers), cluster_names, None)
+    with pytest.raises(TypeError, match='must be an instance of'):
+        Segmentation(labels, inst, cluster_centers, tuple(cluster_names), None)
+    with pytest.raises(TypeError, match='must be an instance of'):
+        Segmentation(labels, inst, cluster_centers, cluster_names, [])
+
+    # values
+    with pytest.raises(ValueError,
+                       match='number of cluster centers and cluster names'):
+        Segmentation(labels, inst, cluster_centers, cluster_names[:2], None)
+    with pytest.raises(ValueError, match='should be a 2D array'):
+        Segmentation(labels, inst, cluster_centers.flatten(), cluster_names,
+                     None)
+    with pytest.raises(ValueError, match='instance and labels do not have'):
+        Segmentation(labels[:10], inst, cluster_centers, cluster_names, None)
+
+    # raw specific
+    with pytest.raises(ValueError, match="'labels' should be"):
+        if isinstance(inst, BaseRaw):
+            Segmentation(labels, inst, cluster_centers, cluster_names, None)
+        if isinstance(inst, Epochs):
+            Segmentation(np.zeros((len(inst), inst.times.size)), inst,
+                         cluster_centers, cluster_names, None)
+
+    # unsupported predict_parameters
+    caplog.clear()
+    Segmentation(labels, inst, cluster_centers, cluster_names, dict(test=101))
+    assert "key 'test' in predict_parameters" in caplog.text
