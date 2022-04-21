@@ -55,12 +55,12 @@ def test_write_and_read(tmp_path, caplog):
     caplog.clear()
     _write_cluster(
         fname2,
-        ModK.cluster_centers_,
-        ModK.info,
+        ModK._cluster_centers_,
+        ModK._info,
         'ModKMeans',
-        ModK.cluster_names,
-        ModK.fitted_data,
-        ModK.labels_,
+        ModK._cluster_names,
+        ModK._fitted_data,
+        ModK._labels_,
         n_init=ModK.n_init,
         max_iter=ModK.max_iter,
         tol=ModK.tol,
@@ -91,9 +91,9 @@ def test_write_and_read(tmp_path, caplog):
     segmentation1 = ModK1.predict(raw2, picks='eeg')
     segmentation2 = ModK2.predict(raw2, picks='eeg')
 
-    assert np.allclose(segmentation.labels, segmentation1.labels)
-    assert np.allclose(segmentation.labels, segmentation2.labels)
-    assert np.allclose(segmentation1.labels, segmentation2.labels)
+    assert np.allclose(segmentation._labels, segmentation1._labels)
+    assert np.allclose(segmentation._labels, segmentation2._labels)
+    assert np.allclose(segmentation1._labels, segmentation2._labels)
 
 
 def test_invalid_write(tmp_path):
@@ -149,12 +149,12 @@ def test_invalid_write(tmp_path):
                        match="'chinfo' must be an instance of"):
         _write_cluster(
             tmp_path / 'cluster.fif',
-            ModK.cluster_centers_,
+            ModK._cluster_centers_,
             101,
             'ModKMeans',
-            ModK.cluster_names,
-            ModK.fitted_data,
-            ModK.labels_,
+            ModK._cluster_names,
+            ModK._fitted_data,
+            ModK._labels_,
             n_init=ModK.n_init,
             max_iter=ModK.max_iter,
             tol=ModK.tol,

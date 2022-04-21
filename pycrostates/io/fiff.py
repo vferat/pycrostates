@@ -172,13 +172,13 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
             f"{', '.join(expected)} should not be None.")
 
     fit_parameters = dict(algorithm=algorithm, version=__version__)
-    fit_variables = dict()
+    fit_variables = {}
     for key, value in kwargs.items():
         if key not in expected:
             continue
 
         # ModKMeans
-        elif key == 'n_init':
+        if key == 'n_init':
             fit_parameters['n_init'] = ModKMeans._check_n_init(value)
         elif key == 'max_iter':
             fit_parameters['max_iter'] = ModKMeans._check_max_iter(value)
@@ -342,7 +342,7 @@ def _create_ModKMeans(
 
 
 # ----------------------------------------------------------------------------
-def _write_meas_info(fid, info, data_type=None, reset_range=True):
+def _write_meas_info(fid, info):
     """Write measurement info into a file id (from a fif file).
 
     Parameters

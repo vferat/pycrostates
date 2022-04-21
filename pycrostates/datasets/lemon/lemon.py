@@ -76,14 +76,21 @@ def standardize(raw):
     the standard setup, then reorder channels and finally
     reference to average.
 
-    inst : Raw
-        :class:`~mne.io.Raw` from the lemon dataset
+    Parameters
+    ----------
+    raw : Raw
+        Raw data from the lemon dataset.
+
+    Returns
+    -------
+    raw : Raw
+        Standardize raw.
 
     Notes
     -----
-    If you don't want to interpolate missing channels, you can
-    use :func:`mne.channels.equalize_channels` instead to have
-    same electrodes accross recordings.
+    If you don't want to interpolate missing channels, you can use
+    :func:`mne.channels.equalize_channels` instead to have same electrodes
+    accross recordings.
     """
     raw = raw.copy()
     n_chan = raw.info['nchan']

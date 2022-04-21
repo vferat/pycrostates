@@ -55,12 +55,14 @@ def plot_cluster_centers(
         if isinstance(axes, Axes) and n_clusters != 1:
             raise ValueError(
                 "Argument 'cluster_centers' and 'axes' must contain the same "
-                "number of clusters and Axes.")
+                f"number of clusters and Axes. Provided: {n_clusters} "
+                "microstates maps and only 1 axes.")
         elif axes.size != n_clusters:
             raise ValueError(
                 "Argument 'cluster_centers' and 'axes' must contain the same "
-                "number of clusters and Axes.")
-        figs = [ax.get_figure() for ax in axes]
+                f"number of clusters and Axes. Provided: {n_clusters} "
+                "microstates maps and {axes.size} axes.")
+        figs = [ax.get_figure() for ax in axes.flatten()]
         if len(set(figs)) == 1:
             f = figs[0]
         else:
@@ -68,10 +70,12 @@ def plot_cluster_centers(
         del figs
 
     # remove show from kwargs passed to topoplot
-    show = True if 'show' not in kwargs else kwargs['show']
-    _check_type(show, (bool, ), 'show')
-    kwargs = {key: value for key, value in kwargs.items()
-              if key not in ('show', )}
+    if 'show' in kwargs:
+        show = kwargs['show']
+        _check_type(show, (bool, ), 'show')
+        del kwargs['show']
+    else:
+        show = True
 
     # plot cluster centers
     for k, (center, name) in enumerate(zip(cluster_centers, cluster_names)):

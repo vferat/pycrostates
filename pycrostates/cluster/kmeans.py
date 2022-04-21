@@ -50,8 +50,7 @@ class ModKMeans(_BaseCluster):
 
     def _repr_html_(self, caption=None):
         from ..html_templates import repr_templates_env
-        t = repr_templates_env.get_template('ModKMeans.html.jinja')
-        name = self.__class__.__name__
+        template = repr_templates_env.get_template('ModKMeans.html.jinja')
         if self.fitted:
             n_samples = self._fitted_data.shape[-1]
             ch_types, ch_counts = np.unique(self.get_channel_types(),
@@ -64,8 +63,8 @@ class ModKMeans(_BaseCluster):
             ch_repr = None
             GEV = None
 
-        html = t.render(
-            name=name,
+        return template.render(
+            name=self.__class__.__name__,
             n_clusters=self._n_clusters,
             n_init=self._n_init,
             GEV=GEV,
@@ -74,7 +73,6 @@ class ModKMeans(_BaseCluster):
             n_samples=n_samples,
             ch_repr=ch_repr,
             )
-        return html
 
     @copy_doc(_BaseCluster.__eq__)
     def __eq__(self, other):
@@ -100,8 +98,7 @@ class ModKMeans(_BaseCluster):
                     return False
 
             return True
-        else:
-            return False
+        return False
 
     @copy_doc(_BaseCluster.__ne__)
     def __ne__(self, other):

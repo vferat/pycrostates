@@ -56,8 +56,7 @@ class ContainsMixin(MNEContainsMixin):
         if name in _inv_attributes or name in _inv_methods:
             raise AttributeError(
                 f"'{self.__class__.__name__}' has not attribute '{name}'")
-        else:
-            return super().__getattribute__(name)
+        return super().__getattribute__(name)
 
 
 class MontageMixin(MNEMontageMixin):

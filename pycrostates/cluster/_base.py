@@ -46,8 +46,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
     def _repr_html_(self, caption=None):
         from ..html_templates import repr_templates_env
-        t = repr_templates_env.get_template('BaseCluster.html.jinja')
-        name = self.__class__.__name__
+        template = repr_templates_env.get_template('BaseCluster.html.jinja')
         if self.fitted:
             n_samples = self._fitted_data.shape[-1]
             ch_types, ch_counts = np.unique(self.get_channel_types(),
@@ -58,15 +57,14 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             n_samples = None
             ch_repr = None
 
-        html = t.render(
-            name=name,
+        return template.render(
+            name=self.__class__.__name__,
             n_clusters=self._n_clusters,
             cluster_names=self._cluster_names,
             fitted=self._fitted,
             n_samples=n_samples,
             ch_repr=ch_repr,
             )
-        return html
 
     def __eq__(self, other):
         """Equality == method."""
@@ -136,8 +134,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         """
         if deep:
             return deepcopy(self)
-        else:
-            return copy(self)
+        return copy(self)
 
     def _check_fit(self):
         """Check if the cluster is fitted."""
@@ -146,10 +143,10 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 'Clustering algorithm must be fitted before using '
                 f'{self.__class__.__name__}')
         # sanity-check
-        assert self.cluster_centers_ is not None
-        assert self.info is not None
-        assert self.fitted_data is not None
-        assert self.labels_ is not None
+        assert self._cluster_centers_ is not None
+        assert self._info is not None
+        assert self._fitted_data is not None
+        assert self._labels_ is not None
 
     @abstractmethod
     @fill_doc
@@ -168,9 +165,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         %(reject_by_annotation_raw)s
         %(n_jobs)s
         """
-        from ..io import ChInfo
-
         # TODO: Maybe those parameters should be moved here instead of docdict?
+        from ..io import ChInfo
         _check_type(inst, (BaseRaw, BaseEpochs), item_name='inst')
         _check_type(tmin, (None, 'numeric'), item_name='tmin')
         _check_type(tmax, (None, 'numeric'), item_name='tmax')
@@ -254,10 +250,10 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             raise ValueError(
                 "Only one of 'mapping' or 'new_names' must be provided.")
 
-        elif mapping is not None:
+        if mapping is not None:
             _check_type(mapping, (dict, ), item_name='mapping')
             for key in mapping:
-                _check_value(key, self.cluster_names, item_name='old name')
+                _check_value(key, self._cluster_names, item_name='old name')
             for value in mapping.values():
                 _check_type(value, (str, ), item_name='new name')
 
@@ -304,7 +300,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             raise ValueError(
                 "Only one of 'mapping' or 'order' must be provided.")
 
-        elif mapping is not None:
+        if mapping is not None:
             _check_type(mapping, (dict, ), item_name='mapping')
             valids = tuple(range(self._n_clusters))
             for key in mapping:
@@ -402,7 +398,11 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             if invert[k]:
                 self._cluster_centers_[k] = - cluster
 
-    def plot(self, axes=None, block=False):
+    def plot(
+            self,
+            axes=None,
+            block: bool = False,
+            ):
         """
         Plot cluster centers as topographic maps.
 
@@ -514,11 +514,13 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         ch_ = [ch for k, ch in enumerate(inst.info['ch_names'])
                if k in picks_ and ch in self._info['bads']]
         if 1 == len(ch_):
-            logger.warning(f"Picked channel {ch_[0]} was set as "
-                           "bads during fitting and will be ignored.")
+            logger.warning("Picked channel %s was set as "
+                           "bads during fitting and will be ignored.",
+                           ch_[0])
         elif 1 < len(ch_):
-            logger.warning(f"Picked channels {', '.join(ch_)} were set as "
-                           "bads during fitting and will be ignored.")
+            logger.warning("Picked channels %s were set as "
+                           "bads during fitting and will be ignored.",
+                           ', '.join(ch_))
 
         # remove channels that were bads during fitting from picks
         picks_ = [ch for k, ch in enumerate(inst.info['ch_names'])
@@ -558,6 +560,15 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                      half_window_size, min_segment_length, reject_edges,
                      reject_by_annotation):
         """Create segmentation for raw."""
+        predict_parameters = {
+            'factor': factor,
+            'tol': tol,
+            'half_window_size': half_window_size,
+            'min_segment_length': min_segment_length,
+            'reject_edges': reject_edges,
+            'reject_by_annotation': reject_by_annotation,
+            }
+
         # retrieve data for picks
         data = raw.get_data(picks=picks_data)
         # retrieve cluster_centers_ for picks
@@ -594,22 +605,35 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             segmentation = _BaseCluster._reject_short_segments(
                 segmentation, data, min_segment_length)
 
-        return RawSegmentation(labels=segmentation,
-                               inst=raw, picks=picks_data,
-                               cluster_centers_=self._cluster_centers_,
-                               cluster_names=self._cluster_names)
+        # Provide properties to copy the arrays
+        return RawSegmentation(
+            labels=segmentation,
+            inst=raw.copy().pick(picks_data),
+            cluster_centers_=self.cluster_centers_,
+            cluster_names=self.cluster_names,
+            predict_parameters=predict_parameters,
+            )
 
     def _predict_epochs(self, epochs, picks_data, picks_cluster_centers,
                         factor, tol, half_window_size, min_segment_length,
                         reject_edges):
         """Create segmentation for epochs."""
+
+        predict_parameters = {
+            'factor': factor,
+            'tol': tol,
+            'half_window_size': half_window_size,
+            'min_segment_length': min_segment_length,
+            'reject_edges': reject_edges,
+            }
+
         # retrieve data for picks
         data = epochs.get_data(picks=picks_data)
         # retrieve cluster_centers_ for picks
         cluster_centers_ = deepcopy(self._cluster_centers_)
         cluster_centers_ = cluster_centers_[:, picks_cluster_centers]
 
-        segments = list()
+        segments = []
         for epoch_data in data:
             segment = _BaseCluster._segment(
                 epoch_data, cluster_centers_, factor, tol, half_window_size)
@@ -622,10 +646,14 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
             segments.append(segment)
 
-        return EpochsSegmentation(labels=np.array(segments),
-                                  inst=epochs, picks=picks_data,
-                                  cluster_centers_=self._cluster_centers_,
-                                  cluster_names=self._cluster_names)
+        # Provide properties to copy the arrays
+        return EpochsSegmentation(
+            labels=np.array(segments),
+            inst=epochs.copy().pick(picks_data),
+            cluster_centers_=self.cluster_centers_,
+            cluster_names=self.cluster_names,
+            predict_parameters=predict_parameters,
+            )
 
     # --------------------------------------------------------------------
     @staticmethod
@@ -776,61 +804,17 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return self._n_clusters
 
     @property
-    def cluster_names(self):
-        """
-        Name of the clusters.
-
-        :type: `list`
-        """
-        return self._cluster_names
-
-    @property
-    def cluster_centers_(self):
-        """
-        Center of the clusters. Returns None if cluster algorithm has not been
-        fitted.
-
-        :type: `~numpy.array`
-        """
-        if self._cluster_centers_ is None:
-            assert not self._fitted  # sanity-check
-            logger.warning('Clustering algorithm has not been fitted.')
-        return self._cluster_centers_
-
-    @property
     def info(self):
         """
-        Info instance corresponding to the MNE object used to fit the
-        clustering algorithm.
+        Info instance with the channel information used to fit the instance.
 
-        :type: `mne.io.Info`
+        :type: `~pycrostates.io.ChInfo`
         """
         if self._info is None:
             assert not self._fitted  # sanity-check
             logger.warning('Clustering algorithm has not been fitted.')
+            return None
         return self._info
-
-    @property
-    def fitted_data(self):
-        """
-        Data array retrieved from MNE used to fit the clustering algorithm.
-
-        :type: `~numpy.array` shape (n_channels, n_samples)
-        """
-        if self._fitted_data is None:
-            assert not self._fitted  # sanity-check
-            logger.warning('Clustering algorithm has not been fitted.')
-        return self._fitted_data
-
-    @property
-    def labels_(self):
-        """
-        labels fit variable.
-        """
-        if self._labels_ is None:
-            assert not self._fitted  # sanity-check
-            logger.warning('Clustering algorithm has not been fitted.')
-        return self._labels_
 
     @property
     def fitted(self):
@@ -860,6 +844,53 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             self._fitted_data = None
             self._labels_ = None
             self._fitted = False
+
+    @property
+    def cluster_centers_(self):
+        """
+        Center of the clusters. Returns None if cluster algorithm has not been
+        fitted.
+
+        :type: `~numpy.array`
+        """
+        if self._cluster_centers_ is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+            return None
+        return self._cluster_centers_.copy()
+
+    @property
+    def fitted_data(self):
+        """
+        Data array retrieved from MNE used to fit the clustering algorithm.
+
+        :type: `~numpy.array` shape (n_channels, n_samples)
+        """
+        if self._fitted_data is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+            return None
+        return self._fitted_data.copy()
+
+    @property
+    def labels_(self):
+        """
+        labels fit variable.
+        """
+        if self._labels_ is None:
+            assert not self._fitted  # sanity-check
+            logger.warning('Clustering algorithm has not been fitted.')
+            return None
+        return self._labels_.copy()
+
+    @property
+    def cluster_names(self):
+        """
+        Name of the clusters.
+
+        :type: `list`
+        """
+        return self._cluster_names.copy()
 
     # --------------------------------------------------------------------
     @staticmethod

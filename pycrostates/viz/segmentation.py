@@ -1,59 +1,246 @@
-from typing import Tuple, Union
-
-import numpy as np
-from mne import Evoked
+from mne import Epochs
 from mne.io import BaseRaw
 from matplotlib import colors
-from matplotlib.axes import Axes
-from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
+import numpy as np
 
 from ..utils._checks import _check_type
+from ..utils._logs import _set_verbose, logger
 
 
-def plot_segmentation(
-        labels: np.ndarray,
-        inst: Union[BaseRaw, Evoked],
-        cluster_centers: np.ndarray,
-        names: list = None,
-        tmin: float = 0.0, tmax: float = None) -> Tuple[Figure, Axes]:
-    _check_type(inst, (BaseRaw, Evoked))
-    inst = inst.copy()
-    inst.crop(tmin=tmin, tmax=tmax)
-    if isinstance(inst, BaseRaw):
-        data = inst.get_data()
-    elif isinstance(inst, Evoked):
-        data = inst.data  # TODO: I think it supports .get_data() nowadays
+# TODO: Add parameters to the docstring.
+def plot_raw_segmentation(
+        labels,
+        raw,
+        n_clusters,
+        cluster_names=None,
+        tmin=None,
+        tmax=None,
+        cmap=None,
+        axes=None,
+        cbar_axes=None,
+        block=False,
+        verbose=None,
+        **kwargs,
+        ):
+    """
+    Plot segmentation
+
+    Returns
+    -------
+    fig : Figure
+        Matplotlib figure(s) on which topographic maps are plotted.
+    """
+    _check_type(labels, (np.ndarray, ), 'labels')  # 1D array (n_times, )
+    if labels.ndim != 1:
+        raise ValueError("Argument 'labels' should be a 1D array.")
+    _check_type(raw, (BaseRaw, ), 'raw')
+    _check_type(block, (bool, ), 'block')
+
+    data = raw.get_data(tmin=tmin, tmax=tmax)
     gfp = np.std(data, axis=0)
-    times = inst.times + tmin
+    # build times array instead of using raw.times because the time-based
+    # selection in MNE can be a bit funky.
+    if tmin is None:
+        tmin = raw.times[0]
+    times = np.arange(
+        tmin,
+        tmin + gfp.size / raw.info['sfreq'],
+        1 / raw.info['sfreq'],
+        )
+    labels = labels[(times * raw.info['sfreq']).astype(int)]
 
-    n_colors = 1 + len(cluster_centers)
-    state_labels = [-1] + list(range(len(cluster_centers)))
-    if not names:
-        names = ['unlabeled'] + [str(k) for k in range(len(cluster_centers))]
+    # make sure shapes are correct
+    if data.shape[1] != labels.size:
+        raise ValueError(
+            "Argument 'labels' and 'raw' do not have the same number of "
+            "samples.")
+
+    fig, axes, show = _plot_segmentation(
+        labels,
+        gfp,
+        times,
+        n_clusters,
+        cluster_names,
+        cmap,
+        axes,
+        cbar_axes,
+        verbose=verbose,
+        **kwargs,
+        )
+
+    # format
+    axes.set_xlabel('Time (s)')
+
+    if show:
+        plt.show(block=block)
+    return fig
+
+
+# TODO: Add parameters to the docstring.
+def plot_epoch_segmentation(
+        labels,
+        epochs,
+        n_clusters,
+        cluster_names=None,
+        cmap=None,
+        axes=None,
+        cbar_axes=None,
+        block=False,
+        verbose=None,
+        **kwargs,
+        ):
+    """
+    Plot segmentation
+
+    Returns
+    -------
+    fig : Figure
+        Matplotlib figure on which topographic maps are plotted.
+    """
+    _check_type(labels, (np.ndarray, ), 'labels')  # 1D array (n_times, )
+    if labels.ndim != 2:
+        raise ValueError("Argument labels should be a 2D array.")
+    _check_type(epochs, (Epochs, ), 'epochs')
+    _check_type(block, (bool, ), 'block')
+
+    data = epochs.get_data().swapaxes(0, 1)
+    data = data.reshape(data.shape[0], -1)
+    gfp = np.std(data, axis=0)
+    times = np.arange(0, data.shape[-1])
+    labels = labels.reshape(-1)
+
+    # make sure shapes are correct
+    if data.shape[1] != labels.size:
+        raise ValueError(
+            "Argument 'labels' and 'epochs' do not have the same number of "
+            "samples.")
+
+    fig, axes, show = _plot_segmentation(
+        labels,
+        gfp,
+        times,
+        n_clusters,
+        cluster_names,
+        cmap,
+        axes,
+        cbar_axes,
+        verbose=verbose,
+        **kwargs,
+        )
+
+    # format
+    x_ticks = np.linspace(
+        epochs.times.size // 2,
+        data.shape[-1] - epochs.times.size // 2,
+        len(epochs),
+        )
+    x_tick_labels = [str(i) for i in range(1, len(epochs) + 1)]
+    axes.set_xticks(x_ticks, x_tick_labels)
+    axes.set_xlabel('Epochs')
+
+    # add epoch lines
+    x = np.linspace(
+        epochs.times.size,
+        data.shape[-1] - epochs.times.size,
+        len(epochs) - 1,
+        )
+    axes.vlines(x, 0, gfp.max(), linestyles='dashed', colors='black')
+
+    if show:
+        plt.show(block=block)
+    return fig
+
+
+def _plot_segmentation(
+        labels,
+        gfp,
+        times,
+        n_clusters,
+        cluster_names=None,
+        cmap=None,
+        axes=None,
+        cbar_axes=None,
+        verbose=None,
+        **kwargs,
+        ):
+    """Common code snippet to plot segmentation for raw and epochs."""
+    _set_verbose(verbose)
+    _check_type(labels, (np.ndarray, ), 'labels')  # 1D array (n_times, )
+    _check_type(gfp, (np.ndarray, ), 'gfp')  # 1D array (n_times, )
+    _check_type(times, (np.ndarray, ), 'times')  # 1D array (n_times, )
+    _check_type(n_clusters, ('int', ), 'n_clusters')
+    if n_clusters <= 0:
+        raise ValueError(
+            f"Provided number of clusters {n_clusters} is invalid. The number "
+            "of clusters must be strictly positive.")
+    _check_type(cluster_names, (None, list, tuple), 'cluster_names')
+    # TODO: Add more option for cmap: list of colors, dict name/color?
+    _check_type(cmap, (None, str), 'cmap')
+    _check_type(axes, (None, Axes), 'ax')
+    _check_type(cbar_axes, (None, Axes), 'cbar_ax')
+
+    # check cluster_names
+    if cluster_names is None:
+        cluster_names = [str(k) for k in range(1, n_clusters + 1)]
+    if len(cluster_names) != n_clusters:
+        raise ValueError(
+            "Argument 'cluster_names' should have the 'n_clusters' elements. "
+            f"Provided: {len(cluster_names)} names for {n_clusters} clusters.")
+
+    if axes is None:
+        fig, axes = plt.subplots(1, 1)
     else:
-        names = ['unlabeled'] + names
+        fig = axes.get_figure()
 
-    labels = labels[(times * inst.info['sfreq']).astype(int)]
-    cmap = plt.cm.get_cmap('plasma', n_colors)
+    # remove show from kwargs passed to plot
+    if 'show' in kwargs:
+        show = kwargs['show']
+        _check_type(show, (bool, ), 'show')
+        del kwargs['show']
+    else:
+        show = True
 
-    fig = plt.figure(figsize=(10, 4))
-    ax = plt.plot(times, gfp, color='black', linewidth=0.2)
+    # add color and linewidth if absent from kwargs
+    if 'color' not in kwargs:
+        kwargs['color'] = 'black'
+    if 'linewidth' not in kwargs:
+        kwargs['linewidth'] = 0.2
+
+    # define states and colors
+    state_labels = [-1] + list(range(n_clusters))
+    cluster_names = ['unlabeled'] + cluster_names
+    n_colors = n_clusters + 1
+    cmap = plt.cm.get_cmap(cmap, n_colors)
+
+    # plot
+    axes.plot(times, gfp, **kwargs)
     for state, color in zip(state_labels, cmap.colors):
-        w = np.where(labels[1:] == state)
-        a = np.sort(np.append(w,  np.add(w, 1)))
-        x = np.zeros(labels.shape)
-        x[a] = 1
-        x = x.astype(bool)
-        plt.fill_between(times, gfp, color=color, where=x, step=None,
-                         interpolate=False)
+        pos = np.where(labels == state)[0]
+        if len(pos):
+            pos = np.unique([pos, pos + 1])
+            x = np.zeros(labels.shape).astype(bool)
+            if pos[-1] == labels.size:
+                pos = pos[:-1]
+            x[pos] = True
+            axes.fill_between(times, gfp, color=color, where=x, step=None,
+                              interpolate=False)
+    logger.info("For visualization purposes, "
+                "the last segment appears truncated by 1 sample. "
+                "In the case where the last segment is 1 sample long, "
+                "it does not appear.")
+
+    # commonm formatting
+    axes.set_title('Segmentation')
+    axes.autoscale(tight=True)
+
+    # color bar
     norm = colors.Normalize(vmin=0, vmax=n_colors)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
-    cbar = plt.colorbar(sm, ticks=[i + 0.5 for i in range(n_colors)])
-    cbar.ax.set(yticklabels=names)
-    plt.xlabel('Time (s)')
-    plt.title('Segmentation')
-    plt.autoscale(tight=True)
-    plt.show()
-    return fig, ax
+    colorbar = plt.colorbar(sm, cax=cbar_axes, ax=axes,
+                            ticks=[i + 0.5 for i in range(n_colors)])
+    colorbar.ax.set_yticklabels(cluster_names)
+
+    return fig, axes, show

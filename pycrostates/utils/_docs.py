@@ -8,7 +8,7 @@ import sys
 from mne.utils.docs import docdict as docdict_mne
 
 # ------------------------- Documentation dictionary -------------------------
-docdict = dict()
+docdict = {}
 
 # ---- Documentation to inc. from MNE ----
 keys = (
@@ -58,7 +58,7 @@ picks : str | list | slice | None
 """
 
 # ------------------------- Documentation functions --------------------------
-docdict_indented = dict()
+docdict_indented = {}
 
 
 def fill_doc(f):
