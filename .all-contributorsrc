@@ -21,7 +21,14 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/73893616?v=4",
       "profile": "https://github.com/mscheltienne",
       "contributions": [
-        "code"
+        "code",
+        "doc",
+        "ideas",
+        "infra",
+        "maintenance",
+        "projectManagement",
+        "review",
+        "test"
       ]
     }
   ],
