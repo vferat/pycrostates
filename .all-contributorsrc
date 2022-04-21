@@ -12,7 +12,13 @@
       "profile": "https://vferat.github.io/about/",
       "contributions": [
         "test",
-        "code"
+        "code",
+        "doc",
+        "ideas",
+        "infra",
+        "maintenance",
+        "projectManagement",
+        "review"
       ]
     },
     {
