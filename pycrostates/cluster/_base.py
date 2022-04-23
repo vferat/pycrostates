@@ -159,7 +159,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     def fit(
             self,
             inst: Union[BaseRaw, BaseEpochs],
-            picks: Union[str, NDArray[int]] ='eeg',
+            picks: Union[str, NDArray[int]] = 'eeg',
             tmin: Optional[Union[int, float]] = None,
             tmax: Optional[Union[int, float]] = None,
             reject_by_annotation: bool = True,
@@ -713,7 +713,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             states: NDArray[float],
             factor: int,
             tol: Union[int, float],
-            half_window_size:int,
+            half_window_size: int,
             ) -> NDArray[int]:
         """Create segmentation. Must operate on a copy of states."""
         data -= np.mean(data, axis=0)
