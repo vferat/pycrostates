@@ -1,9 +1,12 @@
-from mne import Epochs
+from typing import Union, Optional, List
+
+from mne import BaseEpochs
 from mne.io import BaseRaw
 from matplotlib import colors
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 import numpy as np
+from numpy.typing import NDArray
 
 from ..utils._checks import _check_type
 from ..utils._logs import _set_verbose, logger
@@ -11,17 +14,18 @@ from ..utils._logs import _set_verbose, logger
 
 # TODO: Add parameters to the docstring.
 def plot_raw_segmentation(
-        labels,
-        raw,
-        n_clusters,
-        cluster_names=None,
-        tmin=None,
-        tmax=None,
-        cmap=None,
-        axes=None,
-        cbar_axes=None,
-        block=False,
-        verbose=None,
+        labels: NDArray[int],
+        raw: BaseRaw,
+        n_clusters: int,
+        cluster_names: List[str, ...] = None,
+        tmin: Optional[Union[int, float]] = None,
+        tmax: Optional[Union[int, float]] = None,
+        cmap: Optional[str] = None,
+        axes: Optional[Axes] = None,
+        cbar_axes: Optional[Axes] = None,
+        *,
+        block: bool = False,
+        verbose: Optional[str] = None,
         **kwargs,
         ):
     """
@@ -80,15 +84,16 @@ def plot_raw_segmentation(
 
 # TODO: Add parameters to the docstring.
 def plot_epoch_segmentation(
-        labels,
-        epochs,
-        n_clusters,
-        cluster_names=None,
-        cmap=None,
-        axes=None,
-        cbar_axes=None,
-        block=False,
-        verbose=None,
+        labels: NDArray[int],
+        epochs: BaseEpochs,
+        n_clusters: int,
+        cluster_names: List[str, ...] = None,
+        cmap: Optional[str] = None,
+        axes: Optional[Axes] = None,
+        cbar_axes: Optional[Axes] = None,
+        *,
+        block: bool = False,
+        verbose: Optional[str] = None,
         **kwargs,
         ):
     """
@@ -102,7 +107,7 @@ def plot_epoch_segmentation(
     _check_type(labels, (np.ndarray, ), 'labels')  # 1D array (n_times, )
     if labels.ndim != 2:
         raise ValueError("Argument labels should be a 2D array.")
-    _check_type(epochs, (Epochs, ), 'epochs')
+    _check_type(epochs, (BaseEpochs, ), 'epochs')
     _check_type(block, (bool, ), 'block')
 
     data = epochs.get_data().swapaxes(0, 1)
@@ -154,15 +159,16 @@ def plot_epoch_segmentation(
 
 
 def _plot_segmentation(
-        labels,
-        gfp,
-        times,
-        n_clusters,
-        cluster_names=None,
-        cmap=None,
-        axes=None,
-        cbar_axes=None,
-        verbose=None,
+        labels: NDArray[int],
+        gfp: NDArray[float],
+        times: NDArray[float],
+        n_clusters: int,
+        cluster_names: List[str, ...] = None,
+        cmap: Optional[str] = None,
+        axes: Optional[Axes] = None,
+        cbar_axes: Optional[Axes] = None,
+        *,
+        verbose: Optional[str] = None,
         **kwargs,
         ):
     """Common code snippet to plot segmentation for raw and epochs."""

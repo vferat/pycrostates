@@ -1,18 +1,22 @@
+from typing import Optional, List
+
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from mne.io import Info
 from mne.viz import plot_topomap
 import numpy as np
+from numpy.typing import NDArray
 
 from ..utils._checks import _check_type, _check_axes
 
 
 def plot_cluster_centers(
-        cluster_centers,
+        cluster_centers: NDArray[float],
         info,
-        cluster_names=None,
-        axes=None,
-        block=False,
+        cluster_names: List[str, ...] = None,
+        axes: Optional[Axes] = None,
+        *,
+        block: bool = False,
         **kwargs,
         ):
     """

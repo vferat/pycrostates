@@ -1,5 +1,6 @@
 from copy import deepcopy
 from numbers import Number
+from typing import Optional, Union, List, Tuple
 
 from mne.io import Info
 from mne.io.constants import FIFF
@@ -162,13 +163,30 @@ class ChInfo(Info):
                  'instead.',
     }
 
-    def __init__(self, info=None, ch_names=None, ch_types=None):
+    def __init__(
+            self,
+            info: Optional[Info] = None,
+            ch_names: Optional[
+                Union[
+                    int,
+                    List[str, ...],
+                    Tuple[str, ...],
+                    ]
+                ] = None,
+            ch_types: Optional[
+                Union[
+                    str,
+                    List[str, ...],
+                    Tuple[str, ...]
+                    ]
+                ] = None,
+            ):
         if all(arg is None for arg in (info, ch_names, ch_types)):
             raise RuntimeError(
                 "Either 'info' or 'ch_names' and 'ch_types' must not be None.")
         if info is None and all(arg is not None
                                 for arg in (ch_names, ch_types)):
-            _check_type(ch_names, (None, 'int', str, list, tuple),  'ch_names')
+            _check_type(ch_names, (None, 'int', list, tuple), 'ch_names')
             _check_type(ch_types, (None, str, list, tuple), 'ch_types')
             self._init_from_channels(ch_names, ch_types)
         elif info is not None and all(arg is None
@@ -181,7 +199,7 @@ class ChInfo(Info):
                 "None. If 'ch_names' and 'ch_types' are provided, 'info' "
                 "must be None.")
 
-    def _init_from_info(self, info):
+    def _init_from_info(self, info: Info):
         """Init instance from mne Info."""
         self['custom_ref_applied'] = info['custom_ref_applied']
         self['bads'] = info['bads']
@@ -191,7 +209,11 @@ class ChInfo(Info):
         self['projs'] = info['projs']
         self._update_redundant()
 
-    def _init_from_channels(self, ch_names, ch_types):
+    def _init_from_channels(
+            self,
+            ch_names: Union[int, List[str, ...], Tuple[str, ...]],
+            ch_types: Union[str, List[str, ...], Tuple[str, ...]]
+            ):
         """Init instance from channel names and types."""
         self._unlocked = True
 
@@ -360,7 +382,7 @@ class ChInfo(Info):
         result._unlocked = False
         return result
 
-    def _check_consistency(self, prepend_error=''):
+    def _check_consistency(self, prepend_error: str = ''):
         """Do some self-consistency checks and datatype tweaks."""
         missing = [bad for bad in self['bads'] if bad not in self['ch_names']]
         if len(missing) > 0:

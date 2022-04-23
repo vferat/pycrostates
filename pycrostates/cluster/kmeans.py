@@ -1,5 +1,12 @@
+from pathlib import Path
+from typing import Union, Optional, Tuple
+
+from mne import BaseEpochs
+from mne.io import BaseRaw
 from mne.parallel import parallel_func
 import numpy as np
+from numpy.random import Generator, RandomState
+from numpy.typing import NDArray
 
 from ._base import _BaseCluster
 from ..utils import _corr_vectors
@@ -31,8 +38,14 @@ class ModKMeans(_BaseCluster):
     """
     # TODO: docstring for tol doesn't look english
 
-    def __init__(self, n_clusters, n_init=100, max_iter=300, tol=1e-6,
-                 random_state=None):
+    def __init__(
+            self,
+            n_clusters: int,
+            n_init: int = 100,
+            max_iter: int = 300,
+            tol: Union[int, float] = 1e-6,
+            random_state: Optional[int, RandomState, Generator] = None,
+            ):
         super().__init__()
 
         # k-means has a fix number of clusters defined at init
@@ -112,8 +125,17 @@ class ModKMeans(_BaseCluster):
 
     @copy_doc(_BaseCluster.fit)
     @fill_doc
-    def fit(self, inst, picks='eeg', tmin=None, tmax=None,
-            reject_by_annotation=True, n_jobs=1, *, verbose=None):
+    def fit(
+            self,
+            inst: Union[BaseRaw, BaseEpochs],
+            picks: Union[str, NDArray[int]] ='eeg',
+            tmin: Optional[Union[int, float]] = None,
+            tmax: Optional[Union[int, float]] = None,
+            reject_by_annotation: bool = True,
+            n_jobs: int = 1,
+            *,
+            verbose: Optional[str] = None,
+            ) -> NDArray[float]:
         """
         %(verbose)s
         """
@@ -169,7 +191,7 @@ class ModKMeans(_BaseCluster):
         self._fitted = True
 
     @copy_doc(_BaseCluster.save)
-    def save(self, fname):
+    def save(self, fname: Union[str, Path]):
         super().save(fname)
         # TODO: to be replaced by a general writer than infers the writer from
         # the file extension.
@@ -190,7 +212,13 @@ class ModKMeans(_BaseCluster):
 
     # --------------------------------------------------------------------
     @staticmethod
-    def _kmeans(data, n_clusters, max_iter, random_state, tol):
+    def _kmeans(
+            data: NDArray[float],
+            n_clusters: int,
+            max_iter: int,
+            random_state: Union[RandomState, Generator],
+            tol: Union[int, float],
+            ) -> Tuple[float, NDArray[float], NDArray[int], bool]:
         """
         Run the k-means algorithm.
         """
@@ -204,12 +232,19 @@ class ModKMeans(_BaseCluster):
         return gev, maps, segmentation, converged
 
     @staticmethod
-    def _compute_maps(data, n_clusters, max_iter, random_state, tol):
+    def _compute_maps(
+            data: NDArray[float],
+            n_clusters: int,
+            max_iter: int,
+            random_state: Union[RandomState, Generator],
+            tol: Union[int, float],
+            ) -> Tuple[NDArray[float], bool]:
         """
         Computes microstates maps.
         Based on mne_microstates by Marijn van Vliet <w.m.vanvliet@gmail.com>
         https://github.com/wmvanvliet/mne_microstates/blob/master/microstates.py
         """
+        # TODO: Does this work if the RandomState is a generator?
         if not isinstance(random_state, np.random.RandomState):
             random_state = np.random.RandomState(random_state)
 
@@ -267,7 +302,7 @@ class ModKMeans(_BaseCluster):
 
     # --------------------------------------------------------------------
     @property
-    def n_init(self):
+    def n_init(self) -> int:
         """
         Number of time the k-means algorithm is run with different centroid
         seeds.
@@ -277,7 +312,7 @@ class ModKMeans(_BaseCluster):
         return self._n_init
 
     @property
-    def max_iter(self):
+    def max_iter(self) -> int:
         """
         Number of maximum iterations of the k-means algorithm for a single run.
 
@@ -286,7 +321,7 @@ class ModKMeans(_BaseCluster):
         return self._max_iter
 
     @property
-    def tol(self):
+    def tol(self) -> Union[int, float]:
         """
         Relative tolerance.
 
@@ -295,18 +330,20 @@ class ModKMeans(_BaseCluster):
         return self._tol
 
     @property
-    def random_state(self):
+    def random_state(self) -> Union[RandomState, Generator]:
         """
         Random state.
 
-        :type: `~numpy.random.RandomState`
+        :type: `~numpy.random.RandomState` | `~numpy.random.Generator`
         """
         return self._random_state
 
     @property
-    def GEV_(self):
+    def GEV_(self) -> float:
         """
         GEV_ fit variable.
+
+        :type: `float`
         """
         if self._GEV_ is None:
             assert not self._fitted  # sanity-check
@@ -326,7 +363,7 @@ class ModKMeans(_BaseCluster):
     # used outside KMeans, they should be moved to regular function in _base.py
     # ---------------
     @staticmethod
-    def _check_n_init(n_init: int):
+    def _check_n_init(n_init: int) -> int:
         """Check that n_init is a positive integer."""
         _check_type(n_init, ('int', ), item_name='n_init')
         if n_init <= 0:
@@ -336,7 +373,7 @@ class ModKMeans(_BaseCluster):
         return n_init
 
     @staticmethod
-    def _check_max_iter(max_iter: int):
+    def _check_max_iter(max_iter: int) -> int:
         """Check that max_iter is a positive integer."""
         _check_type(max_iter, ('int', ), item_name='max_iter')
         if max_iter <= 0:
@@ -346,7 +383,7 @@ class ModKMeans(_BaseCluster):
         return max_iter
 
     @staticmethod
-    def _check_tol(tol: float):
+    def _check_tol(tol: Union[int, float]) -> Union[int, float]:
         """Check that tol is a positive number."""
         _check_type(tol, ('numeric', ), item_name='tol')
         if tol <= 0:

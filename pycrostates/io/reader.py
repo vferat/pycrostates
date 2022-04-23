@@ -1,11 +1,12 @@
 from pathlib import Path
+from typing import Union
 
 from .fiff import _read_cluster as _read_cluster_fif
 from ..utils._checks import _check_type
 from ..utils._logs import logger
 
 
-def read_cluster(fname):
+def read_cluster(fname: Union[str, Path]):
     """Read clustering solution from disk.
 
     Parameters
