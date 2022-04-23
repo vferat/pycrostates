@@ -64,7 +64,7 @@ def _write_cluster(
         cluster_centers_: NDArray[float],
         chinfo: Union[ChInfo, Info],
         algorithm: str,
-        cluster_names: List[str, ...],
+        cluster_names: List[str],
         fitted_data: NDArray[float],
         labels_: NDArray[int],
         **kwargs

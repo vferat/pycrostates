@@ -13,7 +13,7 @@ from ..utils._checks import _check_type, _check_axes
 def plot_cluster_centers(
         cluster_centers: NDArray[float],
         info,
-        cluster_names: List[str, ...] = None,
+        cluster_names: List[str] = None,
         axes: Optional[Axes] = None,
         *,
         block: bool = False,

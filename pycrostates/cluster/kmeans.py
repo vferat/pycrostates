@@ -44,7 +44,7 @@ class ModKMeans(_BaseCluster):
             n_init: int = 100,
             max_iter: int = 300,
             tol: Union[int, float] = 1e-6,
-            random_state: Optional[int, RandomState, Generator] = None,
+            random_state: Optional[Union[int, RandomState, Generator]] = None,
             ):
         super().__init__()
 

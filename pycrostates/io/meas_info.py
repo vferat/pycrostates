@@ -169,14 +169,14 @@ class ChInfo(Info):
             ch_names: Optional[
                 Union[
                     int,
-                    List[str, ...],
+                    List[str],
                     Tuple[str, ...],
                     ]
                 ] = None,
             ch_types: Optional[
                 Union[
                     str,
-                    List[str, ...],
+                    List[str],
                     Tuple[str, ...]
                     ]
                 ] = None,
@@ -211,8 +211,8 @@ class ChInfo(Info):
 
     def _init_from_channels(
             self,
-            ch_names: Union[int, List[str, ...], Tuple[str, ...]],
-            ch_types: Union[str, List[str, ...], Tuple[str, ...]]
+            ch_names: Union[int, List[str], Tuple[str, ...]],
+            ch_types: Union[str, List[str], Tuple[str, ...]]
             ):
         """Init instance from channel names and types."""
         self._unlocked = True

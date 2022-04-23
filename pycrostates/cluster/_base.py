@@ -249,7 +249,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             mapping: Optional[Dict[str, str]] = None,
             new_names: Optional[
                 Union[
-                    List[str, ...],
+                    List[str],
                     Tuple[str, ...],
                     ]
                 ] = None,
@@ -307,7 +307,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             mapping: Optional[Dict[int, int]] = None,
             order: Optional[
                 Union[
-                    List[int, ...],
+                    List[int],
                     Tuple[int, ...],
                     NDArray[int],
                     ]
@@ -393,7 +393,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             self,
             invert: Union[
                 bool,
-                List[bool, ...],
+                List[bool],
                 Tuple[bool, ...],
                 NDArray[bool],
                 ],
@@ -436,7 +436,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             if invert[k]:
                 self._cluster_centers_[k] = - cluster
 
-    def plot(self, axes: Optional[Axes] = None, block: bool = False):
+    def plot(self, axes: Optional[Axes] = None, *, block: bool = False):
         """
         Plot cluster centers as topographic maps.
 
@@ -457,7 +457,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         picks = _picks_to_idx(self._info, 'all', none='all', exclude='bads')
         info = pick_info(self._info, picks)
         return plot_cluster_centers(self._cluster_centers_, info,
-                                    self._cluster_names, axes, block)
+                                    self._cluster_names, axes, block=block)
 
     @abstractmethod
     def save(self, fname: Union[str, Path]):

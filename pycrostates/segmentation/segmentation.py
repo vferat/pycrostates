@@ -147,7 +147,7 @@ class _BaseSegmentation(ABC):
             labels: NDArray[int],
             inst: Union[BaseRaw, BaseEpochs],
             cluster_centers_: NDArray[float],
-            cluster_names: Optional[List[str, ...]] = None,
+            cluster_names: Optional[List[str]] = None,
             predict_parameters: Optional[dict] = None,
             ):
         # check input
@@ -187,6 +187,7 @@ class _BaseSegmentation(ABC):
     def plot_cluster_centers(
             self,
             axes: Optional[Axes] = None,
+            *,
             block: bool = False
             ):
         """
@@ -210,13 +211,13 @@ class _BaseSegmentation(ABC):
             self._inst.info,
             self._cluster_names,
             axes,
-            block,
+            block=block,
             )
 
     # --------------------------------------------------------------------
     @staticmethod
     def _check_cluster_names(
-            cluster_names: List[str, ...],
+            cluster_names: List[str],
             cluster_centers_: NDArray[float],
             ):
         """
