@@ -1,4 +1,8 @@
-from .metrics import (silhouette, davies_bouldin,  # noqa: F401
-                      calinski_harabasz,  dunn)
+from .metrics import (  # noqa: F401
+    calinski_harabasz,
+    davies_bouldin,
+    dunn,
+    silhouette,
+)
 
-__all__ = ('silhouette', 'davies_bouldin', 'dunn', 'calinski_harabasz')
+__all__ = ("silhouette", "davies_bouldin", "dunn", "calinski_harabasz")

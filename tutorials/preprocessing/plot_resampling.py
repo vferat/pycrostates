@@ -10,13 +10,12 @@ from mne.io import read_raw_eeglab
 
 from pycrostates.datasets import lemon
 
-
-raw_fname = lemon.load_data(subject_id='010004', condition='EC')
+raw_fname = lemon.load_data(subject_id="010004", condition="EC")
 raw = read_raw_eeglab(raw_fname, preload=True)
 raw.crop(0, 30)
 
-raw.pick('eeg')
-raw.set_eeg_reference('average')
+raw.pick("eeg")
+raw.set_eeg_reference("average")
 
 #%%
 # We can now use the :func:`~pycrostates.preprocessing.resample`function to
@@ -25,6 +24,7 @@ raw.set_eeg_reference('average')
 # epochs to draw.
 
 from pycrostates.preprocessing import resample
+
 resamples = resample(raw, n_epochs=10, n_samples=150, random_seed=40)
 resamples
 

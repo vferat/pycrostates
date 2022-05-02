@@ -11,13 +11,12 @@ from mne.io import read_raw_eeglab
 from pycrostates.cluster import ModKMeans
 from pycrostates.datasets import lemon
 
-
-raw_fname = lemon.load_data(subject_id='010017', condition='EC')
+raw_fname = lemon.load_data(subject_id="010017", condition="EC")
 raw = read_raw_eeglab(raw_fname, preload=True)
 raw.crop(0, 30)
 
-raw.pick('eeg')
-raw.set_eeg_reference('average')
+raw.pick("eeg")
+raw.set_eeg_reference("average")
 
 #%%
 # The modified Kmeans can be instanciated with the number of cluster centers
@@ -60,7 +59,7 @@ ModK.plot()
 #%%
 # and renamed using :meth:`ModK.rename_clusters`:
 
-ModK.rename_clusters(new_names=['A', 'B', 'C', 'D', 'F'])
+ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
 ModK.plot()
 
 #%%
@@ -83,7 +82,12 @@ ModK.plot()
 # epoch) as these can be incomplete. It should have little impact for raw, but
 # can be important when working with epochs.
 
-segmentation = ModK.predict(raw, reject_by_annotation=True, factor=10,
-                            half_window_size=10, min_segment_length=5,
-                            reject_edges=True)
+segmentation = ModK.predict(
+    raw,
+    reject_by_annotation=True,
+    factor=10,
+    half_window_size=10,
+    min_segment_length=5,
+    reject_edges=True,
+)
 segmentation.plot(tmin=1, tmax=5)

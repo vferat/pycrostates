@@ -13,11 +13,11 @@ from mne.io import read_raw_eeglab
 
 from pycrostates.datasets import lemon
 
-raw_fname = lemon.load_data(subject_id='010004', condition='EC')
+raw_fname = lemon.load_data(subject_id="010004", condition="EC")
 raw = read_raw_eeglab(raw_fname, preload=True)
 
-raw.pick('eeg')
-raw.set_eeg_reference('average')
+raw.pick("eeg")
+raw.set_eeg_reference("average")
 
 #%%
 # We can then use the :func:`~pycrostates.preprocessing.extract_gfp_peaks`
@@ -26,6 +26,7 @@ raw.set_eeg_reference('average')
 # selected peaks.
 
 from pycrostates.preprocessing import extract_gfp_peaks
+
 raw_peaks = extract_gfp_peaks(raw, min_peak_distance=3)
 raw_peaks
 
@@ -38,7 +39,7 @@ raw_peaks
 #    avoid any misuse of this object, we have deliberately assigned its
 #    sampling rate to -1.
 
-raw_peaks.info['sfreq']
+raw_peaks.info["sfreq"]
 
 #%%
 # Note that this function can also be used on :func:`~mne.epochs.Epochs` but
