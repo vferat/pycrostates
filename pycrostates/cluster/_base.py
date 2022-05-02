@@ -1,13 +1,16 @@
 from abc import ABC, abstractmethod
 from copy import copy, deepcopy
 from itertools import groupby
-from typing import Union
+from pathlib import Path
+from typing import Union, Optional, Dict, List, Tuple
 
+from matplotlib.axes import Axes
 from mne import BaseEpochs, pick_info
 from mne.annotations import _annotations_starts_stops
 from mne.io import BaseRaw
 from mne.io.pick import _picks_to_idx
 import numpy as np
+from numpy.typing import NDArray
 from scipy.signal import convolve2d
 
 from ..segmentation import RawSegmentation, EpochsSegmentation
@@ -124,7 +127,10 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         """Different != method."""
         return not self.__eq__(other)
 
-    def copy(self, deep=True):
+    def copy(
+            self,
+            deep: bool = True,
+            ):
         """Returns a copy of the instance.
 
         Parameters
@@ -150,8 +156,15 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
     @abstractmethod
     @fill_doc
-    def fit(self, inst, picks='eeg', tmin=None, tmax=None,
-            reject_by_annotation=True, n_jobs=1):
+    def fit(
+            self,
+            inst: Union[BaseRaw, BaseEpochs],
+            picks: Union[str, NDArray[int]] = 'eeg',
+            tmin: Optional[Union[int, float]] = None,
+            tmax: Optional[Union[int, float]] = None,
+            reject_by_annotation: bool = True,
+            n_jobs: int = 1,
+            ) -> NDArray[float]:
         """
         Segment `~mne.io.Raw` or `~mne.Epochs` instance into microstate
         sequence.
@@ -231,8 +244,16 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
         return data
 
-    def rename_clusters(self, mapping: dict = None,
-                        new_names: Union[list, tuple] = None):
+    def rename_clusters(
+            self,
+            mapping: Optional[Dict[str, str]] = None,
+            new_names: Optional[
+                Union[
+                    List[str],
+                    Tuple[str, ...],
+                    ]
+                ] = None,
+            ):
         """
         Rename the clusters in-place.
 
@@ -281,8 +302,17 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         self._cluster_names = [mapping[name] if name in mapping else name
                                for name in self._cluster_names]
 
-    def reorder_clusters(self, mapping: dict = None,
-                         order: Union[list, tuple] = None):
+    def reorder_clusters(
+            self,
+            mapping: Optional[Dict[int, int]] = None,
+            order: Optional[
+                Union[
+                    List[int],
+                    Tuple[int, ...],
+                    NDArray[int],
+                    ]
+                ] = None,
+            ):
         """
         Reorder the clusters in-place. The positions are 0-indexed.
 
@@ -291,7 +321,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         mapping : dict
             Mapping from the old order to the new order.
             key: old position, value: new position.
-        order : list | tuple
+        order : list of int | tuple of int | array of int
             1D iterable containing the new order.
         """
         self._check_fit()
@@ -359,13 +389,21 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             new_labels[self._labels_ == k] = order[k]
         self._labels_ = new_labels
 
-    def invert_polarity(self, invert):
+    def invert_polarity(
+            self,
+            invert: Union[
+                bool,
+                List[bool],
+                Tuple[bool, ...],
+                NDArray[bool],
+                ],
+            ):
         """
         Invert map polarities for vizualisation purposes. Operates in-place.
 
         Parameters
         ----------
-        invert : bool | list of bool
+        invert : bool | list of bool | array of bool
             List of bool of length ``n_clusters``.
             True will invert map polarity, while False will have no effect.
             If a bool is provided, it is applied to all maps.
@@ -398,17 +436,13 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             if invert[k]:
                 self._cluster_centers_[k] = - cluster
 
-    def plot(
-            self,
-            axes=None,
-            block: bool = False,
-            ):
+    def plot(self, axes: Optional[Axes] = None, *, block: bool = False):
         """
         Plot cluster centers as topographic maps.
 
         Parameters
         ----------
-        axes : None | Axes
+        axes : Axes | None
             Either none to create a new figure or axes (or an array of axes)
             on which the topographic map should be plotted.
         block : bool
@@ -423,10 +457,10 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         picks = _picks_to_idx(self._info, 'all', none='all', exclude='bads')
         info = pick_info(self._info, picks)
         return plot_cluster_centers(self._cluster_centers_, info,
-                                    self._cluster_names, axes, block)
+                                    self._cluster_names, axes, block=block)
 
     @abstractmethod
-    def save(self, fname):
+    def save(self, fname: Union[str, Path]):
         """
         Save clustering solution to disk.
 
@@ -441,8 +475,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     @verbose
     def predict(
             self,
-            inst,
-            picks='eeg',
+            inst: Union[BaseRaw, BaseEpochs],
+            picks: Union[str, NDArray[int]] = 'eeg',
             factor: int = 0,
             half_window_size: int = 3,
             tol: Union[int, float] = 10e-6,
@@ -450,7 +484,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             reject_edges: bool = True,
             reject_by_annotation: bool = True,
             *,
-            verbose=None,
+            verbose: Optional[str] = None,
             ):
         """Segment `~mne.io.Raw` or `~mne.Epochs` instance into microstate
         sequence.
@@ -556,9 +590,18 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 half_window_size, min_segment_length, reject_edges)
         return segmentation
 
-    def _predict_raw(self, raw, picks_data, picks_cluster_centers, factor, tol,
-                     half_window_size, min_segment_length, reject_edges,
-                     reject_by_annotation):
+    def _predict_raw(
+            self,
+            raw: BaseRaw,
+            picks_data: NDArray[int],
+            picks_cluster_centers: NDArray[int],
+            factor: int,
+            tol: Union[int, float],
+            half_window_size: int,
+            min_segment_length: int,
+            reject_edges: bool,
+            reject_by_annotation: bool,
+            ) -> RawSegmentation:
         """Create segmentation for raw."""
         predict_parameters = {
             'factor': factor,
@@ -614,9 +657,17 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             predict_parameters=predict_parameters,
             )
 
-    def _predict_epochs(self, epochs, picks_data, picks_cluster_centers,
-                        factor, tol, half_window_size, min_segment_length,
-                        reject_edges):
+    def _predict_epochs(
+            self,
+            epochs: BaseEpochs,
+            picks_data: NDArray[int],
+            picks_cluster_centers: NDArray[int],
+            factor: int,
+            tol: Union[int, float],
+            half_window_size: int,
+            min_segment_length: int,
+            reject_edges: bool,
+            ) -> EpochsSegmentation:
         """Create segmentation for epochs."""
 
         predict_parameters = {
@@ -657,7 +708,13 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
     # --------------------------------------------------------------------
     @staticmethod
-    def _segment(data, states, factor, tol, half_window_size):
+    def _segment(
+            data: NDArray[float],
+            states: NDArray[float],
+            factor: int,
+            tol: Union[int, float],
+            half_window_size: int,
+            ) -> NDArray[int]:
         """Create segmentation. Must operate on a copy of states."""
         data -= np.mean(data, axis=0)
         std = np.std(data, axis=0)
@@ -676,8 +733,14 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return labels
 
     @staticmethod
-    def _smooth_segmentation(data, states, labels, factor, tol,
-                             half_window_size):
+    def _smooth_segmentation(
+            data: NDArray[float],
+            states: NDArray[float],
+            labels: NDArray[int],
+            factor: int,
+            tol: Union[int, float],
+            half_window_size: int,
+            ) -> NDArray[int]:
         """Apply smooting. Adapted from [1].
 
         References
@@ -720,7 +783,11 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return labels
 
     @staticmethod
-    def _reject_short_segments(segmentation, data, min_segment_length):
+    def _reject_short_segments(
+            segmentation: NDArray[int],
+            data: NDArray[float],
+            min_segment_length: int,
+            ) -> NDArray[int]:
         """Reject segments that are too short by replacing the labels with the
         adjacent labels based on data correlation."""
         while True:
@@ -781,7 +848,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return segmentation
 
     @staticmethod
-    def _reject_edge_segments(segmentation):
+    def _reject_edge_segments(segmentation: NDArray[int]) -> NDArray[int]:
         """Set the first and last segment as unlabeled (0)."""
         # set first segment to unlabeled
         n = (segmentation != segmentation[0]).argmax()
@@ -795,7 +862,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
     # --------------------------------------------------------------------
     @property
-    def n_clusters(self):
+    def n_clusters(self) -> int:
         """
         Number of clusters.
 
@@ -817,7 +884,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return self._info
 
     @property
-    def fitted(self):
+    def fitted(self) -> bool:
         """
         Current fitting state.
 
@@ -846,7 +913,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             self._fitted = False
 
     @property
-    def cluster_centers_(self):
+    def cluster_centers_(self) -> NDArray[float]:
         """
         Center of the clusters. Returns None if cluster algorithm has not been
         fitted.
@@ -860,7 +927,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return self._cluster_centers_.copy()
 
     @property
-    def fitted_data(self):
+    def fitted_data(self) -> NDArray[float]:
         """
         Data array retrieved from MNE used to fit the clustering algorithm.
 
@@ -873,7 +940,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return self._fitted_data.copy()
 
     @property
-    def labels_(self):
+    def labels_(self) -> NDArray[int]:
         """
         labels fit variable.
         """
@@ -884,7 +951,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return self._labels_.copy()
 
     @property
-    def cluster_names(self):
+    def cluster_names(self) -> List[str]:
         """
         Name of the clusters.
 
@@ -894,7 +961,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
     # --------------------------------------------------------------------
     @staticmethod
-    def _check_n_clusters(n_clusters: int):
+    def _check_n_clusters(n_clusters: int) -> int:
         """Check that the number of clusters is a positive integer."""
         _check_type(n_clusters, ('int', ), item_name='n_clusters')
         if n_clusters <= 0:
@@ -904,7 +971,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         return n_clusters
 
     @staticmethod
-    def _check_reject_by_annotation(reject_by_annotation):
+    def _check_reject_by_annotation(reject_by_annotation: bool) -> bool:
         """Checks the reject_by_annotation argument."""
         _check_type(reject_by_annotation, (bool, str, None),
                     item_name='reject_by_annotation')

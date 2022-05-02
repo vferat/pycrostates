@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
 import itertools
-from typing import Union
+from typing import Union, Optional, List
 
+from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
 import numpy as np
+from numpy.typing import NDArray
 
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
@@ -15,10 +17,10 @@ from ..viz import (
 
 
 def _compute_microstate_parameters(
-        labels,
-        data,
-        maps,
-        maps_names,
+        labels: NDArray[int],
+        data: NDArray[float],
+        maps: NDArray[float],
+        maps_names: List[str],
         sfreq: Union[int, float],
         norm_gfp: bool = True,
         return_dist: bool = False
@@ -142,11 +144,11 @@ class _BaseSegmentation(ABC):
     @abstractmethod
     def __init__(
             self,
-            labels,
-            inst,
-            cluster_centers_,
-            cluster_names=None,
-            predict_parameters=None,
+            labels: NDArray[int],
+            inst: Union[BaseRaw, BaseEpochs],
+            cluster_centers_: NDArray[float],
+            cluster_names: Optional[List[str]] = None,
+            predict_parameters: Optional[dict] = None,
             ):
         # check input
         _check_type(labels, (np.ndarray, ), 'labels')
@@ -184,7 +186,8 @@ class _BaseSegmentation(ABC):
 
     def plot_cluster_centers(
             self,
-            axes=None,
+            axes: Optional[Axes] = None,
+            *,
             block: bool = False
             ):
         """
@@ -208,12 +211,15 @@ class _BaseSegmentation(ABC):
             self._inst.info,
             self._cluster_names,
             axes,
-            block,
+            block=block,
             )
 
     # --------------------------------------------------------------------
     @staticmethod
-    def _check_cluster_names(cluster_names, cluster_centers_):
+    def _check_cluster_names(
+            cluster_names: List[str],
+            cluster_centers_: NDArray[float],
+            ):
         """
         Checks that the argument 'cluster_names' is valid.
         """
@@ -230,7 +236,7 @@ class _BaseSegmentation(ABC):
                     f"cluster centers and '{len(cluster_names)}' provided.")
 
     @staticmethod
-    def _check_predict_parameters(predict_parameters):
+    def _check_predict_parameters(predict_parameters: dict):
         """
         Checks that the argument 'predict_parameters' is valid.
         """
@@ -257,7 +263,7 @@ class _BaseSegmentation(ABC):
 
     # --------------------------------------------------------------------
     @property
-    def predict_parameters(self):
+    def predict_parameters(self) -> dict:
         """
         Parameters used to predict the current segmentation.
 
@@ -271,14 +277,16 @@ class _BaseSegmentation(ABC):
         return self._predict_parameters.copy()
 
     @property
-    def labels(self):
+    def labels(self) -> NDArray[int]:
         """
         Segmentation predicted.
+
+        :type: `~numpy.array`
         """
         return self._labels.copy()
 
     @property
-    def cluster_centers_(self):
+    def cluster_centers_(self) -> NDArray[float]:
         """
         Center of the clusters.
 
@@ -287,7 +295,7 @@ class _BaseSegmentation(ABC):
         return self._cluster_centers_.copy()
 
     @property
-    def cluster_names(self):
+    def cluster_names(self) -> List[str]:
         """
         Name of the clusters.
 
@@ -328,13 +336,14 @@ class RawSegmentation(_BaseSegmentation):
     @fill_doc
     def plot(
             self,
-            tmin=None,
-            tmax=None,
-            cmap=None,
-            axes=None,
-            cbar_axes=None,
+            tmin: Optional[Union[int, float]] = None,
+            tmax: Optional[Union[int, float]] = None,
+            cmap: Optional[str] = None,
+            axes: Optional[Axes] = None,
+            cbar_axes: Optional[Axes] = None,
+            *,
             block: bool = False,
-            verbose=None
+            verbose: Optional[str] = None
             ):
         """
         Plot the segmentation.
@@ -393,7 +402,7 @@ class RawSegmentation(_BaseSegmentation):
 
     # --------------------------------------------------------------------
     @property
-    def raw(self):
+    def raw(self) -> BaseRaw:
         """
         Raw instance.
         """
@@ -458,9 +467,10 @@ class EpochsSegmentation(_BaseSegmentation):
     @fill_doc
     def plot(
             self,
-            cmap=None,
-            axes=None,
-            cbar_axes=None,
+            cmap: Optional[str] = None,
+            axes: Optional[Axes] = None,
+            cbar_axes: Optional[Axes] = None,
+            *,
             block: bool = False,
             verbose=None
             ):
@@ -501,7 +511,7 @@ class EpochsSegmentation(_BaseSegmentation):
 
     # --------------------------------------------------------------------
     @property
-    def epochs(self):
+    def epochs(self) -> BaseEpochs:
         """
         Epochs instance.
         """

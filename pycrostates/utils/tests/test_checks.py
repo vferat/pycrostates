@@ -65,7 +65,7 @@ def test_check_n_jobs():
     assert _check_n_jobs(5) == 5
     assert _check_n_jobs(101) == 101
 
-    with pytest.raises(ValueError, match="n_jobs must be an integer"):
+    with pytest.raises(TypeError, match="'n_jobs' must be an instance of int"):
         _check_n_jobs('cuda')
 
     # all cores
@@ -73,7 +73,7 @@ def test_check_n_jobs():
     for k in range(n):
         assert _check_n_jobs(-k-1) == n - k
     assert _check_n_jobs(-n) == 1
-    with pytest.raises(ValueError, match="If n_jobs has a negative value"):
+    with pytest.raises(ValueError, match="If n_jobs has a non-positive value"):
         _check_n_jobs(-n-1)
 
 

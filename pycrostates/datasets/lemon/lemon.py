@@ -3,6 +3,7 @@ import pkg_resources as pkr
 import numpy as np
 import pooch
 import mne
+from mne.io import BaseRaw
 
 from ...utils._checks import _check_type, _check_value
 from ...utils._config import get_config
@@ -70,7 +71,7 @@ def load_data(subject_id: str, condition: str):
     return output_path_set
 
 
-def standardize(raw):
+def standardize(raw: BaseRaw):
     """Standardize :class:`~mne.io.Raw` from the lemon dataset.
     This function will interpolate missing channels from
     the standard setup, then reorder channels and finally
