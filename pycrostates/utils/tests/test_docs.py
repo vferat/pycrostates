@@ -1,6 +1,6 @@
 """Test _docs.py"""
 
-from pycrostates.utils._docs import fill_doc, copy_doc
+from pycrostates.utils._docs import copy_doc, fill_doc
 
 
 def test_fill_doc():
@@ -17,9 +17,8 @@ def test_fill_doc():
         """
         pass
 
-    assert 'n_clusters : int' in foo.__doc__
-    assert 'verbose : bool' in foo.__doc__
-
+    assert "n_clusters : int" in foo.__doc__
+    assert "verbose : bool" in foo.__doc__
 
 
 def test_copy_doc():
@@ -35,4 +34,4 @@ def test_copy_doc():
     def foo2(x, y):
         pass
 
-    assert 'My doc.' in foo2.__doc__
+    assert "My doc." in foo2.__doc__

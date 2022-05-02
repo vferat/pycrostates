@@ -1,9 +1,9 @@
 """Utility functions for checking types and values. Inspired from MNE."""
 
-from itertools import product
 import multiprocessing as mp
-import os
 import operator
+import os
+from itertools import product
 from pathlib import Path
 
 import numpy as np
@@ -37,8 +37,9 @@ def _ensure_int(item, item_name=None):
         item = int(operator.index(item))
     except TypeError:
         item_name = "Item" if item_name is None else "'%s'" % item_name
-        raise TypeError("%s must be an int, got %s instead."
-                        % (item_name, type(item)))
+        raise TypeError(
+            "%s must be an int, got %s instead." % (item_name, type(item))
+        )
 
     return item
 
@@ -63,8 +64,8 @@ class _Callable:
 _types = {
     "numeric": (np.floating, float, _IntLike()),
     "path-like": (str, Path, os.PathLike),
-    "int": (_IntLike(), ),
-    "callable": (_Callable(), ),
+    "int": (_IntLike(),),
+    "callable": (_Callable(),),
 }
 
 
@@ -88,24 +89,39 @@ def _check_type(item, types, item_name=None):
     TypeError
         When the type of the item is not one of the valid options.
     """
-    check_types = sum(((type(None), ) if type_ is None else (type_, )
-                       if not isinstance(type_, str) else _types[type_]
-                       for type_ in types), ())
+    check_types = sum(
+        (
+            (type(None),)
+            if type_ is None
+            else (type_,)
+            if not isinstance(type_, str)
+            else _types[type_]
+            for type_ in types
+        ),
+        (),
+    )
 
     if not isinstance(item, check_types):
-        type_name = ["None" if cls_ is None else cls_.__name__
-                     if not isinstance(cls_, str) else cls_
-                     for cls_ in types]
+        type_name = [
+            "None"
+            if cls_ is None
+            else cls_.__name__
+            if not isinstance(cls_, str)
+            else cls_
+            for cls_ in types
+        ]
         if len(type_name) == 1:
             type_name = type_name[0]
         elif len(type_name) == 2:
-            type_name = ' or '.join(type_name)
+            type_name = " or ".join(type_name)
         else:
             type_name[-1] = "or " + type_name[-1]
             type_name = ", ".join(type_name)
         item_name = "Item" if item_name is None else "'%s'" % item_name
-        raise TypeError(f"{item_name} must be an instance of {type_name}, "
-                        f"got {type(item)} instead.")
+        raise TypeError(
+            f"{item_name} must be an instance of {type_name}, "
+            f"got {type(item)} instead."
+        )
 
     return item
 
@@ -134,20 +150,27 @@ def _check_value(item, allowed_values, item_name=None, extra=None):
     if item not in allowed_values:
         item_name = "" if item_name is None else " '%s'" % item_name
         extra = "" if extra is None else " " + extra
-        msg = ("Invalid value for the{item_name} parameter{extra}. "
-               "{options}, but got {item!r} instead.")
+        msg = (
+            "Invalid value for the{item_name} parameter{extra}. "
+            "{options}, but got {item!r} instead."
+        )
         allowed_values = tuple(allowed_values)  # e.g., if a dict was given
         if len(allowed_values) == 1:
             options = "The only allowed value is %s" % repr(allowed_values[0])
         elif len(allowed_values) == 2:
-            options = "Allowed values are %s and %s" % \
-                (repr(allowed_values[0]), repr(allowed_values[1]))
+            options = "Allowed values are %s and %s" % (
+                repr(allowed_values[0]),
+                repr(allowed_values[1]),
+            )
         else:
             options = "Allowed values are "
             options += ", ".join([f"{repr(v)}" for v in allowed_values[:-1]])
             options += f", and {repr(allowed_values[-1])}"
-        raise ValueError(msg.format(item_name=item_name, extra=extra,
-                                    options=options, item=item))
+        raise ValueError(
+            msg.format(
+                item_name=item_name, extra=extra, options=options, item=item
+            )
+        )
 
     return item
 
@@ -157,15 +180,16 @@ def _check_n_jobs(n_jobs):
     Check that n_jobs is a positive integer or a negative integer for all
     cores. CUDA is not supported.
     """
-    _check_type(n_jobs, ('int', ), 'n_jobs')
+    _check_type(n_jobs, ("int",), "n_jobs")
     if n_jobs <= 0:
         n_cores = mp.cpu_count()
         n_jobs_orig = n_jobs
         n_jobs = min(n_cores + n_jobs + 1, n_cores)
         if n_jobs <= 0:
             raise ValueError(
-                f'If n_jobs has a non-positive value ({n_jobs_orig}), it must '
-                f'not be less than the number of CPUs present ({n_cores}).')
+                f"If n_jobs has a non-positive value ({n_jobs_orig}), it must "
+                f"not be less than the number of CPUs present ({n_cores})."
+            )
     return n_jobs
 
 
@@ -176,20 +200,22 @@ def _check_random_state(seed):
 
 def _check_axes(axes):
     """Check that ax is an Axes object or an array of Axes."""
-    _check_type(axes, (Axes, np.ndarray), 'axes')
+    _check_type(axes, (Axes, np.ndarray), "axes")
     if isinstance(axes, np.ndarray):
         if axes.ndim == 1:
             for ax in axes:
-                _check_type(ax, (Axes, ))
-                assert hasattr(ax, 'plot')  # sanity-check
+                _check_type(ax, (Axes,))
+                assert hasattr(ax, "plot")  # sanity-check
         elif axes.ndim == 2:
             for i, j in product(range(axes.shape[0]), range(axes.shape[1])):
-                _check_type(axes[i, j], (Axes, ))
-                assert hasattr(axes[i, j], 'plot')  # sanity-check
+                _check_type(axes[i, j], (Axes,))
+                assert hasattr(axes[i, j], "plot")  # sanity-check
         else:
-            raise ValueError("Argument 'axes' should be a matplotib axes or a "
-                             "1D or 2D numpy array of matplotlib axes.")
+            raise ValueError(
+                "Argument 'axes' should be a matplotib axes or a "
+                "1D or 2D numpy array of matplotlib axes."
+            )
     else:
         # sanity-check
-        assert hasattr(axes, 'plot')
+        assert hasattr(axes, "plot")
     return axes

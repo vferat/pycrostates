@@ -1,30 +1,33 @@
-from abc import ABC, abstractmethod
 import itertools
-from typing import Union, Optional, List
+from abc import ABC, abstractmethod
+from typing import List, Optional, Union
 
+import numpy as np
 from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
-import numpy as np
 from numpy.typing import NDArray
 
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
-from ..utils._docs import fill_doc, copy_doc
+from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
 from ..viz import (
-    plot_raw_segmentation, plot_epoch_segmentation, plot_cluster_centers)
+    plot_cluster_centers,
+    plot_epoch_segmentation,
+    plot_raw_segmentation,
+)
 
 
 def _compute_microstate_parameters(
-        labels: NDArray[int],
-        data: NDArray[float],
-        maps: NDArray[float],
-        maps_names: List[str],
-        sfreq: Union[int, float],
-        norm_gfp: bool = True,
-        return_dist: bool = False
-        ):
+    labels: NDArray[int],
+    data: NDArray[float],
+    maps: NDArray[float],
+    maps_names: List[str],
+    sfreq: Union[int, float],
+    norm_gfp: bool = True,
+    return_dist: bool = False,
+):
     """
     Compute microstate parameters.
 
@@ -71,15 +74,14 @@ def _compute_microstate_parameters(
                 Duration of each segments assigned to a given state.
                 Each value is expressed in seconds (s).
     """
-    _check_type(norm_gfp, (bool, ), 'norm_gfp')
-    _check_type(return_dist, (bool, ), 'return_dist')
+    _check_type(norm_gfp, (bool,), "norm_gfp")
+    _check_type(return_dist, (bool,), "return_dist")
 
     gfp = np.std(data, axis=0)
     if norm_gfp:
         gfp /= np.linalg.norm(gfp)
 
-    segments = [(s, list(group))
-                for s, group in itertools.groupby(labels)]
+    segments = [(s, list(group)) for s, group in itertools.groupby(labels)]
 
     d = {}
     for s, state in enumerate(maps):
@@ -88,43 +90,45 @@ def _compute_microstate_parameters(
         if len(arg_where) != 0:
             labeled_tp = data.T[arg_where][:, 0, :].T
             labeled_gfp = gfp[arg_where][:, 0]
-            state_array = np.array([state]*len(arg_where)).transpose()
+            state_array = np.array([state] * len(arg_where)).transpose()
 
             dist_corr = _corr_vectors(state_array, labeled_tp)
-            d[f'{state_name}_mean_corr'] = np.mean(np.abs(dist_corr))
-            dist_gev = (labeled_gfp * dist_corr) ** 2 / np.sum(gfp ** 2)
-            d[f'{state_name}_gev'] = np.sum(dist_gev)
+            d[f"{state_name}_mean_corr"] = np.mean(np.abs(dist_corr))
+            dist_gev = (labeled_gfp * dist_corr) ** 2 / np.sum(gfp**2)
+            d[f"{state_name}_gev"] = np.sum(dist_gev)
 
             s_segments = np.array(
-                [len(group) for s_, group in segments if s_ == s])
-            occurrences = \
+                [len(group) for s_, group in segments if s_ == s]
+            )
+            occurrences = (
                 len(s_segments) / len(np.where(labels != -1)[0]) * sfreq
-            d[f'{state_name}_occurrences'] = occurrences
+            )
+            d[f"{state_name}_occurrences"] = occurrences
 
             timecov = np.sum(s_segments) / len(np.where(labels != -1)[0])
-            d[f'{state_name}_timecov'] = timecov
+            d[f"{state_name}_timecov"] = timecov
 
             dist_durs = s_segments / sfreq
-            d[f'{state_name}_meandurs'] = np.mean(dist_durs)
+            d[f"{state_name}_meandurs"] = np.mean(dist_durs)
 
             if return_dist:
-                d[f'{state_name}_dist_corr'] = dist_corr
-                d[f'{state_name}_dist_gev'] = dist_gev
-                d[f'{state_name}_dist_durs'] = dist_durs
+                d[f"{state_name}_dist_corr"] = dist_corr
+                d[f"{state_name}_dist_gev"] = dist_gev
+                d[f"{state_name}_dist_durs"] = dist_durs
 
         else:
-            d[f'{state_name}_mean_corr'] = 0
-            d[f'{state_name}_gev'] = 0
-            d[f'{state_name}_timecov'] = 0
-            d[f'{state_name}_meandurs'] = 0
-            d[f'{state_name}_occurrences'] = 0
+            d[f"{state_name}_mean_corr"] = 0
+            d[f"{state_name}_gev"] = 0
+            d[f"{state_name}_timecov"] = 0
+            d[f"{state_name}_meandurs"] = 0
+            d[f"{state_name}_occurrences"] = 0
 
             if return_dist:
-                d[f'{state_name}_dist_corr'] = np.array([])
-                d[f'{state_name}_dist_gev'] = np.array([])
-                d[f'{state_name}_dist_durs'] = np.array([])
+                d[f"{state_name}_dist_corr"] = np.array([])
+                d[f"{state_name}_dist_gev"] = np.array([])
+                d[f"{state_name}_dist_durs"] = np.array([])
 
-    d['unlabeled'] = len(np.argwhere(labels == -1)) / len(gfp)
+    d["unlabeled"] = len(np.argwhere(labels == -1)) / len(gfp)
     return d
 
 
@@ -143,53 +147,55 @@ class _BaseSegmentation(ABC):
 
     @abstractmethod
     def __init__(
-            self,
-            labels: NDArray[int],
-            inst: Union[BaseRaw, BaseEpochs],
-            cluster_centers_: NDArray[float],
-            cluster_names: Optional[List[str]] = None,
-            predict_parameters: Optional[dict] = None,
-            ):
+        self,
+        labels: NDArray[int],
+        inst: Union[BaseRaw, BaseEpochs],
+        cluster_centers_: NDArray[float],
+        cluster_names: Optional[List[str]] = None,
+        predict_parameters: Optional[dict] = None,
+    ):
         # check input
-        _check_type(labels, (np.ndarray, ), 'labels')
-        _check_type(cluster_centers_, (np.ndarray, ), 'cluster_centers_')
+        _check_type(labels, (np.ndarray,), "labels")
+        _check_type(cluster_centers_, (np.ndarray,), "cluster_centers_")
         if cluster_centers_.ndim != 2:
             raise ValueError(
                 "Argument 'cluster_centers_' should be a 2D array. The "
                 f"provided array shape is {cluster_centers_.shape} which has "
-                f"{cluster_centers_.ndim} dimensions.")
+                f"{cluster_centers_.ndim} dimensions."
+            )
 
         self._labels = labels
         self._inst = inst
         self._cluster_centers_ = cluster_centers_
         self._cluster_names = _BaseSegmentation._check_cluster_names(
-            cluster_names, self._cluster_centers_)
+            cluster_names, self._cluster_centers_
+        )
         self._predict_parameters = _BaseSegmentation._check_predict_parameters(
-            predict_parameters)
+            predict_parameters
+        )
 
     def __repr__(self) -> str:
         name = self.__class__.__name__
-        s = f'<{name} | n = {len(self._cluster_centers_)} cluster centers |'
-        s += f' {self._inst.__repr__()[1:-1]}>'
+        s = f"<{name} | n = {len(self._cluster_centers_)} cluster centers |"
+        s += f" {self._inst.__repr__()[1:-1]}>"
         return s
 
     def _repr_html_(self, caption=None):
         from ..html_templates import repr_templates_env
+
         template = repr_templates_env.get_template(
-            'BaseSegmentation.html.jinja')
+            "BaseSegmentation.html.jinja"
+        )
         return template.render(
             name=self.__class__.__name__,
             n_clusters=len(self._cluster_centers_),
             cluster_names=self._cluster_names,
             inst_repr=self._inst._repr_html_(),
-            )
+        )
 
     def plot_cluster_centers(
-            self,
-            axes: Optional[Axes] = None,
-            *,
-            block: bool = False
-            ):
+        self, axes: Optional[Axes] = None, *, block: bool = False
+    ):
         """
         Plot cluster centers as topographic maps.
 
@@ -212,18 +218,18 @@ class _BaseSegmentation(ABC):
             self._cluster_names,
             axes,
             block=block,
-            )
+        )
 
     # --------------------------------------------------------------------
     @staticmethod
     def _check_cluster_names(
-            cluster_names: List[str],
-            cluster_centers_: NDArray[float],
-            ):
+        cluster_names: List[str],
+        cluster_centers_: NDArray[float],
+    ):
         """
         Checks that the argument 'cluster_names' is valid.
         """
-        _check_type(cluster_names, (list, None), 'cluster_names')
+        _check_type(cluster_names, (list, None), "cluster_names")
         if cluster_names is None:
             return [str(k) for k in range(1, len(cluster_centers_) + 1)]
         else:
@@ -233,32 +239,34 @@ class _BaseSegmentation(ABC):
                 raise ValueError(
                     "The same number of cluster centers and cluster names "
                     f"should be provided. There are {len(cluster_centers_)} "
-                    f"cluster centers and '{len(cluster_names)}' provided.")
+                    f"cluster centers and '{len(cluster_names)}' provided."
+                )
 
     @staticmethod
     def _check_predict_parameters(predict_parameters: dict):
         """
         Checks that the argument 'predict_parameters' is valid.
         """
-        _check_type(predict_parameters, (dict, None), 'predict_parameters')
+        _check_type(predict_parameters, (dict, None), "predict_parameters")
         if predict_parameters is None:
             return None
         # valid keys from pycrostates prediction
         valid_keys = (
-            'factor',
-            'tol',
-            'half_window_size',
-            'min_segment_length',
-            'reject_edges',
-            'reject_by_annotation',
-            )
+            "factor",
+            "tol",
+            "half_window_size",
+            "min_segment_length",
+            "reject_edges",
+            "reject_by_annotation",
+        )
         # Let the door open for custom prediction with different keys, so log
         # a warning instead of raising.
         for key in predict_parameters.keys():
             if key not in valid_keys:
                 logger.warning(
                     f"The key '{key}' in predict_parameters is not part of "
-                    "the default set of keys supported by pycrostates.")
+                    "the default set of keys supported by pycrostates."
+                )
         return predict_parameters
 
     # --------------------------------------------------------------------
@@ -272,7 +280,8 @@ class _BaseSegmentation(ABC):
         if self._predict_parameters is None:
             logger.info(
                 "Argument 'predict_parameters' was not provided when creating "
-                "the segmentation.")
+                "the segmentation."
+            )
             return None
         return self._predict_parameters.copy()
 
@@ -318,33 +327,35 @@ class RawSegmentation(_BaseSegmentation):
     predict_parameters : dict
     """
 
-    def __init__(self, *args,  **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        _check_type(self._inst, (BaseRaw, ), item_name='raw')
+        _check_type(self._inst, (BaseRaw,), item_name="raw")
         if self._labels.ndim != 1:
             raise ValueError(
                 "Argument 'labels' should be a 1D array. The provided array "
                 f"shape is {self._labels.shape} which has {self._labels.ndim} "
-                "dimensions.")
+                "dimensions."
+            )
 
         if self._inst.times.size != self._labels.shape[-1]:
             raise ValueError(
                 "Provided MNE raw and labels do not have the same number "
                 f"of samples. The 'raw' has {self._inst.times.size} samples, "
-                f"while the 'labels' has {self._labels.shape[-1]} samples.")
+                f"while the 'labels' has {self._labels.shape[-1]} samples."
+            )
 
     @fill_doc
     def plot(
-            self,
-            tmin: Optional[Union[int, float]] = None,
-            tmax: Optional[Union[int, float]] = None,
-            cmap: Optional[str] = None,
-            axes: Optional[Axes] = None,
-            cbar_axes: Optional[Axes] = None,
-            *,
-            block: bool = False,
-            verbose: Optional[str] = None
-            ):
+        self,
+        tmin: Optional[Union[int, float]] = None,
+        tmax: Optional[Union[int, float]] = None,
+        cmap: Optional[str] = None,
+        axes: Optional[Axes] = None,
+        cbar_axes: Optional[Axes] = None,
+        *,
+        block: bool = False,
+        verbose: Optional[str] = None,
+    ):
         """
         Plot the segmentation.
 
@@ -381,24 +392,22 @@ class RawSegmentation(_BaseSegmentation):
             axes=axes,
             cbar_axes=cbar_axes,
             block=block,
-            verbose=verbose
-            )
+            verbose=verbose,
+        )
 
     @copy_doc(_compute_microstate_parameters)
     def compute_parameters(
-            self,
-            norm_gfp: bool = True,
-            return_dist: bool = False
-            ):
+        self, norm_gfp: bool = True, return_dist: bool = False
+    ):
         return _compute_microstate_parameters(
             self._labels,
             self._inst.get_data(),
             self._cluster_centers_,
             self._cluster_names,
-            self._inst.info['sfreq'],
+            self._inst.info["sfreq"],
             norm_gfp=norm_gfp,
             return_dist=return_dist,
-            )
+        )
 
     # --------------------------------------------------------------------
     @property
@@ -423,33 +432,34 @@ class EpochsSegmentation(_BaseSegmentation):
     predict_parameters : dict
     """
 
-    def __init__(self, *args,  **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        _check_type(self._inst, (BaseEpochs, ), 'epochs')
+        _check_type(self._inst, (BaseEpochs,), "epochs")
 
         if self._labels.ndim != 2:
             raise ValueError(
                 "Argument 'labels' should be a 2D array. The provided array "
                 f"shape is {self._labels.shape} which has {self._labels.ndim} "
-                "dimensions.")
+                "dimensions."
+            )
         if len(self._inst) != self._labels.shape[0]:
             raise ValueError(
                 "Provided MNE instance and labels do not have the same number "
                 f"of epochs. The 'MNE instance' has {len(self._inst)} epochs, "
-                f"while the 'labels' has {self._labels.shape[0]} epochs.")
+                f"while the 'labels' has {self._labels.shape[0]} epochs."
+            )
         if self._inst.times.size != self._labels.shape[-1]:
             raise ValueError(
                 "Provided MNE epochs and labels do not have the same number "
                 f"of samples. The 'epochs' have {self._inst.times.size} "
                 f"samples, while the 'labels' has {self._labels.shape[-1]} "
-                "samples.")
+                "samples."
+            )
 
     @copy_doc(_compute_microstate_parameters)
     def compute_parameters(
-            self,
-            norm_gfp: bool = True,
-            return_dist: bool = False
-            ):
+        self, norm_gfp: bool = True, return_dist: bool = False
+    ):
         data = self._inst.get_data()
         data = np.swapaxes(data, 0, 1)
         data = data.reshape(data.shape[0], -1)
@@ -459,21 +469,21 @@ class EpochsSegmentation(_BaseSegmentation):
             data,
             self._cluster_centers_,
             self._cluster_names,
-            self._inst.info['sfreq'],
+            self._inst.info["sfreq"],
             norm_gfp=norm_gfp,
             return_dist=return_dist,
-            )
+        )
 
     @fill_doc
     def plot(
-            self,
-            cmap: Optional[str] = None,
-            axes: Optional[Axes] = None,
-            cbar_axes: Optional[Axes] = None,
-            *,
-            block: bool = False,
-            verbose=None
-            ):
+        self,
+        cmap: Optional[str] = None,
+        axes: Optional[Axes] = None,
+        cbar_axes: Optional[Axes] = None,
+        *,
+        block: bool = False,
+        verbose=None,
+    ):
         """
         Plot segmentation.
 
@@ -507,7 +517,7 @@ class EpochsSegmentation(_BaseSegmentation):
             cbar_axes=cbar_axes,
             block=block,
             verbose=verbose,
-            )
+        )
 
     # --------------------------------------------------------------------
     @property
