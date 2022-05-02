@@ -2,6 +2,8 @@
 pytest==7.0.1
 pytest-cov
 flake8
+black
+isort
 twine
 wheel
 # For EEGLAB I/O in datasets

@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  flake8:
+  style:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -37,3 +37,11 @@ jobs:
         uses: py-actions/flake8@v1
         with:
           path: "pycrostates"
+      - name: Run black
+        uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+      - name: Run isort
+        uses: jamescurtin/isort-action@master
+        with:
+            requirementsFiles: "requirements.txt requirements_testing.txt"
