@@ -4,6 +4,8 @@ from functools import reduce
 import json
 from numbers import Integral
 import operator
+from pathlib import Path
+from typing import Union, List
 
 from mne.io import Info
 from mne.io.constants import FIFF
@@ -18,6 +20,7 @@ from mne.io.write import (
     write_double_matrix, write_dig_points, write_name_list, write_string)
 from mne.io._digitization import _read_dig_fif, _format_dig_points
 import numpy as np
+from numpy.typing import NDArray
 
 from . import ChInfo
 from .. import __version__
@@ -57,13 +60,13 @@ FIFF_MNE_ICA_MISC_PARAMS -> fit variables (ending with '_')
 
 
 def _write_cluster(
-        fname,
-        cluster_centers_,
-        chinfo,
-        algorithm,
-        cluster_names,
-        fitted_data,
-        labels_,
+        fname: Union[str, Path],
+        cluster_centers_: NDArray[float],
+        chinfo: Union[ChInfo, Info],
+        algorithm: str,
+        cluster_names: List[str],
+        fitted_data: NDArray[float],
+        labels_: NDArray[int],
         **kwargs
         ):
     """Save clustering solution to disk.
@@ -92,7 +95,7 @@ def _write_cluster(
     if cluster_centers_.ndim != 2:
         raise ValueError("Argument 'cluster_centers_' should be a 2D array.")
     _check_type(chinfo, (Info, ChInfo), 'chinfo')
-    if not isinstance(chinfo, ChInfo):
+    if isinstance(chinfo, Info):
         chinfo = ChInfo(chinfo)  # convert to ChInfo if a MNE Info is provided
     _check_type(algorithm, (str, ), 'algorithm')
     _check_value(algorithm, ('ModKMeans', ), 'algorithm')
@@ -195,7 +198,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
     return fit_parameters, fit_variables
 
 
-def _read_cluster(fname):
+def _read_cluster(fname: Union[str, Path]):
     """Read clustering solution from disk.
 
     Parameters
@@ -292,7 +295,10 @@ def _read_cluster(fname):
         **fit_parameters, **fit_variables), version
 
 
-def _check_fit_parameters_and_variables(fit_parameters, fit_variables):
+def _check_fit_parameters_and_variables(
+        fit_parameters: dict,
+        fit_variables: dict,
+        ):
     """Check that we have all the keys we are looking for and return algo."""
     valids = {
         'ModKMeans': {
@@ -318,15 +324,15 @@ def _check_fit_parameters_and_variables(fit_parameters, fit_variables):
 
 
 def _create_ModKMeans(
-        cluster_centers_,
-        info,
-        cluster_names,
-        fitted_data,
-        labels_,
-        n_init,
-        max_iter,
-        tol,
-        GEV_,
+        cluster_centers_: NDArray[float],
+        info: ChInfo,
+        cluster_names: List[str],
+        fitted_data: NDArray[float],
+        labels_: NDArray[int],
+        n_init: int,
+        max_iter: int,
+        tol: Union[int, float],
+        GEV_: float,
         ):
     """Create a ModKMeans cluster."""
     cluster = ModKMeans(cluster_centers_.shape[0], n_init, max_iter, tol,
@@ -342,7 +348,7 @@ def _create_ModKMeans(
 
 
 # ----------------------------------------------------------------------------
-def _write_meas_info(fid, info):
+def _write_meas_info(fid, info: ChInfo):
     """Write measurement info into a file id (from a fif file).
 
     Parameters
@@ -468,7 +474,7 @@ def _read_meas_info(fid, tree):
 
 
 # ----------------------------------------------------------------------------
-def _serialize(dict_, outer_sep=';', inner_sep=':'):
+def _serialize(dict_: dict, outer_sep: str = ';', inner_sep: str = ':'):
     """Aux function."""
     s = []
     for key, value in dict_.items():
@@ -489,7 +495,7 @@ def _serialize(dict_, outer_sep=';', inner_sep=':'):
     return outer_sep.join(s)
 
 
-def _deserialize(str_, outer_sep=';', inner_sep=':'):
+def _deserialize(str_: str, outer_sep: str = ';', inner_sep: str = ':'):
     """Aux Function."""
     out = {}
     for mapping in str_.split(outer_sep):

@@ -46,6 +46,9 @@ extensions = [
 # sphinx
 master_doc = 'index'
 
+# autodoc
+autodoc_typehints = 'none'
+
 # pygments style
 pygments_style = 'default'
 

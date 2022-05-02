@@ -1,13 +1,13 @@
 """Utility functions for checking types and values. Inspired from MNE."""
 
 from itertools import product
+import multiprocessing as mp
 import os
 import operator
 from pathlib import Path
 
 import numpy as np
 from matplotlib.axes import Axes
-from mne.parallel import check_n_jobs
 from mne.utils import check_random_state
 
 
@@ -157,7 +157,16 @@ def _check_n_jobs(n_jobs):
     Check that n_jobs is a positive integer or a negative integer for all
     cores. CUDA is not supported.
     """
-    return check_n_jobs(n_jobs, allow_cuda=False)
+    _check_type(n_jobs, ('int', ), 'n_jobs')
+    if n_jobs <= 0:
+        n_cores = mp.cpu_count()
+        n_jobs_orig = n_jobs
+        n_jobs = min(n_cores + n_jobs + 1, n_cores)
+        if n_jobs <= 0:
+            raise ValueError(
+                f'If n_jobs has a non-positive value ({n_jobs_orig}), it must '
+                f'not be less than the number of CPUs present ({n_cores}).')
+    return n_jobs
 
 
 def _check_random_state(seed):
