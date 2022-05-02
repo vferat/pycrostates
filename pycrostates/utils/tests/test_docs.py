@@ -21,6 +21,7 @@ def test_fill_doc():
     assert 'verbose : bool' in foo.__doc__
 
 
+
 def test_copy_doc():
     """Test decorator to copy docstring."""
 
