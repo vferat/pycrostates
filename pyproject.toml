@@ -24,3 +24,9 @@ extend_skip_glob = [
     'tutorials/*',
     'pycrostates/html_templates/repr/*'
 ]
+
+[tool.pydocstyle]
+inherit = false
+match = '(?!test_|setup|__init__).*\.py'
+match-dir = "^(?!docs|tutorials).*"
+
