@@ -24,4 +24,3 @@ extend_skip_glob = [
     'tutorials/*',
     'pycrostates/html_templates/repr/*'
 ]
-known_third_party = ["decorator", "jinja2", "matplotlib", "mne", "numpy", "pkg_resources", "pooch", "pydata_sphinx_theme", "pytest", "recommonmark", "scipy", "setuptools", "sklearn", "sphinx_gallery"]

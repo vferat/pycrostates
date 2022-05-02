@@ -1,7 +1,6 @@
 # requirements for running tests
 pytest==7.0.1
 pytest-cov
-pre-commit
 flake8
 black
 isort
