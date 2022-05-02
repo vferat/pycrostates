@@ -4,18 +4,19 @@ max-line-length = 79
 ignore =
     # these rules don't play well with black
     # whitespace before ':'
-    E203
+    E203,
     # line break before binary operator
-    W503
+    W503,
     E241,E305,W504,W605,E731
 
 exclude =
-    .git
-    .github
-    .pytest_cache
-    pycrostates.egg-info
-    setup.py
-    docs
+    .git,
+    .github,
+    .pytest_cache,
+    pycrostates.egg-info,
+    setup.py,
+    docs/source/conf.py,
+    tutorials/*
 
 per-file-ignores =
     # __init__.py files are allowed to have unused imports and lines-too-long
