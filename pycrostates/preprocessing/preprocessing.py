@@ -1,12 +1,13 @@
 import numpy as np
+from scipy.signal import find_peaks
+
 from mne import BaseEpochs
 from mne.io import BaseRaw, RawArray
 from mne.preprocessing.ica import _check_start_stop
-from scipy.signal import find_peaks
 
-from ..utils._checks import _check_type
-from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
+from ..utils._docs import fill_doc
+from ..utils._checks import _check_type
 from ..utils.utils import _copy_info
 
 
@@ -24,7 +25,7 @@ def _extract_gfps(data, min_peak_distance=2):
         be in CSR format to avoid an un-necessary copy.
     """
     if min_peak_distance < 1:
-        raise (ValueError("min_peak_dist must be >= 1."))
+        raise(ValueError('min_peak_dist must be >= 1.'))
     gfp = np.std(data, axis=0)
     peaks, _ = find_peaks(gfp, distance=min_peak_distance)
     return data[:, peaks]
@@ -32,14 +33,8 @@ def _extract_gfps(data, min_peak_distance=2):
 
 @fill_doc
 @verbose
-def extract_gfp_peaks(
-    inst,
-    min_peak_distance=2,
-    start=None,
-    stop=None,
-    reject_by_annotation=True,
-    verbose=None,
-):
+def extract_gfp_peaks(inst, min_peak_distance=2, start=None, stop=None,
+                      reject_by_annotation=True, verbose=None):
     """Perform GFP peaks extraction.
 
     Extract global field power peaks from :class:`mne.Epochs` or
@@ -73,38 +68,30 @@ def extract_gfp_peaks(
     """
     _check_type(inst, (BaseRaw, BaseEpochs))
     if min_peak_distance < 1:
-        raise (ValueError("min_peak_dist must be >= 1."))
+        raise(ValueError('min_peak_dist must be >= 1.'))
     if isinstance(inst, BaseRaw):
-        reject_by_annotation = "omit" if reject_by_annotation else None
+        reject_by_annotation = 'omit' if reject_by_annotation else None
         start, stop = _check_start_stop(inst, start, stop)
-        data = inst.get_data(
-            start=start, stop=stop, reject_by_annotation=reject_by_annotation
-        )
+        data = inst.get_data(start=start, stop=stop,
+                             reject_by_annotation=reject_by_annotation)
         peaks = _extract_gfps(data, min_peak_distance=min_peak_distance)
         logger.info(
-            "%s GFP peaks extracted out of %s samples (%.2f%% of the original "
-            "data).",
-            peaks.shape[1],
-            data.shape[-1],
-            peaks.shape[1] / data.shape[-1] * 100,
-        )
+            '%s GFP peaks extracted out of %s samples (%.2f%% of the original '
+            'data).', peaks.shape[1], data.shape[-1],
+            peaks.shape[1] / data.shape[-1] * 100)
 
     if isinstance(inst, BaseEpochs):
         data = inst.get_data()
         peaks = list()
         for epoch in data:
             epoch_peaks = _extract_gfps(
-                epoch, min_peak_distance=min_peak_distance
-            )
+                epoch, min_peak_distance=min_peak_distance)
             peaks.append(epoch_peaks)
         peaks = np.hstack(peaks)
         logger.info(
-            "%s GFP peaks extracted out of %s samples (%.2f%% of the original "
-            "data).",
-            peaks.shape[1],
-            data.shape[0] * data.shape[2],
-            peaks.shape[1] / (data.shape[0] * data.shape[2]) * 100,
-        )
+            '%s GFP peaks extracted out of %s samples (%.2f%% of the original '
+            'data).', peaks.shape[1], data.shape[0] * data.shape[2],
+            peaks.shape[1] / (data.shape[0] * data.shape[2]) * 100)
 
     info = _copy_info(inst, sfreq=np.inf)
     raw_peaks = RawArray(data=peaks, info=info, verbose=False)
@@ -113,18 +100,9 @@ def extract_gfp_peaks(
 
 @fill_doc
 @verbose
-def resample(
-    inst,
-    n_epochs=None,
-    n_samples=None,
-    coverage=None,
-    replace=True,
-    start=None,
-    stop=None,
-    reject_by_annotation=True,
-    random_seed=None,
-    verbose=None,
-):
+def resample(inst, n_epochs=None, n_samples=None, coverage=None,
+             replace=True, start=None, stop=None, reject_by_annotation=True,
+             random_seed=None, verbose=None):
     """Resample recording into epochs of random samples.
 
     Resample :class:`~mne.io.Raw` or :class:`~mne.epochs.Epochs`
@@ -176,11 +154,10 @@ def resample(
     _check_type(inst, (BaseRaw, BaseEpochs))
 
     if isinstance(inst, BaseRaw):
-        reject_by_annotation = "omit" if reject_by_annotation else None
+        reject_by_annotation = 'omit' if reject_by_annotation else None
         start, stop = _check_start_stop(inst, start, stop)
-        data = inst.get_data(
-            start=start, stop=stop, reject_by_annotation=reject_by_annotation
-        )
+        data = inst.get_data(start=start, stop=stop,
+                             reject_by_annotation=reject_by_annotation)
 
     if isinstance(inst, BaseEpochs):
         data = inst.get_data()
@@ -190,13 +167,12 @@ def resample(
 
     if len([x for x in [n_epochs, n_samples, coverage] if x is None]) >= 2:
         raise ValueError(
-            "At least two of the [n_epochs, n_samples, coverage] must be "
-            "defined"
-        )
+            'At least two of the [n_epochs, n_samples, coverage] must be '
+            'defined')
 
     if coverage is not None:
         if coverage <= 0:
-            raise ValueError("Coverage must be strictly positive")
+            raise ValueError('Coverage must be strictly positive')
     else:
         coverage = (n_epochs * n_samples) / n_times
 
@@ -211,26 +187,20 @@ def resample(
             raise ValueError(
                 f"Can't draw {n_epochs} epochs of {n_samples} samples = "
                 f"{n_epochs * n_samples} samples without replacement: "
-                f"instance contains only {n_times} samples."
-            )
+                f"instance contains only {n_times} samples.")
 
     logger.info(
-        "Resampling instance into %s epochs of %s covering %.2f%% of the "
-        "original data.",
-        n_epochs,
-        n_samples,
-        coverage * 100,
-    )
+        'Resampling instance into %s epochs of %s covering %.2f%% of the '
+        'original data.', n_epochs, n_samples, coverage * 100)
 
     random_state = np.random.RandomState(random_seed)
     if replace:
-        indices = random_state.randint(
-            0, n_samples, size=(n_epochs, n_samples)
-        )
+        indices = random_state.randint(0, n_samples,
+                                       size=(n_epochs, n_samples))
     else:
         indices = np.arange(n_times)
         random_state.shuffle(indices)
-        indices = indices[: n_epochs * n_samples]
+        indices = indices[:n_epochs*n_samples]
         indices = indices.reshape((n_epochs, n_samples))
 
     data = data[:, indices]

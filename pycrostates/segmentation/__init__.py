@@ -1,3 +1,3 @@
-from .segmentation import EpochsSegmentation, RawSegmentation  # noqa: F401
+from .segmentation import RawSegmentation, EpochsSegmentation  # noqa: F401
 
-__all__ = ("RawSegmentation", "EpochsSegmentation")
+__all__ = ('RawSegmentation', 'EpochsSegmentation')
