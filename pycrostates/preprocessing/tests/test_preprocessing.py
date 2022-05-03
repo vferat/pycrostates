@@ -1,10 +1,10 @@
 from pathlib import Path
 
 import mne
-import numpy as np
 import pytest
 from mne.datasets import testing
 
+from pycrostates.io import ChData
 from pycrostates.preprocessing import extract_gfp_peaks, resample
 
 dir_ = Path(testing.data_path()) / "MEG" / "sample"
@@ -24,8 +24,8 @@ epochs = mne.make_fixed_length_epochs(raw, duration=2, preload=True)
     ],
 )
 def test_resample(inst, replace):
-    data, info = resample(inst, 10, 500, replace=replace)
-    assert data.shape == (10, 60, 500)
+    ch_data = resample(inst, 10, 500, replace=replace)
+    assert ch_data._data.shape == (10, 60, 500)
 
 
 @pytest.mark.parametrize(
@@ -36,8 +36,8 @@ def test_resample(inst, replace):
     ],
 )
 def test_resample_coverage(inst):
-    data, info = resample(inst, n_epochs=10, coverage=0.8, replace=False)
-    assert len(data) == 10
+    ch_data = resample(inst, n_epochs=10, coverage=0.8, replace=False)
+    assert len(ch_data._data) == 10
 
 
 @pytest.mark.parametrize(
@@ -48,8 +48,8 @@ def test_resample_coverage(inst):
     ],
 )
 def test_resample_raw_samples_coverage(inst):
-    data, info = resample(inst, n_samples=500, coverage=0.8, replace=False)
-    assert data.shape[-1] == 500
+    ch_data = resample(inst, n_samples=500, coverage=0.8, replace=False)
+    assert ch_data._data.shape[-1] == 500
 
 
 def test_resample_raw_noreplace_error():
@@ -69,5 +69,5 @@ def test_resample_raw_noreplace_error():
 def test_extract_gfp(inst):
     raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
     raw = raw.pick("eeg")
-    data, info = extract_gfp_peaks(inst, min_peak_distance=4)
-    assert isinstance(data, np.ndarray)
+    ch_data = extract_gfp_peaks(inst, min_peak_distance=4)
+    assert isinstance(ch_data, ChData)

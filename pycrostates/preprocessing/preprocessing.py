@@ -6,10 +6,11 @@ from mne.io import BaseRaw
 from mne.preprocessing.ica import _check_start_stop
 from scipy.signal import find_peaks
 
+from ..io import ChData
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
-from ..io import ChData
+
 
 def _extract_gfps(data, min_peak_distance=2):
     """Extract GFP peaks from input data.

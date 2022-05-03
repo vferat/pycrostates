@@ -1,10 +1,11 @@
+import numpy as np
+from mne.io import Info
+from numpy.typing import NDArray
+
 from ..utils._checks import _check_type
 
-import numpy as np
-from numpy.typing import NDArray
-from mne.io import Info
 
-class ChData():
+class ChData:
     def __init__(self, data: NDArray, info: Info):
         from ..io import ChInfo
 
@@ -23,17 +24,16 @@ class ChData():
             )
         self._data = data
         self._info = ChInfo(info)
-        
+
     def __repr__(self) -> str:
         name = self.__class__.__name__
         s = f"<{name} | {self._data.shape[-1]} samples >"
         return s
-    
+
     def _repr_html_(self, caption=None):
         from ..html_templates import repr_templates_env
-        template = repr_templates_env.get_template(
-            "ChData.html.jinja"
-        )
+
+        template = repr_templates_env.get_template("ChData.html.jinja")
         return template.render(
             n_samples=self._data.shape[-1],
             info_repr=self._info._repr_html_(),

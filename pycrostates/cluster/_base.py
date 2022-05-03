@@ -8,11 +8,12 @@ import numpy as np
 from matplotlib.axes import Axes
 from mne import BaseEpochs, pick_info
 from mne.annotations import _annotations_starts_stops
-from mne.io import BaseRaw, Info
+from mne.io import BaseRaw
 from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 from scipy.signal import convolve2d
 
+from ..io import ChData
 from ..segmentation import EpochsSegmentation, RawSegmentation
 from ..utils import _compare_infos, _corr_vectors
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
@@ -20,7 +21,7 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 from ..viz import plot_cluster_centers
-from ..io import ChData
+
 
 class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     """Base Class for Microstates Clustering algorithms."""
