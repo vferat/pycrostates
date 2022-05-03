@@ -1025,7 +1025,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     @property
     def fitted_data(self) -> NDArray[float]:
         """
-        Return data array retrieved from MNE used to fit the clustering algorithm.
+        Return data array used to fit the clustering algorithm.
 
         :type: `~numpy.array` shape (n_channels, n_samples)
         """
