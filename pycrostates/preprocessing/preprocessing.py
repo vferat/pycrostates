@@ -6,7 +6,6 @@ from mne.io import BaseRaw
 from mne.preprocessing.ica import _check_start_stop
 from scipy.signal import find_peaks
 
-from ..io import ChData
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
@@ -70,6 +69,8 @@ def extract_gfp_peaks(
     info:
         Measurement information without any temporal information.
     """
+    from ..io import ChData
+
     _check_type(inst, (BaseRaw, BaseEpochs))
     if min_peak_distance < 1:
         raise (ValueError("min_peak_dist must be >= 1."))
@@ -166,6 +167,8 @@ def resample(
     parameters must be defined, the non-defined one being
     computed during function execution.
     """
+    from ..io import ChData
+
     _check_type(inst, (BaseRaw, BaseEpochs))
 
     if isinstance(inst, BaseRaw):

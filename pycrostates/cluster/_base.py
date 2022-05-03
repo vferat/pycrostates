@@ -13,7 +13,6 @@ from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 from scipy.signal import convolve2d
 
-from ..io import ChData
 from ..segmentation import EpochsSegmentation, RawSegmentation
 from ..utils import _compare_infos, _corr_vectors
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
@@ -184,7 +183,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         %(n_jobs)s
         """
         # TODO: Maybe those parameters should be moved here instead of docdict?
-        from ..io import ChInfo
+        from ..io import ChInfo, ChData
+
 
         n_jobs = _check_n_jobs(n_jobs)
         _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")

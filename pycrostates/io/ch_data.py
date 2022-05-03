@@ -7,7 +7,7 @@ from ..utils._checks import _check_type
 
 class ChData:
     def __init__(self, data: NDArray, info: Info):
-        from ..io import ChInfo
+        from . import ChInfo
 
         _check_type(data, (np.ndarray,), "data")
         _check_type(info, (Info,), "info")
