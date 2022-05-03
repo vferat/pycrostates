@@ -241,11 +241,12 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 )
             _check_type(inst[0], (np.ndarray,), item_name="inst[0]")
             _check_type(inst[1], (Info,), item_name="inst[1]")
-            if not len(inst[1]['ch_names']) == len(inst[0]):
+            if not len(inst[1]["ch_names"]) == len(inst[0]):
                 raise ValueError(
-                        f"Instance data and Info do not have the same number of channels."
-                    )
-           
+                    "Instance data and Info do not have the same "
+                    "number of channels."
+                )
+
             info = inst[1]
 
         # picks

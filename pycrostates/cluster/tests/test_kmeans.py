@@ -159,7 +159,7 @@ def test_ModKMeans():
         n_clusters,
         len(raw.info["ch_names"]) - len(raw.info["bads"]),
     )
-    
+
     # Test copy
     ModK2 = ModK1.copy()
     _check_fitted(ModK2)
