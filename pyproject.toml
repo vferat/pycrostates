@@ -30,4 +30,4 @@ inherit = false
 ignore-decorators= 'copy_doc'
 match = '(?!test_|setup|__init__).*\.py'
 match-dir = "^(?!docs|tutorials).*"
-
+ignore = 'D107'
