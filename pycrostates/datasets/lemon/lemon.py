@@ -16,7 +16,7 @@ from ...utils._imports import import_optional_dependency
 def load_data(subject_id: str, condition: str):
     """
     Get path to local copy of preprocessed EEG recording from the LEMON dataset.
-    
+
     Get path to local copy of preprocessed EEG recording
     from the mind-brain-body dataset of MRI, EEG, cognition, emotion,
     and peripheral physiology in young and old adults dataset files.

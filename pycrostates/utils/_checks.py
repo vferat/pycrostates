@@ -178,7 +178,7 @@ def _check_value(item, allowed_values, item_name=None, extra=None):
 def _check_n_jobs(n_jobs):
     """
     Check n_jobs parameter.
-    
+
     Check that n_jobs is a positive integer or a negative integer for all
     cores. CUDA is not supported.
     """

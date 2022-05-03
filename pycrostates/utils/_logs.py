@@ -17,7 +17,7 @@ logger.propagate = False  # don't propagate (in case of multiple imports)
 def init_logger(verbose="INFO"):
     """
     Initialize a logger.
-    
+
     Assign sys.stdout as a handler of the logger.
 
     Parameters
@@ -54,7 +54,7 @@ def add_stream_handler(stream, verbose="INFO"):
 def add_file_handler(fname, mode="a", verbose="INFO"):
     """
     Add a file handler to the logger.
-    
+
     The handler saves the logs to file.
 
     Parameters

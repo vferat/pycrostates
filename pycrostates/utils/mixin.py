@@ -14,6 +14,7 @@ class ChannelsMixin:
     # - SetChannelsMixin
     pass
 
+
 @copy_doc(MNEContainsMixin)
 class ContainsMixin(MNEContainsMixin):
     @copy_doc(MNEContainsMixin.__contains__)
@@ -62,6 +63,7 @@ class ContainsMixin(MNEContainsMixin):
                 f"'{self.__class__.__name__}' has not attribute '{name}'"
             )
         return super().__getattribute__(name)
+
 
 @copy_doc(MNEMontageMixin)
 class MontageMixin(MNEMontageMixin):

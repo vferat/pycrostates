@@ -819,7 +819,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         labels: NDArray[int],
         factor: int,
         tol: Union[int, float],
-        half_window_size: int,) -> NDArray[int]:
+        half_window_size: int,
+    ) -> NDArray[int]:
         """
         Apply smooting. Adapted from [1].
 
@@ -872,7 +873,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     ) -> NDArray[int]:
         """
         Reject segments that are too short.
-        
+
         Reject segments that are too short by replacing the labels with the
         adjacent labels based on data correlation.
         """
@@ -1010,7 +1011,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     def cluster_centers_(self) -> NDArray[float]:
         """
         Center of the clusters.
-        
+
         Returns None if cluster algorithm has not been fitted.
 
         :type: `~numpy.array`
