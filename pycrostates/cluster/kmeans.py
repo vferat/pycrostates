@@ -1,3 +1,5 @@
+"""Class and functions to use modified Kmeans."""
+
 from pathlib import Path
 from typing import Optional, Tuple, Union
 
@@ -238,9 +240,7 @@ class ModKMeans(_BaseCluster):
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
     ) -> Tuple[float, NDArray[float], NDArray[int], bool]:
-        """
-        Run the k-means algorithm.
-        """
+        """Run the k-means algorithm."""
         gfp_sum_sq = np.sum(data**2)
         maps, converged = ModKMeans._compute_maps(
             data, n_clusters, max_iter, random_state, tol
@@ -260,7 +260,8 @@ class ModKMeans(_BaseCluster):
         tol: Union[int, float],
     ) -> Tuple[NDArray[float], bool]:
         """
-        Computes microstates maps.
+        Compute microstates maps.
+
         Based on mne_microstates by Marijn van Vliet <w.m.vanvliet@gmail.com>
         https://github.com/wmvanvliet/mne_microstates/blob/master/microstates.py
         """
@@ -336,7 +337,7 @@ class ModKMeans(_BaseCluster):
     @property
     def max_iter(self) -> int:
         """
-        Number of maximum iterations of the k-means algorithm for a single run.
+        Maximum number of iterations of the k-means algorithm for a single run.
 
         :type: `int`
         """

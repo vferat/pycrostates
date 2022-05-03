@@ -1,3 +1,5 @@
+"""Utils functions."""
+
 from copy import deepcopy
 
 import mne
@@ -64,9 +66,7 @@ def _copy_info(inst, sfreq):
 
 
 def _compare_infos(cluster_info, inst_info):
-    """
-    Checks that the channels in cluster_info are all present in inst_info.
-    """
+    """Check that channels in cluster_info are all present in inst_info."""
     for ch in cluster_info["ch_names"]:
         if ch not in inst_info["ch_names"]:
             raise ValueError(

@@ -1,3 +1,5 @@
+"""Segmentation module for segmented data."""
+
 import itertools
 from abc import ABC, abstractmethod
 from typing import List, Optional, Union
@@ -226,9 +228,7 @@ class _BaseSegmentation(ABC):
         cluster_names: List[str],
         cluster_centers_: NDArray[float],
     ):
-        """
-        Checks that the argument 'cluster_names' is valid.
-        """
+        """Check that the argument 'cluster_names' is valid."""
         _check_type(cluster_names, (list, None), "cluster_names")
         if cluster_names is None:
             return [str(k) for k in range(1, len(cluster_centers_) + 1)]
@@ -244,9 +244,7 @@ class _BaseSegmentation(ABC):
 
     @staticmethod
     def _check_predict_parameters(predict_parameters: dict):
-        """
-        Checks that the argument 'predict_parameters' is valid.
-        """
+        """Check that the argument 'predict_parameters' is valid."""
         _check_type(predict_parameters, (dict, None), "predict_parameters")
         if predict_parameters is None:
             return None
@@ -412,9 +410,7 @@ class RawSegmentation(_BaseSegmentation):
     # --------------------------------------------------------------------
     @property
     def raw(self) -> BaseRaw:
-        """
-        Raw instance.
-        """
+        """Raw instance."""
         return self._inst.copy()
 
 
@@ -522,7 +518,5 @@ class EpochsSegmentation(_BaseSegmentation):
     # --------------------------------------------------------------------
     @property
     def epochs(self) -> BaseEpochs:
-        """
-        Epochs instance.
-        """
+        """Epochs instance."""
         return self._inst.copy()

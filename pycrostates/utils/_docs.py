@@ -1,5 +1,6 @@
 """
 Fill docstrings to avoid redundant docstrings in multiple files.
+
 Inspired from mne: https://mne.tools/stable/index.html
 Inspired from mne.utils.docs.py by Eric Larson <larson.eric.d@gmail.com>
 """
@@ -73,6 +74,7 @@ docdict_indented = {}
 
 def fill_doc(f):
     """Fill a docstring with docdict entries.
+
     Parameters
     ----------
     f : callable

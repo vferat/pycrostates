@@ -1,3 +1,5 @@
+"""Preprocessing functions to resample, extract gfp peaks, ect."""
+
 import numpy as np
 from mne import BaseEpochs
 from mne.io import BaseRaw, RawArray

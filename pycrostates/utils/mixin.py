@@ -7,12 +7,14 @@ from ._docs import copy_doc
 
 
 class ChannelsMixin:
+    """Channels Mixin for futur implementation."""
+
     # TODO: Maybe some part are salvageable from mne.channels.channels:
     # - UpdateChannelsMixin
     # - SetChannelsMixin
     pass
 
-
+@copy_doc(MNEContainsMixin)
 class ContainsMixin(MNEContainsMixin):
     @copy_doc(MNEContainsMixin.__contains__)
     def __contains__(self, ch_type):
@@ -61,7 +63,7 @@ class ContainsMixin(MNEContainsMixin):
             )
         return super().__getattribute__(name)
 
-
+@copy_doc(MNEMontageMixin)
 class MontageMixin(MNEMontageMixin):
     def __getattribute__(self, name):
         """Attribute getter."""

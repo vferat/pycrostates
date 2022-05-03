@@ -1,6 +1,7 @@
 """
 Optional dependency import.
-Inspired from pandas: https://pandas.pydata.org/
+
+Inspired from pandas: https://pandas.pydata.org/.
 """
 import importlib
 
@@ -16,6 +17,7 @@ def import_optional_dependency(
 ):
     """
     Import an optional dependency.
+
     By default, if a dependency is missing an ImportError with a nice message
     will be raised.
 

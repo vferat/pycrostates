@@ -23,9 +23,7 @@ from ..viz import plot_cluster_centers
 
 
 class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
-    """
-    Base Class for Microstates Clustering algorithms.
-    """
+    """Base Class for Microstates Clustering algorithms."""
 
     @abstractmethod
     def __init__(self):
@@ -137,7 +135,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         self,
         deep: bool = True,
     ):
-        """Returns a copy of the instance.
+        """Return a copy of the instance.
 
         Parameters
         ----------
@@ -173,8 +171,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         n_jobs: int = 1,
     ) -> NDArray[float]:
         """
-        Segment `~mne.io.Raw` or `~mne.Epochs` instance into microstate
-        sequence.
+        Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
 
         Parameters
         ----------
@@ -530,8 +527,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         *,
         verbose: Optional[str] = None,
     ):
-        """Segment `~mne.io.Raw` or `~mne.Epochs` instance into microstate
-        sequence.
+        """Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
 
         Parameters
         ----------
@@ -751,7 +747,6 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         reject_edges: bool,
     ) -> EpochsSegmentation:
         """Create segmentation for epochs."""
-
         predict_parameters = {
             "factor": factor,
             "tol": tol,
@@ -824,9 +819,9 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         labels: NDArray[int],
         factor: int,
         tol: Union[int, float],
-        half_window_size: int,
-    ) -> NDArray[int]:
-        """Apply smooting. Adapted from [1].
+        half_window_size: int,) -> NDArray[int]:
+        """
+        Apply smooting. Adapted from [1].
 
         References
         ----------
@@ -835,7 +830,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             model estimation and validation.
             IEEE Transactions on Biomedical Engineering,
             vol. 42, no. 7, pp. 658-665, July 1995,
-            https://doi.org/10.1109/10.391164."""
+            https://doi.org/10.1109/10.391164.
+        """
         Ne, Nt = data.shape
         Nu = states.shape[0]
         Vvar = np.sum(data * data, axis=0)
@@ -874,8 +870,12 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         data: NDArray[float],
         min_segment_length: int,
     ) -> NDArray[int]:
-        """Reject segments that are too short by replacing the labels with the
-        adjacent labels based on data correlation."""
+        """
+        Reject segments that are too short.
+        
+        Reject segments that are too short by replacing the labels with the
+        adjacent labels based on data correlation.
+        """
         while True:
             # list all segments
             segments = [list(group) for _, group in groupby(segmentation)]
@@ -956,7 +956,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     @property
     def n_clusters(self) -> int:
         """
-        Number of clusters.
+        Cluster number.
 
         :type: `int`
         """
@@ -978,7 +978,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     @property
     def fitted(self) -> bool:
         """
-        Current fitting state.
+        Fitting state.
 
         :type: `bool`
         """
@@ -1009,8 +1009,9 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     @property
     def cluster_centers_(self) -> NDArray[float]:
         """
-        Center of the clusters. Returns None if cluster algorithm has not been
-        fitted.
+        Center of the clusters.
+        
+        Returns None if cluster algorithm has not been fitted.
 
         :type: `~numpy.array`
         """
@@ -1023,7 +1024,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     @property
     def fitted_data(self) -> NDArray[float]:
         """
-        Data array retrieved from MNE used to fit the clustering algorithm.
+        Return data array retrieved from MNE used to fit the clustering algorithm.
 
         :type: `~numpy.array` shape (n_channels, n_samples)
         """
@@ -1035,9 +1036,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
     @property
     def labels_(self) -> NDArray[int]:
-        """
-        labels fit variable.
-        """
+        """Labels fit variable."""
         if self._labels_ is None:
             assert not self._fitted  # sanity-check
             logger.warning("Clustering algorithm has not been fitted.")
@@ -1067,7 +1066,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
 
     @staticmethod
     def _check_reject_by_annotation(reject_by_annotation: bool) -> bool:
-        """Checks the reject_by_annotation argument."""
+        """Check the reject_by_annotation argument."""
         _check_type(
             reject_by_annotation,
             (bool, str, None),

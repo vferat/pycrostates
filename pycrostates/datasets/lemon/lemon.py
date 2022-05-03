@@ -1,3 +1,5 @@
+"""Functions to use the LEMON dataset."""
+
 import os
 
 import mne
@@ -12,7 +14,10 @@ from ...utils._imports import import_optional_dependency
 
 
 def load_data(subject_id: str, condition: str):
-    """Get path to local copy of preprocessed EEG recording
+    """
+    Get path to local copy of preprocessed EEG recording from the LEMON dataset.
+    
+    Get path to local copy of preprocessed EEG recording
     from the mind-brain-body dataset of MRI, EEG, cognition, emotion,
     and peripheral physiology in young and old adults dataset files.
     If there is no local copy of the recording, this will fetch it from
@@ -76,6 +81,7 @@ def load_data(subject_id: str, condition: str):
 
 def standardize(raw: BaseRaw):
     """Standardize :class:`~mne.io.Raw` from the lemon dataset.
+
     This function will interpolate missing channels from
     the standard setup, then reorder channels and finally
     reference to average.

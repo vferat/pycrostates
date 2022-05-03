@@ -1,3 +1,5 @@
+"""Vizualisation module for plotting segmentations."""
+
 from typing import List, Optional, Union
 
 import numpy as np
@@ -29,7 +31,7 @@ def plot_raw_segmentation(
     **kwargs,
 ):
     """
-    Plot segmentation
+    Plot raw segmentation.
 
     Returns
     -------
@@ -98,7 +100,7 @@ def plot_epoch_segmentation(
     **kwargs,
 ):
     """
-    Plot segmentation
+    Plot epochs segmentation.
 
     Returns
     -------
@@ -173,7 +175,7 @@ def _plot_segmentation(
     verbose: Optional[str] = None,
     **kwargs,
 ):
-    """Common code snippet to plot segmentation for raw and epochs."""
+    """Code snippet to plot segmentation for raw and epochs."""
     _set_verbose(verbose)
     _check_type(labels, (np.ndarray,), "labels")  # 1D array (n_times, )
     _check_type(gfp, (np.ndarray,), "gfp")  # 1D array (n_times, )

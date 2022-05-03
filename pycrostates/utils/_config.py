@@ -3,7 +3,7 @@ import os
 
 
 def _get_user_dir():
-    """Get user directory"""
+    """Get user directory."""
     if os.name.lower() == "nt":
         user_dir = os.getenv("USERPROFILE")
     else:
@@ -12,7 +12,7 @@ def _get_user_dir():
 
 
 def _get_home_dir():
-    """Get pycrostates config directory"""
+    """Get pycrostates config directory."""
     user_dir = _get_user_dir()
     home_dir = os.path.join(user_dir, ".pycrostates")
     if not os.path.isdir(home_dir):
@@ -21,14 +21,14 @@ def _get_home_dir():
 
 
 def _get_config_path():
-    """Get config path"""
+    """Get config path."""
     home_dir = _get_home_dir()
     config_path = os.path.join(home_dir, "pycrostates.json")
     return config_path
 
 
 def _get_data_path():
-    """Get pycrostates data directory"""
+    """Get pycrostates data directory."""
     user_dir = _get_user_dir()
     data_dir = os.path.join(user_dir, "pycrostates_data")
     if not os.path.isdir(data_dir):
@@ -44,7 +44,7 @@ default_config = {
 
 
 def _save_config(config):
-    """Save pycrostates config"""
+    """Save pycrostates config."""
     with open(_get_config_path(), "w", encoding="utf-8") as f:
         json.dump(config, f)
 
@@ -67,7 +67,7 @@ def get_config():
 
 
 def set_config(key, value):
-    """Set preference key in the pycrostates' config file
+    """Set preference key in the pycrostates' config file.
 
     Parameters
     ----------

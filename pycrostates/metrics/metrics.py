@@ -1,3 +1,5 @@
+"""Metric functions for evaluating clusters."""
+
 import numpy as np
 from sklearn.metrics import calinski_harabasz_score, silhouette_score
 from sklearn.metrics.cluster._unsupervised import check_number_of_labels
@@ -17,6 +19,7 @@ def _distance_matrix(X, Y=None):
 def silhouette(modK):  # lower the better
     """
     Compute the mean Silhouette Coefficient of a fitted clustering algorithm.
+
     This function is a proxy function for
     :func:`sklearn.metrics.silhouette_score` that applies directly to a fitted
     :class:´pycrostate.clustering.BaseClustering´. It uses the absolute spatial
@@ -86,7 +89,7 @@ def _davies_bouldin_score(X, labels):
 
 
 def davies_bouldin(modK):  # lower the better
-    """Computes the Davies-Bouldin score.
+    """Compute the Davies-Bouldin score.
 
     This function is a proxy function for
     :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a

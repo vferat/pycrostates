@@ -352,7 +352,7 @@ class ChInfo(Info):
 
     # ------------------------------------------------------------------------
     def __setitem__(self, key, val):
-        """Dict item setter."""
+        """Setter for Dictionary item."""
         # During unpickling, the _unlocked attribute has not been set, so
         # let __setstate__ do it later and act unlocked now
         unlocked = getattr(self, "_unlocked", True)

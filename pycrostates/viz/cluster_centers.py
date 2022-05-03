@@ -1,3 +1,5 @@
+"""Vizualisation module for plotting cluster centers."""
+
 from typing import List, Optional
 
 import numpy as np
