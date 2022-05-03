@@ -79,6 +79,7 @@ def fill_doc(f):
     ----------
     f : callable
         The function to fill the docstring of. Will be modified in place.
+
     Returns
     -------
     f : callable

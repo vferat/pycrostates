@@ -325,10 +325,9 @@ class ModKMeans(_BaseCluster):
 
     # --------------------------------------------------------------------
     @property
-    def n_init(self) -> int:
+    def n_init(self) -> int:  # noqa: D401
         """
-        Number of time the k-means algorithm is run with different centroid
-        seeds.
+        Number of k-means algorithms run wih different centroid seeds.
 
         :type: `int`
         """

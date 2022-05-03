@@ -1,3 +1,5 @@
+"""Measurement information, similar to mne.Info instance."""
+
 from copy import deepcopy
 from numbers import Number
 from typing import List, Optional, Tuple, Union
