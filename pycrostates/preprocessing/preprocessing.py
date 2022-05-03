@@ -2,14 +2,13 @@
 
 import numpy as np
 from mne import BaseEpochs
-from mne.io import BaseRaw, RawArray
+from mne.io import BaseRaw
 from mne.preprocessing.ica import _check_start_stop
 from scipy.signal import find_peaks
 
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
-from ..utils.utils import _copy_info
 
 
 def _extract_gfps(data, min_peak_distance=2):
@@ -47,11 +46,6 @@ def extract_gfp_peaks(
     Extract global field power peaks from :class:`mne.Epochs` or
     :class:`~mne.io.Raw`.
 
-    .. warning:: The temporal dimension of the output :class:`~mne.io.Raw`
-                 object will be destroyed. This object is a convenient
-                 container for GFP peaks and should not be used for standart
-                 MEEG analysis.
-
     Parameters
     ----------
     inst : :class:`~mne.io.Raw`, :class:`~mne.Epochs`
@@ -70,9 +64,13 @@ def extract_gfp_peaks(
 
     Returns
     -------
-    raw : :class:`~mne.io.Raw`
-        The Raw instance containing extracted GFP peaks.
+    data : `~numpy.array` shape(n_channels, n_peaks)
+        Samples data at each GFP peaks.
+    info:
+        Measurement information without any temporal information.
     """
+    from ..io import ChInfo
+
     _check_type(inst, (BaseRaw, BaseEpochs))
     if min_peak_distance < 1:
         raise (ValueError("min_peak_dist must be >= 1."))
@@ -108,9 +106,8 @@ def extract_gfp_peaks(
             peaks.shape[1] / (data.shape[0] * data.shape[2]) * 100,
         )
 
-    info = _copy_info(inst, sfreq=np.inf)
-    raw_peaks = RawArray(data=peaks, info=info, verbose=False)
-    return raw_peaks
+    info = ChInfo(inst.info)
+    return peaks, info
 
 
 @fill_doc
@@ -130,13 +127,8 @@ def resample(
     """Resample recording into epochs of random samples.
 
     Resample :class:`~mne.io.Raw` or :class:`~mne.epochs.Epochs`
-    into ``n_epochs`` :class:`~mne.io.Raw` each containing
-    ``n_samples`` random samples of the original recording.
-
-    .. warning:: The temporal dimension of the output :class:`~mne.io.Raw`
-                 object will be destroyed. This object is a convenient
-                 container for GFP peaks and should not be used for standart
-                 MEEG analysis.
+    into ``n_epochs`` each containing ``n_samples``
+    random samples of the original recording.
 
     Parameters
     ----------
@@ -165,9 +157,10 @@ def resample(
 
     Returns
     -------
-    raw : list of :class:`~mne.io.Raw`
-        Raw objects each containing resampled data
-        (n_epochs raws of n_samples samples).
+    data : `~numpy.array` shape(n_epochs, n_channels, n_samples)
+        Resampled data
+    info:
+        Measurement information without any temporal information.
 
     Notes
     -----
@@ -175,6 +168,8 @@ def resample(
     parameters must be defined, the non-defined one being
     computed during function execution.
     """
+    from ..io import ChInfo
+
     _check_type(inst, (BaseRaw, BaseEpochs))
 
     if isinstance(inst, BaseRaw):
@@ -238,9 +233,5 @@ def resample(
     data = data[:, indices]
     data = np.swapaxes(data, 0, 1)
 
-    info = _copy_info(inst, sfreq=np.inf)
-    resamples = list()
-    for d in data:
-        raw = RawArray(d, info=info, verbose=False)
-        resamples.append(raw)
-    return resamples
+    info = ChInfo(inst.info)
+    return data, info
