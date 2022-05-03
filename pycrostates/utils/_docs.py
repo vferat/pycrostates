@@ -1,5 +1,6 @@
 """
 Fill docstrings to avoid redundant docstrings in multiple files.
+
 Inspired from mne: https://mne.tools/stable/index.html
 Inspired from mne.utils.docs.py by Eric Larson <larson.eric.d@gmail.com>
 """
@@ -12,14 +13,14 @@ docdict = {}
 
 # ---- Documentation to inc. from MNE ----
 keys = (
-    'n_jobs',
-    'picks_all',
-    'random_state',
-    'tmin_raw',
-    'tmax_raw',
-    'reject_by_annotation_raw',
-    'verbose',
-    )
+    "n_jobs",
+    "picks_all",
+    "random_state",
+    "tmin_raw",
+    "tmax_raw",
+    "reject_by_annotation_raw",
+    "verbose",
+)
 
 for key in keys:
     docdict[key] = docdict_mne[key]
@@ -28,24 +29,34 @@ for key in keys:
 # TODO: :ref:`logging documentation <tut-logging>` in 'verbose' to be inc.
 
 # ---- Clusters ----
-docdict['fit_inst'] = """
+docdict[
+    "fit_inst"
+] = """
 inst : Raw | Epochs
     Instance containing data to transform to cluster-distance space
     (absolute spatial correlation)."""
-docdict['predict_inst'] = """
+docdict[
+    "predict_inst"
+] = """
 inst : Raw | Epochs
     Instance containing data to predict."""
-docdict['n_clusters'] = """
+docdict[
+    "n_clusters"
+] = """
 n_clusters : int
     The number of clusters as well as the number of centroids (i.e.
     Microstate topographies).
 """
-docdict['random_seed'] = """
+docdict[
+    "random_seed"
+] = """
 random_seed : float
     As estimation can be non-deterministic it can be useful to fix the
     random state to have reproducible results.
 """
-docdict['picks'] = """
+docdict[
+    "picks"
+] = """
 picks : str | list | slice | None
     Channels to include. Slices and lists of integers will be interpreted
     as channel indices. In lists, channel type strings (e.g.,
@@ -63,10 +74,12 @@ docdict_indented = {}
 
 def fill_doc(f):
     """Fill a docstring with docdict entries.
+
     Parameters
     ----------
     f : callable
         The function to fill the docstring of. Will be modified in place.
+
     Returns
     -------
     f : callable
@@ -85,7 +98,7 @@ def fill_doc(f):
     try:
         indented = docdict_indented[icount]
     except KeyError:
-        indent = ' ' * icount
+        indent = " " * icount
         docdict_indented[icount] = indented = {}
         for name, dstr in docdict.items():
             lines = dstr.splitlines()
@@ -93,16 +106,15 @@ def fill_doc(f):
                 newlines = [lines[0]]
                 for line in lines[1:]:
                     newlines.append(indent + line)
-                indented[name] = '\n'.join(newlines)
+                indented[name] = "\n".join(newlines)
             except IndexError:
                 indented[name] = dstr
     try:
         f.__doc__ = docstring % indented
     except (TypeError, ValueError, KeyError) as exp:
         funcname = f.__name__
-        funcname = docstring.split('\n')[0] if funcname is None else funcname
-        raise RuntimeError('Error documenting %s:\n%s'
-                           % (funcname, str(exp)))
+        funcname = docstring.split("\n")[0] if funcname is None else funcname
+        raise RuntimeError("Error documenting %s:\n%s" % (funcname, str(exp)))
     return f
 
 
@@ -152,12 +164,14 @@ def copy_doc(source):
     >>> print(B.m1.__doc__)
     Docstring for m1 this gets appended
     """
+
     def wrapper(func):
         if source.__doc__ is None or len(source.__doc__) == 0:
-            raise ValueError('Cannot copy docstring: docstring was empty.')
+            raise ValueError("Cannot copy docstring: docstring was empty.")
         doc = source.__doc__
         if func.__doc__ is not None:
             doc += func.__doc__
         func.__doc__ = doc
         return func
+
     return wrapper

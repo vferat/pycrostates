@@ -1,4 +1,6 @@
-from .utils import _corr_vectors, _copy_info, _compare_infos  # noqa: F401
-from ._config import get_config
+"""Utils module for utilities."""
 
-__all__ = ('get_config', )
+from ._config import get_config
+from .utils import _compare_infos, _copy_info, _corr_vectors  # noqa: F401
+
+__all__ = ("get_config",)

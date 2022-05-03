@@ -1,14 +1,17 @@
+"""Metric functions for evaluating clusters."""
+
 import numpy as np
+from sklearn.metrics import calinski_harabasz_score, silhouette_score
+from sklearn.metrics.cluster._unsupervised import check_number_of_labels
 from sklearn.preprocessing import LabelEncoder
 from sklearn.utils import _safe_indexing, check_X_y
-from sklearn.metrics import silhouette_score, calinski_harabasz_score
-from sklearn.metrics.cluster._unsupervised import check_number_of_labels
 
 
 def _distance_matrix(X, Y=None):
     distances = np.abs(1 / np.corrcoef(X, Y)) - 1
-    distances = np.nan_to_num(distances, copy=False, nan=10e300, posinf=10e300,
-                              neginf=-10e300)
+    distances = np.nan_to_num(
+        distances, copy=False, nan=10e300, posinf=10e300, neginf=-10e300
+    )
     # TODO: Sure about the 10e300? That's 1e301.
     return distances
 
@@ -16,6 +19,7 @@ def _distance_matrix(X, Y=None):
 def silhouette(modK):  # lower the better
     """
     Compute the mean Silhouette Coefficient of a fitted clustering algorithm.
+
     This function is a proxy function for
     :func:`sklearn.metrics.silhouette_score` that applies directly to a fitted
     :class:´pycrostate.clustering.BaseClustering´. It uses the absolute spatial
@@ -53,7 +57,7 @@ def silhouette(modK):  # lower the better
     data = data[:, keep]
     labels = labels[keep]
     distances = _distance_matrix(data.T)
-    silhouette = silhouette_score(distances, labels, metric='precomputed')
+    silhouette = silhouette_score(distances, labels, metric="precomputed")
     return silhouette
 
 
@@ -71,8 +75,7 @@ def _davies_bouldin_score(X, labels):
         cluster_k = _safe_indexing(X, labels == k)
         centroid = cluster_k.mean(axis=0)
         centroids[k] = centroid
-        intra_dists[k] = np.average(_distance_matrix(
-            cluster_k, [centroid]))
+        intra_dists[k] = np.average(_distance_matrix(cluster_k, [centroid]))
 
     centroid_distances = _distance_matrix(centroids)
 
@@ -86,7 +89,7 @@ def _davies_bouldin_score(X, labels):
 
 
 def davies_bouldin(modK):  # lower the better
-    """Computes the Davies-Bouldin score.
+    """Compute the Davies-Bouldin score.
 
     This function is a proxy function for
     :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a
@@ -192,18 +195,19 @@ def _dunn_score(X, labels):  # lower the better
     distances = _distance_matrix(X)
     ks = np.sort(np.unique(labels))
 
-    deltas = np.ones([len(ks), len(ks)])*1000000
+    deltas = np.ones([len(ks), len(ks)]) * 1000000
     big_deltas = np.zeros([len(ks), 1])
 
     for i in range(0, len(ks)):
         for j in range(0, len(ks)):
             if i == j:
                 continue  # skip diagonal
-            deltas[i, j] = _delta_fast((labels == ks[i]), (labels == ks[j]),
-                                       distances)
+            deltas[i, j] = _delta_fast(
+                (labels == ks[i]), (labels == ks[j]), distances
+            )
         big_deltas[i] = _big_delta_fast((labels == ks[i]), distances)
 
-    di = np.min(deltas)/np.max(big_deltas)
+    di = np.min(deltas) / np.max(big_deltas)
     return di
 
 

@@ -1,10 +1,10 @@
-from decorator import FunctionMaker
-import sys
 import logging
+import sys
 from pathlib import Path
 from typing import Any, Callable, TypeVar
 
 import mne
+from decorator import FunctionMaker
 
 from ._checks import _check_type
 from ._docs import fill_doc
@@ -14,9 +14,11 @@ logger = logging.getLogger(name)
 logger.propagate = False  # don't propagate (in case of multiple imports)
 
 
-def init_logger(verbose='INFO'):
+def init_logger(verbose="INFO"):
     """
-    Initialize a logger. Assign sys.stdout as a handler of the logger.
+    Initialize a logger.
+
+    Assign sys.stdout as a handler of the logger.
 
     Parameters
     ----------
@@ -27,10 +29,11 @@ def init_logger(verbose='INFO'):
     add_stream_handler(sys.stdout, verbose)
 
 
-def add_stream_handler(stream, verbose='INFO'):
+def add_stream_handler(stream, verbose="INFO"):
     """
-    Add a handler to the logger. The handler redirects the logger output to
-    the stream.
+    Add a stream handler to the logger.
+
+    The handler redirects the logger output to the stream.
 
     Parameters
     ----------
@@ -42,15 +45,17 @@ def add_stream_handler(stream, verbose='INFO'):
     handler.setFormatter(LoggerFormatter())
     logger.addHandler(handler)
 
-    _check_type(verbose, (bool, str, int, None), item_name='verbose')
+    _check_type(verbose, (bool, str, int, None), item_name="verbose")
     if verbose is None:
-        verbose = 'INFO'
+        verbose = "INFO"
     set_handler_log_level(verbose, -1)
 
 
-def add_file_handler(fname, mode='a', verbose='INFO'):
+def add_file_handler(fname, mode="a", verbose="INFO"):
     """
-    Add a file handler to the logger. The handler saves the logs to file.
+    Add a file handler to the logger.
+
+    The handler saves the logs to file.
 
     Parameters
     ----------
@@ -64,15 +69,16 @@ def add_file_handler(fname, mode='a', verbose='INFO'):
     handler.setFormatter(LoggerFormatter())
     logger.addHandler(handler)
 
-    _check_type(verbose, (bool, str, int, None), item_name='verbose')
+    _check_type(verbose, (bool, str, int, None), item_name="verbose")
     if verbose is None:
-        verbose = 'INFO'
+        verbose = "INFO"
     set_handler_log_level(verbose, -1)
 
 
 def set_handler_log_level(verbose, handler_id=0):
     """
     Set the log level for a specific handler.
+
     First handler (ID 0) is always stdout, followed by user-defined handlers.
 
     Parameters
@@ -82,9 +88,9 @@ def set_handler_log_level(verbose, handler_id=0):
     handler_id : int
         ID of the handler among 'logger.handlers'.
     """
-    _check_type(verbose, (bool, str, int, None), item_name='verbose')
+    _check_type(verbose, (bool, str, int, None), item_name="verbose")
     if verbose is None:
-        verbose = 'INFO'
+        verbose = "INFO"
     logger.handlers[handler_id].setLevel = verbose
 
 
@@ -97,32 +103,35 @@ def set_log_level(verbose, return_old_level=False):
     verbose : int | str
         Logger verbosity.
     """
-    _check_type(verbose, (bool, str, int, None), item_name='verbose')
+    _check_type(verbose, (bool, str, int, None), item_name="verbose")
     old_verbose = logger.level
     if verbose is None:
-        verbose = 'INFO'
+        verbose = "INFO"
     logger.setLevel(verbose)
-    return (old_verbose if return_old_level else None)
+    return old_verbose if return_old_level else None
 
 
 class LoggerFormatter(logging.Formatter):
-    """
-    Format string Syntax for pycrostates.
-    """
+    """Format string Syntax for pycrostates."""
+
     # Format string syntax for the different Log levels
     _formatters = {}
     _formatters[logging.DEBUG] = logging.Formatter(
         fmt="[%(module)s:%(funcName)s:%(lineno)d] %(levelname)s: %(message)s "
-            "(%(asctime)s)")
+        "(%(asctime)s)"
+    )
     _formatters[logging.INFO] = logging.Formatter(
-        fmt="[%(module)s.%(funcName)s] %(levelname)s: %(message)s")
+        fmt="[%(module)s.%(funcName)s] %(levelname)s: %(message)s"
+    )
     _formatters[logging.WARNING] = logging.Formatter(
-        fmt="[%(module)s.%(funcName)s] %(levelname)s: %(message)s")
+        fmt="[%(module)s.%(funcName)s] %(levelname)s: %(message)s"
+    )
     _formatters[logging.ERROR] = logging.Formatter(
-        fmt="[%(module)s:%(funcName)s:%(lineno)d] %(levelname)s: %(message)s")
+        fmt="[%(module)s:%(funcName)s:%(lineno)d] %(levelname)s: %(message)s"
+    )
 
     def __init__(self):
-        super().__init__(fmt='%(levelname): %(message)s')
+        super().__init__(fmt="%(levelname): %(message)s")
 
     def format(self, record):
         """
@@ -143,7 +152,7 @@ class LoggerFormatter(logging.Formatter):
 
 # Provide help for static type checkers:
 # https://mypy.readthedocs.io/en/stable/generics.html#declaring-decorators
-_FuncT = TypeVar('_FuncT', bound=Callable[..., Any])
+_FuncT = TypeVar("_FuncT", bound=Callable[..., Any])
 
 
 def verbose(function: _FuncT) -> _FuncT:
@@ -202,21 +211,25 @@ def %(name)s(%(signature)s):\n
             return _function_(%(shortsignature)s)
     else:
         return _function_(%(shortsignature)s)"""
-    evaldict = dict(
-        _use_log_level_=use_log_level, _function_=function)
+    evaldict = dict(_use_log_level_=use_log_level, _function_=function)
     fm = FunctionMaker(function, None, None, None, None, function.__module__)
-    attrs = dict(__wrapped__=function, __qualname__=function.__qualname__,
-                 __globals__=function.__globals__)
+    attrs = dict(
+        __wrapped__=function,
+        __qualname__=function.__qualname__,
+        __globals__=function.__globals__,
+    )
     return fm.make(body, evaldict, addsource=True, **attrs)
 
 
-class use_log_level():
+class use_log_level:
     """Context handler for logging level.
+
     Parameters
     ----------
     level : int
         The level to use.
     """
+
     def __init__(self, level):  # noqa: D102
         self.level = level
 

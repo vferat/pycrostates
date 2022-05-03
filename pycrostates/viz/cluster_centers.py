@@ -1,24 +1,26 @@
-from typing import Optional, List
+"""Vizualisation module for plotting cluster centers."""
 
+from typing import List, Optional
+
+import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from mne.io import Info
 from mne.viz import plot_topomap
-import numpy as np
 from numpy.typing import NDArray
 
-from ..utils._checks import _check_type, _check_axes
+from ..utils._checks import _check_axes, _check_type
 
 
 def plot_cluster_centers(
-        cluster_centers: NDArray[float],
-        info,
-        cluster_names: List[str] = None,
-        axes: Optional[Axes] = None,
-        *,
-        block: bool = False,
-        **kwargs,
-        ):
+    cluster_centers: NDArray[float],
+    info,
+    cluster_names: List[str] = None,
+    axes: Optional[Axes] = None,
+    *,
+    block: bool = False,
+    **kwargs,
+):
     """
     Create topographic maps for cluster centers.
 
@@ -27,21 +29,23 @@ def plot_cluster_centers(
     fig : Figure
         Matplotlib figure(s) on which topographic maps are plotted.
     """
-    _check_type(cluster_centers, (np.ndarray, ), 'cluster_centers')
-    _check_type(info, (Info, ), 'info')
-    _check_type(cluster_names, (None, list, tuple), 'cluster_names')
+    _check_type(cluster_centers, (np.ndarray,), "cluster_centers")
+    _check_type(info, (Info,), "info")
+    _check_type(cluster_names, (None, list, tuple), "cluster_names")
     if axes is not None:
         _check_axes(axes)
-    _check_type(block, (bool, ), 'block')
+    _check_type(block, (bool,), "block")
 
     # check cluster_names
     if cluster_names is None:
         cluster_names = [
-            str(k) for k in range(1, cluster_centers.shape[0] + 1)]
+            str(k) for k in range(1, cluster_centers.shape[0] + 1)
+        ]
     if len(cluster_names) != cluster_centers.shape[0]:
         raise ValueError(
             "Argument 'cluster_centers' and 'cluster_names' should have the "
-            "same number of elements.")
+            "same number of elements."
+        )
 
     # create axes if needed, and retrieve figure
     n_clusters = cluster_centers.shape[0]
@@ -60,12 +64,14 @@ def plot_cluster_centers(
             raise ValueError(
                 "Argument 'cluster_centers' and 'axes' must contain the same "
                 f"number of clusters and Axes. Provided: {n_clusters} "
-                "microstates maps and only 1 axes.")
+                "microstates maps and only 1 axes."
+            )
         elif axes.size != n_clusters:
             raise ValueError(
                 "Argument 'cluster_centers' and 'axes' must contain the same "
                 f"number of clusters and Axes. Provided: {n_clusters} "
-                "microstates maps and {axes.size} axes.")
+                "microstates maps and {axes.size} axes."
+            )
         figs = [ax.get_figure() for ax in axes.flatten()]
         if len(set(figs)) == 1:
             f = figs[0]
@@ -74,10 +80,10 @@ def plot_cluster_centers(
         del figs
 
     # remove show from kwargs passed to topoplot
-    if 'show' in kwargs:
-        show = kwargs['show']
-        _check_type(show, (bool, ), 'show')
-        del kwargs['show']
+    if "show" in kwargs:
+        show = kwargs["show"]
+        _check_type(show, (bool,), "show")
+        del kwargs["show"]
     else:
         show = True
 

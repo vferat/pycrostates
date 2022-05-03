@@ -1,14 +1,16 @@
+"""Measurement information, similar to mne.Info instance."""
+
 from copy import deepcopy
 from numbers import Number
-from typing import Optional, Union, List, Tuple
+from typing import List, Optional, Tuple, Union
 
+import numpy as np
 from mne.io import Info
 from mne.io.constants import FIFF
-from mne.io.meas_info import _check_ch_keys, _unique_channel_names, _check_bads
+from mne.io.meas_info import _check_bads, _check_ch_keys, _unique_channel_names
 from mne.io.pick import get_channel_type_constants
 from mne.io.proj import Projection
 from mne.io.tag import _ch_coord_dict
-import numpy as np
 
 from ..utils._checks import _check_type, _IntLike
 from ..utils._logs import logger
@@ -136,84 +138,82 @@ class ChInfo(Info):
 
     # valid items
     _attributes = {
-        'bads': _check_bads,
-        'ch_names': 'ch_names cannot be set directly. '
-                    'Please use methods inst.add_channels(), '
-                    'inst.drop_channels(), inst.pick_channels(), '
-                    'inst.rename_channels(), inst.reorder_channels() '
-                    'and inst.set_channel_types() instead.',
-        'chs': 'chs cannot be set directly. '
-               'Please use methods inst.add_channels(), '
-               'inst.drop_channels(), inst.pick_channels(), '
-               'inst.rename_channels(), inst.reorder_channels() '
-               'and inst.set_channel_types() instead.',
-        'comps': 'comps cannot be set directly. '
-                 'Please use method Raw.apply_gradient_compensation() '
-                 'instead.',
-        'custom_ref_applied': 'custom_ref_applied cannot be set directly. '
-                              'Please use method inst.set_eeg_reference() '
-                              'instead.',
-        'dig': 'dig cannot be set directly. '
-               'Please use method inst.set_montage() instead.',
-        'nchan': 'nchan cannot be set directly. '
-                 'Please use methods inst.add_channels(), '
-                 'inst.drop_channels(), and inst.pick_channels() instead.',
-        'projs': 'projs cannot be set directly. '
-                 'Please use methods inst.add_proj() and inst.del_proj() '
-                 'instead.',
+        "bads": _check_bads,
+        "ch_names": "ch_names cannot be set directly. "
+        "Please use methods inst.add_channels(), "
+        "inst.drop_channels(), inst.pick_channels(), "
+        "inst.rename_channels(), inst.reorder_channels() "
+        "and inst.set_channel_types() instead.",
+        "chs": "chs cannot be set directly. "
+        "Please use methods inst.add_channels(), "
+        "inst.drop_channels(), inst.pick_channels(), "
+        "inst.rename_channels(), inst.reorder_channels() "
+        "and inst.set_channel_types() instead.",
+        "comps": "comps cannot be set directly. "
+        "Please use method Raw.apply_gradient_compensation() "
+        "instead.",
+        "custom_ref_applied": "custom_ref_applied cannot be set directly. "
+        "Please use method inst.set_eeg_reference() "
+        "instead.",
+        "dig": "dig cannot be set directly. "
+        "Please use method inst.set_montage() instead.",
+        "nchan": "nchan cannot be set directly. "
+        "Please use methods inst.add_channels(), "
+        "inst.drop_channels(), and inst.pick_channels() instead.",
+        "projs": "projs cannot be set directly. "
+        "Please use methods inst.add_proj() and inst.del_proj() "
+        "instead.",
     }
 
     def __init__(
-            self,
-            info: Optional[Info] = None,
-            ch_names: Optional[
-                Union[
-                    int,
-                    List[str],
-                    Tuple[str, ...],
-                    ]
-                ] = None,
-            ch_types: Optional[
-                Union[
-                    str,
-                    List[str],
-                    Tuple[str, ...]
-                    ]
-                ] = None,
-            ):
+        self,
+        info: Optional[Info] = None,
+        ch_names: Optional[
+            Union[
+                int,
+                List[str],
+                Tuple[str, ...],
+            ]
+        ] = None,
+        ch_types: Optional[Union[str, List[str], Tuple[str, ...]]] = None,
+    ):
         if all(arg is None for arg in (info, ch_names, ch_types)):
             raise RuntimeError(
-                "Either 'info' or 'ch_names' and 'ch_types' must not be None.")
-        if info is None and all(arg is not None
-                                for arg in (ch_names, ch_types)):
-            _check_type(ch_names, (None, 'int', list, tuple), 'ch_names')
-            _check_type(ch_types, (None, str, list, tuple), 'ch_types')
+                "Either 'info' or 'ch_names' and 'ch_types' must not be None."
+            )
+        if info is None and all(
+            arg is not None for arg in (ch_names, ch_types)
+        ):
+            _check_type(ch_names, (None, "int", list, tuple), "ch_names")
+            _check_type(ch_types, (None, str, list, tuple), "ch_types")
             self._init_from_channels(ch_names, ch_types)
-        elif info is not None and all(arg is None
-                                      for arg in (ch_names, ch_types)):
-            _check_type(info, (None, Info), 'info')
+        elif info is not None and all(
+            arg is None for arg in (ch_names, ch_types)
+        ):
+            _check_type(info, (None, Info), "info")
             self._init_from_info(info)
         else:
             raise RuntimeError(
                 "If 'info' is provided, 'ch_names' and 'ch_types' must be "
                 "None. If 'ch_names' and 'ch_types' are provided, 'info' "
-                "must be None.")
+                "must be None."
+            )
 
     def _init_from_info(self, info: Info):
         """Init instance from mne Info."""
-        self['custom_ref_applied'] = info['custom_ref_applied']
-        self['bads'] = info['bads']
-        self['chs'] = info['chs']
-        self['dig'] = info['dig']
-        self['comps'] = info['comps']
-        self['projs'] = info['projs']
+        self["custom_ref_applied"] = info["custom_ref_applied"]
+        self["bads"] = info["bads"]
+        self["chs"] = info["chs"]
+        self["dig"] = info["dig"]
+        self["comps"] = info["comps"]
+        self["projs"] = info["projs"]
         self._update_redundant()
 
     def _init_from_channels(
-            self,
-            ch_names: Union[int, List[str], Tuple[str, ...]],
-            ch_types: Union[str, List[str], Tuple[str, ...]]
-            ):
+        self,
+        ch_names: Union[int, List[str], Tuple[str, ...]],
+        ch_types: Union[str, List[str], Tuple[str, ...]],
+    ):
         """Init instance from channel names and types."""
         self._unlocked = True
 
@@ -234,51 +234,61 @@ class ChInfo(Info):
         ndim = np.atleast_1d(np.array(ch_types, np.str_)).ndim
         if ndim != 1 or len(ch_types) != nchan:
             raise ValueError(
-                'ch_types and ch_names must be the same length '
-                f'({len(ch_types)} != {nchan}) for ch_types={ch_types}')
+                "ch_types and ch_names must be the same length "
+                f"({len(ch_types)} != {nchan}) for ch_types={ch_types}"
+            )
 
         # add custom ref flag
-        self['custom_ref_applied'] = FIFF.FIFFV_MNE_CUSTOM_REF_OFF
+        self["custom_ref_applied"] = FIFF.FIFFV_MNE_CUSTOM_REF_OFF
 
         # init empty bads
-        self['bads'] = []  # mutable, as this can be changed by the user
+        self["bads"] = []  # mutable, as this can be changed by the user
 
         # create chs information
-        self['chs'] = []
+        self["chs"] = []
         ch_types_dict = get_channel_type_constants(include_defaults=True)
         for ci, (ch_name, ch_type) in enumerate(zip(ch_names, ch_types)):
-            _check_type(ch_name, (str, ))
-            _check_type(ch_type, (str, ))
+            _check_type(ch_name, (str,))
+            _check_type(ch_type, (str,))
             if ch_type not in ch_types_dict:
                 raise KeyError(
-                    f'kind must be one of {list(ch_types_dict)}, not '
-                    f'{ch_type}.')
+                    f"kind must be one of {list(ch_types_dict)}, not "
+                    f"{ch_type}."
+                )
             this_ch_dict = ch_types_dict[ch_type]
-            kind = this_ch_dict['kind']
+            kind = this_ch_dict["kind"]
             # handle chpi, where kind is a *list* of FIFF constants:
             kind = kind[0] if isinstance(kind, (list, tuple)) else kind
             # mirror what tag.py does here
             coord_frame = _ch_coord_dict.get(kind, FIFF.FIFFV_COORD_UNKNOWN)
-            coil_type = this_ch_dict.get('coil_type', FIFF.FIFFV_COIL_NONE)
-            unit = this_ch_dict.get('unit', FIFF.FIFF_UNIT_NONE)
-            chan_info = dict(loc=np.full(12, np.nan),
-                             unit_mul=FIFF.FIFF_UNITM_NONE, range=1., cal=1.,
-                             kind=kind, coil_type=coil_type, unit=unit,
-                             coord_frame=coord_frame, ch_name=str(ch_name),
-                             scanno=ci + 1, logno=ci + 1)
-            self['chs'].append(chan_info)
+            coil_type = this_ch_dict.get("coil_type", FIFF.FIFFV_COIL_NONE)
+            unit = this_ch_dict.get("unit", FIFF.FIFF_UNIT_NONE)
+            chan_info = dict(
+                loc=np.full(12, np.nan),
+                unit_mul=FIFF.FIFF_UNITM_NONE,
+                range=1.0,
+                cal=1.0,
+                kind=kind,
+                coil_type=coil_type,
+                unit=unit,
+                coord_frame=coord_frame,
+                ch_name=str(ch_name),
+                scanno=ci + 1,
+                logno=ci + 1,
+            )
+            self["chs"].append(chan_info)
 
         # convert to immutable
-        self['chs'] = self['chs']
+        self["chs"] = self["chs"]
 
         # add empty dig
-        self['dig'] = None
+        self["dig"] = None
 
         # add empty compensation grades
-        self['comps'] = []
+        self["comps"] = []
 
         # add empty projs
-        self['projs'] = []
+        self["projs"] = []
 
         self._unlocked = False
 
@@ -289,24 +299,24 @@ class ChInfo(Info):
         """Attribute getter."""
         # disable method/attributes that pycrostates does not support
         # invalid attributes
-        _inv_attributes = (
-            )
+        _inv_attributes = ()
         # invalid methods/properties
         _inv_methods = (
-            'pick_channels'  # TODO: Can be removed when req. for MNE = 1.1.0
-            )
+            "pick_channels"  # TODO: Can be removed when req. for MNE = 1.1.0
+        )
         if name in _inv_attributes or name in _inv_methods:
             raise AttributeError(
-                f"'{self.__class__.__name__}' has not attribute '{name}'")
+                f"'{self.__class__.__name__}' has not attribute '{name}'"
+            )
         return super().__getattribute__(name)
 
     def __eq__(self, other):
         """Equality == method."""
         if isinstance(other, Info):
             # compare channel names
-            if self['ch_names'] != other['ch_names']:
+            if self["ch_names"] != other["ch_names"]:
                 return False
-            assert self['nchan'] == other['nchan']  # sanity-check
+            assert self["nchan"] == other["nchan"]  # sanity-check
 
             # compare channel types
             if self.get_channel_types() != other.get_channel_types():
@@ -326,12 +336,12 @@ class ChInfo(Info):
                     return False
 
             # compare custom ref
-            if self['custom_ref_applied'] != other['custom_ref_applied']:
+            if self["custom_ref_applied"] != other["custom_ref_applied"]:
                 return False
 
             # TODO: Compare projs and compensation grades.
 
-            if self['bads'] != other['bads']:
+            if self["bads"] != other["bads"]:
                 logger.warning("Both info do not have the same bad channels.")
 
             return True
@@ -344,10 +354,10 @@ class ChInfo(Info):
 
     # ------------------------------------------------------------------------
     def __setitem__(self, key, val):
-        """Dict item setter."""
+        """Setter for Dictionary item."""
         # During unpickling, the _unlocked attribute has not been set, so
         # let __setstate__ do it later and act unlocked now
-        unlocked = getattr(self, '_unlocked', True)
+        unlocked = getattr(self, "_unlocked", True)
         if key in self._attributes:
             if isinstance(self._attributes[key], str):
                 if not unlocked:
@@ -358,7 +368,8 @@ class ChInfo(Info):
             raise RuntimeError(
                 f"Info does not support setting the key {repr(key)}. "
                 "Supported keys are "
-                f"{', '.join(repr(k) for k in self._attributes)}")
+                f"{', '.join(repr(k) for k in self._attributes)}"
+            )
         super().__setitem__(key, val)  # calls the dict __setitem__
 
     def __deepcopy__(self, memodict):
@@ -367,14 +378,14 @@ class ChInfo(Info):
         result._unlocked = True
         for k, v in self.items():
             # chs is roughly half the time but most are immutable
-            if k == 'chs':
+            if k == "chs":
                 # dict shallow copy is fast, so use it then overwrite
                 result[k] = []
                 for ch in v:
                     ch = ch.copy()  # shallow
-                    ch['loc'] = ch['loc'].copy()
+                    ch["loc"] = ch["loc"].copy()
                     result[k].append(ch)
-            elif k == 'ch_names':
+            elif k == "ch_names":
                 # we know it's list of str, shallow okay and saves ~100 µs
                 result[k] = v.copy()
             else:
@@ -382,50 +393,71 @@ class ChInfo(Info):
         result._unlocked = False
         return result
 
-    def _check_consistency(self, prepend_error: str = ''):
+    def _check_consistency(self, prepend_error: str = ""):
         """Do some self-consistency checks and datatype tweaks."""
-        missing = [bad for bad in self['bads'] if bad not in self['ch_names']]
+        missing = [bad for bad in self["bads"] if bad not in self["ch_names"]]
         if len(missing) > 0:
-            msg = '%sbad channel(s) %s marked do not exist in info'
-            raise RuntimeError(msg % (prepend_error, missing,))
-
-        chs = [ch['ch_name'] for ch in self['chs']]
-        if len(self['ch_names']) != len(chs) or any(
-                ch_1 != ch_2 for ch_1, ch_2 in zip(self['ch_names'], chs)) or \
-                self['nchan'] != len(chs):
+            msg = "%sbad channel(s) %s marked do not exist in info"
             raise RuntimeError(
-                f'{prepend_error}info channel name inconsistency detected, '
-                'please notify developers.')
+                msg
+                % (
+                    prepend_error,
+                    missing,
+                )
+            )
 
-        for pi, proj in enumerate(self.get('projs', [])):
-            _check_type(proj, (Projection, ), f'info["projs"][{pi}]')
-            for key in ('kind', 'active', 'desc', 'data', 'explained_var'):
+        chs = [ch["ch_name"] for ch in self["chs"]]
+        if (
+            len(self["ch_names"]) != len(chs)
+            or any(ch_1 != ch_2 for ch_1, ch_2 in zip(self["ch_names"], chs))
+            or self["nchan"] != len(chs)
+        ):
+            raise RuntimeError(
+                f"{prepend_error}info channel name inconsistency detected, "
+                "please notify developers."
+            )
+
+        for pi, proj in enumerate(self.get("projs", [])):
+            _check_type(proj, (Projection,), f'info["projs"][{pi}]')
+            for key in ("kind", "active", "desc", "data", "explained_var"):
                 if key not in proj:
-                    raise RuntimeError(f'Projection incomplete, missing {key}')
+                    raise RuntimeError(f"Projection incomplete, missing {key}")
 
         # Ensure info['chs'] has immutable entries (copies much faster)
-        for ci, ch in enumerate(self['chs']):
+        for ci, ch in enumerate(self["chs"]):
             _check_ch_keys(ch, ci)
-            ch_name = ch['ch_name']
+            ch_name = ch["ch_name"]
             if not isinstance(ch_name, str):
                 raise TypeError(
                     f'Bad info: info["chs"][{ci}]["ch_name"] is not a string, '
-                    f'got type {type(ch_name)}.')
-            for key in ('scanno', 'logno', 'kind', 'range', 'cal', 'coil_type',
-                        'unit', 'unit_mul', 'coord_frame'):
+                    f"got type {type(ch_name)}."
+                )
+            for key in (
+                "scanno",
+                "logno",
+                "kind",
+                "range",
+                "cal",
+                "coil_type",
+                "unit",
+                "unit_mul",
+                "coord_frame",
+            ):
                 val = ch.get(key, 1)
                 if not isinstance(val, Number):
                     raise TypeError(
                         f'Bad info: info["chs"][{ci}][{key}] = {val} is type '
-                        f'{type(val)}, must be float or int.')
-            loc = ch['loc']
+                        f"{type(val)}, must be float or int."
+                    )
+            loc = ch["loc"]
             if not (isinstance(loc, np.ndarray) and loc.shape == (12,)):
                 raise TypeError(
                     f'Bad info: info["chs"][{ci}]["loc"] must be ndarray '
-                    f'with 12 elements, got {loc}.')
+                    f"with 12 elements, got {loc}."
+                )
 
         # make sure channel names are unique
         with self._unlock():
-            self['ch_names'] = _unique_channel_names(self['ch_names'])
-            for idx, ch_name in enumerate(self['ch_names']):
-                self['chs'][idx]['ch_name'] = ch_name
+            self["ch_names"] = _unique_channel_names(self["ch_names"])
+            for idx, ch_name in enumerate(self["ch_names"]):
+                self["chs"][idx]["ch_name"] = ch_name

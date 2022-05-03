@@ -1,25 +1,23 @@
 """
 Optional dependency import.
-Inspired from pandas: https://pandas.pydata.org/
+
+Inspired from pandas: https://pandas.pydata.org/.
 """
 import importlib
 
 from ._logs import logger
 
-
 # A mapping from import name to package name (on PyPI) when the package name
 # is different. {python: PyPI}
-INSTALL_MAPPING = {
-    }
+INSTALL_MAPPING = {}
 
 
 def import_optional_dependency(
-        name: str,
-        extra: str = "",
-        raise_error: bool = True
-        ):
+    name: str, extra: str = "", raise_error: bool = True
+):
     """
     Import an optional dependency.
+
     By default, if a dependency is missing an ImportError with a nice message
     will be raised.
 
@@ -49,8 +47,10 @@ def import_optional_dependency(
     try:
         module = importlib.import_module(name)
     except ImportError:
-        msg = f"Missing optional dependency '{install_name}'. {extra} " + \
-              f"Use pip or conda to install '{install_name}'."
+        msg = (
+            f"Missing optional dependency '{install_name}'. {extra} "
+            + f"Use pip or conda to install '{install_name}'."
+        )
         if raise_error:
             raise ImportError(msg)
         logger.warning(msg)

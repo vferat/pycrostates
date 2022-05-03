@@ -11,17 +11,18 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+
 import pydata_sphinx_theme
-from sphinx_gallery.sorting import ExplicitOrder
 from recommonmark.transform import AutoStructify
+from sphinx_gallery.sorting import ExplicitOrder
 
 curdir = os.path.dirname(__file__)
 
 # -- Project information -----------------------------------------------------
 
-project = 'pycrostates'
-copyright = '2021, Victor Férat'
-author = 'Victor Férat'
+project = "pycrostates"
+copyright = "2021, Victor Férat"
+author = "Victor Férat"
 
 # -- General configuration ---------------------------------------------------
 
@@ -29,46 +30,47 @@ author = 'Victor Férat'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-   'sphinx.ext.autodoc',
-   'sphinx.ext.napoleon',
-   'sphinx.ext.autosummary',
-   'sphinx.ext.doctest',
-   'sphinx.ext.coverage',
-   'sphinx.ext.mathjax',
-   'sphinx.ext.viewcode',
-   'sphinx.ext.intersphinx',
-   'nbsphinx',
-   'sphinx_gallery.gen_gallery',
-   'recommonmark',
-   'numpydoc']
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.doctest",
+    "sphinx.ext.coverage",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.intersphinx",
+    "nbsphinx",
+    "sphinx_gallery.gen_gallery",
+    "recommonmark",
+    "numpydoc",
+]
 
 
 # sphinx
-master_doc = 'index'
+master_doc = "index"
 
 # autodoc
 autodoc_typehints = 'none'
 
 # pygments style
-pygments_style = 'default'
+pygments_style = "default"
 
 # A list of ignored prefixes for module index sorting.
-modindex_common_prefix = ['pycrostates.']
+modindex_common_prefix = ["pycrostates."]
 
 # autosummary
 autosummary_generate = True
-autodoc_default_options = {'inherited-members': None}
+autodoc_default_options = {"inherited-members": None}
 
 # intersphinx_mapping
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
-    'numpy': ('https://numpy.org/devdocs', None),
-    'scipy': ('https://scipy.github.io/devdocs', None),
-    'matplotlib': ('https://matplotlib.org', None),
-    'mne': ('https://mne.tools/stable/', None),
-    'joblib': ('https://joblib.readthedocs.io/en/latest', None),
-    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
-    'sklearn': ('https://scikit-learn.org/stable/', None)
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/devdocs", None),
+    "scipy": ("https://scipy.github.io/devdocs", None),
+    "matplotlib": ("https://matplotlib.org", None),
+    "mne": ("https://mne.tools/stable/", None),
+    "joblib": ("https://joblib.readthedocs.io/en/latest", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "sklearn": ("https://scikit-learn.org/stable/", None),
 }
 
 # numpy doc
@@ -78,23 +80,25 @@ numpydoc_xref_param_type = True
 
 # sphinx_gallery_conf
 sphinx_gallery_conf = {
-     'examples_dirs': os.path.abspath(os.path.join(curdir,
-                                                   '..',
-                                                   '..',
-                                                   'tutorials')),
-     'gallery_dirs': 'auto_tutorials',
-     'subsection_order': ExplicitOrder(
-                            ['../../tutorials/preprocessing',
-                             '../../tutorials/clustering',
-                             '../../tutorials/backfitting',
-                             '../../tutorials/group_level_analysis']),
-     'reference_url': {'pycrostates': None},  # current lib uses None
-     'backreferences_dir': 'generated/backreferences',
-     'doc_module': ('pycrostates',)
-                      }
+    "examples_dirs": os.path.abspath(
+        os.path.join(curdir, "..", "..", "tutorials")
+    ),
+    "gallery_dirs": "auto_tutorials",
+    "subsection_order": ExplicitOrder(
+        [
+            "../../tutorials/preprocessing",
+            "../../tutorials/clustering",
+            "../../tutorials/backfitting",
+            "../../tutorials/group_level_analysis",
+        ]
+    ),
+    "reference_url": {"pycrostates": None},  # current lib uses None
+    "backreferences_dir": "generated/backreferences",
+    "doc_module": ("pycrostates",),
+}
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -106,21 +110,24 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'pydata_sphinx_theme'
+html_theme = "pydata_sphinx_theme"
 
 html_theme_options = {
     "icon_links": [
-        {"name": "GitHub",
-         "url": "https://github.com/vferat/pycrostates",
-         "icon": "fab fa-github-square"}],
+        {
+            "name": "GitHub",
+            "url": "https://github.com/vferat/pycrostates",
+            "icon": "fab fa-github-square",
+        }
+    ],
     "external_links": [
-        {"name": "mne",
-         "url": "https://mne.tools/stable/index.html"}],
-                     }
+        {"name": "mne", "url": "https://mne.tools/stable/index.html"}
+    ],
+}
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = [os.path.abspath(os.path.join(curdir, '../_static'))]
+html_static_path = [os.path.abspath(os.path.join(curdir, "../_static"))]
 
 
 def append_attr_meth_examples(app, what, name, obj, options, lines):
@@ -129,21 +136,28 @@ def append_attr_meth_examples(app, what, name, obj, options, lines):
     # does not respect the autodoc templates that would otherwise insert
     # the .. include:: lines, so we need to do it.
     # Eventually this could perhaps live in SG.
-    if what in ('attribute', 'method'):
-        size = os.path.getsize(os.path.join(
-                                    os.path.dirname(__file__),
-                                    'generated',
-                                    'backreferences',
-                                    '%s.examples' % (name,)))
+    if what in ("attribute", "method"):
+        size = os.path.getsize(
+            os.path.join(
+                os.path.dirname(__file__),
+                "generated",
+                "backreferences",
+                "%s.examples" % (name,),
+            )
+        )
         if size > 0:
             lines += """
 .. _sphx_glr_backreferences_{1}:
 .. rubric:: Examples using ``{0}``:
 .. minigallery:: {1}
-""".format(name.split('.')[-1], name).split('\n')
+""".format(
+                name.split(".")[-1], name
+            ).split(
+                "\n"
+            )
 
 
 # -- Auto-convert markdown pages to demo --------------------------------------
 def setup(app):
-    app.connect('autodoc-process-docstring', append_attr_meth_examples)
+    app.connect("autodoc-process-docstring", append_attr_meth_examples)
     app.add_transform(AutoStructify)
