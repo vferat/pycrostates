@@ -9,7 +9,7 @@ from scipy.signal import find_peaks
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
-
+from ..io import ChData
 
 def _extract_gfps(data, min_peak_distance=2):
     """Extract GFP peaks from input data.
@@ -69,8 +69,6 @@ def extract_gfp_peaks(
     info:
         Measurement information without any temporal information.
     """
-    from ..io import ChInfo
-
     _check_type(inst, (BaseRaw, BaseEpochs))
     if min_peak_distance < 1:
         raise (ValueError("min_peak_dist must be >= 1."))
@@ -106,8 +104,7 @@ def extract_gfp_peaks(
             peaks.shape[1] / (data.shape[0] * data.shape[2]) * 100,
         )
 
-    info = ChInfo(inst.info)
-    return peaks, info
+    return ChData(peaks, inst.info)
 
 
 @fill_doc
@@ -168,8 +165,6 @@ def resample(
     parameters must be defined, the non-defined one being
     computed during function execution.
     """
-    from ..io import ChInfo
-
     _check_type(inst, (BaseRaw, BaseEpochs))
 
     if isinstance(inst, BaseRaw):
@@ -233,5 +228,7 @@ def resample(
     data = data[:, indices]
     data = np.swapaxes(data, 0, 1)
 
-    info = ChInfo(inst.info)
-    return data, info
+    resamples = list()
+    for d in data:
+        resamples.append(ChData(d, inst.info))
+    return resamples

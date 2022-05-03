@@ -20,7 +20,7 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 from ..viz import plot_cluster_centers
-
+from ..io import ChData
 
 class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     """Base Class for Microstates Clustering algorithms."""
@@ -186,7 +186,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         from ..io import ChInfo
 
         n_jobs = _check_n_jobs(n_jobs)
-        _check_type(inst, (BaseRaw, BaseEpochs, tuple), item_name="inst")
+        _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
 
         # retrieve info
         if isinstance(inst, BaseRaw):
@@ -228,26 +228,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                     f"instance."
                 )
 
-            info = inst.info
-
-        elif isinstance(inst, BaseEpochs):
-            info = inst.info
-
-        elif isinstance(inst, tuple):
-            if len(inst) != 2:
-                raise ValueError(
-                    f"If provided as a tuple, inst must contain two elements: "
-                    f"a data array and a ChInfo, but got {len(inst)} elements."
-                )
-            _check_type(inst[0], (np.ndarray,), item_name="inst[0]")
-            _check_type(inst[1], (Info,), item_name="inst[1]")
-            if not len(inst[1]["ch_names"]) == len(inst[0]):
-                raise ValueError(
-                    "Instance data and Info do not have the same "
-                    "number of channels."
-                )
-
-            info = inst[1]
+        info = inst.info
 
         # picks
         picks_bads_inc = _picks_to_idx(info, picks, none="all", exclude=[])
@@ -286,8 +267,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             data = np.swapaxes(data, 0, 1)
             data = data.reshape(data.shape[0], -1)
 
-        elif isinstance(inst, tuple):
-            data = inst[0][picks, :]
+        elif isinstance(inst, ChData):
+            data = ChData.data[picks, :]
 
         # store picks and info
         self._info = ChInfo(info=pick_info(info, picks_bads_inc))
