@@ -8,7 +8,7 @@ import numpy as np
 from matplotlib.axes import Axes
 from mne import BaseEpochs, pick_info
 from mne.annotations import _annotations_starts_stops
-from mne.io import BaseRaw
+from mne.io import BaseRaw, Info
 from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 from scipy.signal import convolve2d
@@ -185,19 +185,72 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         # TODO: Maybe those parameters should be moved here instead of docdict?
         from ..io import ChInfo
 
-        _check_type(inst, (BaseRaw, BaseEpochs), item_name="inst")
-        _check_type(tmin, (None, "numeric"), item_name="tmin")
-        _check_type(tmax, (None, "numeric"), item_name="tmax")
-        reject_by_annotation = _BaseCluster._check_reject_by_annotation(
-            reject_by_annotation
-        )
         n_jobs = _check_n_jobs(n_jobs)
+        _check_type(inst, (BaseRaw, BaseEpochs, tuple), item_name="inst")
+
+        # retrieve info
+        if isinstance(inst, BaseRaw):
+            _check_type(tmin, (None, "numeric"), item_name="tmin")
+            _check_type(tmax, (None, "numeric"), item_name="tmax")
+            reject_by_annotation = _BaseCluster._check_reject_by_annotation(
+                reject_by_annotation
+            )
+            # tmin/tmax
+            # check positiveness
+            for name, arg in (("tmin", tmin), ("tmax", tmax)):
+                if arg is None:
+                    continue
+                if arg < 0:
+                    raise ValueError(
+                        f"Argument '{name}' must be positive. "
+                        f"Provided '{arg}'."
+                    )
+            # check tmax is shorter than raw
+            if tmax is not None and inst.times[-1] < tmax:
+                raise ValueError(
+                    f"Argument 'tmax' must be shorter "
+                    f"than the instance length. "
+                    f"Provided: '{tmax}', larger than "
+                    f"{inst.times[-1]}s instance."
+                )
+            # check that tmax is larger than tmin
+            if tmax is not None and tmin is not None and tmax <= tmin:
+                raise ValueError(
+                    f"Argument 'tmax' must be strictly larger "
+                    f"than 'tmin'. "
+                    f"Provided 'tmin' -> '{tmin}' and 'tmax' -> '{tmax}'."
+                )
+            elif tmin is not None and inst.times[-1] <= tmin:
+                raise ValueError(
+                    f"Argument 'tmin' must be shorter than "
+                    f"the instance length. "
+                    f"Provided: '{tmin}', larger than {inst.times[-1]}s "
+                    f"instance."
+                )
+
+            info = inst.info
+
+        elif isinstance(inst, BaseEpochs):
+            info = inst.info
+
+        elif isinstance(inst, tuple):
+            if len(inst) != 2:
+                raise ValueError(
+                    f"If provided as a tuple, inst must contain two elements: "
+                    f"a data array and a ChInfo, but got {len(inst)} elements."
+                )
+            _check_type(inst[0], (np.ndarray,), item_name="inst[0]")
+            _check_type(inst[1], (Info,), item_name="inst[1]")
+            if not len(inst[1]['ch_names']) == len(inst[0]):
+                raise ValueError(
+                        f"Instance data and Info do not have the same number of channels."
+                    )
+           
+            info = inst[1]
 
         # picks
-        picks_bads_inc = _picks_to_idx(
-            inst.info, picks, none="all", exclude=[]
-        )
-        picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
+        picks_bads_inc = _picks_to_idx(info, picks, none="all", exclude=[])
+        picks = _picks_to_idx(info, picks, none="all", exclude="bads")
         ch_not_used = set(picks_bads_inc) - set(picks)
         if len(ch_not_used) != 0:
             if len(ch_not_used) == 1:
@@ -214,51 +267,29 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                     + "explicitly in the 'picks' argument."
                 )
             logger.warning(
-                msg, ", ".join(inst.info["ch_names"][k] for k in ch_not_used)
+                msg, ", ".join(info["ch_names"][k] for k in ch_not_used)
             )
             del msg
 
-        # tmin/tmax
-        # check positiveness
-        for name, arg in (("tmin", tmin), ("tmax", tmax)):
-            if arg is None:
-                continue
-            if arg < 0:
-                raise ValueError(
-                    f"Argument '{name}' must be positive. Provided '{arg}'."
-                )
-        # check tmax is shorter than raw
-        if tmax is not None and inst.times[-1] < tmax:
-            raise ValueError(
-                "Argument 'tmax' must be shorter than the instance length. "
-                f"Provided: '{tmax}', larger than {inst.times[-1]}s instance."
-            )
-        # check that tmax is larger than tmin
-        if tmax is not None and tmin is not None and tmax <= tmin:
-            raise ValueError(
-                "Argument 'tmax' must be strictly larger than 'tmin'. "
-                f"Provided 'tmin' -> '{tmin}' and 'tmax' -> '{tmax}'."
-            )
-        elif tmin is not None and inst.times[-1] <= tmin:
-            raise ValueError(
-                "Argument 'tmin' must be shorter than the instance length. "
-                f"Provided: '{tmin}', larger than {inst.times[-1]}s instance."
+        # retrieve data
+        if isinstance(inst, BaseRaw):
+            data = inst.get_data(
+                picks=picks,
+                tmin=tmin,
+                tmax=tmax,
+                reject_by_annotation=reject_by_annotation,
             )
 
-        # retrieve numpy array
-        kwargs = (
-            dict()
-            if isinstance(inst, BaseEpochs)
-            else dict(reject_by_annotation=reject_by_annotation)
-        )
-        data = inst.get_data(picks=picks, tmin=tmin, tmax=tmax, **kwargs)
-        # reshape if inst is Epochs
-        if isinstance(inst, BaseEpochs):
+        elif isinstance(inst, BaseEpochs):
+            data = inst.get_data(picks=picks, tmin=tmin, tmax=tmax)
             data = np.swapaxes(data, 0, 1)
             data = data.reshape(data.shape[0], -1)
 
+        elif isinstance(inst, tuple):
+            data = inst[0][picks, :]
+
         # store picks and info
-        self._info = ChInfo(info=pick_info(inst.info, picks_bads_inc))
+        self._info = ChInfo(info=pick_info(info, picks_bads_inc))
         self._fitted_data = data
 
         return data

@@ -144,6 +144,22 @@ def test_ModKMeans():
         len(epochs.info["ch_names"]) - len(epochs.info["bads"]),
     )
 
+    # Test fit on Data + Info
+    ModK1.fit((raw.get_data(), raw.info), n_jobs=1)
+    _check_fitted(ModK1)
+    assert ModK1._cluster_centers_.shape == (
+        n_clusters,
+        len(raw.info["ch_names"]) - len(raw.info["bads"]),
+    )
+
+    # Test fit on Data + ChInfo
+    ModK1.fit((raw.get_data(), ChInfo(raw.info)), n_jobs=1)
+    _check_fitted(ModK1)
+    assert ModK1._cluster_centers_.shape == (
+        n_clusters,
+        len(raw.info["ch_names"]) - len(raw.info["bads"]),
+    )
+    
     # Test copy
     ModK2 = ModK1.copy()
     _check_fitted(ModK2)
