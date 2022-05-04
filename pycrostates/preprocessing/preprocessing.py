@@ -129,7 +129,7 @@ def resample(
 
     Parameters
     ----------
-    inst : :class:`~mne.io.Raw`, :class:`~mne.Epochs` or :class:`~pycrostates.io.ChData`
+    inst : `mne.io.Raw`, `mne.Epochs` or `pycrostates.io.ChData`
         Instance from which to extract GFP peaks.
     n_epochs : int
         Number of epoch to draw.
@@ -180,7 +180,7 @@ def resample(
 
     if isinstance(inst, ChData):
         data = inst.data
-        
+
     n_times = data.shape[1]
 
     if len([x for x in [n_epochs, n_samples, coverage] if x is None]) >= 2:
