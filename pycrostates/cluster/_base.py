@@ -183,8 +183,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         %(n_jobs)s
         """
         # TODO: Maybe those parameters should be moved here instead of docdict?
-        from ..io import ChInfo, ChData
-
+        from ..io import ChData, ChInfo
 
         n_jobs = _check_n_jobs(n_jobs)
         _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
@@ -269,7 +268,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             data = data.reshape(data.shape[0], -1)
 
         elif isinstance(inst, ChData):
-            data = ChData.data[picks, :]
+            data = inst._data[picks, :]
 
         # store picks and info
         self._info = ChInfo(info=pick_info(info, picks_bads_inc))
