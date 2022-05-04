@@ -64,10 +64,8 @@ def extract_gfp_peaks(
 
     Returns
     -------
-    data : `~numpy.array` shape(n_channels, n_peaks)
-        Samples data at each GFP peaks.
-    info:
-        Measurement information without any temporal information.
+    ch_data : list of :class:`~pycrostates.io.ChData`
+        Samples at global field power peaks.
     """
     from ..io import ChData
 
@@ -156,10 +154,8 @@ def resample(
 
     Returns
     -------
-    data : `~numpy.array` shape(n_epochs, n_channels, n_samples)
-        Resampled data
-    info:
-        Measurement information without any temporal information.
+    ch_data : list of :class:`~pycrostates.io.ChData`
+        List of resamples.
 
     Notes
     -----
