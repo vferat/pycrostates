@@ -129,7 +129,7 @@ def resample(
 
     Parameters
     ----------
-    inst : :class:`~mne.io.Raw`, :class:`~mne.Epochs`
+    inst : :class:`~mne.io.Raw`, :class:`~mne.Epochs` or :class:`~pycrostates.io.ChData`
         Instance from which to extract GFP peaks.
     n_epochs : int
         Number of epoch to draw.
@@ -165,7 +165,7 @@ def resample(
     """
     from ..io import ChData
 
-    _check_type(inst, (BaseRaw, BaseEpochs))
+    _check_type(inst, (BaseRaw, BaseEpochs, ChData))
 
     if isinstance(inst, BaseRaw):
         reject_by_annotation = "omit" if reject_by_annotation else None
@@ -178,6 +178,9 @@ def resample(
         data = inst.get_data()
         data = np.hstack(data)
 
+    if isinstance(inst, ChData):
+        data = inst.data
+        
     n_times = data.shape[1]
 
     if len([x for x in [n_epochs, n_samples, coverage] if x is None]) >= 2:
