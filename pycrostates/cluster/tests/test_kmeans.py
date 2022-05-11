@@ -434,15 +434,15 @@ def test_properties(caplog):
         random_state=1,
     )
 
-    ModK_.cluster_centers_
+    ModK_.cluster_centers_ # pylint: disable=W0104
     assert "Clustering algorithm has not been fitted." in caplog.text
     caplog.clear()
 
-    ModK_.info
+    ModK_.info # pylint: disable=W0104
     assert "Clustering algorithm has not been fitted." in caplog.text
     caplog.clear()
 
-    ModK_.fitted_data
+    ModK_.fitted_data # pylint: disable=W0104
     assert "Clustering algorithm has not been fitted." in caplog.text
     caplog.clear()
 

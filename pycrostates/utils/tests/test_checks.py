@@ -36,10 +36,10 @@ def test_check_type():
     assert _check_type(101, ("int",)) == 101
     assert _check_type("101.fif", ("path-like",)) == "101.fif"
 
-    def foo():
+    def foo_function():
         pass
 
-    _check_type(foo, ("callable",))
+    _check_type(foo_function, ("callable",))
 
     assert _check_type(101, ("numeric",)) == 101
     assert _check_type(101.0, ("numeric",)) == 101.0

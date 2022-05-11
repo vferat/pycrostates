@@ -215,7 +215,7 @@ class ModKMeans(_BaseCluster):
         super().save(fname)
         # TODO: to be replaced by a general writer than infers the writer from
         # the file extension.
-        from ..io.fiff import _write_cluster
+        from ..io.fiff import _write_cluster # pylint: disable=C0415
 
         _write_cluster(
             fname,

@@ -183,7 +183,7 @@ class _BaseSegmentation(ABC):
         return s
 
     def _repr_html_(self, caption=None):
-        from ..html_templates import repr_templates_env
+        from ..html_templates import repr_templates_env # pylint: disable=C0415
 
         template = repr_templates_env.get_template(
             "BaseSegmentation.html.jinja"
