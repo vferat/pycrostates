@@ -7,7 +7,7 @@ from ..utils._checks import _check_type
 
 class ChData:
     def __init__(self, data: NDArray, info: Info):
-        from . import ChInfo
+        from . import ChInfo # pylint: disable=C0415
 
         _check_type(data, (np.ndarray,), "data")
         _check_type(info, (Info,), "info")
@@ -31,7 +31,7 @@ class ChData:
         return s
 
     def _repr_html_(self, caption=None):
-        from ..html_templates import repr_templates_env
+        from ..html_templates import repr_templates_env # pylint: disable=C0415
 
         template = repr_templates_env.get_template("ChData.html.jinja")
         return template.render(

@@ -13,7 +13,7 @@ raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
 raw = raw.pick("eeg")
 epochs = mne.make_fixed_length_epochs(raw, duration=2, preload=True)
 
-
+# pylint: disable=protected-access
 @pytest.mark.parametrize(
     "inst, replace",
     [

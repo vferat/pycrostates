@@ -96,17 +96,17 @@ def _compare_infos(cluster_info, inst_info):
             break
 
     # Compare attributes in chs
-    cluster_kinds = list()
-    cluster_units = list()
-    cluster_coord_frame = list()
+    cluster_kinds = []
+    cluster_units = []
+    cluster_coord_frame = []
     for ch in cluster_info["chs"]:
         cluster_kinds.append((ch["ch_name"], ch["kind"]))
         cluster_units.append((ch["ch_name"], ch["unit"]))
         cluster_coord_frame.append((ch["ch_name"], ch["coord_frame"]))
 
-    inst_kinds = list()
-    inst_units = list()
-    inst_coord_frames = list()
+    inst_kinds = []
+    inst_units = []
+    inst_coord_frames = []
     for ch in inst_info["chs"]:
         if ch["ch_name"] in cluster_info["ch_names"]:
             inst_kinds.append((ch["ch_name"], ch["kind"]))
