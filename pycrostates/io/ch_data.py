@@ -36,10 +36,12 @@ class ChData:
         )
 
         template = repr_templates_env.get_template("ChData.html.jinja")
-        return template.render(
-            n_samples=self._data.shape[-1],
-            info_repr=self._info._repr_html_(),
+        info_repr = (
+            self._info._repr_html_()
         )  # pylint: disable=protected-access
+        return template.render(
+            n_samples=self._data.shape[-1], info_repr=info_repr
+        )
 
     @property
     def info(self) -> Info:
