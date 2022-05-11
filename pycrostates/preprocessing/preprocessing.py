@@ -67,7 +67,7 @@ def extract_gfp_peaks(
     ch_data : list of :class:`~pycrostates.io.ChData`
         Samples at global field power peaks.
     """
-    from ..io import ChData
+    from ..io import ChData  # pylint: disable=import-outside-toplevel
 
     _check_type(inst, (BaseRaw, BaseEpochs))
     if min_peak_distance < 1:

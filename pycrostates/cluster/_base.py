@@ -268,7 +268,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
             data = data.reshape(data.shape[0], -1)
 
         elif isinstance(inst, ChData):
-            data = inst._data[picks, :]
+            data = inst._data[picks, :]  # pylint: disable=protected-access
 
         # store picks and info
         self._info = ChInfo(info=pick_info(info, picks_bads_inc))
