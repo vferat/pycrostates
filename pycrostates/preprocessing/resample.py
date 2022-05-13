@@ -120,6 +120,9 @@ def resample(
         data = np.hstack(data)
     n_times = data.shape[1]
 
+    # Compute coverage / n_samples from the second
+
+
     # --------------- TODO ---------------------------------------------------
     # /!\ Can not work, n_samples can be None
     if n_epochs is None:
