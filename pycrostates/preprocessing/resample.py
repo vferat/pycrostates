@@ -37,8 +37,9 @@ def resample(
 ) -> ChData:
     """Resample recording into epochs of random samples.
 
-    Resample :class:`~mne.io.Raw` or :class:`~mne.Epochs` into ``n_epochs``
-    each containing ``n_samples`` random samples of the original recording.
+    Resample :class:`~mne.io.Raw`. :class:`~mne.Epochs` or
+    `~pycrostates.io.ChData` into ``n_epochs`` each containing ``n_samples``
+    random samples of the original recording.
 
     Parameters
     ----------
