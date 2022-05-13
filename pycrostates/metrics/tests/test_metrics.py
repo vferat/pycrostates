@@ -5,7 +5,12 @@ from mne.datasets import testing
 from mne.io import read_raw_fif
 
 from pycrostates.cluster import ModKMeans
-from pycrostates.metrics import silhouette
+from pycrostates.metrics import (
+    calinski_harabasz,
+    davies_bouldin,
+    dunn,
+    silhouette,
+)
 
 directory = Path(testing.data_path()) / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
@@ -21,4 +26,19 @@ ModK.fit(raw, n_jobs=1)
 
 def test_silouhette():
     score = silhouette(ModK)
+    assert isinstance(score, float)
+
+
+def test_calinski_harabasz():
+    score = calinski_harabasz(ModK)
+    assert isinstance(score, float)
+
+
+def test_dunn():
+    score = dunn(ModK)
+    assert isinstance(score, float)
+
+
+def test_davies_bouldin():
+    score = davies_bouldin(ModK)
     assert isinstance(score, float)
