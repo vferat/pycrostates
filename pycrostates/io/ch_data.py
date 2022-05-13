@@ -9,7 +9,7 @@ from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 from .meas_info import ChInfo
 
 
-class ChData(ContainsMixin, MontageMixin, ChannelsMixin):
+class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
     """ChData stores atemporal data with its spatial information.
 
     ChData is similar to a raw instance where temporality has been removed.
@@ -30,13 +30,14 @@ class ChData(ContainsMixin, MontageMixin, ChannelsMixin):
         _check_type(info, (Info, ChInfo), "info")
         if data.ndim != 2:
             raise ValueError(
-                "Argument 'data' should be a 2D array. The "
-                f"provided array shape is {data.shape} which has "
-                f"{data.ndim} dimensions."
+                "Argument 'data' should be a 2D array "
+                "(n_channels, n_samples). The provided array "
+                f"shape is {data.shape} which has {data.ndim} "
+                "dimensions."
             )
         if not len(info["ch_names"]) == data.shape[0]:
             raise ValueError(
-                "Instance data and Info do not have the same "
+                "Argument 'data' and 'info' do not have the same "
                 "number of channels."
             )
         self._data = data
@@ -44,7 +45,7 @@ class ChData(ContainsMixin, MontageMixin, ChannelsMixin):
 
     def __repr__(self) -> str:
         name = self.__class__.__name__
-        s = f"<{name} | {self._data.shape[-1]} samples >"
+        s = f"< {name} | {self._data.shape[-1]} samples >"
         return s
 
     def _repr_html_(self, caption=None):
@@ -67,12 +68,12 @@ class ChData(ContainsMixin, MontageMixin, ChannelsMixin):
 
         :type: `~pycrostates.io.ChInfo`
         """
-        return self._info.copy()
+        return self._info
 
     @property
     def data(self) -> NDArray[float]:
         """
-        Data.
+        Atemporal data points.
 
         :type: `~numpy.array`
         """

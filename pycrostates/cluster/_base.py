@@ -22,7 +22,7 @@ from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 from ..viz import plot_cluster_centers
 
 
-class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
+class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     """Base Class for Microstates Clustering algorithms."""
 
     @abstractmethod
