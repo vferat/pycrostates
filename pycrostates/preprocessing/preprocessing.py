@@ -1,31 +1,37 @@
-"""Preprocessing functions to resample, extract gfp peaks, ect."""
+"""Preprocessing functions to extract ChData from raw or epochs instances."""
+
+from typing import Union, Optional
 
 import numpy as np
 from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.preprocessing.ica import _check_start_stop
+from numpy.typing import NDArray
 from scipy.signal import find_peaks
 
-from ..utils._checks import _check_type
+from ..io import ChData
+from ..utils._checks import _check_type, _check_reject_by_annotation
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 
-def _extract_gfps(data, min_peak_distance=2):
+def _extract_gfps(data: NDArray[float], min_peak_distance: int = 2):
     """Extract GFP peaks from input data.
 
     Parameters
     ----------
-    min_peak_dist : int
+    data : array of shape (n_channels, n_samples)
+        The data to extrat GFP peaks from.
+    min_peak_distance : int
         Required minimal horizontal distance (>= 1) in samples between
         neighboring peaks. Smaller peaks are removed first until the condition
         is fulfilled for all remaining peaks. Default to 2.
-    X : array-like, shape ``(n_channels, n_samples)``
-        The data to extrat Gfp peaks, row by row. scipy.sparse matrices should
-        be in CSR format to avoid an un-necessary copy.
+
+    Returns
+    -------
+    data : array of shape (n_channels, n_samples)
+        The data points at the GFP peaks.
     """
-    if min_peak_distance < 1:
-        raise (ValueError("min_peak_dist must be >= 1."))
     gfp = np.std(data, axis=0)
     peaks, _ = find_peaks(gfp, distance=min_peak_distance)
     return data[:, peaks]
@@ -34,32 +40,32 @@ def _extract_gfps(data, min_peak_distance=2):
 @fill_doc
 @verbose
 def extract_gfp_peaks(
-    inst,
-    min_peak_distance=2,
-    start=None,
-    stop=None,
-    reject_by_annotation=True,
+    inst: Union[BaseRaw, BaseEpochs],
+    min_peak_distance: int = 2,
+    tmin: Optional[float] = None,
+    tmax: Optional[float] = None,
+    reject_by_annotation: bool = True,
     verbose=None,
-):
-    """Perform GFP peaks extraction.
+) -> ChData:
+    """GFP peaks extraction.
 
     Extract global field power peaks from :class:`mne.Epochs` or
     :class:`~mne.io.Raw`.
 
     Parameters
     ----------
-    inst : :class:`~mne.io.Raw`, :class:`~mne.Epochs`
+    inst : :class:`~mne.io.Raw` | :class:`~mne.Epochs`
         Instance from which to extract GFP peaks.
-    min_peak_dist : int
+    min_peak_distance : int
         Required minimal horizontal distance (>= 1) in samples between
-        neighboring peaks. Smaller peaks are removed first until the
+        neighboring peaks. Smaller peaks are removed first until the condition
         is fulfilled for all remaining peaks. Default to 2.
+    %(tmin_raw)s
+    %(tmax_raw)s
     reject_by_annotation : bool
         Whether to reject by annotation. If True (default), segments annotated
         with description starting with ‘bad’ are omitted. If False, no
         rejection is done.
-    %(tmin_raw)s
-    %(tmax_raw)s
     %(verbose)s
 
     Returns
@@ -67,13 +73,13 @@ def extract_gfp_peaks(
     ch_data : list of :class:`~pycrostates.io.ChData`
         Samples at global field power peaks.
     """
-    from ..io import ChData  # pylint: disable=import-outside-toplevel
-
     _check_type(inst, (BaseRaw, BaseEpochs))
+    _check_type(min_peak_distance, ('int',), 'min_peak_distance')
     if min_peak_distance < 1:
-        raise (ValueError("min_peak_dist must be >= 1."))
+        raise ValueError("Argument 'min_peak_distance' must be superior or "
+                         f"equal to 1. Provided: {min_peak_distance}.")
     if isinstance(inst, BaseRaw):
-        reject_by_annotation = "omit" if reject_by_annotation else None
+        reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
         start, stop = _check_start_stop(inst, start, stop)
         data = inst.get_data(
             start=start, stop=stop, reject_by_annotation=reject_by_annotation

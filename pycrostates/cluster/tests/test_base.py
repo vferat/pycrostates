@@ -19,25 +19,6 @@ def test_check_n_clusters():
         _BaseCluster._check_n_clusters(-101)
 
 
-def test_check_reject_by_annotation():
-    """Test the checker for reject_by_annoation argument."""
-    reject_by_annotation = _BaseCluster._check_reject_by_annotation(True)
-    assert reject_by_annotation == "omit"
-    reject_by_annotation = _BaseCluster._check_reject_by_annotation(False)
-    assert reject_by_annotation is None
-    reject_by_annotation = _BaseCluster._check_reject_by_annotation(None)
-    assert reject_by_annotation is None
-
-    with pytest.raises(
-        TypeError, match="'reject_by_annotation' must be an instance of"
-    ):
-        _BaseCluster._check_reject_by_annotation(1)
-    with pytest.raises(
-        ValueError, match="'reject_by_annotation' only allows for"
-    ):
-        _BaseCluster._check_reject_by_annotation("101")
-
-
 def test_reject_edge_segments():
     """Test method rejecting edge segments."""
     segmentation = np.array([1, 1, 2, 3, 2, 2, 3, 4, 4])

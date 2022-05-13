@@ -16,6 +16,7 @@ from pycrostates.utils._checks import (
     _check_type,
     _check_value,
     _ensure_int,
+    _check_reject_by_annotation,
 )
 
 
@@ -127,3 +128,22 @@ def test_check_axes():
     with pytest.raises(ValueError, match="Argument 'axes' should be a"):
         _check_axes(ax)
     plt.close("all")
+
+
+def test_check_reject_by_annotation():
+    """Test the checker for reject_by_annoation argument."""
+    reject_by_annotation = _check_reject_by_annotation(True)
+    assert reject_by_annotation == "omit"
+    reject_by_annotation = _check_reject_by_annotation(False)
+    assert reject_by_annotation is None
+    reject_by_annotation = _check_reject_by_annotation(None)
+    assert reject_by_annotation is None
+
+    with pytest.raises(
+        TypeError, match="'reject_by_annotation' must be an instance of"
+    ):
+        _check_reject_by_annotation(1)
+    with pytest.raises(
+        ValueError, match="'reject_by_annotation' only allows for"
+    ):
+        _check_reject_by_annotation("101")

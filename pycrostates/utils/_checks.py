@@ -221,3 +221,25 @@ def _check_axes(axes):
         # sanity-check
         assert hasattr(axes, "plot")
     return axes
+
+
+def _check_reject_by_annotation(reject_by_annotation: bool) -> bool:
+    """Check the reject_by_annotation argument."""
+    _check_type(
+        reject_by_annotation,
+        (bool, str, None),
+        item_name="reject_by_annotation",
+    )
+    if isinstance(reject_by_annotation, bool):
+        if reject_by_annotation:
+            reject_by_annotation = "omit"
+        else:
+            reject_by_annotation = None
+    elif isinstance(reject_by_annotation, str):
+        if reject_by_annotation != "omit":
+            raise ValueError(
+                "Argument 'reject_by_annotation' only allows for 'False', "
+                "'True' (omit), or 'omit'. "
+                f"Provided: '{reject_by_annotation}'."
+            )
+    return reject_by_annotation

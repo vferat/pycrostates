@@ -16,7 +16,7 @@ from scipy.signal import convolve2d
 from ..io import ChData
 from ..segmentation import EpochsSegmentation, RawSegmentation
 from ..utils import _compare_infos, _corr_vectors
-from ..utils._checks import _check_n_jobs, _check_type, _check_value
+from ..utils._checks import (_check_n_jobs, _check_type, _check_value, _check_reject_by_annotation)
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
@@ -223,7 +223,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 )
 
         if isinstance(inst, BaseRaw):
-            reject_by_annotation = _BaseCluster._check_reject_by_annotation(
+            reject_by_annotation = _check_reject_by_annotation(
                 reject_by_annotation
             )
 
@@ -1070,25 +1070,3 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 f"Provided: '{n_clusters}'."
             )
         return n_clusters
-
-    @staticmethod
-    def _check_reject_by_annotation(reject_by_annotation: bool) -> bool:
-        """Check the reject_by_annotation argument."""
-        _check_type(
-            reject_by_annotation,
-            (bool, str, None),
-            item_name="reject_by_annotation",
-        )
-        if isinstance(reject_by_annotation, bool):
-            if reject_by_annotation:
-                reject_by_annotation = "omit"
-            else:
-                reject_by_annotation = None
-        elif isinstance(reject_by_annotation, str):
-            if reject_by_annotation != "omit":
-                raise ValueError(
-                    "Argument 'reject_by_annotation' only allows for 'False', "
-                    "'True' (omit), or 'omit'. "
-                    f"Provided: '{reject_by_annotation}'."
-                )
-        return reject_by_annotation
