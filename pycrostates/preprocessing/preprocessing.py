@@ -1,21 +1,28 @@
 """Preprocessing functions to extract ChData from raw or epochs instances."""
 
-from typing import Union, Optional
+from typing import Optional, Union
 
 import numpy as np
-from mne import BaseEpochs
+from mne import BaseEpochs, pick_info
 from mne.io import BaseRaw
+from mne.io.pick import _picks_to_idx
 from mne.preprocessing.ica import _check_start_stop
 from numpy.typing import NDArray
 from scipy.signal import find_peaks
 
 from ..io import ChData
-from ..utils._checks import _check_type, _check_reject_by_annotation
+from ..utils._checks import (
+    _check_reject_by_annotation,
+    _check_tmin_tmax,
+    _check_type,
+)
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 
-def _extract_gfps(data: NDArray[float], min_peak_distance: int = 2):
+def _extract_gfp_peaks(
+    data: NDArray[float], min_peak_distance: int = 2
+) -> NDArray[float]:
     """Extract GFP peaks from input data.
 
     Parameters
@@ -41,6 +48,7 @@ def _extract_gfps(data: NDArray[float], min_peak_distance: int = 2):
 @verbose
 def extract_gfp_peaks(
     inst: Union[BaseRaw, BaseEpochs],
+    picks: Optional[Union[str, NDArray[int]]] = None,
     min_peak_distance: int = 2,
     tmin: Optional[float] = None,
     tmax: Optional[float] = None,
@@ -54,8 +62,9 @@ def extract_gfp_peaks(
 
     Parameters
     ----------
-    inst : :class:`~mne.io.Raw` | :class:`~mne.Epochs`
+    inst : Raw | Epochs
         Instance from which to extract GFP peaks.
+    %(picks_all)s
     min_peak_distance : int
         Required minimal horizontal distance (>= 1) in samples between
         neighboring peaks. Smaller peaks are removed first until the condition
@@ -70,47 +79,55 @@ def extract_gfp_peaks(
 
     Returns
     -------
-    ch_data : list of :class:`~pycrostates.io.ChData`
+    ch_data : ChData
         Samples at global field power peaks.
     """
     _check_type(inst, (BaseRaw, BaseEpochs))
-    _check_type(min_peak_distance, ('int',), 'min_peak_distance')
+    _check_type(min_peak_distance, ("int",), "min_peak_distance")
     if min_peak_distance < 1:
-        raise ValueError("Argument 'min_peak_distance' must be superior or "
-                         f"equal to 1. Provided: {min_peak_distance}.")
+        raise ValueError(
+            "Argument 'min_peak_distance' must be superior or "
+            f"equal to 1. Provided: {min_peak_distance}."
+        )
+    tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)
     if isinstance(inst, BaseRaw):
-        reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
-        start, stop = _check_start_stop(inst, start, stop)
-        data = inst.get_data(
-            start=start, stop=stop, reject_by_annotation=reject_by_annotation
-        )
-        peaks = _extract_gfps(data, min_peak_distance=min_peak_distance)
-        logger.info(
-            "%s GFP peaks extracted out of %s samples (%.2f%% of the original "
-            "data).",
-            peaks.shape[1],
-            data.shape[-1],
-            peaks.shape[1] / data.shape[-1] * 100,
+        reject_by_annotation = _check_reject_by_annotation(
+            reject_by_annotation
         )
 
-    if isinstance(inst, BaseEpochs):
-        data = inst.get_data()
-        peaks = list()
-        for epoch in data:
-            epoch_peaks = _extract_gfps(
-                epoch, min_peak_distance=min_peak_distance
-            )
-            peaks.append(epoch_peaks)
+    # retrieve picks
+    picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
+
+    # retrieve data array
+    kwargs = (
+        dict()
+        if isinstance(inst, BaseEpochs)
+        else dict(reject_by_annotation=reject_by_annotation)
+    )
+    data = inst.get_data(picks=picks, tmin=tmin, tmax=tmax, **kwargs)
+    assert data.ndim in (2, 3)  # sanity-check
+
+    # extract GFP peaks
+    if data.ndim == 2:
+        peaks = _extract_gfp_peaks(data, min_peak_distance)
+    elif data.ndim == 3:
+        peaks = list()  # run epoch per epoch
+        for k in range(data.shape[0]):
+            peaks.append(_extract_gfp_peaks(data[k, :, :], min_peak_distance))
         peaks = np.hstack(peaks)
-        logger.info(
-            "%s GFP peaks extracted out of %s samples (%.2f%% of the original "
-            "data).",
-            peaks.shape[1],
-            data.shape[0] * data.shape[2],
-            peaks.shape[1] / (data.shape[0] * data.shape[2]) * 100,
-        )
 
-    return ChData(peaks, inst.info)
+    n_samples = data.shape[-1]
+    if isinstance(inst, BaseEpochs):
+        n_samples *= len(inst)
+    logger.info(
+        "%s GFP peaks extracted out of %s samples (%.2f%% of the original "
+        "data).",
+        peaks.shape[1],
+        n_samples,
+        peaks.shape[1] / n_samples * 100,
+    )
+
+    return ChData(peaks, pick_info(inst.info, picks))
 
 
 @fill_doc

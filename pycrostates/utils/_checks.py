@@ -243,3 +243,39 @@ def _check_reject_by_annotation(reject_by_annotation: bool) -> bool:
                 f"Provided: '{reject_by_annotation}'."
             )
     return reject_by_annotation
+
+
+def _check_tmin_tmax(inst, tmin, tmax):
+    """Check tmin/tmax compared to the provided instnace."""
+    _check_type(tmin, (None, "numeric"), item_name="tmin")
+    _check_type(tmax, (None, "numeric"), item_name="tmax")
+
+    # check positiveness for tmin, tmax
+    for name, arg in (("tmin", tmin), ("tmax", tmax)):
+        if arg is None:
+            continue
+        if arg < 0:
+            raise ValueError(
+                f"Argument '{name}' must be positive. " f"Provided '{arg}'."
+            )
+    # check tmax is shorter than instance
+    if tmax is not None and inst.times[-1] < tmax:
+        raise ValueError(
+            "Argument 'tmax' must be shorter than the instance "
+            f"length. Provided: '{tmax}', larger than "
+            f"{inst.times[-1]}s instance."
+        )
+    # check that tmax is larger than tmin
+    if tmax is not None and tmin is not None and tmax <= tmin:
+        raise ValueError(
+            "Argument 'tmax' must be strictly larger than 'tmin'. "
+            f"Provided 'tmin' -> '{tmin}' and 'tmax' -> '{tmax}'."
+        )
+    # check that tmin is shorter than instance
+    if tmin is not None and inst.times[-1] <= tmin:
+        raise ValueError(
+            "Argument 'tmin' must be shorter than the instance "
+            f"length. Provided: '{tmin}', larger than "
+            f"{inst.times[-1]}s instance."
+        )
+    return tmin, tmax

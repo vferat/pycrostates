@@ -50,10 +50,10 @@ def test_ChData():
     assert np.allclose(ch_data._data, data)
 
     # test get_data() with picks
-    data_ = ch_data.get_data(picks='eeg')
+    data_ = ch_data.get_data(picks="eeg")
     assert np.allclose(ch_data._data, data)
-    ch_data.info['bads'] = [ch_data.info['ch_names'][0]]
-    data_ = ch_data.get_data(picks='eeg')
+    ch_data.info["bads"] = [ch_data.info["ch_names"][0]]
+    data_ = ch_data.get_data(picks="eeg")
     assert np.allclose(ch_data._data, data[1:, :])
 
     # test repr

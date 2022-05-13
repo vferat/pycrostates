@@ -16,7 +16,13 @@ from scipy.signal import convolve2d
 from ..io import ChData
 from ..segmentation import EpochsSegmentation, RawSegmentation
 from ..utils import _compare_infos, _corr_vectors
-from ..utils._checks import (_check_n_jobs, _check_type, _check_value, _check_reject_by_annotation)
+from ..utils._checks import (
+    _check_n_jobs,
+    _check_reject_by_annotation,
+    _check_tmin_tmax,
+    _check_type,
+    _check_value,
+)
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
@@ -188,40 +194,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         n_jobs = _check_n_jobs(n_jobs)
         _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
-
         if isinstance(inst, (BaseRaw, BaseEpochs)):
-            _check_type(tmin, (None, "numeric"), item_name="tmin")
-            _check_type(tmax, (None, "numeric"), item_name="tmax")
-
-            # check positiveness for tmin, tmax
-            for name, arg in (("tmin", tmin), ("tmax", tmax)):
-                if arg is None:
-                    continue
-                if arg < 0:
-                    raise ValueError(
-                        f"Argument '{name}' must be positive. "
-                        f"Provided '{arg}'."
-                    )
-            # check tmax is shorter than raw
-            if tmax is not None and inst.times[-1] < tmax:
-                raise ValueError(
-                    "Argument 'tmax' must be shorter than the instance "
-                    f"length. Provided: '{tmax}', larger than "
-                    f"{inst.times[-1]}s instance."
-                )
-            # check that tmax is larger than tmin
-            if tmax is not None and tmin is not None and tmax <= tmin:
-                raise ValueError(
-                    "Argument 'tmax' must be strictly larger than 'tmin'. "
-                    f"Provided 'tmin' -> '{tmin}' and 'tmax' -> '{tmax}'."
-                )
-            if tmin is not None and inst.times[-1] <= tmin:
-                raise ValueError(
-                    "Argument 'tmin' must be shorter than the instance "
-                    f"length. Provided: '{tmin}', larger than "
-                    f"{inst.times[-1]}s instance."
-                )
-
+            tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)
         if isinstance(inst, BaseRaw):
             reject_by_annotation = _check_reject_by_annotation(
                 reject_by_annotation
@@ -254,9 +228,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             del msg
 
         # retrieve numpy array
-        kwargs = dict() if isinstance(inst, ChData) else dict(tmin=tmin, tmax=tmax)
+        kwargs = (
+            dict() if isinstance(inst, ChData) else dict(tmin=tmin, tmax=tmax)
+        )
         if isinstance(inst, BaseRaw):
-            kwargs['reject_by_annotation'] = reject_by_annotation
+            kwargs["reject_by_annotation"] = reject_by_annotation
         data = inst.get_data(picks=picks, tmin=tmin, tmax=tmax, **kwargs)
         # reshape if inst is Epochs
         if isinstance(inst, BaseEpochs):

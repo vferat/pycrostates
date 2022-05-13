@@ -5,10 +5,10 @@ from mne.io import Info
 from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 
-from .meas_info import ChInfo
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
+from .meas_info import ChInfo
 
 
 class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
@@ -64,7 +64,7 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
         )
 
     @fill_doc
-    def get_data(self,  picks=None):
+    def get_data(self, picks=None):
         """Retrieve the data array.
 
         Parameters
