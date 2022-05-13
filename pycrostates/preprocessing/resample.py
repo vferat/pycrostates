@@ -82,18 +82,30 @@ def resample(
         reject_by_annotation = _check_reject_by_annotation(
             reject_by_annotation
         )
-    _check_type(n_epochs, ("int", None), "n_epochs")
-    _check_type(n_samples, ("int", None), "n_samples")
-    _check_type(coverage, ("numeric", None), "coverage")
+    _check_type(n_epochs, (None, "int"), "n_epochs")
+    _check_type(n_samples, (None, "int"), "n_samples")
+    _check_type(coverage, (None, "numeric"), "coverage")
     _check_type(replace, (bool,), "replace")
     random_state = _check_random_state(random_state)
 
-    # checks for n_epochs, n_samples and coverage
-    if len([x for x in [n_epochs, n_samples, coverage] if x is None]) < 2:
+    # Check n_samples, coverage
+    if coverage is None or n_samples is None:
         raise ValueError(
-            "At least two arguments among ('n_epochs', 'n_samples', "
-            "'coverage') must be defined."
-        )
+            "At least one of 'coverage' or 'n_samples' must be provided.")
+    if coverage is not None and n_samples is not None:
+        raise ValueError(
+            "Only one of 'coverage' or 'n_samples' must be provided.")
+    if coverage is not None and coverage <= 0:
+        raise ValueError(
+            "Argument 'coverage' must be a strictly positive number. "
+            f"Provided: '{coverage}'.")
+    if n_samples is not None and n_samples <= 0:
+        raise ValueError(
+            "Argument 'n_samples' must be a strictly positive integer. "
+            f"Provided: '{n_samples}'.")
+
+    # checks for n_epochs
+    # TODO
 
     # retrieve picks
     picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
@@ -108,19 +120,7 @@ def resample(
         data = np.hstack(data)
     n_times = data.shape[1]
 
-    # additional checks for n_epochs, n_samples and coverage
-    #
-    # /!\ Can not work, n_epochs can be None
-    #
-    if coverage is not None:
-        if coverage <= 0:
-            raise ValueError(
-                "Argument 'coverage' must be strictly positive. "
-                f"Provided: '{coverage}'."
-            )
-    else:
-        coverage = (n_epochs * n_samples) / n_times
-
+    # --------------- TODO ---------------------------------------------------
     # /!\ Can not work, n_samples can be None
     if n_epochs is None:
         n_epochs = int((n_times * coverage) / n_samples)
