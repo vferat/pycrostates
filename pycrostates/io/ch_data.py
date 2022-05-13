@@ -63,6 +63,15 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
             n_samples=self._data.shape[-1], info_repr=info_repr
         )
 
+    def __eq__(self, other):
+        """Equality == method."""
+        # TODO
+        pass
+
+    def __ne__(self, other):
+        """Different != method."""
+        return not self.__eq__(other)
+
     @fill_doc
     def get_data(self, picks=None):
         """Retrieve the data array.
