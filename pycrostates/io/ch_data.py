@@ -4,9 +4,9 @@ import numpy as np
 from mne.io import Info
 from numpy.typing import NDArray
 
-from .meas_info import ChInfo
 from ..utils._checks import _check_type
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
+from .meas_info import ChInfo
 
 
 class ChData(ContainsMixin, MontageMixin, ChannelsMixin):
