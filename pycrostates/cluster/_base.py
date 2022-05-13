@@ -189,14 +189,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         n_jobs = _check_n_jobs(n_jobs)
         _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
 
-        if isinstance(inst, BaseRaw):
+        if isinstance(inst, (BaseRaw, BaseEpochs)):
             _check_type(tmin, (None, "numeric"), item_name="tmin")
             _check_type(tmax, (None, "numeric"), item_name="tmax")
-            reject_by_annotation = _BaseCluster._check_reject_by_annotation(
-                reject_by_annotation
-            )
-            # tmin/tmax
-            # check positiveness
+
+            # check positiveness for tmin, tmax
             for name, arg in (("tmin", tmin), ("tmax", tmax)):
                 if arg is None:
                     continue
@@ -208,25 +205,27 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             # check tmax is shorter than raw
             if tmax is not None and inst.times[-1] < tmax:
                 raise ValueError(
-                    f"Argument 'tmax' must be shorter "
-                    f"than the instance length. "
-                    f"Provided: '{tmax}', larger than "
+                    "Argument 'tmax' must be shorter than the instance "
+                    f"length. Provided: '{tmax}', larger than "
                     f"{inst.times[-1]}s instance."
                 )
             # check that tmax is larger than tmin
             if tmax is not None and tmin is not None and tmax <= tmin:
                 raise ValueError(
-                    f"Argument 'tmax' must be strictly larger "
-                    f"than 'tmin'. "
+                    "Argument 'tmax' must be strictly larger than 'tmin'. "
                     f"Provided 'tmin' -> '{tmin}' and 'tmax' -> '{tmax}'."
                 )
-            elif tmin is not None and inst.times[-1] <= tmin:
+            if tmin is not None and inst.times[-1] <= tmin:
                 raise ValueError(
-                    f"Argument 'tmin' must be shorter than "
-                    f"the instance length. "
-                    f"Provided: '{tmin}', larger than {inst.times[-1]}s "
-                    f"instance."
+                    "Argument 'tmin' must be shorter than the instance "
+                    f"length. Provided: '{tmin}', larger than "
+                    f"{inst.times[-1]}s instance."
                 )
+
+        if isinstance(inst, BaseRaw):
+            reject_by_annotation = _BaseCluster._check_reject_by_annotation(
+                reject_by_annotation
+            )
 
         # retrieve info
         info = inst.info
