@@ -233,7 +233,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         )
         if isinstance(inst, BaseRaw):
             kwargs["reject_by_annotation"] = reject_by_annotation
-        data = inst.get_data(picks=picks, tmin=tmin, tmax=tmax, **kwargs)
+        data = inst.get_data(picks=picks, **kwargs)
         # reshape if inst is Epochs
         if isinstance(inst, BaseEpochs):
             data = np.swapaxes(data, 0, 1)
