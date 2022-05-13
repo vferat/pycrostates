@@ -13,6 +13,7 @@ from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 from scipy.signal import convolve2d
 
+from ..io import ChData
 from ..segmentation import EpochsSegmentation, RawSegmentation
 from ..utils import _compare_infos, _corr_vectors
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
@@ -163,7 +164,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     @fill_doc
     def fit(
         self,
-        inst: Union[BaseRaw, BaseEpochs],
+        inst: Union[BaseRaw, BaseEpochs, ChData],
         picks: Union[str, NDArray[int]] = "eeg",
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,
@@ -183,12 +184,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         %(n_jobs)s
         """
         # TODO: Maybe those parameters should be moved here instead of docdict?
-        from ..io import ChData, ChInfo
+        from ..io import ChInfo
 
         n_jobs = _check_n_jobs(n_jobs)
         _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
 
-        # retrieve info
         if isinstance(inst, BaseRaw):
             _check_type(tmin, (None, "numeric"), item_name="tmin")
             _check_type(tmax, (None, "numeric"), item_name="tmax")
@@ -228,6 +228,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                     f"instance."
                 )
 
+        # retrieve info
         info = inst.info
 
         # picks
