@@ -17,7 +17,7 @@ from ..utils._logs import logger
 
 
 class ChInfo(Info):
-    """Measurement information.
+    """Atemporal measurement information.
 
     Similar to a mne.Info class, but without any temporal information. Only the
     channel-related information are present. A ChInfo can be created either:
