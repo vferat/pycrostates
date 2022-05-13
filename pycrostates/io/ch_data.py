@@ -2,11 +2,13 @@ from typing import Union
 
 import numpy as np
 from mne.io import Info
+from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 
-from ..utils._checks import _check_type
-from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 from .meas_info import ChInfo
+from ..utils._checks import _check_type
+from ..utils._docs import fill_doc
+from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 
 
 class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
@@ -61,6 +63,23 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
             n_samples=self._data.shape[-1], info_repr=info_repr
         )
 
+    @fill_doc
+    def get_data(self,  picks=None):
+        """Retrieve the data array.
+
+        Parameters
+        ----------
+        %(picks_all)s
+
+        Returns
+        -------
+        data : array
+            Data array of shape ``(n_channels, n_samples)``.
+        """
+        picks = _picks_to_idx(self._info, picks, none="all", exclude="bads")
+        data = self._data.copy()
+        return data[picks, :]
+
     @property
     def info(self) -> ChInfo:
         """
@@ -69,12 +88,3 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
         :type: `~pycrostates.io.ChInfo`
         """
         return self._info
-
-    @property
-    def data(self) -> NDArray[float]:
-        """
-        Atemporal data points.
-
-        :type: `~numpy.array`
-        """
-        return self._data.copy()

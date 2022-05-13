@@ -23,13 +23,13 @@ def test_ChData():
     """Test basic ChData functionalities."""
     # create from info
     ch_data = ChData(data, info)
-    assert np.allclose(ch_data.data, data)
+    assert np.allclose(ch_data._data, data)
     assert isinstance(ch_data.info, ChInfo)
     assert info.ch_names == ch_data.info.ch_names
 
     # create from chinfo
     ch_data = ChData(data, ch_info)
-    assert np.allclose(ch_data.data, data)
+    assert np.allclose(ch_data._data, data)
     assert isinstance(ch_data.info, ChInfo)
     assert ch_info.ch_names == ch_data.info.ch_names
 
@@ -44,10 +44,17 @@ def test_ChData():
     assert len(ch_data.get_montage().dig) == 9  # 6 channels + 3 fiducials
 
     # test that data is copied
-    data_ = ch_data.data
+    data_ = ch_data.get_data()
     data_[0, :] = 0
     assert not np.allclose(data_, data)
-    assert np.allclose(ch_data.data, data)
+    assert np.allclose(ch_data._data, data)
+
+    # test get_data() with picks
+    data_ = ch_data.get_data(picks='eeg')
+    assert np.allclose(ch_data._data, data)
+    ch_data.info['bads'] = [ch_data.info['ch_names'][0]]
+    data_ = ch_data.get_data(picks='eeg')
+    assert np.allclose(ch_data._data, data[1:, :])
 
     # test repr
     assert isinstance(ch_data.__repr__(), str)

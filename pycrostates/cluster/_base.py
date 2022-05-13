@@ -253,22 +253,15 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             )
             del msg
 
-        # retrieve data
+        # retrieve numpy array
+        kwargs = dict() if isinstance(inst, ChData) else dict(tmin=tmin, tmax=tmax)
         if isinstance(inst, BaseRaw):
-            data = inst.get_data(
-                picks=picks,
-                tmin=tmin,
-                tmax=tmax,
-                reject_by_annotation=reject_by_annotation,
-            )
-
-        elif isinstance(inst, BaseEpochs):
-            data = inst.get_data(picks=picks, tmin=tmin, tmax=tmax)
+            kwargs['reject_by_annotation'] = reject_by_annotation
+        data = inst.get_data(picks=picks, tmin=tmin, tmax=tmax, **kwargs)
+        # reshape if inst is Epochs
+        if isinstance(inst, BaseEpochs):
             data = np.swapaxes(data, 0, 1)
             data = data.reshape(data.shape[0], -1)
-
-        elif isinstance(inst, ChData):
-            data = inst._data[picks, :]  # pylint: disable=protected-access
 
         # store picks and info
         self._info = ChInfo(info=pick_info(info, picks_bads_inc))
