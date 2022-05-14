@@ -1,3 +1,4 @@
+from copy import copy, deepcopy
 from typing import Union
 
 import numpy as np
@@ -78,6 +79,21 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         """Different != method."""
         return not self.__eq__(other)
 
+    def copy(
+        self,
+        deep: bool = True,
+    ):
+        """Return a copy of the instance.
+
+        Parameters
+        ----------
+        deep : bool
+            If True, `~copy.deepcopy` is used instead of `~copy.copy`.
+        """
+        if deep:
+            return deepcopy(self)
+        return copy(self)
+
     @fill_doc
     def get_data(self, picks=None):
         """Retrieve the data array.
@@ -95,6 +111,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         data = self._data.copy()
         return data[picks, :]
 
+    # --------------------------------------------------------------------
     @property
     def info(self) -> CHInfo:
         """

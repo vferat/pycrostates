@@ -45,7 +45,7 @@ def test_ChData():
 
     # test that data is copied
     data_ = ch_data.get_data()
-    data_[0, :] = 0
+    data_[0, :] = 0.
     assert not np.allclose(data_, data)
     assert np.allclose(ch_data._data, data)
 
@@ -60,6 +60,17 @@ def test_ChData():
     assert isinstance(ch_data.__repr__(), str)
     assert ch_data.__repr__() == f"< ChData | {times.size} samples >"
     assert isinstance(ch_data._repr_html_(), str)
+
+    # test ==
+    ch_data1 = ChData(data, info)
+    ch_data2 = ChData(data, ch_info)
+    assert ch_data1 == ch_data2
+    ch_data3 = ChData(data, create_info(6, 400, 'eeg'))
+    assert ch_data1 != ch_data3
+    ch_data3 = ch_data1.copy()
+    assert ch_data1 == ch_data3
+    ch_data3._dat[0, :] = 0.
+    assert ch_data1 != ch_data3
 
 
 def test_ChData_invalid_arguments():
