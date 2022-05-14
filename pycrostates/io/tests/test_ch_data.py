@@ -22,13 +22,13 @@ ch_info = ChInfo(
 def test_ChData():
     """Test basic ChData functionalities."""
     # create from info
-    ch_data = ChData(data, info)
+    ch_data = ChData(data, info.copy())
     assert np.allclose(ch_data._data, data)
     assert isinstance(ch_data.info, ChInfo)
     assert info.ch_names == ch_data.info.ch_names
 
     # create from chinfo
-    ch_data = ChData(data, ch_info)
+    ch_data = ChData(data, ch_info.copy())
     assert np.allclose(ch_data._data, data)
     assert isinstance(ch_data.info, ChInfo)
     assert ch_info.ch_names == ch_data.info.ch_names
@@ -51,10 +51,10 @@ def test_ChData():
 
     # test get_data() with picks
     data_ = ch_data.get_data(picks="eeg")
-    assert np.allclose(ch_data._data, data)
+    assert np.allclose(data_, data)
     ch_data.info["bads"] = [ch_data.info["ch_names"][0]]
     data_ = ch_data.get_data(picks="eeg")
-    assert np.allclose(ch_data._data, data[1:, :])
+    assert np.allclose(data_, data[1:, :])
 
     # test repr
     assert isinstance(ch_data.__repr__(), str)
@@ -62,14 +62,14 @@ def test_ChData():
     assert isinstance(ch_data._repr_html_(), str)
 
     # test == and copy
-    ch_data1 = ChData(data, info)
-    ch_data2 = ChData(data, ch_info)
+    ch_data1 = ChData(data, info.copy())
+    ch_data2 = ChData(data, ch_info.copy())
     assert ch_data1 == ch_data2
     ch_data3 = ChData(data, create_info(6, 400, "eeg"))
     assert ch_data1 != ch_data3
     ch_data3 = ch_data1.copy()
     assert ch_data1 == ch_data3
-    ch_data3._dat[0, :] = 0.0
+    ch_data3._data[0, :] = 0.0
     assert ch_data1 != ch_data3
 
 
