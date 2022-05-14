@@ -57,7 +57,7 @@ def extract_gfp_peaks(
     """
     from ..io import ChData
 
-    _check_type(inst, (BaseRaw, BaseEpochs))
+    _check_type(inst, (BaseRaw, BaseEpochs), "inst")
     _check_type(min_peak_distance, ("int",), "min_peak_distance")
     if min_peak_distance < 1:
         raise ValueError(

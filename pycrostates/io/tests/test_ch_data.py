@@ -71,6 +71,7 @@ def test_ChData():
     assert ch_data1 == ch_data3
     ch_data3._data[0, :] = 0.0
     assert ch_data1 != ch_data3
+    assert ch_data1 != 101
 
 
 def test_ChData_invalid_arguments():
