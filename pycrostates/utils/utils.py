@@ -2,7 +2,6 @@
 
 from copy import deepcopy
 
-import mne
 import numpy as np
 
 from ._logs import logger
