@@ -29,5 +29,5 @@ extend_skip_glob = [
 inherit = false
 convention = 'numpy'
 ignore-decorators= 'copy_doc'
-match = '^(?!.*(setup\.py|__init__\.py|test_.*)).*\.py'
+match = '^(?!.*(setup|__init__|test_.*)).*\.py'
 match-dir = "^(?!docs|tutorials).*"

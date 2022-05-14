@@ -61,7 +61,7 @@ def test_ChData():
     assert ch_data.__repr__() == f"< ChData | {times.size} samples >"
     assert isinstance(ch_data._repr_html_(), str)
 
-    # test ==
+    # test == and copy
     ch_data1 = ChData(data, info)
     ch_data2 = ChData(data, ch_info)
     assert ch_data1 == ch_data2
