@@ -7,7 +7,6 @@ from mne.datasets import testing
 from pycrostates.io import ChData
 from pycrostates.preprocessing import resample
 
-
 dir_ = Path(testing.data_path()) / "MEG" / "sample"
 fname_raw_testing = dir_ / "sample_audvis_trunc_raw.fif"
 raw = mne.io.read_raw_fif(fname_raw_testing, preload=False)

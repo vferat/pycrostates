@@ -7,5 +7,9 @@ risk of circular imports, or for short-cut types re-grouping different types.
 from abc import ABC
 
 
-class CHData(ABC): pass
-class CHInfo(ABC): pass
+class CHData(ABC):
+    pass
+
+
+class CHInfo(ABC):
+    pass

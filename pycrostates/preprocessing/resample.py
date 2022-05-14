@@ -93,18 +93,22 @@ def resample(
     # Check n_samples, coverage
     if coverage is None or n_samples is None:
         raise ValueError(
-            "At least one of 'coverage' or 'n_samples' must be provided.")
+            "At least one of 'coverage' or 'n_samples' must be provided."
+        )
     if coverage is not None and n_samples is not None:
         raise ValueError(
-            "Only one of 'coverage' or 'n_samples' must be provided.")
+            "Only one of 'coverage' or 'n_samples' must be provided."
+        )
     if coverage is not None and coverage <= 0:
         raise ValueError(
             "Argument 'coverage' must be a strictly positive number. "
-            f"Provided: '{coverage}'.")
+            f"Provided: '{coverage}'."
+        )
     if n_samples is not None and n_samples <= 0:
         raise ValueError(
             "Argument 'n_samples' must be a strictly positive integer. "
-            f"Provided: '{n_samples}'.")
+            f"Provided: '{n_samples}'."
+        )
 
     # checks for n_epochs
     # TODO
@@ -123,7 +127,6 @@ def resample(
     n_times = data.shape[1]
 
     # Compute coverage / n_samples from the second
-
 
     # --------------- TODO ---------------------------------------------------
     # /!\ Can not work, n_samples can be None

@@ -30,12 +30,11 @@ from mne.io.write import (
 )
 from numpy.typing import NDArray
 
-from .._typing import CHInfo
 from .. import __version__
+from .._typing import CHInfo
 from ..cluster import ModKMeans
 from ..utils._checks import _check_type, _check_value
 from ..utils._logs import logger
-
 
 # ----------------------------------------------------------------------------
 """
