@@ -5,13 +5,13 @@ from mne.io import Info
 from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 
+from .._typing import CHData, CHInfo
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
-from .meas_info import ChInfo
 
 
-class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
+class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
     """ChData stores atemporal data with its spatial information.
 
     ChData is similar to a raw instance where temporality has been removed.
@@ -27,7 +27,9 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
         converted to a `~pycrostates.io.ChInfo`.
     """
 
-    def __init__(self, data: NDArray[float], info: Union[Info, ChInfo]):
+    def __init__(self, data: NDArray[float], info: Union[Info, CHInfo]):
+        from .meas_info import ChInfo
+
         _check_type(data, (np.ndarray,), "data")
         _check_type(info, (Info, ChInfo), "info")
         if data.ndim != 2:
@@ -94,7 +96,7 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
         return data[picks, :]
 
     @property
-    def info(self) -> ChInfo:
+    def info(self) -> CHInfo:
         """
         Atemporal measurement information.
 

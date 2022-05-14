@@ -9,7 +9,7 @@ from mne.io.pick import _picks_to_idx
 from numpy.random import Generator, RandomState
 from numpy.typing import NDArray
 
-from ..io import ChData
+from .._typing import CHData
 from ..utils._checks import (
     _check_random_state,
     _check_reject_by_annotation,
@@ -23,7 +23,7 @@ from ..utils._logs import logger, verbose
 @fill_doc
 @verbose
 def resample(
-    inst: Union[BaseRaw, BaseEpochs, ChData],
+    inst: Union[BaseRaw, BaseEpochs, CHData],
     picks: Optional[Union[str, NDArray[int]]] = None,
     tmin: Optional[float] = None,
     tmax: Optional[float] = None,
@@ -34,7 +34,7 @@ def resample(
     replace: bool = True,
     random_state: Optional[Union[int, RandomState, Generator]] = None,
     verbose=None,
-) -> ChData:
+) -> CHData:
     """Resample recording into epochs of random samples.
 
     Resample :class:`~mne.io.Raw`. :class:`~mne.Epochs` or
@@ -75,6 +75,8 @@ def resample(
     parameters must be defined, the non-defined one being
     computed during function execution.
     """
+    from ..io import ChData
+
     _check_type(inst, (BaseRaw, BaseEpochs, ChData))
     if isinstance(inst, (BaseRaw, BaseEpochs)):
         tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)

@@ -7,7 +7,7 @@ from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 from scipy.signal import find_peaks
 
-from ..io import ChData
+from .._typing import CHData
 from ..utils._checks import (
     _check_reject_by_annotation,
     _check_tmin_tmax,
@@ -27,7 +27,7 @@ def extract_gfp_peaks(
     tmax: Optional[float] = None,
     reject_by_annotation: bool = True,
     verbose=None,
-) -> ChData:
+) -> CHData:
     """GFP peaks extraction.
 
     Extract global field power peaks from :class:`mne.Epochs` or
@@ -55,6 +55,8 @@ def extract_gfp_peaks(
     ch_data : ChData
         Samples at global field power peaks.
     """
+    from ..io import ChData
+
     _check_type(inst, (BaseRaw, BaseEpochs))
     _check_type(min_peak_distance, ("int",), "min_peak_distance")
     if min_peak_distance < 1:
