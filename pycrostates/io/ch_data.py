@@ -65,8 +65,12 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
 
     def __eq__(self, other):
         """Equality == method."""
-        # TODO
-        pass
+        if not isinstance(other, ChData):
+            return False
+        if other.info == self.info and np.allclose(other._data, self._data):
+            return True
+        else:
+            return False
 
     def __ne__(self, other):
         """Different != method."""
