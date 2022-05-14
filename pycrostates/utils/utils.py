@@ -51,20 +51,6 @@ def _corr_vectors(A, B, axis=0):
     return corr
 
 
-# TODO: To be removed when ChInfo is implemented.
-def _copy_info(inst, sfreq):
-    ch_names = inst.info["ch_names"]
-    ch_types = [
-        mne.channel_type(inst.info, idx)
-        for idx in range(0, inst.info["nchan"])
-    ]
-    new_info = mne.create_info(ch_names, sfreq=sfreq, ch_types=ch_types)
-    if inst.get_montage():
-        montage = inst.get_montage()
-        new_info.set_montage(montage)
-    return new_info
-
-
 def _compare_infos(cluster_info, inst_info):
     """Check that channels in cluster_info are all present in inst_info."""
     for ch in cluster_info["ch_names"]:
