@@ -211,7 +211,7 @@ def _big_delta_fast(ci, distances):
     return np.max(values)
 
 
-def _dunn_score(X, labels):  # lower the better
+def _dunn_score(X, labels):  # higher the better
     # based on https://github.com/jqmviegas/jqm_cvi
     """Compute the Dunn index.
 

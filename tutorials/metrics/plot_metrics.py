@@ -18,7 +18,7 @@ from mne.io import read_raw_eeglab
 from pycrostates.cluster import ModKMeans
 from pycrostates.datasets import lemon
 
-raw_fname = lemon.load_data(subject_id="010017", condition="EC")
+raw_fname = lemon.load_data(subject_id="010017", condition="EO")
 raw = read_raw_eeglab(raw_fname, preload=True)
 raw.crop(0, 30)
 
