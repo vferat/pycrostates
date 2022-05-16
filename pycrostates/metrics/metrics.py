@@ -5,6 +5,9 @@ from sklearn.metrics import calinski_harabasz_score, silhouette_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn.utils import _safe_indexing, check_X_y
 
+from ..cluster._base import _BaseCluster
+from ..utils._checks import _check_type
+
 
 def _distance_matrix(X, Y=None):
     distances = np.abs(1 / np.corrcoef(X, Y)) - 1
@@ -16,7 +19,7 @@ def _distance_matrix(X, Y=None):
 
 
 # silhouette
-def silhouette(modK):  # higher the better
+def silhouette(cluster):  # higher the better
     """
     Compute the mean Silhouette Coefficient of a fitted clustering algorithm.
 
@@ -27,7 +30,7 @@ def silhouette(modK):  # higher the better
 
     Parameters
     ----------
-    BaseClustering : :class:`pycrostate.clustering.BaseClustering`
+    cluster : :class:`pycrostate.clustering.BaseClustering`
         Fitted clustering algorithm from which to compute score.
 
     Returns
@@ -50,9 +53,10 @@ def silhouette(modK):  # higher the better
        Computational and Applied Mathematics 20: 53-65.
        <https://doi.org/10.1016/0377-0427(87)90125-7>`_
     """
-    modK._check_fit()
-    data = modK._fitted_data
-    labels = modK._labels_
+    _check_type(cluster, (_BaseCluster,), item_name="cluster")
+    cluster._check_fit()
+    data = cluster._fitted_data
+    labels = cluster._labels_
     keep = np.linalg.norm(data.T, axis=1) != 0
     data = data[:, keep]
     labels = labels[keep]
@@ -62,7 +66,7 @@ def silhouette(modK):  # higher the better
 
 
 # calinski harabasz
-def calinski_harabasz(modK):  # higher the better
+def calinski_harabasz(cluster):  # higher the better
     """Compute the Calinski and Harabasz score.
 
     This function is a proxy function for
@@ -71,7 +75,7 @@ def calinski_harabasz(modK):  # higher the better
 
     Parameters
     ----------
-    BaseClustering : :class:`pycrostate.clustering.BaseClustering`
+    cluster : :class:`pycrostate.clustering.BaseClustering`
         Fitted clustering algorithm from which to compute score.
 
     Returns
@@ -91,14 +95,15 @@ def calinski_harabasz(modK):  # higher the better
        Communications in Statistics.
        <https://doi.org/10.1080/03610927408827101>`_
     """
-    modK._check_fit()
-    data = modK._fitted_data
-    labels = modK._labels_
+    _check_type(cluster, (_BaseCluster,), item_name="cluster")
+    cluster._check_fit()
+    data = cluster._fitted_data
+    labels = cluster._labels_
     keep = np.linalg.norm(data.T, axis=1) != 0
     data = data[:, keep]
     labels = labels[keep]
     # Align polarities just in case..
-    x = modK.cluster_centers_[labels].T
+    x = cluster.cluster_centers_[labels].T
     sign = np.sign((x.T * data.T).sum(axis=1))
     data = data * sign
     score = calinski_harabasz_score(data.T, labels)
@@ -146,7 +151,7 @@ def _davies_bouldin_score(X, labels):
     return np.mean(scores)
 
 
-def davies_bouldin(modK):  # lower the better
+def davies_bouldin(cluster):  # lower the better
     """Compute the Davies-Bouldin score.
 
     This function is a proxy function for
@@ -156,7 +161,7 @@ def davies_bouldin(modK):  # lower the better
 
     Parameters
     ----------
-    BaseClustering : :class:`pycrostate.clustering.BaseClustering`
+    cluster : :class:`pycrostate.clustering.BaseClustering`
             Fitted clustering algorithm from which to compute score.
 
     Returns
@@ -179,14 +184,15 @@ def davies_bouldin(modK):  # lower the better
        PAMI-1 (2): 224-227.
        <https://doi.org/10.1109/TPAMI.1979.4766909>`_
     """
-    modK._check_fit()
-    data = modK._fitted_data
-    labels = modK._labels_
+    _check_type(cluster, (_BaseCluster,), item_name="cluster")
+    cluster._check_fit()
+    data = cluster._fitted_data
+    labels = cluster._labels_
     keep = np.linalg.norm(data.T, axis=1) != 0
     data = data[:, keep]
     labels = labels[keep]
     # Align polarities just in case..
-    x = modK.cluster_centers_[labels].T
+    x = cluster.cluster_centers_[labels].T
     sign = np.sign((x.T * data.T).sum(axis=1))
     data = data * sign
     davies_bouldin_score = _davies_bouldin_score(data.T, labels)
@@ -235,12 +241,12 @@ def _dunn_score(X, labels):  # lower the better
     return di
 
 
-def dunn(modK):  # higher the better
+def dunn(cluster):  # higher the better
     """Compute the Dunn index score.
 
     Parameters
     ----------
-    BaseClustering : :class:`pycrostate.clustering.BaseClustering`
+    cluster : :class:`pycrostate.clustering.BaseClustering`
         Fitted clustering algorithm from which to compute score.
 
     Returns
@@ -259,9 +265,10 @@ def dunn(modK):  # higher the better
        Journal of Cybernetics.
        <https://doi.org/10.1080/01969727408546059>`_
     """
-    modK._check_fit()
-    data = modK._fitted_data
-    labels = modK._labels_
+    _check_type(cluster, (_BaseCluster,), item_name="cluster")
+    cluster._check_fit()
+    data = cluster._fitted_data
+    labels = cluster._labels_
     keep = np.linalg.norm(data.T, axis=1) != 0
     data = data[:, keep]
     labels = labels[keep]
