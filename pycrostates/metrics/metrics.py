@@ -64,21 +64,26 @@ def silhouette(modK):  # higher the better
 # calinski harabasz
 def calinski_harabasz(modK):  # higher the better
     """Compute the Calinski and Harabasz score.
+
     This function is a proxy function for
     :func:`sklearn.metrics.calinski_harabasz_score` that applies directly to a
     fitted :class:`pycrostate.clustering.BaseClustering`.
+
     Parameters
     ----------
     BaseClustering : :class:`pycrostate.clustering.BaseClustering`
         Fitted clustering algorithm from which to compute score.
+
     Returns
     -------
     score : float
         The resulting Davies-Bouldin score.
+
     Notes
     -----
     For more details regarding the implementation, please refer to
     :func:`sklearn.metrics.calinski_harabasz_score`.
+
     References
     ----------
     .. [1] `T. Calinski and J. Harabasz (1974).
@@ -103,6 +108,7 @@ def calinski_harabasz(modK):  # higher the better
 # davies bouldin
 def _davies_bouldin_score(X, labels):
     """Compute the Davies-Bouldin score.
+
     Parameters
     ----------
     X : array-like of shape (n_samples, n_features)
@@ -110,6 +116,7 @@ def _davies_bouldin_score(X, labels):
         to a single data point.
     labels : array-like of shape (n_samples,)
         Predicted labels for each sample.
+
     Returns
     -------
     score: float
@@ -141,24 +148,29 @@ def _davies_bouldin_score(X, labels):
 
 def davies_bouldin(modK):  # lower the better
     """Compute the Davies-Bouldin score.
+
     This function is a proxy function for
     :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a
     fitted :class:`pycrostate.clustering.BaseClustering`. It uses the absolute
     spatial correlation for distance computations.
+
     Parameters
     ----------
     BaseClustering : :class:`pycrostate.clustering.BaseClustering`
             Fitted clustering algorithm from which to compute score.
+
     Returns
     -------
     score : float
         The resulting Davies-Bouldin score.
+
     Notes
     -----
     For more details regarding the implementation, please refere to
     :func:`sklearn.metrics.davies_bouldin_score`.
     This function was modified in order to use the absolute spatial correlation
     for distance computations instead of euclidean distance.
+
     References
     ----------
     .. [1] `Davies, David L.; Bouldin, Donald W (1979).
@@ -196,6 +208,7 @@ def _big_delta_fast(ci, distances):
 def _dunn_score(X, labels):  # lower the better
     # based on https://github.com/jqmviegas/jqm_cvi
     """Compute the Dunn index.
+
     Parameters
     ----------
     X : np.array
@@ -224,17 +237,21 @@ def _dunn_score(X, labels):  # lower the better
 
 def dunn(modK):  # higher the better
     """Compute the Dunn index score.
+
     Parameters
     ----------
     BaseClustering : :class:`pycrostate.clustering.BaseClustering`
         Fitted clustering algorithm from which to compute score.
+
     Returns
     -------
     score : float
         The resulting Davies-Bouldin score.
+
     Notes
     -----
     This function uses the absolute spatial correlation for distance.
+
     References
     ----------
     .. [1] `J. C. Dunn (1974).
