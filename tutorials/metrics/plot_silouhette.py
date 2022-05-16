@@ -32,23 +32,58 @@ raw.set_eeg_reference("average")
 # while ensuring that the metric used for distance computations is
 # the opposite value of the absolute spatial correlation.
 # More details can be found in [sklearn User Guide] (https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html#sklearn.metrics.silhouette_score)
-from pycrostates.metrics.metrics import silhouette
+from pycrostates.metrics import silhouette, calinski_harabasz, dunn, davies_bouldin
 
 cluster_numbers = range(2,12)
 silhouette_scores = []
-for k in range(2,12):
+calinski_harabasz_scores = []
+dunn_scores = []
+davies_bouldin_scores = []
+
+for k in cluster_numbers:
     ModK = ModKMeans(n_clusters=k, random_state=42)
     ModK.fit(raw, n_jobs=12)
-    score = silhouette(ModK)
-    silhouette_scores.append(score)
+
+    silhouette_score = silhouette(ModK)
+    silhouette_scores.append(silhouette_score)
+
+    calinski_harabasz_score = calinski_harabasz(ModK)
+    calinski_harabasz_scores.append(calinski_harabasz_score)
+    
+    dunn_score = dunn(ModK)
+    dunn_scores.append(dunn_score)
+    
+    davies_bouldin_score = davies_bouldin(ModK)
+    davies_bouldin_scores.append(davies_bouldin_score)
 #%%
-# Most methods need the modified Kmeans to be fitted. This can be done with
-# either :class:`mne.io.Raw` or :class:`mne.epochs.Epochs` data structures.
-# Note that, depending on your setup, you can change ``n_jobs=1`` in order to
-# use parallel processing and reduce computation time.
+# Silhouette
 import matplotlib.pyplot as plt
 plt.figure()
 plt.scatter(cluster_numbers, silhouette_scores)
 plt.xlabel('n_clusters')
 plt.ylabel('Silhouette score') 
+plt.show()
+#%%
+# calinski_harabasz
+import matplotlib.pyplot as plt
+plt.figure()
+plt.scatter(cluster_numbers, calinski_harabasz_scores)
+plt.xlabel('n_clusters')
+plt.ylabel('calinski_harabasz score') 
+plt.show()
+#%%
+# dunn
+import matplotlib.pyplot as plt
+plt.figure()
+plt.scatter(cluster_numbers, dunn_scores)
+plt.xlabel('n_clusters')
+plt.ylabel('dunn score') 
+plt.show()
+#%%
+# davies_bouldin
+import matplotlib.pyplot as plt
+plt.figure()
+plt.scatter(cluster_numbers, davies_bouldin_scores)
+plt.xlabel('n_clusters')
+plt.ylabel('davies_bouldin score') 
 plt.show()
