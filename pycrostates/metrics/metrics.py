@@ -21,7 +21,7 @@ def _distance_matrix(X, Y=None):
 # silhouette
 def silhouette(cluster):  # higher the better
     """
-    Compute the mean Silhouette Coefficient of a fitted clustering algorithm.
+    Compute the mean Silhouette Coefficient.
 
     This function is a proxy function for
     :func:`sklearn.metrics.silhouette_score` that applies directly to a fitted
