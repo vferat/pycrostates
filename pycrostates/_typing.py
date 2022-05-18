@@ -8,12 +8,12 @@ from abc import ABC
 
 
 class CHData(ABC):
-    """Typing wfor CHData."""
+    """Typing for CHData."""
 
     pass
 
 
 class CHInfo(ABC):
-    """Typing wfor CHInfo."""
+    """Typing for CHInfo."""
 
     pass

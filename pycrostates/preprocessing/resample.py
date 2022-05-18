@@ -99,11 +99,13 @@ def resample(
             )
         if coverage is None and n_samples is None:
             raise ValueError(
-                "When providing n_epochs, at least one of 'coverage' or 'n_samples' must be provided."
+                "When providing n_epochs, at least one of 'coverage' "
+                "or 'n_samples' must be provided."
             )
         if coverage is not None and n_samples is not None:
             raise ValueError(
-                "When providing n_epochs, only one of 'coverage' or 'n_samples' must be provided."
+                "When providing n_epochs, only one of 'coverage' "
+                "or 'n_samples' must be provided."
             )
         if coverage is not None and (coverage <= 0 or coverage > 1):
             raise ValueError(
@@ -118,7 +120,8 @@ def resample(
     else:
         if coverage is None or n_samples is None:
             raise ValueError(
-                "When n_epochs is None, both 'coverage' or 'n_samples' must be provided."
+                "When n_epochs is None, both 'coverage' or "
+                "'n_samples' must be provided."
             )
         if n_samples <= 0:
             raise ValueError(

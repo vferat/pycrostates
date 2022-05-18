@@ -60,7 +60,7 @@ def test_resample_n_epochs_coverage(inst, replace):
         (epochs, False),
     ],
 )
-def test_resample_n_epochs_coverage(inst, replace):
+def test_resample_n_samples_coverage(inst, replace):
     resamples = resample(inst, n_samples=500, coverage=0.8, replace=replace)
     assert isinstance(resamples, list)
     for r in resamples:
