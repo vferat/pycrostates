@@ -46,6 +46,7 @@ class ModKMeans(_BaseCluster):
        IEEE Trans Biomed Eng.
        <https://doi.org/10.1109/10.391164>`_
     """
+
     # TODO: docstring for tol doesn't look english
 
     def __init__(
