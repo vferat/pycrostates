@@ -37,12 +37,12 @@ class ModKMeans(_BaseCluster):
         Relative tolerance with regards estimate residual noise in the cluster
         centers of two consecutive iterations to declare convergence.
     %(random_state)s
-    
+
     References
     ----------
     .. [1] `Pascual-Marqui RD, Michel CM, Lehmann D. (1995).
-       "Segmentation of brain electrical activity into microstates: 
-       model estimation and validation.".
+       "Segmentation of brain electrical activity into microstates:
+        model estimation and validation.".
        IEEE Trans Biomed Eng.
        <https://doi.org/10.1109/10.391164>`_
     """
