@@ -1,3 +1,4 @@
+"""Clas to handle no temporal but spatial data."""
 from copy import copy, deepcopy
 from typing import Union
 
@@ -54,9 +55,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         return s
 
     def _repr_html_(self, caption=None):
-        from ..html_templates import (
-            repr_templates_env,
-        )
+        from ..html_templates import repr_templates_env
 
         template = repr_templates_env.get_template("ChData.html.jinja")
         info_repr = (

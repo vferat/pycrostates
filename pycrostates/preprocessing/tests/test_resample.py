@@ -25,24 +25,26 @@ epochs = mne.make_fixed_length_epochs(raw, duration=2, preload=True)
         (epochs, False),
     ],
 )
-def test_resample(inst, replace):
+def test_resample_n_epochs_n_samples(inst, replace):
     resamples = resample(inst, n_epochs=10, n_samples=500, replace=replace)
     assert isinstance(resamples, list)
     assert len(resamples) == 10
     for r in resamples:
         assert isinstance(r, ChData)
-        assert r._data.shape == (60, 500)
+        assert r._data.shape == (59, 500)
 
 
 @pytest.mark.parametrize(
-    "inst",
+    "inst, replace",
     [
-        (raw),
-        (epochs),
+        (raw, True),
+        (raw, False),
+        (epochs, True),
+        (epochs, False),
     ],
 )
-def test_resample_coverage(inst):
-    resamples = resample(inst, n_epochs=10, coverage=0.8, replace=False)
+def test_resample_n_epochs_coverage(inst, replace):
+    resamples = resample(inst, n_epochs=10, coverage=0.8, replace=replace)
     assert isinstance(resamples, list)
     assert len(resamples) == 10
     for r in resamples:
@@ -50,18 +52,20 @@ def test_resample_coverage(inst):
 
 
 @pytest.mark.parametrize(
-    "inst",
+    "inst, replace",
     [
-        (raw),
-        (epochs),
+        (raw, True),
+        (raw, False),
+        (epochs, True),
+        (epochs, False),
     ],
 )
-def test_resample_raw_samples_coverage(inst):
-    resamples = resample(inst, n_samples=500, coverage=0.8, replace=False)
+def test_resample_n_epochs_coverage(inst, replace):
+    resamples = resample(inst, n_samples=500, coverage=0.8, replace=replace)
     assert isinstance(resamples, list)
     for r in resamples:
         assert isinstance(r, ChData)
-        assert r._data.shape == (60, 500)
+        assert r._data.shape == (59, 500)
 
 
 def test_resample_raw_noreplace_error():

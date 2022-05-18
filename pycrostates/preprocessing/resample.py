@@ -1,4 +1,4 @@
-"""Preprocessing functions to extract ChData from raw or epochs instances."""
+"""Preprocessing functions to create resamples from raw or epochs instances."""
 
 from typing import Optional, Union
 
@@ -91,27 +91,45 @@ def resample(
     random_state = _check_random_state(random_state)
 
     # Check n_samples, coverage
-    if coverage is None or n_samples is None:
-        raise ValueError(
-            "At least one of 'coverage' or 'n_samples' must be provided."
-        )
-    if coverage is not None and n_samples is not None:
-        raise ValueError(
-            "Only one of 'coverage' or 'n_samples' must be provided."
-        )
-    if coverage is not None and coverage <= 0:
-        raise ValueError(
-            "Argument 'coverage' must be a strictly positive number. "
-            f"Provided: '{coverage}'."
-        )
-    if n_samples is not None and n_samples <= 0:
-        raise ValueError(
-            "Argument 'n_samples' must be a strictly positive integer. "
-            f"Provided: '{n_samples}'."
-        )
-
-    # checks for n_epochs
-    # TODO
+    if n_epochs is not None:
+        if n_epochs <= 0:
+            raise ValueError(
+                "Argument 'n_epochs' must be a strictly positive integer. "
+                f"Provided: '{n_epochs}'."
+            )
+        if coverage is None and n_samples is None:
+            raise ValueError(
+                "When providing n_epochs, at least one of 'coverage' or 'n_samples' must be provided."
+            )
+        if coverage is not None and n_samples is not None:
+            raise ValueError(
+                "When providing n_epochs, only one of 'coverage' or 'n_samples' must be provided."
+            )
+        if coverage is not None and (coverage <= 0 or coverage > 1):
+            raise ValueError(
+                "Argument 'coverage' must be 0 <= coverage <= 1. "
+                f"Provided: '{coverage}'."
+            )
+        if n_samples is not None and n_samples <= 0:
+            raise ValueError(
+                "Argument 'n_samples' must be a strictly positive integer. "
+                f"Provided: '{n_samples}'."
+            )
+    else:
+        if coverage is None or n_samples is None:
+            raise ValueError(
+                "When n_epochs is None, both 'coverage' or 'n_samples' must be provided."
+            )
+        if n_samples <= 0:
+            raise ValueError(
+                "Argument 'n_samples' must be a strictly positive integer. "
+                f"Provided: '{n_samples}'."
+            )
+        if coverage <= 0 or coverage > 1:
+            raise ValueError(
+                "Argument 'coverage' must be 0 <= coverage <= 1. "
+                f"Provided: '{coverage}'."
+            )
 
     # retrieve picks
     picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
@@ -136,6 +154,9 @@ def resample(
     if n_samples is None:
         n_samples = int((n_times * coverage) / n_epochs)
 
+    if coverage is None:
+        coverage = n_times / (n_epochs * n_samples)
+
     if replace is False:
         if n_epochs * n_samples > n_times:
             raise ValueError(
@@ -152,7 +173,6 @@ def resample(
         coverage * 100,
     )
 
-    random_state = np.random.RandomState(random_seed)
     if replace:
         indices = random_state.randint(
             0, n_samples, size=(n_epochs, n_samples)
@@ -166,7 +186,8 @@ def resample(
     data = data[:, indices]
     data = np.swapaxes(data, 0, 1)
 
+    info = pick_info(inst.info, picks)
     resamples = list()
     for d in data:
-        resamples.append(ChData(d, inst.info))
+        resamples.append(ChData(d, info))
     return resamples

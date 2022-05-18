@@ -1,3 +1,4 @@
+"""Preprocessing functions to extract gfp peaks from raw or epochs instances."""
 from typing import Optional, Union
 
 import numpy as np
