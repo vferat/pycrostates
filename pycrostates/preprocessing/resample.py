@@ -6,10 +6,8 @@ import numpy as np
 from mne import BaseEpochs, pick_info
 from mne.io import BaseRaw
 from mne.io.pick import _picks_to_idx
-from numpy.random import Generator, RandomState
-from numpy.typing import NDArray
 
-from .._typing import CHData
+from .._typing import CHData, Picks, RANDomState
 from ..utils._checks import (
     _check_random_state,
     _check_reject_by_annotation,
@@ -24,7 +22,7 @@ from ..utils._logs import logger, verbose
 @verbose
 def resample(
     inst: Union[BaseRaw, BaseEpochs, CHData],
-    picks: Optional[Union[str, NDArray[int]]] = None,
+    picks: Picks = None,
     tmin: Optional[float] = None,
     tmax: Optional[float] = None,
     reject_by_annotation: bool = True,
@@ -32,7 +30,7 @@ def resample(
     n_samples: int = None,
     coverage: float = None,
     replace: bool = True,
-    random_state: Optional[Union[int, RandomState, Generator]] = None,
+    random_state: RANDomState = None,
     verbose=None,
 ) -> List[CHData]:
     """Resample recording into epochs of random samples.

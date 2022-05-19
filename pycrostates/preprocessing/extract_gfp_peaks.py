@@ -8,7 +8,7 @@ from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 from scipy.signal import find_peaks
 
-from .._typing import CHData
+from .._typing import CHData, Picks
 from ..utils._checks import (
     _check_reject_by_annotation,
     _check_tmin_tmax,
@@ -22,7 +22,7 @@ from ..utils._logs import logger, verbose
 @verbose
 def extract_gfp_peaks(
     inst: Union[BaseRaw, BaseEpochs],
-    picks: Optional[Union[str, NDArray[int]]] = None,
+    picks: Picks = None,
     min_peak_distance: int = 2,
     tmin: Optional[float] = None,
     tmax: Optional[float] = None,

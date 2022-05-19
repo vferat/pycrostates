@@ -10,6 +10,7 @@ from mne.parallel import parallel_func
 from numpy.random import Generator, RandomState
 from numpy.typing import NDArray
 
+from .._typing import Picks, RANDomState
 from ..utils import _corr_vectors
 from ..utils._checks import _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc
@@ -47,7 +48,7 @@ class ModKMeans(_BaseCluster):
         n_init: int = 100,
         max_iter: int = 300,
         tol: Union[int, float] = 1e-6,
-        random_state: Optional[Union[int, RandomState, Generator]] = None,
+        random_state: RANDomState = None,
     ):
         super().__init__()
 
@@ -135,7 +136,7 @@ class ModKMeans(_BaseCluster):
     def fit(
         self,
         inst: Union[BaseRaw, BaseEpochs],
-        picks: Union[str, NDArray[int]] = "eeg",
+        picks: Picks = None,
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,
         reject_by_annotation: bool = True,

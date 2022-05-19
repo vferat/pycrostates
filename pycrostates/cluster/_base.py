@@ -13,7 +13,7 @@ from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 from scipy.signal import convolve2d
 
-from .._typing import CHData
+from .._typing import CHData, Picks
 from ..segmentation import EpochsSegmentation, RawSegmentation
 from ..utils import _compare_infos, _corr_vectors
 from ..utils._checks import (
@@ -171,7 +171,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     def fit(
         self,
         inst: Union[BaseRaw, BaseEpochs, CHData],
-        picks: Union[str, NDArray[int]] = "eeg",
+        picks: Picks = None,
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,
         reject_by_annotation: bool = True,
@@ -499,7 +499,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     def predict(
         self,
         inst: Union[BaseRaw, BaseEpochs],
-        picks: Union[str, NDArray[int]] = "eeg",
+        picks: Picks = None,
         factor: int = 0,
         half_window_size: int = 3,
         tol: Union[int, float] = 10e-6,
