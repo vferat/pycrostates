@@ -1,6 +1,6 @@
 """Preprocessing functions to create resamples from raw or epochs instances."""
 
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import numpy as np
 from mne import BaseEpochs, pick_info
@@ -34,7 +34,7 @@ def resample(
     replace: bool = True,
     random_state: Optional[Union[int, RandomState, Generator]] = None,
     verbose=None,
-) -> CHData:
+) -> List[CHData]:
     """Resample recording into epochs of random samples.
 
     Resample :class:`~mne.io.Raw`. :class:`~mne.Epochs` or
@@ -66,7 +66,7 @@ def resample(
 
     Returns
     -------
-    ch_data : list of :class:`~pycrostates.io.ChData`
+    resamples : list of :class:`~pycrostates.io.ChData`
         List of resamples.
 
     Notes
@@ -99,17 +99,17 @@ def resample(
             )
         if coverage is None and n_samples is None:
             raise ValueError(
-                "When providing n_epochs, at least one of 'coverage' "
+                "When providing 'n_epochs', at least one of 'coverage' "
                 "or 'n_samples' must be provided."
             )
         if coverage is not None and n_samples is not None:
             raise ValueError(
-                "When providing n_epochs, only one of 'coverage' "
+                "When providing 'n_epochs', only one of 'coverage' "
                 "or 'n_samples' must be provided."
             )
         if coverage is not None and (coverage <= 0 or coverage > 1):
             raise ValueError(
-                "Argument 'coverage' must be 0 <= coverage <= 1. "
+                "Argument 'coverage' must respect 0 <= coverage <= 1. "
                 f"Provided: '{coverage}'."
             )
         if n_samples is not None and n_samples <= 0:
@@ -120,7 +120,7 @@ def resample(
     else:
         if coverage is None or n_samples is None:
             raise ValueError(
-                "When n_epochs is None, both 'coverage' or "
+                "When 'n_epochs' is None, both 'coverage' and "
                 "'n_samples' must be provided."
             )
         if n_samples <= 0:
@@ -130,7 +130,7 @@ def resample(
             )
         if coverage <= 0 or coverage > 1:
             raise ValueError(
-                "Argument 'coverage' must be 0 <= coverage <= 1. "
+                "Argument 'coverage' must respect 0 <= coverage <= 1. "
                 f"Provided: '{coverage}'."
             )
 
@@ -145,12 +145,10 @@ def resample(
     assert data.ndim in (2, 3)  # sanity-check
     if isinstance(inst, BaseEpochs):
         data = np.hstack(data)
+    assert data.ndim == 2  # sanity-check
     n_times = data.shape[1]
 
     # Compute coverage / n_samples from the second
-
-    # --------------- TODO ---------------------------------------------------
-    # /!\ Can not work, n_samples can be None
     if n_epochs is None:
         n_epochs = int((n_times * coverage) / n_samples)
 
@@ -163,9 +161,9 @@ def resample(
     if replace is False:
         if n_epochs * n_samples > n_times:
             raise ValueError(
-                f"Can't draw {n_epochs} epochs of {n_samples} samples = "
-                f"{n_epochs * n_samples} samples without replacement: "
-                f"instance contains only {n_times} samples."
+                f"Can not draw {n_epochs} epochs of {n_samples} samples = "
+                f"{n_epochs * n_samples} samples without replacement because "
+                f"the instance contains only {n_times} samples."
             )
 
     logger.info(
@@ -176,19 +174,18 @@ def resample(
         coverage * 100,
     )
 
-    if replace:
-        indices = random_state.randint(
-            0, n_samples, size=(n_epochs, n_samples)
-        )
-    else:
-        indices = np.arange(n_times)
-        random_state.shuffle(indices)
-        indices = indices[: n_epochs * n_samples]
-        indices = indices.reshape((n_epochs, n_samples))
+    # random selection
+    times_idx = np.arange(n_times)
+    indices = np.random.choice(
+        times_idx, size=n_epochs * n_samples, replace=replace
+    )
+    indices = indices.reshape((n_epochs, n_samples))
 
+    # select data
     data = data[:, indices]
     data = np.swapaxes(data, 0, 1)
 
+    # create list of ChData
     info = pick_info(inst.info, picks)
     resamples = list()
     for d in data:
