@@ -33,7 +33,7 @@ def resample(
     random_state: RANDomState = None,
     verbose=None,
 ) -> List[CHData]:
-    """Resample recording into epochs of random samples.
+    """Resample a recording into epochs of random samples.
 
     Resample :class:`~mne.io.Raw`. :class:`~mne.Epochs` or
     `~pycrostates.io.ChData` into ``n_epochs`` each containing ``n_samples``
@@ -51,12 +51,13 @@ def resample(
         with description starting with ‘bad’ are omitted. If False, no
         rejection is done.
     n_epochs : int
-        Number of epochs to draw.
+        Number of epochs to draw. Each epoch can be used to fit a separate
+        clustering solution. See notes for additional information.
     n_samples : int
-        Length of each epoch (in samples).
+        Length of each epoch (in samples). See notes for additional information.
     coverage : float (strictly positive)
         Ratio between resampling data size and size of the original recording.
-        Can be > 1 if replace=True.
+        See notes for additional information.
     replace : bool
         Whether or not to allow resampling with replacement.
     %(random_state)s
@@ -70,8 +71,8 @@ def resample(
     Notes
     -----
     Only two of ``n_epochs``, ``n_samples`` and ``coverage``
-    parameters must be defined, the non-defined one being
-    computed during function execution.
+    parameters must be defined, the non-defined one will be
+    determine at runtime by the 2 other parameters.
     """
     from ..io import ChData
 
