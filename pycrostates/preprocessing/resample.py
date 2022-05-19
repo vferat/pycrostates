@@ -54,7 +54,8 @@ def resample(
         Number of epochs to draw. Each epoch can be used to fit a separate
         clustering solution. See notes for additional information.
     n_samples : int
-        Length of each epoch (in samples). See notes for additional information.
+        Length of each epoch (in samples). See notes for additional
+        information.
     coverage : float (strictly positive)
         Ratio between resampling data size and size of the original recording.
         See notes for additional information.
