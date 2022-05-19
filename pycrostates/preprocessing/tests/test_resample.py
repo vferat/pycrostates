@@ -74,6 +74,7 @@ def test_resample_n_epochs_coverage(inst, replace, n_epochs, cov):
         assert r._data.shape == (n_ch, int(cov * n_data / n_epochs))
 
 
+# pylint: disable=protected-access
 @pytest.mark.parametrize(
     "inst, replace, n_samples, cov",
     [
