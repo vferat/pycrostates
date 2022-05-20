@@ -26,7 +26,7 @@ def resample(
     tmin: Optional[float] = None,
     tmax: Optional[float] = None,
     reject_by_annotation: bool = True,
-    n_epochs: int = None,
+    n_resamples: int = None,
     n_samples: int = None,
     coverage: float = None,
     replace: bool = True,
@@ -36,7 +36,7 @@ def resample(
     """Resample a recording into epochs of random samples.
 
     Resample :class:`~mne.io.Raw`. :class:`~mne.Epochs` or
-    `~pycrostates.io.ChData` into ``n_epochs`` each containing ``n_samples``
+    `~pycrostates.io.ChData` into ``n_resamples`` each containing ``n_samples``
     random samples of the original recording.
 
     Parameters
@@ -50,8 +50,8 @@ def resample(
         Whether to reject by annotation. If True (default), segments annotated
         with description starting with ‘bad’ are omitted. If False, no
         rejection is done.
-    n_epochs : int
-        Number of epochs to draw. Each epoch can be used to fit a separate
+    n_resamples : int
+        Number of resamples to draw. Each epoch can be used to fit a separate
         clustering solution. See notes for additional information.
     n_samples : int
         Length of each epoch (in samples). See notes for additional
@@ -71,7 +71,7 @@ def resample(
 
     Notes
     -----
-    Only two of ``n_epochs``, ``n_samples`` and ``coverage``
+    Only two of ``n_resamples``, ``n_samples`` and ``coverage``
     parameters must be defined, the non-defined one will be
     determine at runtime by the 2 other parameters.
     """
@@ -84,27 +84,27 @@ def resample(
         reject_by_annotation = _check_reject_by_annotation(
             reject_by_annotation
         )
-    _check_type(n_epochs, (None, "int"), "n_epochs")
+    _check_type(n_resamples, (None, "int"), "n_resamples")
     _check_type(n_samples, (None, "int"), "n_samples")
     _check_type(coverage, (None, "numeric"), "coverage")
     _check_type(replace, (bool,), "replace")
     random_state = _check_random_state(random_state)
 
     # Check n_samples, coverage
-    if n_epochs is not None:
-        if n_epochs <= 0:
+    if n_resamples is not None:
+        if n_resamples <= 0:
             raise ValueError(
-                "Argument 'n_epochs' must be a strictly positive integer. "
-                f"Provided: '{n_epochs}'."
+                "Argument 'n_resamples' must be a strictly positive integer. "
+                f"Provided: '{n_resamples}'."
             )
         if coverage is None and n_samples is None:
             raise ValueError(
-                "When providing 'n_epochs', at least one of 'coverage' "
+                "When providing 'n_resamples', at least one of 'coverage' "
                 "or 'n_samples' must be provided."
             )
         if coverage is not None and n_samples is not None:
             raise ValueError(
-                "When providing 'n_epochs', only one of 'coverage' "
+                "When providing 'n_resamples', only one of 'coverage' "
                 "or 'n_samples' must be provided."
             )
         if coverage is not None and (coverage <= 0 or coverage > 1):
@@ -120,7 +120,7 @@ def resample(
     else:
         if coverage is None or n_samples is None:
             raise ValueError(
-                "When 'n_epochs' is None, both 'coverage' and "
+                "When 'n_resamples' is None, both 'coverage' and "
                 "'n_samples' must be provided."
             )
         if n_samples <= 0:
@@ -149,27 +149,28 @@ def resample(
     n_times = data.shape[1]
 
     # Compute coverage / n_samples from the second
-    if n_epochs is None:
-        n_epochs = int((n_times * coverage) / n_samples)
+    if n_resamples is None:
+        n_resamples = int((n_times * coverage) / n_samples)
 
     if n_samples is None:
-        n_samples = int((n_times * coverage) / n_epochs)
+        n_samples = int((n_times * coverage) / n_resamples)
 
     if coverage is None:
-        coverage = n_times / (n_epochs * n_samples)
+        coverage = n_times / (n_resamples * n_samples)
 
     if replace is False:
-        if n_epochs * n_samples > n_times:
+        if n_resamples * n_samples > n_times:
             raise ValueError(
-                f"Can not draw {n_epochs} epochs of {n_samples} samples = "
-                f"{n_epochs * n_samples} samples without replacement because "
-                f"the instance contains only {n_times} samples."
+                f"Can not draw {n_resamples} resamples of {n_samples} "
+                f"samples = {n_resamples * n_samples} samples without "
+                f"replacement because the instance contains only "
+                f"{n_times} samples."
             )
 
     logger.info(
-        "Resampling instance into %s epochs of %s covering %.2f%% of the "
-        "original data.",
-        n_epochs,
+        "Resampling instance into %s resamples of %s samples "
+        "covering %.2f%% of the original data.",
+        n_resamples,
         n_samples,
         coverage * 100,
     )
@@ -177,9 +178,9 @@ def resample(
     # random selection
     times_idx = np.arange(n_times)
     indices = np.random.choice(
-        times_idx, size=n_epochs * n_samples, replace=replace
+        times_idx, size=n_resamples * n_samples, replace=replace
     )
-    indices = indices.reshape((n_epochs, n_samples))
+    indices = indices.reshape((n_resamples, n_samples))
 
     # select data
     data = data[:, indices]
