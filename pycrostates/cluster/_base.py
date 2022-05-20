@@ -13,16 +13,23 @@ from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 from scipy.signal import convolve2d
 
+from .._typing import CHData, Picks
 from ..segmentation import EpochsSegmentation, RawSegmentation
 from ..utils import _compare_infos, _corr_vectors
-from ..utils._checks import _check_n_jobs, _check_type, _check_value
+from ..utils._checks import (
+    _check_n_jobs,
+    _check_reject_by_annotation,
+    _check_tmin_tmax,
+    _check_type,
+    _check_value,
+)
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 from ..viz import plot_cluster_centers
 
 
-class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
+class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     """Base Class for Microstates Clustering algorithms."""
 
     @abstractmethod
@@ -163,8 +170,8 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     @fill_doc
     def fit(
         self,
-        inst: Union[BaseRaw, BaseEpochs],
-        picks: Union[str, NDArray[int]] = "eeg",
+        inst: Union[BaseRaw, BaseEpochs, CHData],
+        picks: Picks = None,
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,
         reject_by_annotation: bool = True,
@@ -183,21 +190,23 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
         %(n_jobs)s
         """
         # TODO: Maybe those parameters should be moved here instead of docdict?
-        from ..io import ChInfo
+        from ..io import ChData, ChInfo
 
-        _check_type(inst, (BaseRaw, BaseEpochs), item_name="inst")
-        _check_type(tmin, (None, "numeric"), item_name="tmin")
-        _check_type(tmax, (None, "numeric"), item_name="tmax")
-        reject_by_annotation = _BaseCluster._check_reject_by_annotation(
-            reject_by_annotation
-        )
         n_jobs = _check_n_jobs(n_jobs)
+        _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
+        if isinstance(inst, (BaseRaw, BaseEpochs)):
+            tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)
+        if isinstance(inst, BaseRaw):
+            reject_by_annotation = _check_reject_by_annotation(
+                reject_by_annotation
+            )
+
+        # retrieve info
+        info = inst.info
 
         # picks
-        picks_bads_inc = _picks_to_idx(
-            inst.info, picks, none="all", exclude=[]
-        )
-        picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
+        picks_bads_inc = _picks_to_idx(info, picks, none="all", exclude=[])
+        picks = _picks_to_idx(info, picks, none="all", exclude="bads")
         ch_not_used = set(picks_bads_inc) - set(picks)
         if len(ch_not_used) != 0:
             if len(ch_not_used) == 1:
@@ -214,51 +223,24 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                     + "explicitly in the 'picks' argument."
                 )
             logger.warning(
-                msg, ", ".join(inst.info["ch_names"][k] for k in ch_not_used)
+                msg, ", ".join(info["ch_names"][k] for k in ch_not_used)
             )
             del msg
 
-        # tmin/tmax
-        # check positiveness
-        for name, arg in (("tmin", tmin), ("tmax", tmax)):
-            if arg is None:
-                continue
-            if arg < 0:
-                raise ValueError(
-                    f"Argument '{name}' must be positive. Provided '{arg}'."
-                )
-        # check tmax is shorter than raw
-        if tmax is not None and inst.times[-1] < tmax:
-            raise ValueError(
-                "Argument 'tmax' must be shorter than the instance length. "
-                f"Provided: '{tmax}', larger than {inst.times[-1]}s instance."
-            )
-        # check that tmax is larger than tmin
-        if tmax is not None and tmin is not None and tmax <= tmin:
-            raise ValueError(
-                "Argument 'tmax' must be strictly larger than 'tmin'. "
-                f"Provided 'tmin' -> '{tmin}' and 'tmax' -> '{tmax}'."
-            )
-        elif tmin is not None and inst.times[-1] <= tmin:
-            raise ValueError(
-                "Argument 'tmin' must be shorter than the instance length. "
-                f"Provided: '{tmin}', larger than {inst.times[-1]}s instance."
-            )
-
         # retrieve numpy array
         kwargs = (
-            dict()
-            if isinstance(inst, BaseEpochs)
-            else dict(reject_by_annotation=reject_by_annotation)
+            dict() if isinstance(inst, ChData) else dict(tmin=tmin, tmax=tmax)
         )
-        data = inst.get_data(picks=picks, tmin=tmin, tmax=tmax, **kwargs)
+        if isinstance(inst, BaseRaw):
+            kwargs["reject_by_annotation"] = reject_by_annotation
+        data = inst.get_data(picks=picks, **kwargs)
         # reshape if inst is Epochs
         if isinstance(inst, BaseEpochs):
             data = np.swapaxes(data, 0, 1)
             data = data.reshape(data.shape[0], -1)
 
         # store picks and info
-        self._info = ChInfo(info=pick_info(inst.info, picks_bads_inc))
+        self._info = ChInfo(info=pick_info(info, picks_bads_inc))
         self._fitted_data = data
 
         return data
@@ -517,7 +499,7 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
     def predict(
         self,
         inst: Union[BaseRaw, BaseEpochs],
-        picks: Union[str, NDArray[int]] = "eeg",
+        picks: Picks = None,
         factor: int = 0,
         half_window_size: int = 3,
         tol: Union[int, float] = 10e-6,
@@ -1064,25 +1046,3 @@ class _BaseCluster(ABC, ContainsMixin, MontageMixin, ChannelsMixin):
                 f"Provided: '{n_clusters}'."
             )
         return n_clusters
-
-    @staticmethod
-    def _check_reject_by_annotation(reject_by_annotation: bool) -> bool:
-        """Check the reject_by_annotation argument."""
-        _check_type(
-            reject_by_annotation,
-            (bool, str, None),
-            item_name="reject_by_annotation",
-        )
-        if isinstance(reject_by_annotation, bool):
-            if reject_by_annotation:
-                reject_by_annotation = "omit"
-            else:
-                reject_by_annotation = None
-        elif isinstance(reject_by_annotation, str):
-            if reject_by_annotation != "omit":
-                raise ValueError(
-                    "Argument 'reject_by_annotation' only allows for 'False', "
-                    "'True' (omit), or 'omit'. "
-                    f"Provided: '{reject_by_annotation}'."
-                )
-        return reject_by_annotation

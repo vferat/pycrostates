@@ -18,7 +18,7 @@ from mne.io.pick import _picks_to_idx
 
 from pycrostates import __version__
 from pycrostates.cluster import ModKMeans
-from pycrostates.io import ChInfo, read_cluster
+from pycrostates.io import ChData, ChInfo, read_cluster
 from pycrostates.io.fiff import _read_cluster
 from pycrostates.segmentation import EpochsSegmentation, RawSegmentation
 from pycrostates.utils._logs import logger, set_log_level
@@ -40,9 +40,10 @@ epochs_meg = Epochs(
     raw_meg, events, tmin=0, tmax=0.5, baseline=None, preload=True
 )
 epochs = Epochs(raw, events, tmin=0, tmax=0.5, baseline=None, preload=True)
-n_clusters = 4
-
+# ch_data
+ch_data = ChData(raw.get_data(), raw.info)
 # Fit one for general purposes
+n_clusters = 4
 ModK = ModKMeans(
     n_clusters=n_clusters, n_init=10, max_iter=100, tol=1e-4, random_state=1
 )
@@ -142,6 +143,14 @@ def test_ModKMeans():
     assert ModK1._cluster_centers_.shape == (
         n_clusters,
         len(epochs.info["ch_names"]) - len(epochs.info["bads"]),
+    )
+
+    # Test fit on ChData
+    ModK1.fit(ch_data, n_jobs=1)
+    _check_fitted(ModK1)
+    assert ModK1._cluster_centers_.shape == (
+        n_clusters,
+        len(raw.info["ch_names"]) - len(raw.info["bads"]),
     )
 
     # Test copy
@@ -425,15 +434,15 @@ def test_properties(caplog):
         random_state=1,
     )
 
-    ModK_.cluster_centers_
+    ModK_.cluster_centers_  # pylint: disable=pointless-statement
     assert "Clustering algorithm has not been fitted." in caplog.text
     caplog.clear()
 
-    ModK_.info
+    ModK_.info  # pylint: disable=pointless-statement
     assert "Clustering algorithm has not been fitted." in caplog.text
     caplog.clear()
 
-    ModK_.fitted_data
+    ModK_.fitted_data  # pylint: disable=pointless-statement
     assert "Clustering algorithm has not been fitted." in caplog.text
     caplog.clear()
 

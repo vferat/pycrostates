@@ -31,10 +31,10 @@ from mne.io.write import (
 from numpy.typing import NDArray
 
 from .. import __version__
+from .._typing import CHInfo
 from ..cluster import ModKMeans
 from ..utils._checks import _check_type, _check_value
 from ..utils._logs import logger
-from . import ChInfo
 
 # ----------------------------------------------------------------------------
 """
@@ -69,7 +69,7 @@ FIFF_MNE_ICA_MISC_PARAMS -> fit variables (ending with '_')
 def _write_cluster(
     fname: Union[str, Path],
     cluster_centers_: NDArray[float],
-    chinfo: Union[ChInfo, Info],
+    chinfo: Union[CHInfo, Info],
     algorithm: str,
     cluster_names: List[str],
     fitted_data: NDArray[float],
@@ -96,6 +96,8 @@ def _write_cluster(
     labels_ : array
         Array of labels for each sample of shape (n_samples, )
     """
+    from . import ChInfo
+
     # error checking on input
     _check_type(fname, ("path-like",), "fname")
     _check_type(cluster_centers_, (np.ndarray,), "cluster_centers_")
@@ -351,7 +353,7 @@ def _check_fit_parameters_and_variables(
 
 def _create_ModKMeans(
     cluster_centers_: NDArray[float],
-    info: ChInfo,
+    info: CHInfo,
     cluster_names: List[str],
     fitted_data: NDArray[float],
     labels_: NDArray[int],
@@ -375,7 +377,7 @@ def _create_ModKMeans(
 
 
 # ----------------------------------------------------------------------------
-def _write_meas_info(fid, info: ChInfo):
+def _write_meas_info(fid, info: CHInfo):
     """Write measurement info into a file id (from a fif file).
 
     Parameters
@@ -430,6 +432,8 @@ def _read_meas_info(fid, tree):
     info : ChInfo
         Channel information instance.
     """
+    from . import ChInfo
+
     # Find the desired blocks
     meas = dir_tree_find(tree, FIFF.FIFFB_MEAS)
     if len(meas) == 0:

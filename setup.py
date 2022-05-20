@@ -52,7 +52,7 @@ install_requires = get_requirements("requirements.txt")
 
 setup(
     name="pycrostates",
-    version="0.1.0",
+    version=version,
     author="Victor Férat",
     author_email="victor.ferat@unige.ch",
     description=short_description,

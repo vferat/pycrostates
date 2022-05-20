@@ -1,6 +1,6 @@
 """Preprocessing module for preprocessing data."""
 
-from .preprocessing import resample  # noqa: F401
-from .preprocessing import _extract_gfps, extract_gfp_peaks
+from .extract_gfp_peaks import extract_gfp_peaks
+from .resample import resample
 
-__all__ = ("_extract_gfps", "resample", "extract_gfp_peaks")
+__all__ = ("extract_gfp_peaks", "resample")

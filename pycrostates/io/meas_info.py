@@ -12,12 +12,13 @@ from mne.io.pick import get_channel_type_constants
 from mne.io.proj import Projection
 from mne.io.tag import _ch_coord_dict
 
+from .._typing import CHInfo
 from ..utils._checks import _check_type, _IntLike
 from ..utils._logs import logger
 
 
-class ChInfo(Info):
-    """Measurement information.
+class ChInfo(CHInfo, Info):
+    """Atemporal measurement information.
 
     Similar to a mne.Info class, but without any temporal information. Only the
     channel-related information are present. A ChInfo can be created either:

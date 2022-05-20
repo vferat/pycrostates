@@ -3,9 +3,11 @@
 import os
 import re
 
+import numpy as np
 import pytest
 from matplotlib import pyplot as plt
-from numpy import isclose
+from mne import EpochsArray, create_info
+from mne.io import RawArray
 from numpy.random import PCG64, Generator
 from numpy.random.mtrand import RandomState
 
@@ -13,6 +15,8 @@ from pycrostates.utils._checks import (
     _check_axes,
     _check_n_jobs,
     _check_random_state,
+    _check_reject_by_annotation,
+    _check_tmin_tmax,
     _check_type,
     _check_value,
     _ensure_int,
@@ -36,10 +40,10 @@ def test_check_type():
     assert _check_type(101, ("int",)) == 101
     assert _check_type("101.fif", ("path-like",)) == "101.fif"
 
-    def foo():
+    def foo_function():
         pass
 
-    _check_type(foo, ("callable",))
+    _check_type(foo_function, ("callable",))
 
     assert _check_type(101, ("numeric",)) == 101
     assert _check_type(101.0, ("numeric",)) == 101.0
@@ -92,7 +96,7 @@ def test_check_random_state():
     assert isinstance(rs, RandomState)
     rs3 = _check_random_state(102)
     assert isinstance(rs, RandomState)
-    assert not isclose(rs2.normal(), rs3.normal())
+    assert not np.isclose(rs2.normal(), rs3.normal())
 
     rng = Generator(PCG64())
     rs = _check_random_state(rng)
@@ -127,3 +131,74 @@ def test_check_axes():
     with pytest.raises(ValueError, match="Argument 'axes' should be a"):
         _check_axes(ax)
     plt.close("all")
+
+
+def test_check_reject_by_annotation():
+    """Test the checker for reject_by_annoation argument."""
+    reject_by_annotation = _check_reject_by_annotation(True)
+    assert reject_by_annotation == "omit"
+    reject_by_annotation = _check_reject_by_annotation(False)
+    assert reject_by_annotation is None
+    reject_by_annotation = _check_reject_by_annotation(None)
+    assert reject_by_annotation is None
+
+    with pytest.raises(
+        TypeError, match="'reject_by_annotation' must be an instance of"
+    ):
+        _check_reject_by_annotation(1)
+    with pytest.raises(
+        ValueError, match="'reject_by_annotation' only allows for"
+    ):
+        _check_reject_by_annotation("101")
+
+
+def test_check_tmin_tmax():
+    """Test the checker for tmin/tmax arguments."""
+    # create fake data as 3 sin sources measured across 6 channels
+    times = np.linspace(0, 5, 2000)
+    signals = np.array([np.sin(2 * np.pi * k * times) for k in (7, 22, 37)])
+    coeffs = np.random.rand(6, 3)
+    data = np.dot(coeffs, signals) + np.random.normal(
+        0, 0.1, (coeffs.shape[0], times.size)
+    )
+    info = create_info(
+        ["Fpz", "Cz", "CPz", "Oz", "M1", "M2"], sfreq=400, ch_types="eeg"
+    )
+    raw = RawArray(data, info)
+    epochs = EpochsArray(data.reshape(5, 6, 400), info)
+
+    # test valid tmin/tmax
+    _check_tmin_tmax(raw, None, None)
+    _check_tmin_tmax(epochs, None, None)
+    _check_tmin_tmax(raw, 1, 4)
+    _check_tmin_tmax(epochs, 0, 0.5)
+
+    # test invalid tmin/tmax
+    with pytest.raises(
+        ValueError, match="Argument 'tmax' must be shorter than"
+    ):
+        _check_tmin_tmax(raw, 1, 6)
+    with pytest.raises(
+        ValueError, match="Argument 'tmax' must be shorter than"
+    ):
+        _check_tmin_tmax(epochs, 1, 6)
+    with pytest.raises(ValueError, match="Argument 'tmin' must be positive"):
+        _check_tmin_tmax(raw, -1, 4)
+    with pytest.raises(ValueError, match="Argument 'tmax' must be positive"):
+        _check_tmin_tmax(raw, 1, -4)
+    with pytest.raises(
+        ValueError, match="Argument 'tmax' must be strictly larger than 'tmin'"
+    ):
+        _check_tmin_tmax(raw, 3, 1)
+    with pytest.raises(
+        ValueError, match="Argument 'tmax' must be strictly larger than 'tmin'"
+    ):
+        _check_tmin_tmax(epochs, 0.3, 0.1)
+    with pytest.raises(
+        ValueError, match="Argument 'tmin' must be shorter than"
+    ):
+        _check_tmin_tmax(raw, 6, None)
+    with pytest.raises(
+        ValueError, match="Argument 'tmin' must be shorter than"
+    ):
+        _check_tmin_tmax(epochs, 2, None)
