@@ -122,7 +122,9 @@ def test_n_resamples_n_samples_coverage_errors():
     with pytest.raises(ValueError, match="'n_resamples', at least one of"):
         resample(raw, n_resamples=10, replace=False)
     with pytest.raises(ValueError, match="'n_resamples', only one of"):
-        resample(raw, n_resamples=10, n_samples=50, coverage=0.2, replace=False)
+        resample(
+            raw, n_resamples=10, n_samples=50, coverage=0.2, replace=False
+        )
     with pytest.raises(ValueError, match="'coverage' must respect"):
         resample(raw, n_resamples=10, coverage=1.2, replace=False)
     with pytest.raises(
