@@ -1,4 +1,4 @@
-"""Vizualisation module for plotting cluster centers."""
+"""Visualisation module for plotting cluster centers."""
 
 from typing import List, Optional
 

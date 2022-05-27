@@ -92,7 +92,7 @@ def standardize(raw: BaseRaw):
     -----
     If you don't want to interpolate missing channels, you can use
     :func:`mne.channels.equalize_channels` instead to have same electrodes
-    accross recordings.
+    across recordings.
     """
     raw = raw.copy()
     n_chan = raw.info["nchan"]

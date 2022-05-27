@@ -114,7 +114,7 @@ def _extract_gfp_peaks(
     Parameters
     ----------
     data : array of shape (n_channels, n_samples)
-        The data to extrat GFP peaks from.
+        The data to extract GFP peaks from.
     min_peak_distance : int
         Required minimal horizontal distance (>= 1) in samples between
         neighboring peaks. Smaller peaks are removed first until the condition

@@ -1,4 +1,4 @@
-"""Module dedicated to exemple datasets."""
+"""Module dedicated to example datasets."""
 
 from . import lemon
 

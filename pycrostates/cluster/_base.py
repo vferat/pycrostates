@@ -414,7 +414,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         ],
     ):
         """
-        Invert map polarities for vizualisation purposes. Operates in-place.
+        Invert map polarities for visualisation purposes. Operates in-place.
 
         Parameters
         ----------
@@ -804,7 +804,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         half_window_size: int,
     ) -> NDArray[int]:
         """
-        Apply smooting. Adapted from [1].
+        Apply smoothing. Adapted from [1].
 
         References
         ----------

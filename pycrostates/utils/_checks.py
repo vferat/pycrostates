@@ -246,7 +246,7 @@ def _check_reject_by_annotation(reject_by_annotation: bool) -> bool:
 
 
 def _check_tmin_tmax(inst, tmin, tmax):
-    """Check tmin/tmax compared to the provided instnace."""
+    """Check tmin/tmax compared to the provided instance."""
     _check_type(tmin, (None, "numeric"), item_name="tmin")
     _check_type(tmax, (None, "numeric"), item_name="tmax")
 
