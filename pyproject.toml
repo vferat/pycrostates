@@ -72,6 +72,11 @@ tracker = "https://github.com/vferat/pycrostates/issues"
 [tool.setuptools]
 include-package-data = true
 
+[tool.setuptools.packages.find]
+where = ["pycrostates"]
+include = ["pycrostates*"]
+exclude = ["^.*tests"]
+
 [tool.black]
 line-length = 79
 target-version = ['py37']
