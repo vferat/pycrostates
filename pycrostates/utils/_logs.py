@@ -8,7 +8,7 @@ from decorator import FunctionMaker
 from ._checks import _check_type
 from ._docs import fill_doc
 
-logger = logging.getLogger(__package__.split(".utils")[0])
+logger = logging.getLogger(__package__.split(".utils", maxsplit=1)[0])
 logger.propagate = False  # don't propagate (in case of multiple imports)
 
 
