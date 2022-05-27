@@ -46,7 +46,8 @@ dependencies = [
     'pooch',
     'decorator',
     'jinja2',
-    'importlib-metadata; python_version < "3.8"'
+    'importlib-metadata; python_version < "3.8"',
+    'importlib-resources; python_version < "3.9"'
 ]
 
 [project.optional-dependencies]
