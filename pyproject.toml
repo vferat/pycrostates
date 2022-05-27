@@ -50,7 +50,7 @@ dependencies = [
 
 [project.optional-dependencies]
 style = ['black', 'codespell', 'isort', 'flake8', 'pydocstyle[toml]']
-test = ['pytest==7.0.1', 'pytest-cov']
+test = ['pytest==7.0.1', 'pytest-azurepipelines', 'pytest-cov']
 build = ['build', 'twine']
 all = [
     'black',
@@ -60,6 +60,7 @@ all = [
     'flake8',
     'pydocstyle[toml]',
     'pytest==7.0.1',
+    'pytest-azurepipelines',
     'pytest-cov',
     'twine'
 ]
