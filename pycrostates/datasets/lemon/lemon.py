@@ -2,12 +2,11 @@
 
 import os
 
-import mne
 import numpy as np
 import pkg_resources as pkr
 import pooch
 from mne import create_info
-from mne.io import BaseRaw
+from mne.io import BaseRaw, RawArray
 
 from ...utils._checks import _check_type, _check_value
 from ...utils._config import get_config
@@ -36,7 +35,7 @@ def load_data(subject_id: str, condition: str):
     Returns
     -------
     path : str
-        path to local copy of the requested recording .
+        path to local copy of the requested recording.
 
     References
     ----------
@@ -119,7 +118,7 @@ def standardize(raw: BaseRaw):
         info = create_info(
             ch_names=ch_names, ch_types=ch_types, sfreq=raw.info["sfreq"]
         )
-        raw = mne.io.RawArray(data=data, info=info)
+        raw = RawArray(data=data, info=info)
         raw.info["bads"].extend(missing_channels)
 
     raw.reorder_channels(standard_channels)
