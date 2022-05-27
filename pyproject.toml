@@ -75,7 +75,6 @@ tracker = 'https://github.com/vferat/pycrostates/issues'
 include-package-data = true
 
 [tool.setuptools.packages.find]
-where = ['pycrostates']
 include = ['pycrostates*']
 exclude = ['^.*tests']
 
