@@ -10,7 +10,6 @@ from mne.io import BaseRaw
 
 from ...utils._checks import _check_type, _check_value
 from ...utils._config import get_config
-from ...utils._imports import import_optional_dependency
 
 
 def load_data(subject_id: str, condition: str):
@@ -44,17 +43,10 @@ def load_data(subject_id: str, condition: str):
            A mind-brain-body dataset of MRI, EEG, cognition, emotion,
            and peripheral physiology in young and old adults. Sci Data 6, 180308 (2019).
            https://doi.org/10.1038/sdata.2018.308
-    """  # noqa
+    """
     _check_type(subject_id, (str,), "subject_id")
     _check_type(condition, (str,), "condition")
     _check_value(condition, ("EO", "EC"), "condition")
-
-    import_optional_dependency(
-        "pymatreader",
-        extra="pymatreader is needed to load the EEGLAB .set files from the "
-        "lemon dataset.",
-        raise_error=False,
-    )
 
     config = get_config()
     path = config["PREPROCESSED_LEMON_DATASET_PATH"]
