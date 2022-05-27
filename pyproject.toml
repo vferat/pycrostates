@@ -19,6 +19,7 @@ maintainers = [
 keywords = [
     'python',
     'neuroscience',
+    'eeg',
     'microstates'
 ]
 classifiers = [
