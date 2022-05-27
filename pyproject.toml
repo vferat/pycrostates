@@ -63,7 +63,7 @@ docs = [
     'sphinx_gallery'
 ]
 style = ['black', 'codespell', 'isort', 'flake8', 'pydocstyle[toml]']
-test = ['pytest==7.0.1', 'pytest-azurepipelines', 'pytest-cov']
+test = ['pymatreader', 'pytest==7.0.1', 'pytest-azurepipelines', 'pytest-cov']
 all = [
     'black',
     'build',
