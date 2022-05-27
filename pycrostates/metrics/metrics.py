@@ -152,6 +152,7 @@ def _davies_bouldin_score(X, labels):
     scores = np.max(combined_intra_dists / centroid_distances, axis=1)
     return np.mean(scores)
 
+
 @fill_doc
 def davies_bouldin(cluster):  # lower the better
     """Compute the Davies-Bouldin score.
@@ -240,6 +241,7 @@ def _dunn_score(X, labels):  # higher the better
 
     di = np.min(deltas) / np.max(big_deltas)
     return di
+
 
 @fill_doc
 def dunn(cluster):  # higher the better
