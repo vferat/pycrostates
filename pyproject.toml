@@ -10,17 +10,19 @@ readme = 'README.md'
 license = {file = 'LICENSE'}
 requires-python = '>=3.7'
 authors = [
-    {name = 'Victor Férat', email = 'victor.ferat@unige.ch'}
+    {name = 'Victor Férat', email = 'victor.ferat@unige.ch'},
 ]
 maintainers = [
     {name = 'Victor Férat', email = 'victor.ferat@unige.ch'},
-    {name = 'Mathieu Scheltienne', email = 'mathieu.scheltienne@fcbg.ch'}
+    {name = 'Mathieu Scheltienne', email = 'mathieu.scheltienne@fcbg.ch'},
 ]
 keywords = [
     'python',
     'neuroscience',
+    'neuroimaging',
     'eeg',
-    'microstates'
+    'microstates',
+    'brain',
 ]
 classifiers = [
     'Operating System :: Microsoft :: Windows',
@@ -34,7 +36,7 @@ classifiers = [
     'Natural Language :: English',
     'License :: OSI Approved :: BSD License',
     'Intended Audience :: Science/Research',
-    'Topic :: Scientific/Engineering'
+    'Topic :: Scientific/Engineering',
 ]
 dependencies = [
     'numpy>=1.20.0',
@@ -47,7 +49,7 @@ dependencies = [
     'decorator',
     'jinja2',
     'importlib-metadata; python_version < "3.8"',
-    'importlib-resources; python_version < "3.9"'
+    'importlib-resources; python_version < "3.9"',
 ]
 
 [project.optional-dependencies]
@@ -62,21 +64,22 @@ docs = [
     'pymatreader',
     'recommonmark',
     'sphinx',
-    'sphinx_gallery'
+    'sphinx_gallery',
 ]
-style = ['black', 'codespell', 'isort', 'flake8', 'pydocstyle[toml]']
-test = ['pymatreader', 'pytest==7.0.1', 'pytest-azurepipelines', 'pytest-cov']
-all = [
+style = [
     'black',
-    'build',
     'codespell',
     'isort',
     'flake8',
     'pydocstyle[toml]',
+]
+test = [
+    'pymatreader',
     'pytest==7.0.1',
     'pytest-azurepipelines',
     'pytest-cov',
-    'twine',
+]
+all = [
     'm2r2',
     'nbsphinx',
     'numpydoc',
@@ -86,7 +89,16 @@ all = [
     'pymatreader',
     'recommonmark',
     'sphinx',
-    'sphinx_gallery'
+    'sphinx_gallery',
+    'black',
+    'codespell',
+    'isort',
+    'flake8',
+    'pydocstyle[toml]',
+    'pymatreader',
+    'pytest==7.0.1',
+    'pytest-azurepipelines',
+    'pytest-cov',
 ]
 
 [project.urls]
