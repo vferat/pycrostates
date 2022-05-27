@@ -13,7 +13,7 @@ from ...utils._checks import _check_type, _check_value
 from ...utils._config import get_config
 
 
-def data_path(subject_id: str, condition: str):
+def data_path(subject_id: str, condition: str) -> Path:
     """
     Get path to local copy of preprocessed EEG recording from the LEMON dataset.
 
@@ -35,8 +35,8 @@ def data_path(subject_id: str, condition: str):
 
     Returns
     -------
-    path : str
-        path to local copy of the requested recording.
+    path : Path
+        Path to a local copy of the requested recording.
 
     References
     ----------
