@@ -8,6 +8,7 @@ trigger:
 
 jobs:
 - job: Linux
+  timeoutInMinutes: 30
   pool:
    vmImage: 'ubuntu-latest'
   strategy:
@@ -24,6 +25,7 @@ jobs:
     - template: azure-pipelines-steps.yml
 
 - job: Windows
+  timeoutInMinutes: 30
   pool:
    vmImage: 'windows-latest'
   strategy:
@@ -40,6 +42,7 @@ jobs:
     - template: azure-pipelines-steps.yml
 
 - job: macOS
+  timeoutInMinutes: 30
   pool:
    vmImage: 'macOS-latest'
   strategy:
@@ -56,6 +59,7 @@ jobs:
     - template: azure-pipelines-steps.yml
 
 - job: Linux_MNE_dev
+  timeoutInMinutes: 30
   pool:
    vmImage: 'ubuntu-latest'
   strategy:
