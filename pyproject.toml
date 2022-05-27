@@ -49,9 +49,21 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+build = ['build', 'twine']
+docs = [
+    'm2r2',
+    'nbsphinx',
+    'numpydoc',
+    'pandas',
+    'pillow',
+    'pydata-sphinx-theme',
+    'pymatreader',
+    'recommonmark',
+    'sphinx',
+    'sphinx_gallery'
+]
 style = ['black', 'codespell', 'isort', 'flake8', 'pydocstyle[toml]']
 test = ['pytest==7.0.1', 'pytest-azurepipelines', 'pytest-cov']
-build = ['build', 'twine']
 all = [
     'black',
     'build',
@@ -62,7 +74,17 @@ all = [
     'pytest==7.0.1',
     'pytest-azurepipelines',
     'pytest-cov',
-    'twine'
+    'twine',
+    'm2r2',
+    'nbsphinx',
+    'numpydoc',
+    'pandas',
+    'pillow',
+    'pydata-sphinx-theme',
+    'pymatreader',
+    'recommonmark',
+    'sphinx',
+    'sphinx_gallery'
 ]
 
 [project.urls]
