@@ -22,7 +22,7 @@ raw.set_eeg_reference('average')
 #%%
 # We can then use the :func:`~pycrostates.preprocessing.extract_gfp_peaks`
 # function to extract samples with highest global field power.
-# The min_peak_distance allow to select the minimum number of sample beween 2
+# The min_peak_distance allow to select the minimum number of sample between 2
 # selected peaks.
 
 from pycrostates.preprocessing import extract_gfp_peaks
