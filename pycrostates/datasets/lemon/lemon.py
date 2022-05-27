@@ -1,10 +1,13 @@
 """Functions to use the LEMON dataset."""
 
-import os
+try:
+    from importlib.resources import files  # type: ignore
+except ImportError:
+    from importlib_resources import files  # type: ignore
+
 from pathlib import Path
 
 import numpy as np
-import pkg_resources as pkr
 import pooch
 from mne import create_info
 from mne.io import BaseRaw, RawArray
@@ -50,18 +53,16 @@ def data_path(subject_id: str, condition: str) -> Path:
     _check_value(condition, ("EO", "EC"), "condition")
 
     config = get_config()
-    path = config["PREPROCESSED_LEMON_DATASET_PATH"]
     fetcher = pooch.create(
-        path=path,
+        path=config["PREPROCESSED_LEMON_DATASET_PATH"],
         base_url="https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Preprocessed_BIDS_ID/EEG_Preprocessed/",  # noqa,
         version=None,
         registry=None,
     )
-    registry = pkr.resource_stream(
-        "pycrostates",
-        os.path.join(
-            "datasets", "lemon", "data", "PREPROCESSED_LEMON_registry.txt"
-        ),
+    registry = str(
+        files("pycrostates.datasets.lemon").joinpath(
+            "data/PREPROCESSED_LEMON_registry.txt"
+        )
     )
     fetcher.load_registry(registry)
 
