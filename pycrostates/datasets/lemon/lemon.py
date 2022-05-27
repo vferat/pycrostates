@@ -6,6 +6,7 @@ import mne
 import numpy as np
 import pkg_resources as pkr
 import pooch
+from mne import create_info
 from mne.io import BaseRaw
 
 from ...utils._checks import _check_type, _check_value
@@ -66,9 +67,9 @@ def load_data(subject_id: str, condition: str):
 
     filename_set = f"sub-{subject_id}_{condition}.set"
     filename_fdt = f"sub-{subject_id}_{condition}.fdt"
-    output_path_set = fetcher.fetch(filename_set)
+    path = fetcher.fetch(filename_set)
     _ = fetcher.fetch(filename_fdt)
-    return output_path_set
+    return path
 
 
 def standardize(raw: BaseRaw):
@@ -95,83 +96,32 @@ def standardize(raw: BaseRaw):
     across recordings.
     """
     raw = raw.copy()
-    n_chan = raw.info["nchan"]
+    # fmt: off
     standard_channels = [
-        "Fp1",
-        "Fp2",
-        "F7",
-        "F3",
-        "Fz",
-        "F4",
-        "F8",
-        "FC5",
-        "FC1",
-        "FC2",
-        "FC6",
-        "T7",
-        "C3",
-        "Cz",
-        "C4",
-        "T8",
-        "CP5",
-        "CP1",
-        "CP2",
-        "CP6",
-        "AFz",
-        "P7",
-        "P3",
-        "Pz",
-        "P4",
-        "P8",
-        "PO9",
-        "O1",
-        "Oz",
-        "O2",
-        "PO10",
-        "AF7",
-        "AF3",
-        "AF4",
-        "AF8",
-        "F5",
-        "F1",
-        "F2",
-        "F6",
-        "FT7",
-        "FC3",
-        "FC4",
-        "FT8",
-        "C5",
-        "C1",
-        "C2",
-        "C6",
-        "TP7",
-        "CP3",
-        "CPz",
-        "CP4",
-        "TP8",
-        "P5",
-        "P1",
-        "P2",
-        "P6",
-        "PO7",
-        "PO3",
-        "POz",
-        "PO4",
-        "PO8",
+        "Fp1", "Fp2", "F7", "F3", "Fz", "F4", "F8", "FC5",
+        "FC1", "FC2", "FC6", "T7", "C3", "Cz", "C4", "T8",
+        "CP5", "CP1", "CP2", "CP6", "AFz", "P7", "P3", "Pz",
+        "P4", "P8", "PO9", "O1", "Oz", "O2", "PO10", "AF7",
+        "AF3", "AF4", "AF8", "F5", "F1", "F2", "F6", "FT7",
+        "FC3", "FC4", "FT8", "C5", "C1", "C2", "C6", "TP7",
+        "CP3", "CPz", "CP4", "TP8", "P5", "P1", "P2", "P6",
+        "PO7", "PO3", "POz", "PO4", "PO8",
     ]
+    # fmt: on
     missing_channels = list(set(standard_channels) - set(raw.info["ch_names"]))
-    missing_data = np.zeros((len(missing_channels), raw.n_times))
-    missing_types = ["eeg"] * len(missing_channels)
 
-    full_data = np.vstack([raw.get_data(), missing_data])
-    full_ch_names = raw.info["ch_names"] + missing_channels
-    full_ch_types = [mne.channel_type(raw.info, idx) for idx in range(n_chan)]
-    full_ch_types += missing_types
-    info = mne.create_info(
-        ch_names=full_ch_names, ch_types=full_ch_types, sfreq=raw.info["sfreq"]
-    )
-    raw = mne.io.RawArray(data=full_data, info=info)
-    raw.info["bads"].extend(missing_channels)
+    if len(missing_channels) != 0:
+        # add the missing channels as bads (array of zeros)
+        missing_data = np.zeros((len(missing_channels), raw.n_times))
+        data = np.vstack([raw.get_data(), missing_data])
+        ch_names = raw.info["ch_names"] + missing_channels
+        ch_types = raw.get_channel_types() + ["eeg"] * len(missing_channels)
+        info = create_info(
+            ch_names=ch_names, ch_types=ch_types, sfreq=raw.info["sfreq"]
+        )
+        raw = mne.io.RawArray(data=data, info=info)
+        raw.info["bads"].extend(missing_channels)
+
     raw.reorder_channels(standard_channels)
     raw.set_montage("standard_1005")
     raw.interpolate_bads()
