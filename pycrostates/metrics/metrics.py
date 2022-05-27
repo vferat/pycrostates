@@ -7,6 +7,7 @@ from sklearn.utils import _safe_indexing, check_X_y
 
 from ..cluster._base import _BaseCluster
 from ..utils._checks import _check_type
+from ..utils._docs import fill_doc
 
 
 def _distance_matrix(X, Y=None):
@@ -19,6 +20,7 @@ def _distance_matrix(X, Y=None):
 
 
 # silhouette
+@fill_doc
 def silhouette(cluster):  # higher the better
     """
     Compute the mean Silhouette Coefficient.
@@ -30,8 +32,7 @@ def silhouette(cluster):  # higher the better
 
     Parameters
     ----------
-    cluster : :class:`pycrostate.clustering.BaseClustering`
-        Fitted clustering algorithm from which to compute score.
+    %(cluster)s
 
     Returns
     -------
@@ -66,6 +67,7 @@ def silhouette(cluster):  # higher the better
 
 
 # calinski harabasz
+@fill_doc
 def calinski_harabasz(cluster):  # higher the better
     """Compute the Calinski and Harabasz score.
 
@@ -75,8 +77,7 @@ def calinski_harabasz(cluster):  # higher the better
 
     Parameters
     ----------
-    cluster : :class:`pycrostate.clustering.BaseClustering`
-        Fitted clustering algorithm from which to compute score.
+    %(cluster)s
 
     Returns
     -------
@@ -111,6 +112,7 @@ def calinski_harabasz(cluster):  # higher the better
 
 
 # davies bouldin
+@fill_doc
 def _davies_bouldin_score(X, labels):
     """Compute the Davies-Bouldin score.
 
@@ -150,7 +152,7 @@ def _davies_bouldin_score(X, labels):
     scores = np.max(combined_intra_dists / centroid_distances, axis=1)
     return np.mean(scores)
 
-
+@fill_doc
 def davies_bouldin(cluster):  # lower the better
     """Compute the Davies-Bouldin score.
 
@@ -161,8 +163,7 @@ def davies_bouldin(cluster):  # lower the better
 
     Parameters
     ----------
-    cluster : :class:`pycrostate.clustering.BaseClustering`
-            Fitted clustering algorithm from which to compute score.
+    %(cluster)s
 
     Returns
     -------
@@ -240,14 +241,13 @@ def _dunn_score(X, labels):  # higher the better
     di = np.min(deltas) / np.max(big_deltas)
     return di
 
-
+@fill_doc
 def dunn(cluster):  # higher the better
     """Compute the Dunn index score.
 
     Parameters
     ----------
-    cluster : :class:`pycrostate.clustering.BaseClustering`
-        Fitted clustering algorithm from which to compute score.
+    %(cluster)s
 
     Returns
     -------
