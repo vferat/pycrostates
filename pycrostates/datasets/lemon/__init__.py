@@ -1,3 +1,3 @@
-from .lemon import load_data, standardize
+from .lemon import data_path, standardize
 
 __all__ = ("load_data", "standardize")

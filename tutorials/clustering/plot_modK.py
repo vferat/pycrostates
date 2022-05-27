@@ -12,7 +12,7 @@ from pycrostates.cluster import ModKMeans
 from pycrostates.datasets import lemon
 
 
-raw_fname = lemon.load_data(subject_id='010017', condition='EC')
+raw_fname = lemon.data_path(subject_id='010017', condition='EC')
 raw = read_raw_eeglab(raw_fname, preload=True)
 raw.crop(0, 30)
 

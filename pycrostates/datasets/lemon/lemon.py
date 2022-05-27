@@ -1,6 +1,7 @@
 """Functions to use the LEMON dataset."""
 
 import os
+from pathlib import Path
 
 import numpy as np
 import pkg_resources as pkr
@@ -12,7 +13,7 @@ from ...utils._checks import _check_type, _check_value
 from ...utils._config import get_config
 
 
-def load_data(subject_id: str, condition: str):
+def data_path(subject_id: str, condition: str):
     """
     Get path to local copy of preprocessed EEG recording from the LEMON dataset.
 
@@ -68,7 +69,7 @@ def load_data(subject_id: str, condition: str):
     filename_fdt = f"sub-{subject_id}_{condition}.fdt"
     path = fetcher.fetch(filename_set)
     _ = fetcher.fetch(filename_fdt)
-    return path
+    return Path(path)
 
 
 def standardize(raw: BaseRaw):
@@ -121,6 +122,7 @@ def standardize(raw: BaseRaw):
         raw = RawArray(data=data, info=info)
         raw.info["bads"].extend(missing_channels)
 
+    raw.add_reference_channels("FCz")
     raw.reorder_channels(standard_channels)
     raw.set_montage("standard_1005")
     raw.interpolate_bads()
