@@ -26,7 +26,7 @@ raw.pick("eeg")
 raw.set_eeg_reference("average")
 
 #%%
-# In this exemple, we will used the [Silhouette Coefficient](https://doi.org/10.1016/0377-0427(87)90125-7)
+# In this example, we will used the [Silhouette Coefficient](https://doi.org/10.1016/0377-0427(87)90125-7)
 # to evaluate the
 # Pycrostates implementations relies on sklearn implementation
 # while ensuring that the metric used for distance computations is
