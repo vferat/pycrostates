@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from copy import copy, deepcopy
 from itertools import groupby
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from matplotlib.axes import Axes
@@ -44,7 +44,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self._labels_ = None
         self._fitted = False
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # noqa: D401
+        """String representation."""
         name = self.__class__.__name__
         if self.fitted:
             s = f"<{name} | fitted on n = {self.n_clusters} cluster centers>"
@@ -53,6 +54,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         return s
 
     def _repr_html_(self, caption=None):
+        """HTML representation."""
         from ..html_templates import repr_templates_env
 
         template = repr_templates_env.get_template("BaseCluster.html.jinja")
@@ -78,7 +80,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             ch_repr=ch_repr,
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         """Equality == method."""
         if isinstance(other, _BaseCluster):
             # check fit
@@ -134,7 +136,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         else:
             return False
 
-    def __ne__(self, other):
+    def __ne__(self, other: Any) -> bool:
         """Different != method."""
         return not self.__eq__(other)
 
@@ -414,7 +416,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         ],
     ):
         """
-        Invert map polarities for vizualisation purposes. Operates in-place.
+        Invert map polarities for visualisation purposes. Operates in-place.
 
         Parameters
         ----------
@@ -804,7 +806,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         half_window_size: int,
     ) -> NDArray[int]:
         """
-        Apply smooting. Adapted from [1].
+        Apply smoothing. Adapted from [1].
 
         References
         ----------

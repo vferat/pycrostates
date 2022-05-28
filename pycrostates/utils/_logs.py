@@ -1,6 +1,5 @@
 import logging
 import sys
-from pathlib import Path
 from typing import Any, Callable, TypeVar
 
 import mne
@@ -9,8 +8,7 @@ from decorator import FunctionMaker
 from ._checks import _check_type
 from ._docs import fill_doc
 
-name = Path(__file__).parent.parent.name
-logger = logging.getLogger(name)
+logger = logging.getLogger(__package__.split(".utils", maxsplit=1)[0])
 logger.propagate = False  # don't propagate (in case of multiple imports)
 
 
@@ -61,7 +59,7 @@ def add_file_handler(fname, mode="a", verbose="INFO"):
     ----------
     fname : str | Path
     mode : str
-        Mode in which the file is openned.
+        Mode in which the file is opened.
     verbose : int | str
         Handler verbosity.
     """

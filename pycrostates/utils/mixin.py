@@ -34,7 +34,7 @@ class ContainsMixin(MNEContainsMixin):
 
     def __getattribute__(self, name):
         """Attribute getter."""
-        # check if the attribute requies a .info to work
+        # check if the attribute requires a .info to work
         _req_info = (
             "compensation_grade",
             "get_channel_types",
@@ -69,7 +69,7 @@ class ContainsMixin(MNEContainsMixin):
 class MontageMixin(MNEMontageMixin):
     def __getattribute__(self, name):
         """Attribute getter."""
-        # check if the attribute requies a .info to work
+        # check if the attribute requires a .info to work
         _req_info = (
             "get_montage",
             "set_montage",

@@ -12,7 +12,7 @@ from pycrostates.cluster import ModKMeans
 from pycrostates.datasets import lemon
 
 
-raw_fname = lemon.load_data(subject_id='010017', condition='EC')
+raw_fname = lemon.data_path(subject_id='010017', condition='EC')
 raw = read_raw_eeglab(raw_fname, preload=True)
 raw.crop(0, 30)
 
@@ -20,7 +20,7 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# The modified Kmeans can be instanciated with the number of cluster centers
+# The modified Kmeans can be instantiated with the number of cluster centers
 # ``n_clusters`` to compute. By default, the modified Kmeans will only work
 # with EEG data, but this can be modified thanks to the ``picks`` parameter.
 # A random_state can be defined during class definition in order to have
