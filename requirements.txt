@@ -1,9 +1,0 @@
-numpy>=1.20.0
-scipy
-mne>=1.0.0
-joblib
-matplotlib
-sklearn
-pooch
-decorator
-jinja2

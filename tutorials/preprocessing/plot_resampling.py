@@ -11,7 +11,7 @@ from mne.io import read_raw_eeglab
 from pycrostates.datasets import lemon
 
 
-raw_fname = lemon.load_data(subject_id='010004', condition='EC')
+raw_fname = lemon.data_path(subject_id='010004', condition='EC')
 raw = read_raw_eeglab(raw_fname, preload=True)
 raw.crop(0, 30)
 
@@ -21,7 +21,7 @@ raw.set_eeg_reference('average')
 #%%
 # We can now use the :func:`~pycrostates.preprocessing.resample`function to
 # draw n_resamples of n_samples for our recording where n_sample defines the
-# number of sample cointained in each epoch and n_resamples defines the number of
+# number of sample contained in each epoch and n_resamples defines the number of
 # epochs to draw.
 
 from pycrostates.preprocessing import resample
@@ -30,8 +30,8 @@ resamples
 
 #%%
 # We can also use the 'coverage' parameter to automatically compute one of the
-# two preivous parameters based on the amount of original data we want to
-# cover. For exemple by setting n_resamples and coverage:
+# two previous parameters based on the amount of original data we want to
+# cover. For example by setting n_resamples and coverage:
 
 resamples = resample(raw, n_resamples=10, coverage=0.5, random_state=40)
 resamples

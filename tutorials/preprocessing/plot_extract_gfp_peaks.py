@@ -13,7 +13,7 @@ from mne.io import read_raw_eeglab
 
 from pycrostates.datasets import lemon
 
-raw_fname = lemon.load_data(subject_id='010004', condition='EC')
+raw_fname = lemon.data_path(subject_id='010004', condition='EC')
 raw = read_raw_eeglab(raw_fname, preload=True)
 
 raw.pick('eeg')
@@ -22,7 +22,7 @@ raw.set_eeg_reference('average')
 #%%
 # We can then use the :func:`~pycrostates.preprocessing.extract_gfp_peaks`
 # function to extract samples with highest global field power.
-# The min_peak_distance allow to select the minimum number of sample beween 2
+# The min_peak_distance allow to select the minimum number of sample between 2
 # selected peaks.
 
 from pycrostates.preprocessing import extract_gfp_peaks

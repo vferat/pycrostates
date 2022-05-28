@@ -1,4 +1,4 @@
-"""Vizualisation module for plotting segmentations."""
+"""Visualisation module for plotting segmentations."""
 
 from typing import List, Optional, Union
 

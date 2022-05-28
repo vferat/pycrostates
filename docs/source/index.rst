@@ -9,5 +9,4 @@ Pycrostates
    install.rst
    microstates.rst
    auto_tutorials/index
-   API/index
-
+   api/index

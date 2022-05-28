@@ -12,7 +12,6 @@
 #
 import os
 
-import pydata_sphinx_theme
 from recommonmark.transform import AutoStructify
 from sphinx_gallery.sorting import ExplicitOrder
 

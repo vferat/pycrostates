@@ -55,7 +55,7 @@ def get_config():
     Returns
     -------
     config : dict
-        Dictionnary containing all preferences as key/values pairs.
+        Dictionary containing all preferences as key/values pairs.
     """
     config_path = _get_config_path()
     if not os.path.isfile(config_path):

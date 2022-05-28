@@ -6,17 +6,15 @@ steps:
 
 - script: |
     python -m pip install --progress-bar off --upgrade pip setuptools wheel
-    pip install -r requirements.txt --progress-bar off
-    pip install -U --progress-bar off --no-deps https://github.com/mne-tools/mne-python/archive/main.zip
-    pip install -r requirements_testing.txt --progress-bar off
-
+    python -m pip install --progress-bar off .[test]
+    python -m pip uninstall -y mne
+    python -m pip install --progress-bar off --no-deps https://github.com/mne-tools/mne-python/archive/main.zip
   displayName: 'Install dependencies'
 
 - script: |
     mne sys_info -pd
-  displayName: 'Print MNE config'
+  displayName: 'Display MNE config'
 
 - script: |
-    pip install pytest-azurepipelines --progress-bar off
     pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
-  displayName: 'pytest'
+  displayName: 'Run tests'

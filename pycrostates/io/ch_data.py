@@ -1,6 +1,6 @@
 """Clas to handle no temporal but spatial data."""
 from copy import copy, deepcopy
-from typing import Union
+from typing import Any, Union
 
 import numpy as np
 from mne.io import Info
@@ -49,12 +49,14 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         self._data = data
         self._info = info if isinstance(info, ChInfo) else ChInfo(info)
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # noqa: D401
+        """String representation."""
         name = self.__class__.__name__
         s = f"< {name} | {self._data.shape[-1]} samples >"
         return s
 
     def _repr_html_(self, caption=None):
+        """HTML representation."""
         from ..html_templates import repr_templates_env
 
         template = repr_templates_env.get_template("ChData.html.jinja")
@@ -65,7 +67,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
             n_samples=self._data.shape[-1], info_repr=info_repr
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         """Equality == method."""
         if (
             isinstance(other, ChData)
@@ -77,7 +79,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         else:
             return False
 
-    def __ne__(self, other):
+    def __ne__(self, other: Any) -> bool:
         """Different != method."""
         return not self.__eq__(other)
 
@@ -97,7 +99,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         return copy(self)
 
     @fill_doc
-    def get_data(self, picks=None):
+    def get_data(self, picks=None) -> NDArray[float]:
         """Retrieve the data array.
 
         Parameters

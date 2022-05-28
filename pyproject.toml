@@ -1,3 +1,119 @@
+[build-system]
+requires = ['setuptools >= 61.0.0', 'wheel']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'pycrostates'
+version = '0.1.0.dev'
+description = 'A simple open source Python package for EEG microstate segmentation.'
+readme = 'README.md'
+license = {file = 'LICENSE'}
+requires-python = '>=3.7'
+authors = [
+    {name = 'Victor Férat', email = 'victor.ferat@unige.ch'},
+]
+maintainers = [
+    {name = 'Victor Férat', email = 'victor.ferat@unige.ch'},
+    {name = 'Mathieu Scheltienne', email = 'mathieu.scheltienne@fcbg.ch'},
+]
+keywords = [
+    'python',
+    'neuroscience',
+    'neuroimaging',
+    'eeg',
+    'microstates',
+    'brain',
+]
+classifiers = [
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: Unix',
+    'Operating System :: MacOS',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Natural Language :: English',
+    'License :: OSI Approved :: BSD License',
+    'Intended Audience :: Science/Research',
+    'Topic :: Scientific/Engineering',
+]
+dependencies = [
+    'numpy>=1.20.0',
+    'scipy',
+    'mne>=1.0.0',
+    'joblib',
+    'matplotlib',
+    'sklearn',
+    'pooch',
+    'decorator',
+    'jinja2',
+    'importlib-metadata; python_version < "3.8"',
+    'importlib-resources; python_version < "3.9"',
+]
+
+[project.optional-dependencies]
+build = ['build', 'twine']
+docs = [
+    'm2r2',
+    'nbsphinx',
+    'numpydoc',
+    'pandas',
+    'pillow',
+    'pydata-sphinx-theme',
+    'pymatreader',
+    'recommonmark',
+    'sphinx',
+    'sphinx_gallery',
+]
+style = [
+    'black',
+    'codespell',
+    'isort',
+    'flake8',
+    'pydocstyle[toml]',
+]
+test = [
+    'pymatreader',
+    'pytest==7.0.1',
+    'pytest-azurepipelines',
+    'pytest-cov',
+]
+all = [
+    'm2r2',
+    'nbsphinx',
+    'numpydoc',
+    'pandas',
+    'pillow',
+    'pydata-sphinx-theme',
+    'pymatreader',
+    'recommonmark',
+    'sphinx',
+    'sphinx_gallery',
+    'black',
+    'codespell',
+    'isort',
+    'flake8',
+    'pydocstyle[toml]',
+    'pymatreader',
+    'pytest==7.0.1',
+    'pytest-azurepipelines',
+    'pytest-cov',
+]
+
+[project.urls]
+homepage = 'https://pycrostates.readthedocs.io/en/master/'
+documentation = 'https://pycrostates.readthedocs.io/en/master/'
+source = 'https://github.com/vferat/pycrostates'
+tracker = 'https://github.com/vferat/pycrostates/issues'
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ['pycrostates*']
+exclude = ['^.*tests']
+
 [tool.black]
 line-length = 79
 target-version = ['py37']
@@ -14,7 +130,7 @@ extend-exclude = '''
 '''
 
 [tool.isort]
-profile = "black"
+profile = 'black'
 multi_line_output = 3
 line_length = 79
 py_version = 37
@@ -26,8 +142,7 @@ extend_skip_glob = [
 ]
 
 [tool.pydocstyle]
-inherit = false
 convention = 'numpy'
-ignore-decorators= 'copy_doc'
-match = '^(?!.*(setup|__init__|test_.*)).*\.py'
-match-dir = "^(?!docs|tutorials).*"
+ignore-decorators= '(copy_doc|property|.*setter|.*getter)'
+match = '^(?!setup|__init__|test_).*\.py'
+match-dir = '^(?!docs|tutorials|build|dist|\.).*'

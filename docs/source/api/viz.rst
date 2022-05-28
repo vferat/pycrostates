@@ -1,4 +1,4 @@
-Vizualisation
+Visualisation
 =============
 
 :py:mod:`pycrostates.viz`:

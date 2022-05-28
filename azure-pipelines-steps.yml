@@ -6,14 +6,12 @@ steps:
 
 - script: |
     python -m pip install --progress-bar off --upgrade pip setuptools wheel
-    pip install -r requirements.txt --progress-bar off
-    pip install -r requirements_testing.txt --progress-bar off
+    python -m pip install --progress-bar off .[test]
   displayName: 'Install dependencies'
 
 - script: |
-    pip install pytest-azurepipelines --progress-bar off
     pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
-  displayName: 'pytest'
+  displayName: 'Run tests'
 
 - task: PublishCodeCoverageResults@1
   inputs:

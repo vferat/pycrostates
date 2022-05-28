@@ -6,9 +6,10 @@
 trigger:
 - 'main'
 
-jobs: 
-- job: Build_Linux 
-  pool:  
+jobs:
+- job: Linux
+  timeoutInMinutes: 30
+  pool:
    vmImage: 'ubuntu-latest'
   strategy:
     matrix:
@@ -18,11 +19,14 @@ jobs:
         python.version: '3.8'
       Python39:
         python.version: '3.9'
-  steps: 
+      Python310:
+        python.version: '3.10'
+  steps:
     - template: azure-pipelines-steps.yml
 
-- job: Build_windows 
-  pool:  
+- job: Windows
+  timeoutInMinutes: 30
+  pool:
    vmImage: 'windows-latest'
   strategy:
     matrix:
@@ -32,11 +36,14 @@ jobs:
         python.version: '3.8'
       Python39:
         python.version: '3.9'
-  steps: 
+      Python310:
+        python.version: '3.10'
+  steps:
     - template: azure-pipelines-steps.yml
 
-- job: Build_macOS 
-  pool:  
+- job: macOS
+  timeoutInMinutes: 30
+  pool:
    vmImage: 'macOS-latest'
   strategy:
     matrix:
@@ -46,15 +53,18 @@ jobs:
         python.version: '3.8'
       Python39:
         python.version: '3.9'
-  steps: 
+      Python310:
+        python.version: '3.10'
+  steps:
     - template: azure-pipelines-steps.yml
 
-- job: Build_Linux_MNE_dev
-  pool:  
+- job: Linux_MNE_dev
+  timeoutInMinutes: 30
+  pool:
    vmImage: 'ubuntu-latest'
   strategy:
     matrix:
       Python39:
         python.version: '3.9'
-  steps: 
+  steps:
     - template: azure-pipelines-steps-mne.yml
