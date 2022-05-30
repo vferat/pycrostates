@@ -7,7 +7,7 @@ number of clusters centers k to use.
 It is important to note that there is no single solution to this choice.
 It will always be a trade off between the quality of the clustering,
 the possibility to analyze the microstates in the light of the literature
-and the variance expressed by the decomposition
+and the variance expressed by the decomposition.
 """
 
 #%%
@@ -49,10 +49,10 @@ for k in cluster_numbers:
 
     calinski_harabasz_score = calinski_harabasz(ModK)
     calinski_harabasz_scores.append(calinski_harabasz_score)
-    
+
     dunn_score = dunn(ModK)
     dunn_scores.append(dunn_score)
-    
+
     davies_bouldin_score = davies_bouldin(ModK)
     davies_bouldin_scores.append(davies_bouldin_score)
 #%%
@@ -61,7 +61,7 @@ import matplotlib.pyplot as plt
 plt.figure()
 plt.scatter(cluster_numbers, silhouette_scores)
 plt.xlabel('n_clusters')
-plt.ylabel('Silhouette score') 
+plt.ylabel('Silhouette score')
 plt.show()
 #%%
 # calinski_harabasz
@@ -69,7 +69,7 @@ import matplotlib.pyplot as plt
 plt.figure()
 plt.scatter(cluster_numbers, calinski_harabasz_scores)
 plt.xlabel('n_clusters')
-plt.ylabel('calinski_harabasz score') 
+plt.ylabel('calinski_harabasz score')
 plt.show()
 #%%
 # dunn
@@ -77,7 +77,7 @@ import matplotlib.pyplot as plt
 plt.figure()
 plt.scatter(cluster_numbers, dunn_scores)
 plt.xlabel('n_clusters')
-plt.ylabel('dunn score') 
+plt.ylabel('dunn score')
 plt.show()
 #%%
 # davies_bouldin
@@ -85,5 +85,5 @@ import matplotlib.pyplot as plt
 plt.figure()
 plt.scatter(cluster_numbers, davies_bouldin_scores)
 plt.xlabel('n_clusters')
-plt.ylabel('davies_bouldin score') 
+plt.ylabel('davies_bouldin score')
 plt.show()
