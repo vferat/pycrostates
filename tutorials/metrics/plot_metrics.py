@@ -34,7 +34,7 @@ raw.set_eeg_reference("average")
 # - The Dunn score (higher the better)
 # - The Davies Bouldin score (lower the better)
 #
-# We can apply theses metrics on clustering solution
+# We can apply these metrics on clustering solution
 # computed with different values of n_clusters and
 # analyse which give the best clsutering solution. 
 from pycrostates.metrics import (
