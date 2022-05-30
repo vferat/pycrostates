@@ -13,6 +13,7 @@ and the variance expressed by the decomposition.
 #%%
 # We first start by importing some EEG data
 
+import matplotlib.pyplot as plt
 from mne.io import read_raw_eeglab
 
 from pycrostates.cluster import ModKMeans
@@ -26,12 +27,14 @@ raw.pick("eeg")
 raw.set_eeg_reference("average")
 
 #%%
-# In this example, we will used the [Silhouette Coefficient](https://doi.org/10.1016/0377-0427(87)90125-7)
-# to evaluate the
+# In this example, we will used the
+# [Silhouette Coefficient](https://doi.org/10.1016/0377-0427(87)90125-7) to
+# evaluate the
 # Pycrostates implementations relies on sklearn implementation
 # while ensuring that the metric used for distance computations is
 # the opposite value of the absolute spatial correlation.
-# More details can be found in [sklearn User Guide] (https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html#sklearn.metrics.silhouette_score)
+# More details can be found on the [sklearn User Guide](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html#sklearn.metrics.silhouette_score)
+
 from pycrostates.metrics import silhouette, calinski_harabasz, dunn, davies_bouldin
 
 cluster_numbers = range(2,12)
@@ -55,35 +58,38 @@ for k in cluster_numbers:
 
     davies_bouldin_score = davies_bouldin(ModK)
     davies_bouldin_scores.append(davies_bouldin_score)
+
 #%%
-# Silhouette
-import matplotlib.pyplot as plt
+# Silhouette score
+
 plt.figure()
 plt.scatter(cluster_numbers, silhouette_scores)
 plt.xlabel('n_clusters')
 plt.ylabel('Silhouette score')
 plt.show()
+
 #%%
-# calinski_harabasz
-import matplotlib.pyplot as plt
-plt.figure()
+# Calinski Harabasz score
+
 plt.scatter(cluster_numbers, calinski_harabasz_scores)
 plt.xlabel('n_clusters')
-plt.ylabel('calinski_harabasz score')
+plt.ylabel('Calinski Harabasz score')
 plt.show()
+
 #%%
-# dunn
-import matplotlib.pyplot as plt
+# Dunn score
+
 plt.figure()
 plt.scatter(cluster_numbers, dunn_scores)
 plt.xlabel('n_clusters')
-plt.ylabel('dunn score')
+plt.ylabel('Dunn score')
 plt.show()
+
 #%%
-# davies_bouldin
-import matplotlib.pyplot as plt
+# Davies Bouldin
+
 plt.figure()
 plt.scatter(cluster_numbers, davies_bouldin_scores)
 plt.xlabel('n_clusters')
-plt.ylabel('davies_bouldin score')
+plt.ylabel('Davies Bouldin score')
 plt.show()
