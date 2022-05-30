@@ -11,8 +11,8 @@ Metrics
 
 .. autosummary::
    :toctree: generated/
-   
-   metrics.silhouette
-   metrics.calinski_harabasz
-   metrics.davies_bouldin
-   metrics.dunn
+
+   metrics.silhouette_score
+   metrics.calinski_harabasz_score
+   metrics.davies_bouldin_score
+   metrics.dunn_score

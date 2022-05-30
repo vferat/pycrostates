@@ -35,7 +35,12 @@ raw.set_eeg_reference("average")
 # the opposite value of the absolute spatial correlation.
 # More details can be found on the [sklearn User Guide](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html#sklearn.metrics.silhouette_score)
 
-from pycrostates.metrics import silhouette, calinski_harabasz, dunn, davies_bouldin
+from pycrostates.metrics import (
+    silhouette_score,
+    calinski_harabasz_score,
+    dunn_score,
+    davies_bouldin_score,
+)
 
 cluster_numbers = range(2,12)
 silhouette_scores = []
@@ -46,18 +51,14 @@ davies_bouldin_scores = []
 for k in cluster_numbers:
     ModK = ModKMeans(n_clusters=k, random_state=42)
     ModK.fit(raw, n_jobs=12)
-
-    silhouette_score = silhouette(ModK)
-    silhouette_scores.append(silhouette_score)
-
-    calinski_harabasz_score = calinski_harabasz(ModK)
-    calinski_harabasz_scores.append(calinski_harabasz_score)
-
-    dunn_score = dunn(ModK)
-    dunn_scores.append(dunn_score)
-
-    davies_bouldin_score = davies_bouldin(ModK)
-    davies_bouldin_scores.append(davies_bouldin_score)
+    # silhouettee
+    silhouette_scores.append(silhouette_score(ModK))
+    # calinski and harabasz
+    calinski_harabasz_scores.append(calinski_harabasz_score(ModK))
+    # dunn
+    dunn_scores.append(dunn_score(ModK))
+    # davies bouldin
+    davies_bouldin_scores.append(davies_bouldin_score(ModK))
 
 #%%
 # Silhouette score
