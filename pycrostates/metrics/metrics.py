@@ -13,13 +13,11 @@ from ..utils._docs import fill_doc
 def _distance_matrix(X, Y=None):
     distances = np.abs(1 / np.corrcoef(X, Y)) - 1
     distances = np.nan_to_num(
-        distances, copy=False, nan=10e300, posinf=10e300, neginf=-10e300
+        distances, copy=False, nan=10e300, posinf=1e300, neginf=-1e300
     )
-    # TODO: Sure about the 10e300? That's 1e301.
     return distances
 
 
-# silhouette
 @fill_doc
 def silhouette(cluster):  # higher the better
     """
@@ -27,8 +25,8 @@ def silhouette(cluster):  # higher the better
 
     This function is a proxy function for
     :func:`sklearn.metrics.silhouette_score` that applies directly to a fitted
-    :class:´pycrostate.clustering.BaseClustering´. It uses the absolute spatial
-    correlation for distance computations.
+    :ref:`Clustering` instance. It uses the absolute spatial correlation for
+    distance computations.
 
     Parameters
     ----------
@@ -37,7 +35,7 @@ def silhouette(cluster):  # higher the better
     Returns
     -------
     silhouette : float
-        Mean Silhouette Coefficient.
+        The mean Silhouette Coefficient.
 
     Notes
     -----
@@ -66,14 +64,13 @@ def silhouette(cluster):  # higher the better
     return silhouette
 
 
-# calinski harabasz
 @fill_doc
 def calinski_harabasz(cluster):  # higher the better
     """Compute the Calinski and Harabasz score.
 
     This function is a proxy function for
     :func:`sklearn.metrics.calinski_harabasz_score` that applies directly to a
-    fitted :class:`pycrostate.clustering.BaseClustering`.
+    fitted :ref:`Clustering` instance.
 
     Parameters
     ----------
@@ -112,16 +109,15 @@ def calinski_harabasz(cluster):  # higher the better
 
 
 # davies bouldin
-@fill_doc
 def _davies_bouldin_score(X, labels):
     """Compute the Davies-Bouldin score.
 
     Parameters
     ----------
-    X : array-like of shape (n_samples, n_features)
+    X : array of shape (n_samples, n_features)
         A list of ``n_features``-dimensional data points. Each row corresponds
         to a single data point.
-    labels : array-like of shape (n_samples,)
+    labels : array of shape (n_samples,)
         Predicted labels for each sample.
 
     Returns
@@ -159,8 +155,8 @@ def davies_bouldin(cluster):  # lower the better
 
     This function is a proxy function for
     :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a
-    fitted :class:`pycrostate.clustering.BaseClustering`. It uses the absolute
-    spatial correlation for distance computations.
+    fitted :ref:`Clustering` instance. It uses the absolute spatial correlation
+    for distance computations.
 
     Parameters
     ----------
