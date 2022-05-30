@@ -1,3 +1,5 @@
+"""Dunn score."""
+
 import numpy as np
 
 from ..cluster._base import _BaseCluster

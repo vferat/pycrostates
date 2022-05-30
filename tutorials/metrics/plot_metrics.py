@@ -27,14 +27,16 @@ raw.pick("eeg")
 raw.set_eeg_reference("average")
 
 #%%
-# In this example, we will used the
-# [Silhouette Coefficient](https://doi.org/10.1016/0377-0427(87)90125-7) to
-# evaluate the
-# Pycrostates implementations relies on sklearn implementation
-# while ensuring that the metric used for distance computations is
-# the opposite value of the absolute spatial correlation.
-# More details can be found on the [sklearn User Guide](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html#sklearn.metrics.silhouette_score)
-
+# Pycrostates implements several metrics to evaluate the quality of
+# clustering solutions without knowing the ground truth:
+# - The silhouette score (higher the better)
+# - The Calinski Harabasz score (higher the better)
+# - The Dunn score (higher the better)
+# - The Davies Bouldin score (lower the better)
+#
+# We can apply theses metrics on clustering solution
+# computed with different values of n_clusters and
+# analyse which give the best clsutering solution. 
 from pycrostates.metrics import (
     silhouette_score,
     calinski_harabasz_score,
@@ -42,7 +44,7 @@ from pycrostates.metrics import (
     davies_bouldin_score,
 )
 
-cluster_numbers = range(2,12)
+cluster_numbers = range(2,10)
 silhouette_scores = []
 calinski_harabasz_scores = []
 dunn_scores = []
@@ -94,3 +96,11 @@ plt.scatter(cluster_numbers, davies_bouldin_scores)
 plt.xlabel('n_clusters')
 plt.ylabel('Davies Bouldin score')
 plt.show()
+
+#%%
+# As can be seen, there is no global consensus on which n_cluster value to choose.
+# The silhoutette score seems to be in favor of
+# ``n_clusters=3``, Calinski Harabasz score for ``n_clusters=4``,
+# Dunns core for ``n_clusters=8`` and Davies Bouldin score for ``n_clusters= 3 or 4``.
+# It is then up to the scientist to choose which compromise
+# he/she wants to make for this analysis

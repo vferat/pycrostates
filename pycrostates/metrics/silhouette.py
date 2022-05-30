@@ -1,3 +1,5 @@
+"""Silhouette score."""
+
 import numpy as np
 from sklearn.metrics import silhouette_score as sk_silhouette_score
 

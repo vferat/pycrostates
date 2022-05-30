@@ -1,4 +1,4 @@
-"""Metric functions for evaluating clusters."""
+"""Davies Bouldin score."""
 
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
