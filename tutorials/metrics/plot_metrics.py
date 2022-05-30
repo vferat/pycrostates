@@ -36,7 +36,7 @@ raw.set_eeg_reference("average")
 #
 # We can apply these metrics on clustering solution
 # computed with different values of n_clusters and
-# analyse which give the best clsutering solution. 
+# analyse which give the best clustering solution. 
 from pycrostates.metrics import (
     silhouette_score,
     calinski_harabasz_score,
