@@ -60,14 +60,14 @@ def _dunn_score(X, labels):  # higher the better
     deltas = np.ones([len(ks), len(ks)]) * 1000000
     big_deltas = np.zeros([len(ks), 1])
 
-    for i in range(0, len(ks)):
-        for j in range(0, len(ks)):
+    for i, ks_i in enumerate(ks):
+        for j, ks_j in enumerate(ks):
             if i == j:
                 continue  # skip diagonal
             deltas[i, j] = _delta_fast(
-                (labels == ks[i]), (labels == ks[j]), distances
+                (labels == ks_i), (labels == ks_j), distances
             )
-        big_deltas[i] = _big_delta_fast((labels == ks[i]), distances)
+        big_deltas[i] = _big_delta_fast((labels == ks_i), distances)
 
     di = np.min(deltas) / np.max(big_deltas)
     return di
