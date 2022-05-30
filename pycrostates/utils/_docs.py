@@ -71,9 +71,9 @@ docdict[
     "cluster"
 ] = """
 cluster : :ref:`Clustering`.
-        Fitted clustering algorithm from which to compute score.
-        For more details about current clustering implementations,
-        check the :ref:`Clustering` section of the documentation.
+    Fitted clustering algorithm from which to compute score.
+    For more details about current clustering implementations,
+    check the :ref:`Clustering` section of the documentation.
 """
 # ------------------------- Documentation functions --------------------------
 docdict_indented = {}
