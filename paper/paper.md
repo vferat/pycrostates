@@ -34,24 +34,28 @@ bibliography: paper.bib
 ---
 
 # Summary
+Microstate analysis of the electroencephalogram (EEG), introduced in 1972 by Lehman [citation] is a spatiotemporal analysis technique that takes advantage of the full spatial resolution of EEG recordings. Formalized by Pascual Marqui and colleagues [@pascual-marqui_segmentation_1995], it consists in studying the distribution of the surface EEG potential maps over time and thus transforming the EEG recordings into sequences of successive states of variable duration called EEG microstates.
 
-Pycrostates is a free and open source project for electroencephalography (EEG) microstates analysis. Microstates analysis is a method allowing investigation of spatiotemporal characteristics of EEG recordings. It consists in breaking down the multichannel EEG signal into a succession of quasi-stable state, each state being characterized by a spatial distribution of its scalp potentials also called microstate map or microstate topography. Pycrostates implements core functions such as preprocessing tools (global field power peaks extraction, resampling), clustering algorithm (modified version of the kmeans algorithm), clustering quality evaluations tools (silhouette, Dunn) and backfitting (also called prediction) needed to perform such analysis. It provides researchers all the block needed to design their own microstate analysis. Pycrostates is built to fit as best as it can in the python scientific environment and more particularly scikit-learn [@pedregosa_scikit-learn_nodate] and MNE-python [@gramfort_meg_2013]  from which it is inspired in its philosophy and its implementation [@buitinck_api_2013]. The library comes with extensive documentation including descriptions of all its algorithms and functions as well as several tutorials to help researcher to get started. Finally, pycrostates is provided under the new BSD license allowing code reuse, even in commercial products.
+
+Pycrostates implements multiple modules that allow researchers to apply this method to their data:
+
+- the dataset module provides direct access to preprocessed EEG data from the LEMON dataset [@babayan_mind-brain-body_2019] and thus offers test and experimental data.
+the preprocessing module completes the classical EEG preprocessing tools [@pernet2020issues] with those specific to the preparation of data for microstate analysis.
+
+- a segmentation module allows the sequences of microstates obtained to be studied
+
+- the cluster module gathers the different algorithms of transformation of the recordings in sequence of microstates. It takes example of the API of scikit-learn [@pedregosa_scikit-learn_nodate] [@buitinck_api_2013] for a simple and effective integration.
+
+- a segmentation module that allows to study the sequences of microstates obtained from clustering prediction.
+
+- a metrics module that allows to quantify the quality of the clustering results.
+
+By construction, Pycrostates is evolutionary. Future improvements can easily be added, such as the addition of clustering algorithms or new tools for sequence analysis such as Markov chains. Authors welcome proposals for improvements and new contributions and look forward to promoting and advancing the analysis of EEG microstates.
 
 # Statement of need
 
-Statement of need
-
-# Mathematics
-
-Mathematics
-
-# Citations
-
-Citations
-
-# Figures
-
-Figures
+Today, there are several software suites and libraries that allow research to carry out EEG microstatate analysis such as Cartool [@brunet_spatiotemporal_nodate], Tomas Koening's Matlab plugins (https://www.thomaskoenig.ch/index.php/software/microstates-in-eeglab),the Matlab microstates plugin [@poulsen_microstate_2018] and some python toolboxes[@von_wegner_information-theoretical_2018]. In the last few years, the python programming language ecosystem has expanded widely, especially in scientific fields. In neuroscience, the MNE-python library [@gramfort_meg_2013] stands out for the analysis of EEG signals. However, it does not currently offer an implementation allowing the decomposition of EEG recordings and the analysis of microstates. Pycrostates is based on this existing system and completes it by offering researchers simple tools that can be easily integrated with existing tools for EEG microstate analysis.
+In addition to providing a simple but complete API that can replicate most of the analyses proposed in the literature [@MICHEL2018577], it is built in a modular and scalable way and provided exhaustive documentation and tutorials. Pycrosatates follows modern development methods and uses a number of code review and testing tools, thus facilitating its maintenance and evolution over time.
 
 # Acknowledgements
 
