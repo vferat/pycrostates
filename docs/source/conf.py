@@ -32,6 +32,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
+    "sphinx.ext.autosectionlabel",
     "sphinx.ext.doctest",
     "sphinx.ext.coverage",
     "sphinx.ext.mathjax",
@@ -89,6 +90,7 @@ sphinx_gallery_conf = {
             "../../tutorials/clustering",
             "../../tutorials/backfitting",
             "../../tutorials/group_level_analysis",
+            "../../tutorials/metrics",
         ]
     ),
     "reference_url": {"pycrostates": None},  # current lib uses None

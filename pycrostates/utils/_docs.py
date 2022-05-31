@@ -67,7 +67,14 @@ picks : str | list | slice | None
     Note that channels in info['bads'] will be included.
     Default to 'eeg'.
 """
-
+docdict[
+    "cluster"
+] = """
+cluster : :ref:`Clustering`.
+    Fitted clustering algorithm from which to compute score.
+    For more details about current clustering implementations,
+    check the :ref:`Clustering` section of the documentation.
+"""
 # ------------------------- Documentation functions --------------------------
 docdict_indented = {}
 

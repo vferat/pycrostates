@@ -1,6 +1,13 @@
 """Metric module for evaluating clusters."""
 
-from .metrics import davies_bouldin  # noqa: F401
-from .metrics import calinski_harabasz, dunn, silhouette
+from .calinski_harabasz import calinski_harabasz_score
+from .davies_bouldin import davies_bouldin_score
+from .dunn import dunn_score
+from .silhouette import silhouette_score
 
-__all__ = ("silhouette", "davies_bouldin", "dunn", "calinski_harabasz")
+__all__ = (
+    "calinski_harabasz_score",
+    "davies_bouldin_score",
+    "dunn_score",
+    "silhouette_score",
+)

@@ -50,6 +50,15 @@ def _corr_vectors(A, B, axis=0):
     return corr
 
 
+def _distance_matrix(X, Y=None):
+    """Distance matrix used in metrics."""
+    distances = np.abs(1 / np.corrcoef(X, Y)) - 1
+    distances = np.nan_to_num(
+        distances, copy=False, nan=10e300, posinf=1e300, neginf=-1e300
+    )
+    return distances
+
+
 def _compare_infos(cluster_info, inst_info):
     """Check that channels in cluster_info are all present in inst_info."""
     for ch in cluster_info["ch_names"]:
