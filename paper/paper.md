@@ -39,18 +39,15 @@ Microstate analysis of the electroencephalogram (EEG), introduced in 1972 by Leh
 
 Pycrostates implements multiple modules that allow researchers to apply this method to their data:
 
-- the dataset module provides direct access to preprocessed EEG data from the LEMON dataset [@babayan_mind-brain-body_2019] and thus offers test and experimental data.
-the preprocessing module completes the classical EEG preprocessing tools [@pernet2020issues] with those specific to the preparation of data for microstate analysis.
+- the cluster module supports the different algorithms that transform the signals into sequences of microstates. 
+- the segmentation module supports the study of microstates sequences.
+- the metrics module quantifies the quality of the fitted clustering algorithms.
 
-- a segmentation module allows the sequences of microstates obtained to be studied
+Pycrostates is supported by additionals modules to help researchers in the development of analysis pipelines:
+- the dataset module provides direct access to preprocessed data that can be used to test pipelines. As of writing, it supports the LEMON dataset [@babayan_mind-brain-body_2019] comprising 227 healthy participants' EEG recordings.
+- the viz module provides visualization tools to perform microstates analysis.
 
-- the cluster module gathers the different algorithms of transformation of the recordings in sequence of microstates. It takes example of the API of scikit-learn [@pedregosa_scikit-learn_nodate] [@buitinck_api_2013] for a simple and effective integration.
-
-- a segmentation module that allows to study the sequences of microstates obtained from clustering prediction.
-
-- a metrics module that allows to quantify the quality of the clustering results.
-
-By construction, Pycrostates is evolutionary. Future improvements can easily be added, such as the addition of clustering algorithms or new tools for sequence analysis such as Markov chains. Authors welcome proposals for improvements and new contributions and look forward to promoting and advancing the analysis of EEG microstates.
+By design, Pycrostates supports natively all data types from MNE-Python [@Agramfort2013] and is not restricted to EEG data. It is designed to support future improvements and additions such as different clustering algorithms or new tools for sequence analysis suck as Markov chains. Moreover, this work builds its API on top of the robust MNE-Python ecosystem, enabling a seamless integration microstates analysis.
 
 # Statement of need
 
