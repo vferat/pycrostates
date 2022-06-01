@@ -1,5 +1,5 @@
 ---
-title: 'Pycrostates: : a python library to study EEG microstates'
+title: 'Pycrostates: a Python library to study EEG microstates'
 tags:
   - Python
   - neuroscience
