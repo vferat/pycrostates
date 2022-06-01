@@ -4,7 +4,7 @@ tags:
   - Python
   - neuroscience
   - neuroimaging
-  - eeg
+  - EEG
   - microstates
   - brain
 authors:
