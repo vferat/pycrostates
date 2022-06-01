@@ -55,7 +55,9 @@ By construction, Pycrostates is evolutionary. Future improvements can easily be 
 # Statement of need
 
 Several software and libraries are available to perform EEG microstates analysis: Cartool [@brunet_spatiotemporal_nodate], Tomas Koening's Matlab plugins (https://www.thomaskoenig.ch/index.php/software/microstates-in-eeglab), the Matlab microstates plugin [@poulsen_microstate_2018], or the python 2 library from Frederic von Wegner [@von_wegner_information-theoretical_2018]. In the last few years, the Python programming language ecosystem has expanded widely, especially in scientific fields. The MNE-Python [@Agramfort2013] library stands out for the analysis of human neurophysiological data. However, the current implementation of microstates analysis from Marijn van Vliet is lacking in features and maintenance. Pycrostates is based on the robust MNE-Python ecosystem and completes it with simple tools to develop integrated microstates analysis pipelines. 
-In addition to providing a simple but complete API that can replicate most of the analyses proposed in the literature [@MICHEL2018577], it is built in a modular and scalable way and provided exhaustive documentation and tutorials. Pycrosatates follows modern development methods and uses a number of code review and testing tools, thus facilitating its maintenance and evolution over time.
+In addition to providing a simple and complete API that can replicate most of the analyses proposed in the literature [@MICHEL2018577], Pycrostates is built with a modular and scalable design, following modern development methods and standards to facilitate its maintenance and evolution over time. Finally, new users are helped by the exhaustive documentation and tutorials describing the microstate analysis modules.
+
+The developer team is excited to improve the state of the art in microstates analysis and is looking forward to welcoming new contributors and users from the broader MNE, neuroscience, and electrophysiology community.
 
 # Acknowledgements
 
