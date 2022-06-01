@@ -43,7 +43,7 @@ Pycrostates implements multiple modules that allow researchers to apply  microst
 - the segmentation module supports the study of microstates sequences.
 - the metrics module quantifies the quality of the fitted clustering algorithms.
 
-Pycrostates is supported by additionals modules to help researchers in the development of analysis pipelines:
+Pycrostates is supported by additional modules to help researchers in the development of analysis pipelines:
 - the dataset module provides direct access to preprocessed data that can be used to test pipelines. As of writing, it supports the LEMON dataset [@babayan_mind-brain-body_2019] comprising 227 healthy participants' preprocessed EEG recordings.
 - the viz module provides visualization tools to perform microstates analysis.
 
