@@ -34,17 +34,17 @@ bibliography: paper.bib
 ---
 
 # Summary
-Microstate analysis of the electroencephalogram (EEG), introduced in 1972 by Lehman [citation] is a spatiotemporal analysis technique that takes advantage of the full spatial resolution of EEG recordings. Formalized by Pascual Marqui and colleagues [@pascual-marqui_segmentation_1995], microstate analysis studies the distribution of the surface EEG potential maps over time. It transforms the EEG recordings into sequences of successive states of variable duration, called EEG microstates.
+Microstate analysis of the electroencephalogram (EEG), introduced in 1972 by Lehman [@lehmann1971multichannel] is a spatiotemporal analysis technique that takes advantage of the full spatial resolution of EEG recordings. Formalized by Pascual Marqui and colleagues [@pascual-marqui_segmentation_1995], microstate analysis studies the distribution of the surface EEG potential maps over time. It transforms the EEG recordings into sequences of successive states of variable duration, called EEG microstates.
 
 
-Pycrostates implements multiple modules that allow researchers to apply this method to their data:
+Pycrostates implements multiple modules that allow researchers to apply  microstates analysis on their data:
 
 - the cluster module supports the different algorithms that transform the signals into sequences of microstates. 
 - the segmentation module supports the study of microstates sequences.
 - the metrics module quantifies the quality of the fitted clustering algorithms.
 
 Pycrostates is supported by additionals modules to help researchers in the development of analysis pipelines:
-- the dataset module provides direct access to preprocessed data that can be used to test pipelines. As of writing, it supports the LEMON dataset [@babayan_mind-brain-body_2019] comprising 227 healthy participants' EEG recordings.
+- the dataset module provides direct access to preprocessed data that can be used to test pipelines. As of writing, it supports the LEMON dataset [@babayan_mind-brain-body_2019] comprising 227 healthy participants' preprocessed EEG recordings.
 - the viz module provides visualization tools to perform microstates analysis.
 
 By design, Pycrostates supports natively all data types from MNE-Python [@Agramfort2013] and is not restricted to EEG data. It is designed to support future improvements and additions such as different clustering algorithms or new tools for sequence analysis suck as Markov chains. Moreover, this work builds its API on top of the robust MNE-Python ecosystem, enabling a seamless integration microstates analysis.
