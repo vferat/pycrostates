@@ -36,7 +36,6 @@ bibliography: paper.bib
 # Summary
 Microstate analysis of the electroencephalogram (EEG), introduced in 1972 by Lehman [@lehmann1971multichannel], is a spatiotemporal analysis technique that takes advantage of the full spatial resolution of EEG recordings. Formalized by Pascual Marqui and colleagues [@pascual-marqui_segmentation_1995], microstate analysis studies the distribution of the surface EEG potential maps over time. It transforms the EEG recordings into sequences of successive states of variable duration, called EEG microstates.
 
-
 Pycrostates implements multiple modules that allow researchers to apply  microstates analysis on their data:
 
 - the cluster module supports the different algorithms that transform the signals into sequences of microstates. 
