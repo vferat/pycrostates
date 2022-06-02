@@ -47,7 +47,7 @@ Additional modules help researchers to develop analysis pipelines:
 - the dataset module provides direct access to preprocessed data that can be used to test pipelines. As of writing, it supports the LEMON dataset [@babayan_mind-brain-body_2019] comprising 227 healthy participants' preprocessed EEG recordings.
 - the viz module provides visualization tools to perform microstates analysis.
 
-By design, Pycrostates supports natively all data types from MNE-Python [@Agramfort2013] and is not restricted to EEG data. It is designed to support future improvements and additions such as different clustering algorithms or new tools for sequence analysis suck as Markov chains. Moreover, this work builds its API on top of the robust MNE-Python ecosystem, enabling a seamless integration microstates analysis.
+By design, Pycrostates supports natively all data types from MNE-Python [@Agramfort2013] and is not restricted to EEG data. It is designed to support future improvements and additions such as different clustering algorithms or new tools for sequence analysis such as Markov chains. Moreover, this work builds its API on top of the robust MNE-Python ecosystem, enabling a seamless integration of microstates analysis.
 
 # Statement of need
 
