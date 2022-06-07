@@ -52,7 +52,8 @@ ModK.fit(individual_gfp_peaks, n_jobs=n_jobs)
 ModK.plot();
 
 #%%
-# We can reorganize our clustering results to our needs
+# We can reorganize our clustering results to our needs.
+
 ModK.reorder_clusters(order=[0, 2, 4, 3, 1])
 ModK.rename_clusters(new_names=['A', 'B', 'C', 'D', 'F'])
 ModK.plot();
