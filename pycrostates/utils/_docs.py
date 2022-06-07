@@ -5,6 +5,7 @@ Inspired from mne: https://mne.tools/stable/index.html
 Inspired from mne.utils.docs.py by Eric Larson <larson.eric.d@gmail.com>
 """
 import sys
+from typing import Callable, List
 
 from mne.utils.docs import docdict as docdict_mne
 
@@ -79,67 +80,78 @@ cluster : :ref:`Clustering`.
 docdict_indented = {}
 
 
-def fill_doc(f):
+def fill_doc(f: Callable) -> Callable:
     """Fill a docstring with docdict entries.
 
     Parameters
     ----------
     f : callable
-        The function to fill the docstring of. Will be modified in place.
+        The function to fill the docstring of (modified in place).
 
     Returns
     -------
     f : callable
-        The function, potentially with an updated ``__doc__``.
+        The function, potentially with an updated __doc__.
     """
     docstring = f.__doc__
     if not docstring:
         return f
+
     lines = docstring.splitlines()
-    # Find the minimum indent of the main docstring, after first line
-    if len(lines) < 2:
-        icount = 0
-    else:
-        icount = _indentcount_lines(lines[1:])
-    # Insert this indent to dictionary docstrings
+    indent_count = _indentcount_lines(lines)
+
     try:
-        indented = docdict_indented[icount]
+        indented = docdict_indented[indent_count]
     except KeyError:
-        indent = " " * icount
-        docdict_indented[icount] = indented = {}
-        for name, dstr in docdict.items():
-            lines = dstr.splitlines()
-            try:
-                newlines = [lines[0]]
-                for line in lines[1:]:
-                    newlines.append(indent + line)
-                indented[name] = "\n".join(newlines)
-            except IndexError:
-                indented[name] = dstr
+        indent = " " * indent_count
+        docdict_indented[indent_count] = indented = dict()
+
+        for name, docstr in docdict.items():
+            lines = [
+                indent + line if k != 0 else line
+                for k, line in enumerate(docstr.strip().splitlines())
+            ]
+            indented[name] = "\n".join(lines)
+
     try:
         f.__doc__ = docstring % indented
     except (TypeError, ValueError, KeyError) as exp:
         funcname = f.__name__
         funcname = docstring.split("\n")[0] if funcname is None else funcname
-        raise RuntimeError("Error documenting %s:\n%s" % (funcname, str(exp)))
+        raise RuntimeError(f"Error documenting {funcname}:\n{str(exp)}")
+
     return f
 
 
-def _indentcount_lines(lines):
-    """Compute minimum indent for all lines in line list."""
-    indentno = sys.maxsize
-    for line in lines:
-        stripped = line.lstrip()
-        if stripped:
-            indentno = min(indentno, len(line) - len(stripped))
-    if indentno == sys.maxsize:
-        return 0
-    return indentno
+def _indentcount_lines(lines: List[str]) -> int:
+    """Minimum indent for all lines in line list.
 
-
-def copy_doc(source):
+    >>> lines = [' one', '  two', '   three']
+    >>> indentcount_lines(lines)
+    1
+    >>> lines = []
+    >>> indentcount_lines(lines)
+    0
+    >>> lines = [' one']
+    >>> indentcount_lines(lines)
+    1
+    >>> indentcount_lines(['    '])
+    0
     """
-    Copy the docstring from another function (decorator).
+    indent = sys.maxsize
+    for k, line in enumerate(lines):
+        if k == 0:
+            continue
+        line_stripped = line.lstrip()
+        if line_stripped:
+            indent = min(indent, len(line) - len(line_stripped))
+    if indent == sys.maxsize:
+        return 0
+    return indent
+
+
+def copy_doc(source: Callable) -> Callable:
+    """Copy the docstring from another function (decorator).
 
     The docstring of the source function is prepepended to the docstring of the
     function wrapped by this decorator.
@@ -149,12 +161,12 @@ def copy_doc(source):
 
     Parameters
     ----------
-    source : function
-        Function to copy the docstring from.
+    source : callable
+        The function to copy the docstring from.
 
     Returns
     -------
-    wrapper : function
+    wrapper : callable
         The decorated function.
 
     Examples
@@ -174,7 +186,10 @@ def copy_doc(source):
 
     def wrapper(func):
         if source.__doc__ is None or len(source.__doc__) == 0:
-            raise ValueError("Cannot copy docstring: docstring was empty.")
+            raise RuntimeError(
+                f"The docstring from {source.__name__} could not be copied "
+                "because it was empty."
+            )
         doc = source.__doc__
         if func.__doc__ is not None:
             doc += func.__doc__
