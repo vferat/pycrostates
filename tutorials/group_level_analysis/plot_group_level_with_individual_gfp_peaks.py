@@ -18,6 +18,7 @@ from pycrostates.io import ChData
 
 condition = 'EO'
 subject_ids = ['010020', '010021' , '010022', '010023', '010024']
+
 #%%
 # In this example, we first extract individual
 # GFP peaks. Then we concatenate them into
