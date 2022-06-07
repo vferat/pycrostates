@@ -7,7 +7,8 @@ by computing group level topogrpahies based on individual gfp peaks.
 """
 
 #%%
-# We first start by importing some EEG data
+# We first start by importing some EEG data.
+
 from mne.io import read_raw_eeglab
 
 from pycrostates.cluster import ModKMeans
