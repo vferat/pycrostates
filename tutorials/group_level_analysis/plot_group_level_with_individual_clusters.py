@@ -18,6 +18,7 @@ from pycrostates.io import ChData
 
 condition = 'EO'
 subject_ids = ['010020', '010021' , '010022', '010023', '010024']
+
 #%%
 # In this example, we first compute individual
 # topographies from GFP peaks (subject level analysis).
