@@ -177,7 +177,7 @@ def resample(
 
     # random selection
     times_idx = np.arange(n_times)
-    indices = np.random.choice(
+    indices = random_state.choice(
         times_idx, size=n_resamples * n_samples, replace=replace
     )
     indices = indices.reshape((n_resamples, n_samples))
