@@ -80,25 +80,10 @@ test = [
     'pytest-cov',
 ]
 all = [
-    'm2r2',
-    'nbsphinx',
-    'numpydoc',
-    'pandas',
-    'pillow',
-    'pydata-sphinx-theme',
-    'pymatreader',
-    'recommonmark',
-    'sphinx',
-    'sphinx_gallery',
-    'black',
-    'codespell',
-    'isort',
-    'flake8',
-    'pydocstyle[toml]',
-    'pymatreader',
-    'pytest==7.0.1',
-    'pytest-azurepipelines',
-    'pytest-cov',
+    'pycrostates[build]',
+    'pycrostates[docs]',
+    'pycrostates[style]',
+    'pycrostates[test]',
 ]
 
 [project.urls]
@@ -112,7 +97,7 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 include = ['pycrostates*']
-exclude = ['^.*tests']
+exclude = ['pycrostates*tests']
 
 [tool.black]
 line-length = 79
