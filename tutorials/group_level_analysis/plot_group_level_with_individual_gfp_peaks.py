@@ -24,6 +24,7 @@ subject_ids = ['010020', '010021' , '010022', '010023', '010024']
 # GFP peaks. Then we concatenate them into
 # a single dataset in order to submit it to
 # clustering (group level analysis).
+
 import numpy as np
 
 ModK = ModKMeans(n_clusters=5,  random_state=42)
