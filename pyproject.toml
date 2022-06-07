@@ -93,11 +93,14 @@ source = 'https://github.com/vferat/pycrostates'
 tracker = 'https://github.com/vferat/pycrostates/issues'
 
 [tool.setuptools]
-include-package-data = true
+include-package-data = false
 
 [tool.setuptools.packages.find]
 include = ['pycrostates*']
 exclude = ['pycrostates*tests']
+
+[tool.setuptools.package-data]
+"pycrostates.datasets" = ["**/*.txt"]
 
 [tool.black]
 line-length = 79
