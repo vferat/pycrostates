@@ -3,7 +3,7 @@ Group-level analysis from individual clusters
 =============================================
 
 In this tutorial, we will learn how to conduct group level analysis
-by computing group level topogrpahies based on individual clusters.
+by computing group-level topographies based on individual clusters.
 """
 
 #%%
