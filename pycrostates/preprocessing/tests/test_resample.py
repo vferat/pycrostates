@@ -154,3 +154,4 @@ def test_resample_random_state():
         raw, n_resamples=1, n_samples=500, random_state=42
     )[0]
     assert np.allclose(resamples_0._data, resamples_1._data)
+    
