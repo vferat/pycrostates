@@ -88,7 +88,6 @@ sphinx_gallery_conf = {
         [
             "../../tutorials/preprocessing",
             "../../tutorials/clustering",
-            "../../tutorials/backfitting",
             "../../tutorials/group_level_analysis",
             "../../tutorials/metrics",
         ]
