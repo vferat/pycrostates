@@ -156,7 +156,7 @@ def resample(
         n_samples = int((n_times * coverage) / n_resamples)
 
     if coverage is None:
-        coverage = n_times / (n_resamples * n_samples)
+        coverage = (n_resamples * n_samples) / n_times
 
     if replace is False:
         if n_resamples * n_samples > n_times:
