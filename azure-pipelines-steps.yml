@@ -6,6 +6,7 @@ steps:
 
 - script: |
     python -m pip install --progress-bar off --upgrade pip setuptools wheel
+    python -m pip install --progress-bar off --force-reinstall tk
     python -m pip install --progress-bar off .[test]
   displayName: 'Install dependencies'
 
