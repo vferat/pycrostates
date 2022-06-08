@@ -9,141 +9,101 @@ pr:
     include:
       - '*'
 
-stages:
-- stage: download_datasets
-  displayName: 'Download datasets'
-  jobs:
-  - job: cache_datasets
-    displayName: 'Cache datasets'
-    timeoutInMinutes: 15
-    continueOnError: false
-    pool:
-      vmImage: 'ubuntu-latest'
-    variables:
-      PYTHON_VERSION: '3.9'
-      CACHE_PATH: /home/vsts/mne_data
-    steps:
-    - script: |
-        curl https://raw.githubusercontent.com/mne-tools/mne-testing-data/master/version.txt -o mne_testing_data_version.txt
-      displayName: "Retrieve MNE testing dataset version"
-    - task: Cache@2
-      inputs:
-        key: '"mne_testing_data" | mne_testing_data_version.txt'
-        path: $(CACHE_PATH)
-        cacheHitVar: CACHE_RESTORED
-      displayName: 'Cache MNE testing dataset'
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: $(PYTHON_VERSION)
-        architecture: 'x64'
-        addToPath: true
-      condition: ne(variables.CACHE_RESTORED, 'true')
-      displayName: 'Setup Python $(PYTHON_VERSION)'
-    - script: |
-        python -m pip install --progress-bar off --upgrade pip setuptools wheel
-        python -m pip install --progress-bar off mne
-      condition: ne(variables.CACHE_RESTORED, 'true')
-      displayName: 'Install dependencies'
-    - script: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
-      condition: ne(variables.CACHE_RESTORED, 'true')
-      displayName: 'Get MNE testing datataset'
+jobs:
+- job: linux
+  timeoutInMinutes: 30
+  pool:
+    vmImage: 'ubuntu-latest'
+  variables:
+    CACHE_PATH: /home/vsts/mne_data
+  strategy:
+    maxParallel: 2
+    matrix:
+      3.7:
+        PYTHON_VERSION: '3.7'
+      3.8:
+        PYTHON_VERSION: '3.8'
+      3.9:
+        PYTHON_VERSION: '3.9'
+      3.10:
+        PYTHON_VERSION: '3.10'
+  steps:
+  - template: azure-pipelines-steps.yml
 
-- stage: PyTest
-  jobs:
-  - job: linux
-    timeoutInMinutes: 30
-    pool:
-      vmImage: 'ubuntu-latest'
-    variables:
-      CACHE_PATH: /home/vsts/mne_data
-    strategy:
-      maxParallel: 2
-      matrix:
-        3.7:
-          PYTHON_VERSION: '3.7'
-        3.8:
-          PYTHON_VERSION: '3.8'
-        3.9:
-          PYTHON_VERSION: '3.9'
-        3.10:
-          PYTHON_VERSION: '3.10'
-    steps:
-    - template: azure-pipelines-steps.yml
+- job: macOS
+  timeoutInMinutes: 30
+  pool:
+    vmImage: 'macOS-latest'
+  variables:
+    CACHE_PATH: /Users/runner/mne_data
+  strategy:
+    maxParallel: 2
+    matrix:
+      3.7:
+        PYTHON_VERSION: '3.7'
+      3.8:
+        PYTHON_VERSION: '3.8'
+      3.9:
+        PYTHON_VERSION: '3.9'
+      3.10:
+        PYTHON_VERSION: '3.10'
+  steps:
+  - template: azure-pipelines-steps.yml
 
-  - job: macOS
-    timeoutInMinutes: 30
-    pool:
-      vmImage: 'macOS-latest'
-    variables:
-      CACHE_PATH: /Users/runner/mne_data
-    strategy:
-      maxParallel: 2
-      matrix:
-        3.7:
-          PYTHON_VERSION: '3.7'
-        3.8:
-          PYTHON_VERSION: '3.8'
-        3.9:
-          PYTHON_VERSION: '3.9'
-        3.10:
-          PYTHON_VERSION: '3.10'
-    steps:
-    - template: azure-pipelines-steps.yml
+- job: windows
+  timeoutInMinutes: 30
+  pool:
+    vmImage: 'windows-latest'
+  variables:
+    CACHE_PATH: C:\Users\VssAdministrator\mne_data
+  strategy:
+    maxParallel: 2
+    matrix:
+      3.7:
+        PYTHON_VERSION: '3.7'
+      3.8:
+        PYTHON_VERSION: '3.8'
+      3.9:
+        PYTHON_VERSION: '3.9'
+      3.10:
+         PYTHON_VERSION: '3.10'
+  steps:
+  - template: azure-pipelines-steps.yml
 
-  - job: windows
-    timeoutInMinutes: 30
-    pool:
-      vmImage: 'windows-latest'
-    variables:
-      CACHE_PATH: C:\Users\VssAdministrator\mne_data
-    strategy:
-      maxParallel: 2
-      matrix:
-        3.7:
-          PYTHON_VERSION: '3.7'
-        3.8:
-          PYTHON_VERSION: '3.8'
-        3.9:
-          PYTHON_VERSION: '3.9'
-        3.10:
-          PYTHON_VERSION: '3.10'
-    steps:
-    - template: azure-pipelines-steps.yml
-
-  - job: 'linux_MNE_dev'
-    displayName: 'linux $(PYTHON_VERSION) MNE-dev'
-    timeoutInMinutes: 30
-    pool:
-      vmImage: 'ubuntu-latest'
-    variables:
-      PYTHON_VERSION: '3.10'
-      CACHE_PATH: /home/vsts/mne_data
-    steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: $(PYTHON_VERSION)
-        architecture: 'x64'
-        addToPath: true
-      displayName: 'Setup Python $(PYTHON_VERSION)'
-    - script: |
-        python -m pip install --progress-bar off --upgrade pip setuptools wheel
-        python -m pip install --progress-bar off .[test]
-        python -m pip uninstall -y mne
-        python -m pip install --progress-bar off --no-deps https://github.com/mne-tools/mne-python/archive/main.zip
-      displayName: 'Install dependencies'
-    - script: mne sys_info -pd
-      displayName: 'Display MNE config'
-    - script: |
-        curl https://raw.githubusercontent.com/mne-tools/mne-testing-data/master/version.txt -o mne_testing_data_version.txt
-      displayName: "Retrieve MNE testing dataset version"
-    - task: Cache@2
-      inputs:
-        key: '"mne_testing_data" | mne_testing_data_version.txt'
-        path: $(CACHE_PATH)
-        cacheHitVar: CACHE_RESTORED
-      displayName: 'Cache MNE testing dataset'
-    - script: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
-      displayName: 'Get MNE testing datataset'
-      condition: ne(variables.CACHE_RESTORED, 'true')
-    - script: pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
-      displayName: 'Run tests'
+- job: 'linux_MNE_dev'
+  displayName: 'linux $(PYTHON_VERSION) MNE-dev'
+  timeoutInMinutes: 30
+  pool:
+    vmImage: 'ubuntu-latest'
+  variables:
+    PYTHON_VERSION: '3.10'
+    CACHE_PATH: /home/vsts/mne_data
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: $(PYTHON_VERSION)
+      architecture: 'x64'
+      addToPath: true
+    displayName: 'Setup Python $(PYTHON_VERSION)'
+  - script: |
+      python -m pip install --progress-bar off --upgrade pip setuptools wheel
+      python -m pip install --progress-bar off .[test]
+      python -m pip uninstall -y mne
+      python -m pip install --progress-bar off --no-deps https://github.com/mne-tools/mne-python/archive/main.zip
+    displayName: 'Install dependencies'
+  - script: mne sys_info -pd
+    displayName: 'Display MNE config'
+  - script: |
+      curl https://raw.githubusercontent.com/mne-tools/mne-testing-data/master/version.txt -o mne_testing_data_version.txt
+    displayName: "Retrieve MNE testing dataset version"
+  - task: Cache@2
+    inputs:
+      key: '"mne_testing_data" | mne_testing_data_version.txt'
+      path: $(CACHE_PATH)
+      cacheHitVar: CACHE_RESTORED
+    displayName: 'Cache MNE testing dataset'
+  - script: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
+    displayName: 'Get MNE testing datataset'
+    condition: ne(variables.CACHE_RESTORED, 'true')
+  - script: pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
+    displayName: 'Run tests'
