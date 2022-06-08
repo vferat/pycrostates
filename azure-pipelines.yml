@@ -18,7 +18,7 @@ stages:
     timeoutInMinutes: 15
     continueOnError: false
     pool:
-      vmImage: 'windows-latest'
+      vmImage: 'ubuntu-latest'
     variables:
       PYTHON_VERSION: '3.9'
       CACHE_PATH: /home/vsts/mne_data
@@ -87,7 +87,7 @@ stages:
     pool:
       vmImage: 'windows-latest'
     variables:
-      CACHE_PATH: ~/mne_data
+      CACHE_PATH: C:\Users\VssAdministrator\mne_data
     strategy:
       maxParallel: 2
       matrix:
