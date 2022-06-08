@@ -1,7 +1,5 @@
 """Test Metrics."""
 
-from pathlib import Path
-
 from mne.datasets import testing
 from mne.io import read_raw_fif
 
@@ -13,7 +11,7 @@ from pycrostates.metrics import (
     silhouette_score,
 )
 
-directory = Path(testing.data_path()) / "MEG" / "sample"
+directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname, preload=False)
 raw.pick("eeg").crop(0, 10)

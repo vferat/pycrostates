@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import mne
 import pytest
 from mne import pick_info
@@ -12,7 +10,7 @@ from pycrostates.utils._logs import logger
 
 logger.propagate = True
 
-dir_ = Path(testing.data_path()) / "MEG" / "sample"
+dir_ = testing.data_path() / "MEG" / "sample"
 fname_raw_testing = dir_ / "sample_audvis_trunc_raw.fif"
 raw = mne.io.read_raw_fif(fname_raw_testing, preload=False)
 raw = raw.pick("eeg")

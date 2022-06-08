@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 import pytest
 from mne.datasets import testing
@@ -14,7 +13,7 @@ set_log_level("INFO")
 logger.propagate = True
 
 
-directory = Path(testing.data_path()) / "MEG" / "sample"
+directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname, preload=True)
 raw = raw.crop(0, 10).apply_proj()

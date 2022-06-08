@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 
 from pycrostates.viz import plot_epoch_segmentation, plot_raw_segmentation
 
-folder = mne.datasets.sample.data_path() / "MEG" / "sample"
+folder = mne.datasets.testing.data_path() / "MEG" / "sample"
 fname = folder / "sample_audvis_filt-0-40_raw.fif"
 raw = mne.io.read_raw(fname, preload=False)
 raw.pick_types(eeg=True).crop(tmin=0, tmax=10, include_tmax=True)

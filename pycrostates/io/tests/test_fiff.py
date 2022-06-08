@@ -1,7 +1,6 @@
 """Test import/export to FIFF format."""
 
 import os
-from pathlib import Path
 
 import numpy as np
 import pytest
@@ -19,7 +18,7 @@ logger.propagate = True
 
 
 # Fit one for general purposes
-directory = Path(testing.data_path()) / "MEG" / "sample"
+directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname, preload=True)
 raw2 = raw.copy().crop(10, None).apply_proj()

@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
@@ -15,7 +13,7 @@ set_log_level("INFO")
 logger.propagate = True
 
 
-dir_ = Path(testing.data_path()) / "MEG" / "sample"
+dir_ = testing.data_path() / "MEG" / "sample"
 fname_raw_testing = dir_ / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname_raw_testing, preload=True)
 raw = raw.pick("eeg").crop(0, 10).filter(0, 40).apply_proj()

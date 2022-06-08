@@ -4,7 +4,6 @@ import logging
 import re
 from copy import deepcopy
 from itertools import groupby
-from pathlib import Path
 
 import numpy as np
 import pytest
@@ -27,7 +26,7 @@ set_log_level("INFO")
 logger.propagate = True
 
 
-directory = Path(testing.data_path()) / "MEG" / "sample"
+directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname, preload=True)
 raw_meg = raw.copy().pick_types(meg=True, eeg=True, exclude="bads")

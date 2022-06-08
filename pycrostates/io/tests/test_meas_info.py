@@ -18,7 +18,7 @@ set_log_level("INFO")
 logger.propagate = True
 
 
-directory = Path(testing.data_path()) / "MEG" / "sample"
+directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname, preload=True)
 
