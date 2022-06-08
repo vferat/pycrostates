@@ -1,25 +1,28 @@
 steps:
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: $(python.version)
+    versionSpec: $(PYTHON_VERSION)
     architecture: 'x64'
     addToPath: true
-  displayName: 'Use Python $(python.version)'
-
+  displayName: 'Use Python $(PYTHON_VERSION)'
 - script: |
     python -m pip install --progress-bar off --upgrade pip setuptools wheel
     python -m pip install --progress-bar off .[test]
   displayName: 'Install dependencies'
-
+- task: Cache@2
+  inputs:
+    key: 'mne_testing_data'
+    path: $(CACHE_PATH)
+  displayName: 'Cache testing data'
+- script: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
+  displayName: 'Get testing data'
 - script: |
     pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
   displayName: 'Run tests'
-
 - task: PublishCodeCoverageResults@1
   inputs:
     codeCoverageTool: Cobertura
     summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
-
 - bash: |
      bash <(curl -s https://codecov.io/bash)
   condition: and(eq(variables['Agent.OS'], 'Linux' ), eq(variables['python.version'], '3.9' ))
