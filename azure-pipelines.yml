@@ -12,7 +12,8 @@ pr:
 stages:
 - stage: Prepare
   jobs:
-  - job: cache
+  - job: cache_datasets
+    displayName: 'Cache datasets'
     timeoutInMinutes: 15
     continueOnError: false
     pool:
@@ -29,7 +30,7 @@ stages:
     - script: |
         python -m pip install --progress-bar off --upgrade pip setuptools wheel
         python -m pip install --progress-bar off .
-    - script: python -c "import pycrostates; pycrostates.datasets.lemon.data_path(verbose=True)"
+    - script: python -c "import pycrostates; pycrostates.datasets.lemon.data_path()"
       displayName: 'Get testing data'
 
 - stage: PyTest
