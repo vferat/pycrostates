@@ -89,7 +89,8 @@ stages:
     - template: azure-pipelines-steps.yml
 
 
-  - job: 'linux MNE-dev'
+  - job: 'linux_MNE_dev'
+    displayName: 'linux MNE-dev'
     timeoutInMinutes: 30
     pool:
       vmImage: 'ubuntu-latest'
