@@ -43,7 +43,7 @@ jobs:
         CACHE_MNE_PATH: $(CACHE_PATH_MNE_LINUX)
       linux 3.10 MNE-dev:
         IMAGE_NAME: 'ubuntu-latest'
-        PYTHON_VERSIION: '3.10'
+        PYTHON_VERSION: '3.10'
         MNE_DEV: true
         CACHE_MNE_PATH: $(CACHE_PATH_MNE_LINUX)
       macOS 3.7:
