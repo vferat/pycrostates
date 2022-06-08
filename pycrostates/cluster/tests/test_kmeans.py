@@ -39,7 +39,9 @@ events = make_fixed_length_events(raw_meg, duration=1)
 epochs_meg = Epochs(
     raw_meg, events, tmin=0, tmax=0.5, baseline=None, preload=True
 )
-epochs_eeg = Epochs(raw_eeg, events, tmin=0, tmax=0.5, baseline=None, preload=True)
+epochs_eeg = Epochs(
+    raw_eeg, events, tmin=0, tmax=0.5, baseline=None, preload=True
+)
 # ch_data
 ch_data = ChData(raw_eeg.get_data(), raw_eeg.info)
 # Fit one for general purposes
@@ -643,7 +645,12 @@ def test_fit_data_shapes():
     ModK_.fitted = False
     _check_unfitted(ModK_)
     ModK_.fit(
-        raw_eeg, n_jobs=1, picks="eeg", tmin=2, tmax=8, reject_by_annotation=False
+        raw_eeg,
+        n_jobs=1,
+        picks="eeg",
+        tmin=2,
+        tmax=8,
+        reject_by_annotation=False,
     )
     _check_fitted_data_raw(ModK_._fitted_data, raw_eeg, "eeg", 2, 8, None)
 
