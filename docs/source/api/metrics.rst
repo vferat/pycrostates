@@ -12,7 +12,7 @@ Metrics
 .. autosummary::
    :toctree: generated/
 
-   metrics.silhouette_score
-   metrics.calinski_harabasz_score
-   metrics.davies_bouldin_score
-   metrics.dunn_score
+   silhouette_score
+   calinski_harabasz_score
+   davies_bouldin_score
+   dunn_score
