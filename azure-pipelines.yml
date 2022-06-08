@@ -23,15 +23,6 @@ stages:
       PYTHON_VERSION: '3.9'
       CACHE_PATH: /home/vsts/mne_data
     steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: $(PYTHON_VERSION)
-        architecture: 'x64'
-        addToPath: true
-      displayName: 'Setup Python $(PYTHON_VERSION)'
-    - script: |
-        python -m pip install --progress-bar off --upgrade pip setuptools wheel
-        python -m pip install --progress-bar off mne
     - script: |
         curl https://raw.githubusercontent.com/mne-tools/mne-testing-data/master/version.txt -o mne_testing_data_version.txt
       displayName: "Retrieve MNE testing dataset version"
@@ -39,8 +30,22 @@ stages:
       inputs:
         key: '"mne_testing_data" | mne_testing_data_version.txt'
         path: $(CACHE_PATH)
+        cacheHitVar: CACHE_RESTORED
       displayName: 'Cache MNE testing dataset'
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: $(PYTHON_VERSION)
+        architecture: 'x64'
+        addToPath: true
+      condition: ne(variables.CACHE_RESTORED, 'true')
+      displayName: 'Setup Python $(PYTHON_VERSION)'
+    - script: |
+        python -m pip install --progress-bar off --upgrade pip setuptools wheel
+        python -m pip install --progress-bar off mne
+      condition: ne(variables.CACHE_RESTORED, 'true')
+      displayName: 'Install dependencies'
     - script: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
+      condition: ne(variables.CACHE_RESTORED, 'true')
       displayName: 'Get MNE testing datataset'
 
 - stage: PyTest
@@ -135,6 +140,7 @@ stages:
       inputs:
         key: '"mne_testing_data" | mne_testing_data_version.txt'
         path: $(CACHE_PATH)
+        cacheHitVar: CACHE_RESTORED
       displayName: 'Cache MNE testing dataset'
     - script: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
       displayName: 'Get MNE testing datataset'
