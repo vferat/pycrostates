@@ -88,7 +88,6 @@ jobs:
         CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
   pool:
     vmImage: $(IMAGE_NAME)
-
   steps:
   - task: UsePythonVersion@0
     inputs:
