@@ -18,7 +18,7 @@ stages:
     timeoutInMinutes: 15
     continueOnError: false
     pool:
-      vmImage: 'macOS-latest'
+      vmImage: 'windows-latest'
     variables:
       PYTHON_VERSION: '3.9'
       CACHE_PATH: /home/vsts/mne_data
@@ -47,7 +47,7 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     variables:
-      CACHE_PATH: ~/mne_data
+      CACHE_PATH: /home/vsts/mne_data
     strategy:
       maxParallel: 2
       matrix:
@@ -67,7 +67,7 @@ stages:
     pool:
       vmImage: 'macOS-latest'
     variables:
-      CACHE_PATH: ~/mne_data
+      CACHE_PATH: /Users/runner/mne_data
     strategy:
       maxParallel: 2
       matrix:
