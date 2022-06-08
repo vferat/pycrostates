@@ -28,25 +28,26 @@ logger.propagate = True
 
 directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
-raw = read_raw_fif(fname, preload=True)
-raw_meg = raw.copy().pick_types(meg=True, eeg=True, exclude="bads")
-raw_meg.crop(0, 10).apply_proj()
-# 59 EEG channels in raw_meg: 1 EEG channel has been removed
-raw.pick("eeg").crop(0, 10).apply_proj()
-# 60 EEG channels in raw
-events = make_fixed_length_events(raw, duration=1)
+# raw
+raw_meg = read_raw_fif(fname, preload=False)
+raw_meg.crop(0, 10)
+raw_eeg = raw_meg.copy().pick("eeg").load_data().apply_proj()
+raw_meg.pick_types(meg=True, eeg=True, exclude="bads")
+raw_meg.load_data().apply_proj()
+# epochs
+events = make_fixed_length_events(raw_meg, duration=1)
 epochs_meg = Epochs(
     raw_meg, events, tmin=0, tmax=0.5, baseline=None, preload=True
 )
-epochs = Epochs(raw, events, tmin=0, tmax=0.5, baseline=None, preload=True)
+epochs_eeg = Epochs(raw_eeg, events, tmin=0, tmax=0.5, baseline=None, preload=True)
 # ch_data
-ch_data = ChData(raw.get_data(), raw.info)
+ch_data = ChData(raw_eeg.get_data(), raw_eeg.info)
 # Fit one for general purposes
 n_clusters = 4
 ModK = ModKMeans(
     n_clusters=n_clusters, n_init=10, max_iter=100, tol=1e-4, random_state=1
 )
-ModK.fit(raw, n_jobs=1)
+ModK.fit(raw_eeg, n_jobs=1)
 
 
 # pylint: disable=protected-access
@@ -125,11 +126,11 @@ def test_ModKMeans():
     assert ModK1._cluster_names == ["0", "1", "2", "3"]
 
     # Test fit on RAW
-    ModK1.fit(raw, n_jobs=1)
+    ModK1.fit(raw_eeg, n_jobs=1)
     _check_fitted(ModK1)
     assert ModK1._cluster_centers_.shape == (
         n_clusters,
-        len(raw.info["ch_names"]) - len(raw.info["bads"]),
+        len(raw_eeg.info["ch_names"]) - len(raw_eeg.info["bads"]),
     )
 
     # Test reset
@@ -137,11 +138,11 @@ def test_ModKMeans():
     _check_unfitted(ModK1)
 
     # Test fit on Epochs
-    ModK1.fit(epochs, n_jobs=1)
+    ModK1.fit(epochs_eeg, n_jobs=1)
     _check_fitted(ModK1)
     assert ModK1._cluster_centers_.shape == (
         n_clusters,
-        len(epochs.info["ch_names"]) - len(epochs.info["bads"]),
+        len(epochs_eeg.info["ch_names"]) - len(epochs_eeg.info["bads"]),
     )
 
     # Test fit on ChData
@@ -149,7 +150,7 @@ def test_ModKMeans():
     _check_fitted(ModK1)
     assert ModK1._cluster_centers_.shape == (
         n_clusters,
-        len(raw.info["ch_names"]) - len(raw.info["bads"]),
+        len(raw_eeg.info["ch_names"]) - len(raw_eeg.info["bads"]),
     )
 
     # Test copy
@@ -538,40 +539,40 @@ def test_invalid_arguments():
     )
     # inst
     with pytest.raises(TypeError, match="'inst' must be an instance of "):
-        ModK_.fit(epochs.average())
+        ModK_.fit(epochs_eeg.average())
 
     # tmin/tmax
     with pytest.raises(TypeError, match="'tmin' must be an instance of "):
-        ModK_.fit(raw, tmin="101")
+        ModK_.fit(raw_eeg, tmin="101")
     with pytest.raises(TypeError, match="'tmax' must be an instance of "):
-        ModK_.fit(raw, tmax="101")
+        ModK_.fit(raw_eeg, tmax="101")
     with pytest.raises(ValueError, match="Argument 'tmin' must be positive"):
-        ModK_.fit(raw, tmin=-101, tmax=None)
+        ModK_.fit(raw_eeg, tmin=-101, tmax=None)
     with pytest.raises(ValueError, match="Argument 'tmax' must be positive"):
-        ModK_.fit(raw, tmin=None, tmax=-101)
+        ModK_.fit(raw_eeg, tmin=None, tmax=-101)
     with pytest.raises(
         ValueError,
         match="Argument 'tmax' must be strictly larger than 'tmin'.",
     ):
-        ModK_.fit(raw, tmin=5, tmax=1)
+        ModK_.fit(raw_eeg, tmin=5, tmax=1)
     with pytest.raises(
         ValueError,
         match="Argument 'tmin' must be shorter than the instance length.",
     ):
-        ModK_.fit(raw, tmin=101, tmax=None)
+        ModK_.fit(raw_eeg, tmin=101, tmax=None)
     with pytest.raises(
         ValueError,
         match="Argument 'tmax' must be shorter than the instance length.",
     ):
-        ModK_.fit(raw, tmin=None, tmax=101)
+        ModK_.fit(raw_eeg, tmin=None, tmax=101)
 
     # reject_by_annotation
     with pytest.raises(
         TypeError, match="'reject_by_annotation' must be an instance of "
     ):
-        ModK_.fit(raw, reject_by_annotation=1)
+        ModK_.fit(raw_eeg, reject_by_annotation=1)
     with pytest.raises(ValueError, match="only allows for"):
-        ModK_.fit(raw, reject_by_annotation="101")
+        ModK_.fit(raw_eeg, reject_by_annotation="101")
 
 
 def test_fit_data_shapes():
@@ -588,81 +589,81 @@ def test_fit_data_shapes():
     ModK_.fitted = False
     _check_unfitted(ModK_)
     ModK_.fit(
-        raw,
+        raw_eeg,
         n_jobs=1,
         picks="eeg",
         tmin=5,
         tmax=None,
         reject_by_annotation=False,
     )
-    _check_fitted_data_raw(ModK_._fitted_data, raw, "eeg", 5, None, None)
+    _check_fitted_data_raw(ModK_._fitted_data, raw_eeg, "eeg", 5, None, None)
     # save for later
     fitted_data_5_end = deepcopy(ModK_._fitted_data)
 
     ModK_.fitted = False
     _check_unfitted(ModK_)
     ModK_.fit(
-        epochs,
+        epochs_eeg,
         n_jobs=1,
         picks="eeg",
         tmin=0.2,
         tmax=None,
         reject_by_annotation=False,
     )
-    _check_fitted_data_epochs(ModK_._fitted_data, epochs, "eeg", 0.2, None)
+    _check_fitted_data_epochs(ModK_._fitted_data, epochs_eeg, "eeg", 0.2, None)
 
     # tmax
     ModK_.fitted = False
     _check_unfitted(ModK_)
     ModK_.fit(
-        raw,
+        raw_eeg,
         n_jobs=1,
         picks="eeg",
         tmin=None,
         tmax=5,
         reject_by_annotation=False,
     )
-    _check_fitted_data_raw(ModK_._fitted_data, raw, "eeg", None, 5, None)
+    _check_fitted_data_raw(ModK_._fitted_data, raw_eeg, "eeg", None, 5, None)
     # save for later
     fitted_data_0_5 = deepcopy(ModK_._fitted_data)
 
     ModK_.fitted = False
     _check_unfitted(ModK_)
     ModK_.fit(
-        epochs,
+        epochs_eeg,
         n_jobs=1,
         picks="eeg",
         tmin=None,
         tmax=0.3,
         reject_by_annotation=False,
     )
-    _check_fitted_data_epochs(ModK_._fitted_data, epochs, "eeg", None, 0.3)
+    _check_fitted_data_epochs(ModK_._fitted_data, epochs_eeg, "eeg", None, 0.3)
 
     # tmin, tmax
     ModK_.fitted = False
     _check_unfitted(ModK_)
     ModK_.fit(
-        raw, n_jobs=1, picks="eeg", tmin=2, tmax=8, reject_by_annotation=False
+        raw_eeg, n_jobs=1, picks="eeg", tmin=2, tmax=8, reject_by_annotation=False
     )
-    _check_fitted_data_raw(ModK_._fitted_data, raw, "eeg", 2, 8, None)
+    _check_fitted_data_raw(ModK_._fitted_data, raw_eeg, "eeg", 2, 8, None)
 
     ModK_.fitted = False
     _check_unfitted(ModK_)
     ModK_.fit(
-        epochs,
+        epochs_eeg,
         n_jobs=1,
         picks="eeg",
         tmin=0.1,
         tmax=0.4,
         reject_by_annotation=False,
     )
-    _check_fitted_data_epochs(ModK_._fitted_data, epochs, "eeg", 0.1, 0.4)
+    _check_fitted_data_epochs(ModK_._fitted_data, epochs_eeg, "eeg", 0.1, 0.4)
 
     # ---------------------
     # Reject by annotations
     # ---------------------
     bad_annot = Annotations([1], [2], "bad")
-    raw_ = raw.copy()
+    raw_ = raw_eeg.copy()
     raw_.set_annotations(bad_annot)
 
     ModK_.fitted = False
@@ -723,7 +724,7 @@ def test_fit_data_shapes():
 def test_fit_with_bads(caplog):
     """Test log messages emitted when fitting with bad channels."""
     # 0 bads
-    raw_ = raw.copy()
+    raw_ = raw_eeg.copy()
     raw_.info["bads"] = []
     ModK_ = ModKMeans(
         n_clusters=n_clusters,
@@ -740,7 +741,7 @@ def test_fit_with_bads(caplog):
     caplog.clear()
 
     # 1 bads
-    raw_ = raw.copy()
+    raw_ = raw_eeg.copy()
     raw_.info["bads"] = [raw_.ch_names[0]]
     ModK_ = ModKMeans(
         n_clusters=n_clusters,
@@ -757,7 +758,7 @@ def test_fit_with_bads(caplog):
     caplog.clear()
 
     # more than 1 bads
-    raw_ = raw.copy()
+    raw_ = raw_eeg.copy()
     raw_.info["bads"] = [raw_.ch_names[0], raw_.ch_names[1]]
     ModK_ = ModKMeans(
         n_clusters=n_clusters,
@@ -774,7 +775,7 @@ def test_fit_with_bads(caplog):
     caplog.clear()
 
     # Test on epochs
-    epochs_ = epochs.copy()
+    epochs_ = epochs_eeg.copy()
     epochs_.info["bads"] = [epochs_.ch_names[0], epochs_.ch_names[1]]
     ModK_ = ModKMeans(
         n_clusters=n_clusters,
@@ -794,13 +795,13 @@ def test_fit_with_bads(caplog):
 def test_predict(caplog):
     """Test predict method default behaviors."""
     # raw, no smoothing, no_edge
-    segmentation = ModK.predict(raw, factor=0, reject_edges=False)
+    segmentation = ModK.predict(raw_eeg, factor=0, reject_edges=False)
     assert isinstance(segmentation, RawSegmentation)
     assert "Segmenting data without smoothing" in caplog.text
     caplog.clear()
 
     # raw, no smoothing, with edge rejection
-    segmentation = ModK.predict(raw, factor=0, reject_edges=True)
+    segmentation = ModK.predict(raw_eeg, factor=0, reject_edges=True)
     assert isinstance(segmentation, RawSegmentation)
     assert segmentation._labels[0] == -1
     assert segmentation._labels[-1] == -1
@@ -808,7 +809,7 @@ def test_predict(caplog):
     caplog.clear()
 
     # raw, with smoothing
-    segmentation = ModK.predict(raw, factor=3, reject_edges=True)
+    segmentation = ModK.predict(raw_eeg, factor=3, reject_edges=True)
     assert isinstance(segmentation, RawSegmentation)
     assert segmentation._labels[0] == -1
     assert segmentation._labels[-1] == -1
@@ -817,7 +818,7 @@ def test_predict(caplog):
 
     # raw with min_segment_length
     segmentation = ModK.predict(
-        raw, factor=0, reject_edges=False, min_segment_length=5
+        raw_eeg, factor=0, reject_edges=False, min_segment_length=5
     )
     assert isinstance(segmentation, RawSegmentation)
     segment_lengths = [
@@ -828,13 +829,13 @@ def test_predict(caplog):
     caplog.clear()
 
     # epochs, no smoothing, no_edge
-    segmentation = ModK.predict(epochs, factor=0, reject_edges=False)
+    segmentation = ModK.predict(epochs_eeg, factor=0, reject_edges=False)
     assert isinstance(segmentation, EpochsSegmentation)
     assert "Segmenting data without smoothing" in caplog.text
     caplog.clear()
 
     # epochs, no smoothing, with edge rejection
-    segmentation = ModK.predict(epochs, factor=0, reject_edges=True)
+    segmentation = ModK.predict(epochs_eeg, factor=0, reject_edges=True)
     assert isinstance(segmentation, EpochsSegmentation)
     for epoch_labels in segmentation._labels:
         assert epoch_labels[0] == -1
@@ -843,7 +844,7 @@ def test_predict(caplog):
     caplog.clear()
 
     # epochs, with smoothing
-    segmentation = ModK.predict(epochs, factor=3, reject_edges=True)
+    segmentation = ModK.predict(epochs_eeg, factor=3, reject_edges=True)
     assert isinstance(segmentation, EpochsSegmentation)
     for epoch_labels in segmentation._labels:
         assert epoch_labels[0] == -1
@@ -853,7 +854,7 @@ def test_predict(caplog):
 
     # epochs with min_segment_length
     segmentation = ModK.predict(
-        epochs, factor=0, reject_edges=False, min_segment_length=5
+        epochs_eeg, factor=0, reject_edges=False, min_segment_length=5
     )
     assert isinstance(segmentation, EpochsSegmentation)
     for epoch_labels in segmentation._labels:
@@ -866,7 +867,7 @@ def test_predict(caplog):
 
     # raw with reject_by_annotation
     bad_annot = Annotations([1], [2], "bad")
-    raw_ = raw.copy()
+    raw_ = raw_eeg.copy()
     raw_.set_annotations(bad_annot)
     segmentation_rej_True = ModK.predict(
         raw_, factor=0, reject_edges=True, reject_by_annotation=True
@@ -878,7 +879,7 @@ def test_predict(caplog):
         raw_, factor=0, reject_edges=True, reject_by_annotation=None
     )
     segmentation_no_annot = ModK.predict(
-        raw, factor=0, reject_edges=True, reject_by_annotation="omit"
+        raw_eeg, factor=0, reject_edges=True, reject_by_annotation="omit"
     )
     assert not np.isclose(
         segmentation_rej_True._labels, segmentation_rej_False._labels
@@ -892,28 +893,28 @@ def test_predict(caplog):
 
     # test different half_window_size
     segmentation1 = ModK.predict(
-        raw, factor=3, reject_edges=False, half_window_size=3
+        raw_eeg, factor=3, reject_edges=False, half_window_size=3
     )
     segmentation2 = ModK.predict(
-        raw, factor=3, reject_edges=False, half_window_size=60
+        raw_eeg, factor=3, reject_edges=False, half_window_size=60
     )
     segmentation3 = ModK.predict(
-        raw, factor=0, reject_edges=False, half_window_size=3
+        raw_eeg, factor=0, reject_edges=False, half_window_size=3
     )
     assert not np.isclose(segmentation1._labels, segmentation2._labels).all()
     assert not np.isclose(segmentation1._labels, segmentation3._labels).all()
     assert not np.isclose(segmentation2._labels, segmentation3._labels).all()
 
     # with raw and picks
-    raw_ = raw.copy()
-    raw_.info["bads"] = [raw.ch_names[k] for k in range(3)]
+    raw_ = raw_eeg.copy()
+    raw_.info["bads"] = [raw_.ch_names[k] for k in range(3)]
     segmentation = ModK.predict(raw_, picks="eeg")
     assert "channel EEG 053 was set as bads" in caplog.text
     caplog.clear()
 
     # with epochs and picks
-    epochs_ = epochs.copy()
-    epochs_.info["bads"] = [epochs.ch_names[k] for k in range(3)]
+    epochs_ = epochs_eeg.copy()
+    epochs_.info["bads"] = [epochs_.ch_names[k] for k in range(3)]
     segmentation = ModK.predict(epochs_, picks="eeg")
     assert "channel EEG 053 was set as bads" in caplog.text
     caplog.clear()
@@ -954,17 +955,17 @@ def test_predict(caplog):
     assert "channels EEG 059, EEG 060 were set" in caplog.text
 
     # with picks of non-extreme channels
-    raw_ = raw.copy()
-    raw_.info["bads"] = [raw.info["ch_names"][k] for k in range(2, 5)]
-    raw_.info["bads"] += [raw.info["ch_names"][k] for k in range(20, 22)]
+    raw_ = raw_eeg.copy()
+    raw_.info["bads"] = [raw_.info["ch_names"][k] for k in range(2, 5)]
+    raw_.info["bads"] += [raw_.info["ch_names"][k] for k in range(20, 22)]
     ModK_ = ModKMeans(
         n_clusters=4, n_init=10, max_iter=100, tol=1e-4, random_state=1
     )
     ModK_.fit(raw_, n_jobs=1)
     raw_.info["bads"] = []
     segmentation = ModK_.predict(raw_, picks="eeg")
-    raw_.info["bads"] = [raw.info["ch_names"][k] for k in range(1, 3)]
-    raw_.info["bads"] += [raw.info["ch_names"][k] for k in range(42, 50)]
+    raw_.info["bads"] = [raw_.info["ch_names"][k] for k in range(1, 3)]
+    raw_.info["bads"] += [raw_.info["ch_names"][k] for k in range(42, 50)]
     segmentation = ModK_.predict(raw_, picks="eeg")
 
     # with different channels
@@ -972,8 +973,8 @@ def test_predict(caplog):
         ModK.predict(raw_meg_, picks="eeg")
 
     # test with an explicit set of channels in picks
-    raw_ = raw.copy()
-    raw_.info["bads"] = [raw.info["ch_names"][k] for k in range(3)]
+    raw_ = raw_eeg.copy()
+    raw_.info["bads"] = [raw_.info["ch_names"][k] for k in range(3)]
     picks = [
         ch
         for k, ch in enumerate(raw_.info["ch_names"])
@@ -986,30 +987,30 @@ def test_predict(caplog):
 def test_predict_invalid_arguments():
     """Test invalid arguments passed to predict."""
     with pytest.raises(TypeError, match="'inst' must be an instance of "):
-        ModK.predict(epochs.average())
+        ModK.predict(epochs_eeg.average())
     with pytest.raises(TypeError, match="'factor' must be an instance of "):
-        ModK.predict(raw, factor="0")
+        ModK.predict(raw_eeg, factor="0")
     with pytest.raises(
         TypeError, match="'reject_edges' must be an instance of "
     ):
-        ModK.predict(raw, reject_edges=1)
+        ModK.predict(raw_eeg, reject_edges=1)
     with pytest.raises(
         TypeError, match="'half_window_size' must be an instance of "
     ):
-        ModK.predict(raw, half_window_size="1")
+        ModK.predict(raw_eeg, half_window_size="1")
     with pytest.raises(TypeError, match="'tol' must be an instance of "):
-        ModK.predict(raw, tol="0")
+        ModK.predict(raw_eeg, tol="0")
     with pytest.raises(
         TypeError, match="'min_segment_length' must be an instance of "
     ):
-        ModK.predict(raw, min_segment_length="0")
+        ModK.predict(raw_eeg, min_segment_length="0")
     with pytest.raises(
         TypeError, match="'reject_by_annotation' must be an instance of "
     ):
-        ModK.predict(raw, reject_by_annotation=1)
+        ModK.predict(raw_eeg, reject_by_annotation=1)
     with pytest.raises(ValueError, match="'reject_by_annotation' can be"):
-        ModK.predict(raw, reject_by_annotation="101")
-    raw_ = raw.copy().drop_channels([raw.ch_names[0]])
+        ModK.predict(raw_eeg, reject_by_annotation="101")
+    raw_ = raw_eeg.copy().drop_channels([raw_eeg.ch_names[0]])
     with pytest.raises(ValueError, match="does not have the same channels"):
         ModK.predict(raw_)
 
@@ -1023,7 +1024,7 @@ def test_n_jobs():
         tol=1e-4,
         random_state=1,
     )
-    ModK_.fit(raw, n_jobs=2)
+    ModK_.fit(raw_eeg, n_jobs=2)
     _check_fitted(ModK_)
     assert np.isclose(ModK_._cluster_centers_, ModK._cluster_centers_).all()
     assert np.isclose(ModK_.GEV_, ModK.GEV_)
@@ -1036,7 +1037,7 @@ def test_fit_not_converged(caplog):
     ModK_ = ModKMeans(
         n_clusters=n_clusters, n_init=10, max_iter=40, tol=1e-4, random_state=1
     )
-    ModK_.fit(raw, n_jobs=1)
+    ModK_.fit(raw_eeg, n_jobs=1)
     _check_fitted(ModK_)
     assert "after 10/10 iterations converged." in caplog.text
     caplog.clear()
@@ -1049,7 +1050,7 @@ def test_fit_not_converged(caplog):
         tol=1e-10,
         random_state=1,
     )
-    ModK_.fit(raw, n_jobs=1)
+    ModK_.fit(raw_eeg, n_jobs=1)
     _check_fitted(ModK_)
     assert "after 6/10 iterations converged." in caplog.text
     caplog.clear()
@@ -1062,7 +1063,7 @@ def test_fit_not_converged(caplog):
         tol=1e-20,
         random_state=1,
     )
-    ModK_.fit(raw, n_jobs=1)
+    ModK_.fit(raw_eeg, n_jobs=1)
     _check_unfitted(ModK_)
     assert "All the K-means run failed to converge." in caplog.text
     caplog.clear()
@@ -1074,7 +1075,7 @@ def test_fit_not_converged(caplog):
         tol=1e-20,
         random_state=1,
     )
-    ModK_.fit(raw, n_jobs=2)
+    ModK_.fit(raw_eeg, n_jobs=2)
     _check_unfitted(ModK_)
     assert "All the K-means run failed to converge." in caplog.text
     caplog.clear()
@@ -1085,15 +1086,15 @@ def test_randomseed():
     ModK1 = ModKMeans(
         n_clusters=n_clusters, n_init=10, max_iter=40, tol=1e-4, random_state=1
     )
-    ModK1.fit(raw, n_jobs=1)
+    ModK1.fit(raw_eeg, n_jobs=1)
     ModK2 = ModKMeans(
         n_clusters=n_clusters, n_init=10, max_iter=40, tol=1e-4, random_state=1
     )
-    ModK2.fit(raw, n_jobs=1)
+    ModK2.fit(raw_eeg, n_jobs=1)
     ModK3 = ModKMeans(
         n_clusters=n_clusters, n_init=10, max_iter=40, tol=1e-4, random_state=2
     )
-    ModK3.fit(raw, n_jobs=1)
+    ModK3.fit(raw_eeg, n_jobs=1)
 
     assert np.isclose(ModK1._cluster_centers_, ModK2._cluster_centers_).all()
     assert not np.isclose(
@@ -1176,9 +1177,9 @@ def test_save(tmp_path, caplog):
     assert ModK1 == ModK2  # sanity-check
 
     # test prediction
-    segmentation = ModK.predict(raw, picks="eeg")
-    segmentation1 = ModK1.predict(raw, picks="eeg")
-    segmentation2 = ModK2.predict(raw, picks="eeg")
+    segmentation = ModK.predict(raw_eeg, picks="eeg")
+    segmentation1 = ModK1.predict(raw_eeg, picks="eeg")
+    segmentation2 = ModK2.predict(raw_eeg, picks="eeg")
 
     assert np.allclose(segmentation._labels, segmentation1._labels)
     assert np.allclose(segmentation._labels, segmentation2._labels)
