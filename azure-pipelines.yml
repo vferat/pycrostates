@@ -9,106 +9,113 @@ pr:
     include:
       - '*'
 
-- job: cache
-  timeoutInMinutes: 15
-  pool:
-   vmImage: 'ubuntu-latest'
-  variables:
-    PYTHON_VERSION: '3.9'
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: $(PYTHON_VERSION)
-      architecture: 'x64'
-      addToPath: true
-    displayName: 'Setup Python $(PYTHON_VERSION)'
-  - script: |
-      python -m pip install --progress-bar off --upgrade pip setuptools wheel
-      python -m pip install --progress-bar off .
-  - script: python -c "import pycrostates; pycrostates.datasets.lemon.data_path(verbose=True)"
-    displayName: 'Get testing data'
+stages:
+- stage: Prepare
+  jobs:
+  - job: cache
+    timeoutInMinutes: 15
+    continueOnError: false
+    pool:
+      vmImage: 'ubuntu-latest'
+    variables:
+      PYTHON_VERSION: '3.9'
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: $(PYTHON_VERSION)
+        architecture: 'x64'
+        addToPath: true
+      displayName: 'Setup Python $(PYTHON_VERSION)'
+    - script: |
+        python -m pip install --progress-bar off --upgrade pip setuptools wheel
+        python -m pip install --progress-bar off .
+    - script: python -c "import pycrostates; pycrostates.datasets.lemon.data_path(verbose=True)"
+      displayName: 'Get testing data'
 
-- job: linux
-  timeoutInMinutes: 30
-  pool:
-   vmImage: 'ubuntu-latest'
-  strategy:
-    maxParallel: 2
-    matrix:
-      Python37:
-        python.version: '3.7'
-      Python38:
-        python.version: '3.8'
-      Python39:
-        python.version: '3.9'
-      Python310:
-        python.version: '3.10'
-  steps:
-  - template: azure-pipelines-steps.yml
+- stage: PyTest
+  jobs:
+  - job: linux
+    timeoutInMinutes: 30
+    pool:
+      vmImage: 'ubuntu-latest'
+    strategy:
+      maxParallel: 2
+      matrix:
+        Python37:
+          python.version: '3.7'
+        Python38:
+          python.version: '3.8'
+        Python39:
+          python.version: '3.9'
+        Python310:
+          python.version: '3.10'
+    steps:
+    - template: azure-pipelines-steps.yml
 
-- job: windows
-  timeoutInMinutes: 30
-  pool:
-   vmImage: 'windows-latest'
-  strategy:
-    maxParallel: 2
-    matrix:
-      Python37:
-        python.version: '3.7'
-      Python38:
-        python.version: '3.8'
-      Python39:
-        python.version: '3.9'
-      Python310:
-        python.version: '3.10'
-  steps:
-  - template: azure-pipelines-steps.yml
+  - job: macOS
+    timeoutInMinutes: 30
+    pool:
+      vmImage: 'macOS-latest'
+    strategy:
+      maxParallel: 2
+      matrix:
+        Python37:
+          python.version: '3.7'
+        Python38:
+          python.version: '3.8'
+        Python39:
+          python.version: '3.9'
+        Python310:
+          python.version: '3.10'
+    steps:
+    - template: azure-pipelines-steps.yml
 
-- job: macOS
-  timeoutInMinutes: 30
-  pool:
-   vmImage: 'macOS-latest'
-  strategy:
-    maxParallel: 2
-    matrix:
-      3.7:
-        python.version: '3.7'
-      3.8:
-        python.version: '3.8'
-      3.9:
-        python.version: '3.9'
-      3.10:
-        python.version: '3.10'
-  steps:
-  - template: azure-pipelines-steps.yml
+  - job: windows
+    timeoutInMinutes: 30
+    pool:
+      vmImage: 'windows-latest'
+    strategy:
+      maxParallel: 2
+      matrix:
+        Python37:
+          python.version: '3.7'
+        Python38:
+          python.version: '3.8'
+        Python39:
+          python.version: '3.9'
+        Python310:
+          python.version: '3.10'
+    steps:
+    - template: azure-pipelines-steps.yml
 
-- job: 'linux MNE-dev'
-  timeoutInMinutes: 30
-  pool:
-   vmImage: 'ubuntu-latest'
-  variables:
-    PYTHON_VERSION: '3.9'
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: $(PYTHON_VERSION)
-      architecture: 'x64'
-      addToPath: true
-    displayName: 'Setup Python $(PYTHON_VERSION)'
-  - script: |
-      python -m pip install --progress-bar off --upgrade pip setuptools wheel
-      python -m pip install --progress-bar off .[test]
-      python -m pip uninstall -y mne
-      python -m pip install --progress-bar off --no-deps https://github.com/mne-tools/mne-python/archive/main.zip
-    displayName: 'Install dependencies'
-  - script: mne sys_info -pd
-    displayName: 'Display MNE config'
-  - task: Cache@2
-    inputs:
-      key: 'pycrostates_data'
-      path: C:\Users\VssAdministrator\pycrostates_data
-    displayName: 'Cache testing data'
-  - script: python -c "import pycrostates; pycrostates.datasets.lemon.data_path(verbose=True)"
-    displayName: 'Get testing data'
-  - script: pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
-    displayName: 'Run tests'
+
+  - job: 'linux MNE-dev'
+    timeoutInMinutes: 30
+    pool:
+      vmImage: 'ubuntu-latest'
+    variables:
+      PYTHON_VERSION: '3.9'
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: $(PYTHON_VERSION)
+        architecture: 'x64'
+        addToPath: true
+      displayName: 'Setup Python $(PYTHON_VERSION)'
+    - script: |
+        python -m pip install --progress-bar off --upgrade pip setuptools wheel
+        python -m pip install --progress-bar off .[test]
+        python -m pip uninstall -y mne
+        python -m pip install --progress-bar off --no-deps https://github.com/mne-tools/mne-python/archive/main.zip
+      displayName: 'Install dependencies'
+    - script: mne sys_info -pd
+      displayName: 'Display MNE config'
+    - task: Cache@2
+      inputs:
+        key: 'pycrostates_data'
+        path: C:\Users\VssAdministrator\pycrostates_data
+      displayName: 'Cache testing data'
+    - script: python -c "import pycrostates; pycrostates.datasets.lemon.data_path(verbose=True)"
+      displayName: 'Get testing data'
+    - script: pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
+      displayName: 'Run tests'
