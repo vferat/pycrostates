@@ -10,7 +10,8 @@ pr:
       - '*'
 
 stages:
-- stage: Prepare
+- stage: prepare_environment
+  displayName: 'Prepare environment'
   jobs:
   - job: cache_datasets
     displayName: 'Cache datasets'
@@ -30,7 +31,7 @@ stages:
       displayName: 'Setup Python $(PYTHON_VERSION)'
     - script: |
         python -m pip install --progress-bar off --upgrade pip setuptools wheel
-        python -m pip install --progress-bar off
+        python -m pip install --progress-bar off mne
     - task: Cache@2
       inputs:
         key: 'mne_testing_data'
