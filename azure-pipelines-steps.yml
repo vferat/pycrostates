@@ -1,12 +1,13 @@
 steps:
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: '$(python.version)'
+    versionSpec: $(python.version)
+    architecture: 'x64'
+    addToPath: true
   displayName: 'Use Python $(python.version)'
 
 - script: |
     python -m pip install --progress-bar off --upgrade pip setuptools wheel
-    python -m pip install --progress-bar off --force-reinstall tk
     python -m pip install --progress-bar off .[test]
   displayName: 'Install dependencies'
 
