@@ -18,10 +18,10 @@ stages:
     timeoutInMinutes: 15
     continueOnError: false
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: 'macOS-latest'
     variables:
       PYTHON_VERSION: '3.9'
-      CACHE_PATH: ~/mne_data
+      CACHE_PATH: /home/vsts/mne_data
     steps:
     - task: UsePythonVersion@0
       inputs:
@@ -110,7 +110,7 @@ stages:
       vmImage: 'ubuntu-latest'
     variables:
       PYTHON_VERSION: '3.9'
-      CACHE_PATH: ~/mne_data
+      CACHE_PATH: /home/vsts/mne_data
     steps:
     - task: UsePythonVersion@0
       inputs:
