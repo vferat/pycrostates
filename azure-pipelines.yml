@@ -95,7 +95,7 @@ jobs:
       versionSpec: $(PYTHON_VERSION)
       architecture: 'x64'
       addToPath: true
-    displayName: 'Use Python $(PYTHON_VERSION)'
+    displayName: 'Setup Python $(PYTHON_VERSION)'
   - script: |
       python -m pip install --progress-bar off --upgrade pip setuptools wheel
       python -m pip install --progress-bar off .[test]
