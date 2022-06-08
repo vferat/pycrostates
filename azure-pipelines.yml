@@ -29,8 +29,8 @@ stages:
       displayName: 'Setup Python $(PYTHON_VERSION)'
     - script: |
         python -m pip install --progress-bar off --upgrade pip setuptools wheel
-        python -m pip install --progress-bar off .
-    - script: python -c "import pycrostates; pycrostates.datasets.lemon.data_path()"
+        python -m pip install --progress-bar off mne
+    - script: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
       displayName: 'Get testing data'
 
 - stage: PyTest
