@@ -9,7 +9,7 @@ pr:
     include:
       - '*'
 
-- job: 'cache datasets'
+- job: cache
   timeoutInMinutes: 15
   pool:
    vmImage: 'ubuntu-latest'
@@ -27,8 +27,6 @@ pr:
       python -m pip install --progress-bar off .
   - script: python -c "import pycrostates; pycrostates.datasets.lemon.data_path(verbose=True)"
     displayName: 'Get testing data'
-  - script: python -c "import pycrostates; print(pycrostates.datasets.lemon.data_path(verbose=True))"
-    displayName: 'print path to testing data'
 
 - job: linux
   timeoutInMinutes: 30
