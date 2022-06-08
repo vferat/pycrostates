@@ -133,6 +133,6 @@ stages:
       displayName: 'Cache testing data'
     - script: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
       displayName: 'Get testing data'
-      condition: ne($(CACHE_RESTORED), 'true')
+      condition: ne(variables.CACHE_RESTORED, 'true')
     - script: pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
       displayName: 'Run tests'
