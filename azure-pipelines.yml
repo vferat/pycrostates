@@ -10,8 +10,8 @@ pr:
       - '*'
 
 stages:
-- stage: prepare_environment
-  displayName: 'Prepare environment'
+- stage: download_datasets
+  displayName: 'Download datasets'
   jobs:
   - job: cache_datasets
     displayName: 'Cache datasets'
@@ -102,9 +102,8 @@ stages:
     steps:
     - template: azure-pipelines-steps.yml
 
-
   - job: 'linux_MNE_dev'
-    displayName: 'linux 3.10 MNE-dev'
+    displayName: 'linux $(PYTHON_VERSION) MNE-dev'
     timeoutInMinutes: 30
     pool:
       vmImage: 'ubuntu-latest'
@@ -130,8 +129,10 @@ stages:
       inputs:
         key: 'mne_testing_data'
         path: $(CACHE_PATH)
+        cacheHitVar: CACHE_RESTORED
       displayName: 'Cache testing data'
     - script: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
       displayName: 'Get testing data'
+      condition: ne(variables.CACHE_RESTORED, 'true')
     - script: pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
       displayName: 'Run tests'
