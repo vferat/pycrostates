@@ -10,87 +10,101 @@ pr:
       - '*'
 
 jobs:
-- job: linux
+- job: unit_tests
+  displayName: Unit tests
   timeoutInMinutes: 30
-  pool:
-    vmImage: 'ubuntu-latest'
   variables:
-    CACHE_PATH: /home/vsts/mne_data
+    CACHE_PATH_MNE_LINUX: /home/vsts/mne_data
+    CACHE_PATH_MNE_MACOS: /Users/runner/mne_data
+    CACHE_PATH_MNE_WINDOWS: C:\Users\VssAdministrator\mne_data
+    CODECOV_OS: Linux
+    CODECOV_PYTHON_VERSION: 3.9
   strategy:
-    maxParallel: 2
     matrix:
-      3.7:
+      linux 3.7:
+        IMAGE_NAME: 'ubuntu-latest'
         PYTHON_VERSION: '3.7'
-      3.8:
+        MNE_DEV: false
+        CACHE_MNE_PATH: $(CACHE_PATH_MNE_LINUX)
+      linux 3.8:
+        IMAGE_NAME: 'ubuntu-latest'
         PYTHON_VERSION: '3.8'
-      3.9:
+        MNE_DEV: false
+        CACHE_MNE_PATH: $(CACHE_PATH_MNE_LINUX)
+      linux 3.9:
+        IMAGE_NAME: 'ubuntu-latest'
         PYTHON_VERSION: '3.9'
-      3.10:
+        MNE_DEV: false
+        CACHE_MNE_PATH: $(CACHE_PATH_MNE_LINUX)
+      linux 3.10:
+        IMAGE_NAME: 'ubuntu-latest'
         PYTHON_VERSION: '3.10'
-  steps:
-  - template: azure-pipelines-steps.yml
-
-- job: macOS
-  timeoutInMinutes: 30
-  pool:
-    vmImage: 'macOS-latest'
-  variables:
-    CACHE_PATH: /Users/runner/mne_data
-  strategy:
-    maxParallel: 2
-    matrix:
-      3.7:
+        MNE_DEV: false
+        CACHE_MNE_PATH: $(CACHE_PATH_MNE_LINUX)
+      linux 3.10 MNE-dev:
+        IMAGE_NAME: 'ubuntu-latest'
+        PYTHON_VERSIION: '3.10'
+        MNE_DEV: true
+        CACHE_MNE_PATH: $(CACHE_PATH_MNE_LINUX)
+      macOS 3.7:
+        IMAGE_NAME: 'macOS-latest'
         PYTHON_VERSION: '3.7'
-      3.8:
+        MNE_DEV: false
+        CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
+      macOS 3.8:
+        IMAGE_NAME: 'macOS-latest'
         PYTHON_VERSION: '3.8'
-      3.9:
+        MNE_DEV: false
+        CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
+      macOS 3.9:
+        IMAGE_NAME: 'macOS-latest'
         PYTHON_VERSION: '3.9'
-      3.10:
+        MNE_DEV: false
+        CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
+      macOS 3.10:
+        IMAGE_NAME: 'macOS-latest'
         PYTHON_VERSION: '3.10'
-  steps:
-  - template: azure-pipelines-steps.yml
-
-- job: windows
-  timeoutInMinutes: 30
-  pool:
-    vmImage: 'windows-latest'
-  variables:
-    CACHE_PATH: C:\Users\VssAdministrator\mne_data
-  strategy:
-    maxParallel: 2
-    matrix:
-      3.7:
+        MNE_DEV: false
+        CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
+      windows 3.7:
+        IMAGE_NAME: 'windows-latest'
         PYTHON_VERSION: '3.7'
-      3.8:
+        MNE_DEV: false
+        CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
+      windows 3.8:
+        IMAGE_NAME: 'windows-latest'
         PYTHON_VERSION: '3.8'
-      3.9:
+        MNE_DEV: false
+        CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
+      windows 3.9:
+        IMAGE_NAME: 'windows-latest'
         PYTHON_VERSION: '3.9'
-      3.10:
-         PYTHON_VERSION: '3.10'
-  steps:
-  - template: azure-pipelines-steps.yml
-
-- job: 'linux_MNE_dev'
-  displayName: 'linux $(PYTHON_VERSION) MNE-dev'
-  timeoutInMinutes: 30
+        MNE_DEV: false
+        CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
+      windows 3.10:
+        IMAGE_NAME: 'windows-latest'
+        PYTHON_VERSION: '3.10'
+        MNE_DEV: false
+        CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
   pool:
-    vmImage: 'ubuntu-latest'
-  variables:
-    PYTHON_VERSION: '3.10'
-    CACHE_PATH: /home/vsts/mne_data
+    vmImage: $(IMAGE_NAME)
+
   steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: $(PYTHON_VERSION)
       architecture: 'x64'
       addToPath: true
-    displayName: 'Setup Python $(PYTHON_VERSION)'
+    displayName: 'Use Python $(PYTHON_VERSION)'
   - script: |
       python -m pip install --progress-bar off --upgrade pip setuptools wheel
       python -m pip install --progress-bar off .[test]
+    displayName: 'Install dependencies and MNE (stable)'
+  - script: |
       python -m pip uninstall -y mne
       python -m pip install --progress-bar off --no-deps https://github.com/mne-tools/mne-python/archive/main.zip
-    displayName: 'Install dependencies'
+    condition: eq(variables.MNE_DEV, 'true')
+    displayName: 'Install MNE (main)'
   - script: mne sys_info -pd
     displayName: 'Display MNE config'
   - script: |
@@ -99,11 +113,18 @@ jobs:
   - task: Cache@2
     inputs:
       key: '"mne_testing_data" | mne_testing_data_version.txt'
-      path: $(CACHE_PATH)
+      path: $(CACHE_MNE_PATH)
       cacheHitVar: CACHE_RESTORED
     displayName: 'Cache MNE testing dataset'
   - script: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
     displayName: 'Get MNE testing datataset'
     condition: ne(variables.CACHE_RESTORED, 'true')
   - script: pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
-    displayName: 'Run tests'
+    displayName: 'Run unit tests'
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+  - bash: bash <(curl -s https://codecov.io/bash)
+    condition: and(eq(variables['Agent.OS'], variables.CODECOV_OS), eq(variables.PYTHON_VERSION, variables.CODECOV_PYTHON_VERSION))
+    displayName: 'Upload to codecov.io'
