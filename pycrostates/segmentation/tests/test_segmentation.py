@@ -15,8 +15,9 @@ logger.propagate = True
 
 dir_ = testing.data_path() / "MEG" / "sample"
 fname_raw_testing = dir_ / "sample_audvis_trunc_raw.fif"
-raw = read_raw_fif(fname_raw_testing, preload=True)
-raw = raw.pick("eeg").crop(0, 10).filter(0, 40).apply_proj()
+raw = read_raw_fif(fname_raw_testing, preload=False)
+raw = raw.pick("eeg").crop(0, 10)
+raw = raw.load_data().filter(1, 40).apply_proj()
 
 events = make_fixed_length_events(raw, 1)
 epochs = Epochs(raw, events, preload=True)

@@ -14,10 +14,6 @@ steps:
     key: 'mne_testing_data'
     path: $(CACHE_PATH)
   displayName: 'Cache testing data'
-- script: |
-    python -c "import mne; print (mne.datasets.testing.data_path(verbose=True))"
-    python -c "import os; print (os.listdir('/home/vsts/mne_data/MNE-testing-data/MEG/sample'))"
-
 - script: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
   displayName: 'Get testing data'
 - script: |
