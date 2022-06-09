@@ -34,13 +34,12 @@ stages:
   condition: and(succeeded(), eq(dependencies.Check.outputs['Skip.result.start_main'], 'true'))
   dependsOn: ['Check']
   jobs:
-  - job: unit_tests
-    displayName: Unit tests
+  - job: pytest
     timeoutInMinutes: 30
     variables:
       CACHE_PATH_MNE_LINUX: /home/vsts/mne_data
       CACHE_PATH_MNE_MACOS: /Users/runner/mne_data
-      CACHE_PATH_MNE_WINDOWS: C:\Users\runner\mne_data
+      CACHE_PATH_MNE_WINDOWS: C:\Users\VssAdministrator\mne_data
       CODECOV_OS: Linux
       CODECOV_PYTHON_VERSION: 3.9
     strategy:
