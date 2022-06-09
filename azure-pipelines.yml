@@ -40,7 +40,7 @@ stages:
     variables:
       CACHE_PATH_MNE_LINUX: /home/vsts/mne_data
       CACHE_PATH_MNE_MACOS: /Users/runner/mne_data
-      CACHE_PATH_MNE_WINDOWS: C:\Users\VssAdministrator\mne_data
+      CACHE_PATH_MNE_WINDOWS: C:\Users\runner\mne_data
       CODECOV_OS: Linux
       CODECOV_PYTHON_VERSION: 3.9
     strategy:
@@ -94,22 +94,22 @@ stages:
           VM_IMAGE: 'windows-latest'
           PYTHON_VERSION: '3.7'
           MNE_DEV: false
-          CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
+          CACHE_MNE_PATH: $(CACHE_PATH_MNE_WINDOWS)
         windows 3.8:
           VM_IMAGE: 'windows-latest'
           PYTHON_VERSION: '3.8'
           MNE_DEV: false
-          CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
+          CACHE_MNE_PATH: $(CACHE_PATH_MNE_WINDOWS)
         windows 3.9:
           VM_IMAGE: 'windows-latest'
           PYTHON_VERSION: '3.9'
           MNE_DEV: false
-          CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
+          CACHE_MNE_PATH: $(CACHE_PATH_MNE_WINDOWS)
         windows 3.10:
           VM_IMAGE: 'windows-latest'
           PYTHON_VERSION: '3.10'
           MNE_DEV: false
-          CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
+          CACHE_MNE_PATH: $(CACHE_PATH_MNE_WINDOWS)
     pool:
       vmImage: $(VM_IMAGE)
     steps:
