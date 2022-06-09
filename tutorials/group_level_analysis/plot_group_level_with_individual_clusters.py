@@ -16,8 +16,8 @@ from pycrostates.datasets import lemon
 from pycrostates.preprocessing import extract_gfp_peaks
 from pycrostates.io import ChData
 
-condition = 'EO'
-subject_ids = ['010020', '010021' , '010022', '010023', '010024']
+condition = "EO"
+subject_ids = ["010020", "010021", "010022", "010023", "010024"]
 
 #%%
 # In this example, we first compute individual
@@ -27,19 +27,19 @@ subject_ids = ['010020', '010021' , '010022', '010023', '010024']
 # clustering (group level analysis).
 import numpy as np
 
-ModK = ModKMeans(n_clusters=5,  random_state=42)
+ModK = ModKMeans(n_clusters=5, random_state=42)
 n_jobs = 2
 
 individual_cluster_centers = list()
 for subject_id in subject_ids:
-    #Load Data
+    # Load Data
     raw_fname = lemon.data_path(subject_id=subject_id, condition=condition)
     raw = read_raw_eeglab(raw_fname, preload=True)
     raw = lemon.standardize(raw)
-    raw.pick('eeg')
+    raw.pick("eeg")
     # For sake of time, we only use 30s of recording.
     raw.crop(0, 30)
-    raw.set_eeg_reference('average')
+    raw.set_eeg_reference("average")
     # Extract Gfp peaks
     gfp_peaks = extract_gfp_peaks(raw)
     # Subject level clustering
@@ -50,13 +50,13 @@ group_cluster_centers = np.hstack(individual_cluster_centers)
 group_cluster_centers = ChData(group_cluster_centers, ModK.info)
 # Group level clustering
 ModK.fit(group_cluster_centers, n_jobs=n_jobs)
-ModK.plot();
+ModK.plot()
 
 #%%
 # We can reorganize our clustering results to our needs
 ModK.reorder_clusters(order=[2, 3, 4, 1, 0])
-ModK.rename_clusters(new_names=['A', 'B', 'C', 'D', 'F'])
-ModK.plot();
+ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
+ModK.plot()
 
 #%%
 # We can now backfit the group level maps
@@ -67,16 +67,16 @@ import pandas as pd
 
 ms_data = list()
 for subject_id in subject_ids:
-    #Load Data
+    # Load Data
     raw_fname = lemon.data_path(subject_id=subject_id, condition=condition)
     raw = read_raw_eeglab(raw_fname, preload=True)
     raw = lemon.standardize(raw)
-    raw.pick('eeg')
-    raw.crop(0, 30) # for sake of time
-    raw.set_eeg_reference('average')
+    raw.pick("eeg")
+    raw.crop(0, 30)  # for sake of time
+    raw.set_eeg_reference("average")
     segmentation = ModK.predict(raw, factor=10, half_window_size=8)
     d = segmentation.compute_parameters()
-    d['subject_id'] = subject_id
+    d["subject_id"] = subject_id
     ms_data.append(d)
 
 ms_data = pd.DataFrame(ms_data)
