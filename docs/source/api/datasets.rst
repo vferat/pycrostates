@@ -11,7 +11,6 @@ Datasets
 
 .. autosummary::
    :toctree: generated/
-   
-   lemon.load_data
-   lemon.standardize
 
+   lemon.data_path
+   lemon.standardize
