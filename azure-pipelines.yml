@@ -16,7 +16,6 @@ stages:
       pool:
         vmImage: 'ubuntu-latest'
       variables:
-        DECODE_PERCENTS: 'false'
         RET: 'true'
         BUILD_REASON: $(Build.Reason)
       steps:
