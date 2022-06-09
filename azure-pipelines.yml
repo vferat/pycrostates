@@ -12,6 +12,7 @@ pr:
 jobs:
 - job: unit_tests
   displayName: Unit tests
+  condition: not(contains(variables['Build.SourceVersionMessage'], '[skip azp]'))
   timeoutInMinutes: 30
   variables:
     CACHE_PATH_MNE_LINUX: /home/vsts/mne_data
