@@ -4,11 +4,11 @@ from matplotlib import pyplot as plt
 
 from pycrostates.viz import plot_epoch_segmentation, plot_raw_segmentation
 
-folder = mne.datasets.sample.data_path() / "MEG" / "sample"
-fname = folder / "sample_audvis_filt-0-40_raw.fif"
+folder = mne.datasets.testing.data_path() / "MEG" / "sample"
+fname = folder / "sample_audvis_trunc_raw.fif"
 raw = mne.io.read_raw(fname, preload=False)
 raw.pick_types(eeg=True).crop(tmin=0, tmax=10, include_tmax=True)
-raw.load_data()
+raw.load_data().filter(1, 40)
 events = mne.make_fixed_length_events(raw, duration=1)
 epochs = mne.Epochs(raw, events, tmin=0, tmax=0.5, baseline=None, preload=True)
 

@@ -1,8 +1,10 @@
 import mne
+import pytest
 
 from pycrostates.datasets import lemon
 
 
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_lemon_data_path():
     file_path = lemon.data_path(subject_id="010003", condition="EC")
     assert file_path.is_file()
@@ -10,6 +12,7 @@ def test_lemon_data_path():
     assert isinstance(raw, mne.io.eeglab.eeglab.RawEEGLAB)
 
 
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_lemon_standardize():
     file_path = lemon.data_path(subject_id="010003", condition="EC")
     raw = mne.io.read_raw_eeglab(file_path, preload=True)
