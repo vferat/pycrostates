@@ -147,10 +147,10 @@ def test_n_resamples_n_samples_coverage_errors():
 
 def test_resample_random_state():
     """Test resampling with n_samples and coverage provided."""
-    resamples_0 = resample(
-        raw, n_resamples=1, n_samples=500, random_state=42
-    )[0]
-    resamples_1 = resample(
-        raw, n_resamples=1, n_samples=500, random_state=42
-    )[0]
+    resamples_0 = resample(raw, n_resamples=1, n_samples=500, random_state=42)[
+        0
+    ]
+    resamples_1 = resample(raw, n_resamples=1, n_samples=500, random_state=42)[
+        0
+    ]
     assert np.allclose(resamples_0._data, resamples_1._data)
