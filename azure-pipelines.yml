@@ -32,6 +32,7 @@ stages:
 
 - stage: Tests
   condition: and(succeeded(), eq(dependencies.Check.outputs['Skip.result.start_main'], 'true'))
+  dependsOn: ['Check']
   jobs:
   - job: unit_tests
     displayName: Unit tests
