@@ -23,10 +23,16 @@ stages:
       - bash: |
           git_log=`git log --format=oneline -n 1 --skip=1`
           echo "##vso[task.setvariable variable=log]$git_log"
+        displayName: Retrieve git log
       - bash: echo "##vso[task.setvariable variable=RET]false"
         condition: and(eq(variables.BUILD_REASON, 'PullRequest'), or(contains(variables.log, '[skip azp]'), contains(variables.log, '[azp skip]'), contains(variables.log, '[skip ci]'), contains(variables.log, '[ci skip]')))
+        displayName: Check for skip flags
+      - bash: echo "##vso[task.setvariable variable=start_main;isOutput=true]$RET"
+        name: result
+        displayName: Store result in start_main
 
 - stage: Tests
+  condition: and(succeeded(), eq(dependencies.Check.outputs['Skip.result.start_main'], 'true'))
   jobs:
   - job: unit_tests
     displayName: Unit tests
