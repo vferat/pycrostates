@@ -135,3 +135,8 @@ ignore-decorators= '(copy_doc|property|.*setter|.*getter)'
 match = '^(?!setup|__init__|test_).*\.py'
 match-dir = '^(?!docs|tutorials|build|dist|\.).*'
 add_ignore = 'D100,D104,D107'
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore:Matplotlib is currently using agg:UserWarning",
+]
