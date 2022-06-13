@@ -1007,7 +1007,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         Returns None if cluster algorithm has not been fitted.
 
-        :type: `~numpy.array` | None
+        :type: `~numpy.array` (n_clusters, n_channels) | None
         """
         if self._cluster_centers_ is None:
             assert not self._fitted  # sanity-check

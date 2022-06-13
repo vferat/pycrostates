@@ -52,6 +52,20 @@ docdict["fname_fiff"] = """
 fname : path-like
     Path to the .fif file where the clustering solution is saved."""
 
+# -- Segmentation --
+docdict["labels"] = """
+labels : Array (n_samples, ) or (n_epochs, n_samples)
+    Microstates labels attributed to each sample, i.e. the segmentation."""
+docdict["cluster_centers_"] = """
+cluster_centers_ : Array (n_clusters, n_channels)
+    Fitted clusters, i.e. the microstates maps."""
+docdict["cluster_names"] = """
+cluster_names : list | None
+    Name of the clusters."""
+# TODO: predict_parameters docstring is missing.
+docdict["predict_parameters"] = """
+predict_parameters : dict | None"""
+
 # ------------------------- Documentation functions --------------------------
 docdict_indented = {}
 

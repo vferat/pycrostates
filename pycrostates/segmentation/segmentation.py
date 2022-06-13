@@ -21,16 +21,18 @@ from ..viz import (
 )
 
 
+@fill_doc
 class _BaseSegmentation(ABC):
     """Base class for a Microstates segmentation.
 
     Parameters
     ----------
-    labels : array
+    %(labels)s
     inst : Raw | Epochs
-    cluster_centers_ : array
-    cluster_names : list | None
-    predict_parameters : dict | None
+        MNE instance used to predict the segmentation.
+    %(cluster_centers_)s
+    %(cluster_names)s
+    %(predict_parameters)
     """
 
     @abstractmethod
@@ -324,18 +326,18 @@ class _BaseSegmentation(ABC):
         return self._cluster_names.copy()
 
 
-# TODO: Parameters to be added to docdict
 class RawSegmentation(_BaseSegmentation):
     """
     Contains the segmentation for a `~mne.io.Raw` instance.
 
     Parameters
     ----------
-    labels : array
-    inst : Raw
-    cluster_centers_ : array
-    cluster_names : list
-    predict_parameters : dict
+    %(labels)s
+    raw : Raw
+        `~mne.io.Raw` instance used for prediction.
+    %(cluster_centers_)s
+    %(cluster_names)s
+    %(predict_parameters)
     """
 
     def __init__(self, *args, **kwargs):
@@ -412,17 +414,17 @@ class RawSegmentation(_BaseSegmentation):
         return self._inst.copy()
 
 
-# TODO: Parameters to be added to docdict
 class EpochsSegmentation(_BaseSegmentation):
     """Contains the segmentation for an epoch instance.
 
     Parameters
     ----------
-    labels : array
-    inst : Epochs
-    cluster_centers_ : array
-    cluster_names : list
-    predict_parameters : dict
+    %(labels)s
+    epochs : Epochs
+        `~mne.Epochs` instance used for prediction.
+    %(cluster_centers_)s
+    %(cluster_names)s
+    %(predict_parameters)
     """
 
     def __init__(self, *args, **kwargs):
