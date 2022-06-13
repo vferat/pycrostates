@@ -31,17 +31,6 @@ for key in keys:
 
 # ---- Clusters ----
 docdict[
-    "fit_inst"
-] = """
-inst : Raw | Epochs
-    Instance containing data to transform to cluster-distance space
-    (absolute spatial correlation)."""
-docdict[
-    "predict_inst"
-] = """
-inst : Raw | Epochs
-    Instance containing data to predict."""
-docdict[
     "n_clusters"
 ] = """
 n_clusters : int
