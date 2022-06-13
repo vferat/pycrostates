@@ -41,6 +41,7 @@ def plot_cluster_centers(
         Matplotlib figure(s) on which topographic maps are plotted.
     """
     from ..io import ChInfo
+
     _check_type(cluster_centers, (np.ndarray,), "cluster_centers")
     _check_type(info, (Info, ChInfo), "info")
     _check_type(cluster_names, (None, list, tuple), "cluster_names")

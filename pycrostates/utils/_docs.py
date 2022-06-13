@@ -36,10 +36,14 @@ docdict[
 n_clusters : int
     The number of clusters, i.e. the number of microstates, to look for.
 """
-docdict["cluster_centers"] = """
+docdict[
+    "cluster_centers"
+] = """
 cluster_centers : Array (n_clusters, n_channels)
     Fitted clusters, i.e. the microstates maps."""
-docdict["cluster_names"] = """
+docdict[
+    "cluster_names"
+] = """
 cluster_names : list | None
     Name of the clusters."""
 
@@ -54,23 +58,33 @@ cluster : :ref:`Clustering`.
 """
 
 # ------ I/O -------
-docdict["fname_fiff"] = """
+docdict[
+    "fname_fiff"
+] = """
 fname : path-like
     Path to the .fif file where the clustering solution is saved."""
 
 # -- Segmentation --
-docdict["labels_raw"] = """
+docdict[
+    "labels_raw"
+] = """
 labels : Array (n_samples, )
     Microstates labels attributed to each sample, i.e. the segmentation."""
-docdict["labels_epo"] = """
+docdict[
+    "labels_epo"
+] = """
 labels : Array (n_epochs, n_samples)
     Microstates labels attributed to each sample, i.e. the segmentation."""
 # TODO: predict_parameters docstring is missing.
-docdict["predict_parameters"] = """
+docdict[
+    "predict_parameters"
+] = """
 predict_parameters : dict | None"""
 
 # ------ Viz -------
-docdict["cmap"] = """
+docdict[
+    "cmap"
+] = """
 cmap : str | None
     The name of a colormap known to Matplotlib."""
 

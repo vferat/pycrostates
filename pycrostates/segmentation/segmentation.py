@@ -224,7 +224,9 @@ class _BaseSegmentation(ABC):
         return_dist: bool = False,
     ):
         """Compute microstate parameters."""
-        assert (data.ndim == 3 and labels.ndim == 2) or (data.ndim == 2 and labels.ndim == 1)
+        assert (data.ndim == 3 and labels.ndim == 2) or (
+            data.ndim == 2 and labels.ndim == 1
+        )
         if data.ndim == 3:  # epochs
             data = np.swapaxes(data, 0, 1)
             data = data.reshape(data.shape[0], -1)

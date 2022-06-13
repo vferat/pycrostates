@@ -1052,7 +1052,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         """Setter for the cluster names."""
         logger.warning(
             "The attribute 'cluster_names' can not be set directly. Please "
-            "use the 'rename_clusters' method instead.")
+            "use the 'rename_clusters' method instead."
+        )
 
     # --------------------------------------------------------------------
     @staticmethod

@@ -10,8 +10,8 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 from numpy.typing import NDArray
 
-from ..utils._docs import fill_doc
 from ..utils._checks import _check_type
+from ..utils._docs import fill_doc
 from ..utils._logs import _set_verbose, logger
 
 
