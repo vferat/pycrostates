@@ -365,7 +365,7 @@ class ModKMeans(_BaseCluster):
 
     @property
     def GEV_(self) -> float:
-        """GEV_ fit variable.
+        """Global Explained Variance.
 
         :type: `float`
         """
