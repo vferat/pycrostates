@@ -151,7 +151,7 @@ class ModKMeans(_BaseCluster):
         n_jobs: int = 1,
         *,
         verbose: Optional[str] = None,
-    ) -> NDArray[float]:
+    ) -> None:
         """
         %(verbose)s
         """
