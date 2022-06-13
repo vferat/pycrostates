@@ -1,7 +1,7 @@
 """Class and functions to use modified Kmeans."""
 
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 import numpy as np
 from mne import BaseEpochs
@@ -20,14 +20,11 @@ from ._base import _BaseCluster
 
 @fill_doc
 class ModKMeans(_BaseCluster):
-    """
-    Modified K-Means clustering algorithms.
+    """Modified K-Means clustering algorithms.
 
     Parameters
     ----------
-    n_clusters : int
-        The number of clusters to form as well as the number of centroids to
-        generate.
+    %(n_clusters)s
     n_init : int
         Number of time the k-means algorithm is run with different centroid
         seeds. The final result will be the run with highest global explained
@@ -104,7 +101,8 @@ class ModKMeans(_BaseCluster):
         )
 
     @copy_doc(_BaseCluster.__eq__)
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
+        """Equality == method."""
         if isinstance(other, ModKMeans):
             if not super().__eq__(other):
                 return False
@@ -130,7 +128,8 @@ class ModKMeans(_BaseCluster):
         return False
 
     @copy_doc(_BaseCluster.__ne__)
-    def __ne__(self, other):
+    def __ne__(self, other: Any) -> bool:
+        """Different != method."""
         return not self.__eq__(other)
 
     @copy_doc(_BaseCluster._check_fit)
@@ -268,8 +267,7 @@ class ModKMeans(_BaseCluster):
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
     ) -> Tuple[NDArray[float], bool]:
-        """
-        Compute microstates maps.
+        """Compute microstates maps.
 
         Based on mne_microstates by Marijn van Vliet <w.m.vanvliet@gmail.com>
         https://github.com/wmvanvliet/mne_microstates/blob/master/microstates.py
@@ -335,8 +333,7 @@ class ModKMeans(_BaseCluster):
     # --------------------------------------------------------------------
     @property
     def n_init(self) -> int:  # noqa: D401
-        """
-        Number of k-means algorithms run with different centroid seeds.
+        """Number of k-means algorithms run with different centroid seeds.
 
         :type: `int`
         """
@@ -344,8 +341,7 @@ class ModKMeans(_BaseCluster):
 
     @property
     def max_iter(self) -> int:
-        """
-        Maximum number of iterations of the k-means algorithm for a single run.
+        """Maximum number of iterations of the k-means algorithm for a run.
 
         :type: `int`
         """
@@ -353,8 +349,7 @@ class ModKMeans(_BaseCluster):
 
     @property
     def tol(self) -> Union[int, float]:
-        """
-        Relative tolerance.
+        """Relative tolerance to reach convergence.
 
         :type: `float`
         """
@@ -362,8 +357,7 @@ class ModKMeans(_BaseCluster):
 
     @property
     def random_state(self) -> Union[RandomState, Generator]:
-        """
-        Random state.
+        """Random state to fix seed generation.
 
         :type: `~numpy.random.RandomState` | `~numpy.random.Generator`
         """
@@ -371,8 +365,7 @@ class ModKMeans(_BaseCluster):
 
     @property
     def GEV_(self) -> float:
-        """
-        GEV_ fit variable.
+        """GEV_ fit variable.
 
         :type: `float`
         """
@@ -389,10 +382,9 @@ class ModKMeans(_BaseCluster):
             self._GEV_ = None
 
     # --------------------------------------------------------------------
-    # ---------------
     # For now, check function are defined as static within KMeans. If they are
     # used outside KMeans, they should be moved to regular function in _base.py
-    # ---------------
+    # --------------------------------------------------------------------
     @staticmethod
     def _check_n_init(n_init: int) -> int:
         """Check that n_init is a positive integer."""
