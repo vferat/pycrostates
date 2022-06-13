@@ -192,7 +192,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         %(reject_by_annotation_raw)s
         %(n_jobs)s
         """
-        # TODO: Maybe those parameters should be moved here instead of docdict?
         from ..io import ChData, ChInfo
 
         n_jobs = _check_n_jobs(n_jobs)
