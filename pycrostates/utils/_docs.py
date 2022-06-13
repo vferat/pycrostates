@@ -45,28 +45,7 @@ docdict[
     "n_clusters"
 ] = """
 n_clusters : int
-    The number of clusters as well as the number of centroids (i.e.
-    Microstate topographies).
-"""
-docdict[
-    "random_seed"
-] = """
-random_seed : float
-    As estimation can be non-deterministic it can be useful to fix the
-    random state to have reproducible results.
-"""
-docdict[
-    "picks"
-] = """
-picks : str | list | slice | None
-    Channels to include. Slices and lists of integers will be interpreted
-    as channel indices. In lists, channel type strings (e.g.,
-    ['meg', 'eeg']) will pick channels of those types, channel name strings
-    (e.g., ['MEG0111', 'MEG2623'] will pick the given channels.
-    Can also be the string values “all” to pick all channels, or “data” to
-    pick data channels. None will pick all channels.
-    Note that channels in info['bads'] will be included.
-    Default to 'eeg'.
+    The number of clusters, i.e. the number of microstates, to look for.
 """
 docdict[
     "cluster"
