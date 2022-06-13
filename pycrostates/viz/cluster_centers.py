@@ -9,7 +9,7 @@ from mne.io import Info
 from mne.viz import plot_topomap
 from numpy.typing import NDArray
 
-from ..io import ChInfo
+from .._typing import CHInfo
 from ..utils._checks import _check_axes, _check_type
 from ..utils._docs import fill_doc
 
@@ -17,7 +17,7 @@ from ..utils._docs import fill_doc
 @fill_doc
 def plot_cluster_centers(
     cluster_centers: NDArray[float],
-    info: Union[Info, ChInfo],
+    info: Union[Info, CHInfo],
     cluster_names: List[str] = None,
     axes: Optional[Axes] = None,
     *,
@@ -28,7 +28,7 @@ def plot_cluster_centers(
 
     Parameters
     ----------
-    %(cluster_centers)
+    %(cluster_centers)s
     info : Info | ChInfo
         Info instance with a montage used to plot the topographic maps.
     %(cluster_names)s
@@ -40,6 +40,7 @@ def plot_cluster_centers(
     fig : Figure
         Matplotlib figure(s) on which topographic maps are plotted.
     """
+    from ..io import ChInfo
     _check_type(cluster_centers, (np.ndarray,), "cluster_centers")
     _check_type(info, (Info, ChInfo), "info")
     _check_type(cluster_names, (None, list, tuple), "cluster_names")

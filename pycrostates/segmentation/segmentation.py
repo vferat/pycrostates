@@ -27,12 +27,13 @@ class _BaseSegmentation(ABC):
 
     Parameters
     ----------
-    %(labels)s
+    labels : Array (n_samples, ) or (n_epochs, n_samples)
+        Microstates labels attributed to each sample, i.e. the segmentation.
     inst : Raw | Epochs
         MNE instance used to predict the segmentation.
     %(cluster_centers)s
     %(cluster_names)s
-    %(predict_parameters)
+    %(predict_parameters)s
     """
 
     @abstractmethod
@@ -338,7 +339,7 @@ class RawSegmentation(_BaseSegmentation):
         `~mne.io.Raw` instance used for prediction.
     %(cluster_centers)s
     %(cluster_names)s
-    %(predict_parameters)
+    %(predict_parameters)s
     """
 
     def __init__(self, *args, **kwargs):
@@ -426,7 +427,7 @@ class EpochsSegmentation(_BaseSegmentation):
         `~mne.Epochs` instance used for prediction.
     %(cluster_centers)s
     %(cluster_names)s
-    %(predict_parameters)
+    %(predict_parameters)s
     """
 
     def __init__(self, *args, **kwargs):
