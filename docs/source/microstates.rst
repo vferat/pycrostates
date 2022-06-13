@@ -19,21 +19,21 @@ called microstate map or microstate topography.
 
 How to compute EEG microstates ?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 This decomposition is based on two consecutive steps: the clustering which
 allows to define topographies that best represent the studied data and the
-backfitting than consist on assigning each timepoint of one or several EEG
-recordings to the previously extracted topographies.
+backfitting than consist on assigning one of the previously extracted
+topographies to each timepoint of one or several EEG recordings.
 
 The methods relies on assigning timepoints to the most similar microstate map,
-that is why it is important to define how distance between two topographies is
-computed. For microstate analysis, it is the inverse of the absolute value of
-the spatial correlation that is used as a measure of distance to carry out all
-computations. The absolute value is used in order to ignore topography
-polarities of the topographies, as state can oscillate in a given configuration
-(i.e topography).
+which is why it is important to define how distance between two topographies is
+computed. For microstate analysis, the inverse of the absolute value of the
+spatial correlation is used as a measure of distance to carry out all
+computations. The absolute value is used in order to ignore the topography
+polarity.
 
 Pycrostates implements a conveniente class
-:class:`pycrostates.cluster.ModKMeans` allowing to perform clustering through
+:class:`pycrostates.cluster.ModKMeans` to perform clustering through
 the :meth:`pycrostates.cluster.ModKMeans.fit` method and backfitting through
 the :meth:`pycrostates.cluster.ModKMeans.predict` method. It also implements
 other methods to facilitate the analysis and display of results.
