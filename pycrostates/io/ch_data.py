@@ -25,7 +25,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
     data : array
         Data array of shape ``(n_channels, n_samples)``.
     info : mne.Info | ChInfo
-        Atemporal measurement information. If a ``mne.Info``is provided, it is
+        Atemporal measurement information. If a `mne.Info` is provided, it is
         converted to a `~pycrostates.io.ChInfo`.
     """
 
