@@ -14,7 +14,7 @@ from ..utils._docs import fill_doc
 def calinski_harabasz_score(cluster):  # higher the better
     """Compute the Calinski and Harabasz score.
 
-    This function is a proxy function for
+    This function is a wrapper around
     :func:`sklearn.metrics.calinski_harabasz_score` that applies directly to a
     fitted :ref:`Clustering` instance.
 

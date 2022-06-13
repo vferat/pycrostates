@@ -36,6 +36,8 @@ docdict[
 n_clusters : int
     The number of clusters, i.e. the number of microstates, to look for.
 """
+
+# ---- Metrics -----
 docdict[
     "cluster"
 ] = """
@@ -44,6 +46,12 @@ cluster : :ref:`Clustering`.
     For more details about current clustering implementations,
     check the :ref:`Clustering` section of the documentation.
 """
+
+# ------ I/O -------
+docdict["fname_fiff"] = """
+fname : path-like
+    Path to the .fif file where the clustering solution is saved."""
+
 # ------------------------- Documentation functions --------------------------
 docdict_indented = {}
 

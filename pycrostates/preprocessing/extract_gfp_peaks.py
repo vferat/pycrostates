@@ -31,7 +31,7 @@ def extract_gfp_peaks(
 ) -> CHData:
     """GFP peaks extraction.
 
-    Extract global field power peaks from :class:`mne.Epochs` or
+    Extract global field power peaks from :class:`~mne.Epochs` or
     :class:`~mne.io.Raw`.
 
     Parameters
@@ -45,10 +45,7 @@ def extract_gfp_peaks(
         is fulfilled for all remaining peaks. Default to 2.
     %(tmin_raw)s
     %(tmax_raw)s
-    reject_by_annotation : bool
-        Whether to reject by annotation. If True (default), segments annotated
-        with description starting with ‘bad’ are omitted. If False, no
-        rejection is done.
+    %(reject_by_annotation_raw)s
     %(verbose)s
 
     Returns

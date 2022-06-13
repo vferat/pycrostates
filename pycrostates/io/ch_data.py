@@ -118,8 +118,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
     # --------------------------------------------------------------------
     @property
     def info(self) -> CHInfo:
-        """
-        Atemporal measurement information.
+        """Atemporal measurement information.
 
         :type: `~pycrostates.io.ChInfo`
         """

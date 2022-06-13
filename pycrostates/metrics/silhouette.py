@@ -11,13 +11,11 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def silhouette_score(cluster):  # higher the better
-    """
-    Compute the mean Silhouette Coefficient.
+    """Compute the mean Silhouette Coefficient.
 
-    This function is a proxy function for
-    :func:`sklearn.metrics.silhouette_score` that applies directly to a fitted
-    :ref:`Clustering` instance. It uses the absolute spatial correlation for
-    distance computations.
+    This function is a wrapper around :func:`sklearn.metrics.silhouette_score`
+    that applies directly to a fitted :ref:`Clustering` instance. It uses the
+    absolute spatial correlation for distance computations.
 
     Parameters
     ----------
@@ -32,7 +30,7 @@ def silhouette_score(cluster):  # higher the better
     -----
     For more details regarding the implementation, please refer to
     :func:`sklearn.metrics.silhouette_score`.
-    This proxy function uses metric="precomputed" with the absolute spatial
+    This proxy function uses ``metric="precomputed"`` with the absolute spatial
     correlation for distance computations.
 
     References

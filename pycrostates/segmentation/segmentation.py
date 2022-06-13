@@ -30,8 +30,7 @@ def _compute_microstate_parameters(
     norm_gfp: bool = True,
     return_dist: bool = False,
 ):
-    """
-    Compute microstate parameters.
+    """Compute microstate parameters.
 
     Parameters
     ----------
@@ -135,16 +134,15 @@ def _compute_microstate_parameters(
 
 
 class _BaseSegmentation(ABC):
-    """
-    Base class for a Microstates segmentation.
+    """Base class for a Microstates segmentation.
 
     Parameters
     ----------
     labels : array
     inst : Raw | Epochs
     cluster_centers_ : array
-    cluster_names : list
-    predict_parameters : dict
+    cluster_names : list | None
+    predict_parameters : dict | None
     """
 
     @abstractmethod
@@ -200,14 +198,13 @@ class _BaseSegmentation(ABC):
     def plot_cluster_centers(
         self, axes: Optional[Axes] = None, *, block: bool = False
     ):
-        """
-        Plot cluster centers as topographic maps.
+        """Plot cluster centers as topographic maps.
 
         Parameters
         ----------
-        axes : None | Axes
-            Either none to create a new figure or axes (or an array of axes)
-            on which the topographic map should be plotted.
+        axes : Axes | None
+            Either ``None`` to create a new figure or axes (or an array of
+            axes) on which the topographic map should be plotted.
         block : bool
             Whether to halt program execution until the figure is closed.
 
@@ -272,8 +269,7 @@ class _BaseSegmentation(ABC):
     # --------------------------------------------------------------------
     @property
     def predict_parameters(self) -> dict:
-        """
-        Parameters used to predict the current segmentation.
+        """Parameters used to predict the current segmentation.
 
         :type: `dict`
         """
@@ -287,8 +283,7 @@ class _BaseSegmentation(ABC):
 
     @property
     def labels(self) -> NDArray[int]:
-        """
-        Segmentation predicted.
+        """Microstate label attributed to each sample, i.e. the segmentation.
 
         :type: `~numpy.array`
         """
@@ -296,8 +291,7 @@ class _BaseSegmentation(ABC):
 
     @property
     def cluster_centers_(self) -> NDArray[float]:
-        """
-        Center of the clusters.
+        """Fitted clusters, i.e. the mirostates maps.
 
         :type: `~numpy.array`
         """
@@ -305,8 +299,7 @@ class _BaseSegmentation(ABC):
 
     @property
     def cluster_names(self) -> List[str]:
-        """
-        Name of the clusters.
+        """Name of the clusters.
 
         :type: `list`
         """
@@ -316,7 +309,7 @@ class _BaseSegmentation(ABC):
 # TODO: Parameters to be added to docdict
 class RawSegmentation(_BaseSegmentation):
     """
-    Contains the segmentation for a raw instance.
+    Contains the segmentation for a `~mne.io.Raw` instance.
 
     Parameters
     ----------
@@ -356,8 +349,7 @@ class RawSegmentation(_BaseSegmentation):
         block: bool = False,
         verbose: Optional[str] = None,
     ):
-        """
-        Plot the segmentation.
+        """Plot the segmentation.
 
         Parameters
         ----------
@@ -365,10 +357,10 @@ class RawSegmentation(_BaseSegmentation):
         %(tmax_raw)s
         cmap : matplotlib colormap name
             The mapping from label name to color space.
-        axes : None | Axes
-            Either none to create a new figure or axes on which the
+        axes : Axes | None
+            Either ``None`` to create a new figure or axes on which the
             segmentation is plotted.
-        cbar_axes : None | Axes
+        cbar_axes : Axes | None
             Axes on which to draw the colorbar, otherwise the colormap takes
             space from the main axes.
         block : bool
@@ -418,8 +410,7 @@ class RawSegmentation(_BaseSegmentation):
 
 # TODO: Parameters to be added to docdict
 class EpochsSegmentation(_BaseSegmentation):
-    """
-    Contains the segmentation for an epoch instance.
+    """Contains the segmentation for an epoch instance.
 
     Parameters
     ----------
@@ -482,17 +473,16 @@ class EpochsSegmentation(_BaseSegmentation):
         block: bool = False,
         verbose=None,
     ):
-        """
-        Plot segmentation.
+        """Plot segmentation.
 
         Parameters
         ----------
         cmap : matplotlib colormap name
             The mapping from label name to color space.
-        axes : None | Axes
+        axes : Axes | None
             Either none to create a new figure or axes on which the
             segmentation is plotted.
-        cbar_axes : None | Axes
+        cbar_axes : Axes | none
             Axes on which to draw the colorbar, otherwise the colormap takes
             space from the main axes.
         block : bool
