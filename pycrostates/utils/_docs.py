@@ -26,9 +26,6 @@ keys = (
 for key in keys:
     docdict[key] = docdict_mne[key]
 
-# TODO: sphinx :term:`data channels` in 'picks_all' to be inc.
-# TODO: :ref:`logging documentation <tut-logging>` in 'verbose' to be inc.
-
 # ---- Clusters ----
 docdict[
     "n_clusters"
