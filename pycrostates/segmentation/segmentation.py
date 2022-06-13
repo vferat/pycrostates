@@ -106,28 +106,30 @@ class _BaseSegmentation(ABC):
 
             Available parameters are listed below:
                 'mean_corr' : Mean correlation
-                    Mean correlation value of each time point assigned to a given
-                    state.
+                    Mean correlation value of each time point assigned to a
+                    given state.
                 'gev' : Global explained variance
                     Total explained variance expressed by a given state.
                     It is the sum of global explained variance values of each
                     time point assigned to a given state.
                 'timecov' : Time coverage
-                    The proportion of time during which a given state is active.
-                    This metric is expressed in percentage (%%).
+                    The proportion of time during which a given state is
+                    active. This metric is expressed in percentage (%%).
                 'meandurs' : Mean duration
                     Mean temporal duration segments assigned to a given state.
                     This metric is expressed in seconds (s).
                 'occurrences' : occurrences
-                    Mean number of segment assigned to a given state per second.
-                    This metrics is expressed in segment per second ( . / s).
-            If return_dist is set to True, also return the following distributions:
+                    Mean number of segment assigned to a given state per
+                    second. This metrics is expressed in segment per second
+                    ( . / s).
+            If return_dist is set to True, also return the following
+            distributions:
                 'dist_corr' : Distribution of correlations
                     Correlation values of each time point assigned to a given
                     state.
                 'dist_gev' : Distribution of global explained variances
-                    Global explained variance values of each time point assigned to
-                    a given state.
+                    Global explained variance values of each time point
+                    assigned to a given state.
                 'dist_durs' : Distribution of durations.
                     Duration of each segments assigned to a given state.
                     Each value is expressed in seconds (s).
