@@ -144,6 +144,7 @@ class _BaseSegmentation(ABC):
             return_dist=return_dist,
         )
 
+    @fill_doc
     def plot_cluster_centers(
         self, axes: Optional[Axes] = None, *, block: bool = False
     ):
@@ -154,8 +155,7 @@ class _BaseSegmentation(ABC):
         axes : Axes | None
             Either ``None`` to create a new figure or axes (or an array of
             axes) on which the topographic map should be plotted.
-        block : bool
-            Whether to halt program execution until the figure is closed.
+        %(block)s
 
         Returns
         -------

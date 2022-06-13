@@ -45,7 +45,7 @@ def plot_raw_segmentation(
     %(cmap)s
     axes : Axes | None
     cbar_axes : Axes | None
-    block : bool
+    %(block)s
     %(verbose)s
 
     Returns
@@ -127,7 +127,7 @@ def plot_epoch_segmentation(
     %(cmap)s
     axes : Axes | None
     cbar_axes : Axes | None
-    block : bool
+    %(block)s
     %(verbose)s
 
     Returns

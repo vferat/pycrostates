@@ -33,7 +33,7 @@ def plot_cluster_centers(
         Info instance with a montage used to plot the topographic maps.
     %(cluster_names)s
     axes : Axes | None
-    block : bool
+    %(block)s
 
     Returns
     -------
