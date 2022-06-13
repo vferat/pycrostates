@@ -87,6 +87,31 @@ docdict[
 ] = """
 cmap : str | None
     The name of a colormap known to Matplotlib."""
+docdict[
+    "block"
+] = """
+block : bool
+    Whether to halt program execution until the figure is closed."""
+docdict[
+    "axes_topo"
+] = """
+axes : Axes | None
+    Either ``None`` to create a new figure or axes (or an array of
+    axes) on which the topographic map should be plotted. If the number of
+    microstates maps to plot is ``≥ 1``, an array of axes of size
+    ``n_clusters`` should be provided."""
+docdict[
+    "axes_seg"
+] = """
+axes : Axes | None
+    Either ``None`` to create a new figure or axes on which the
+    segmentation is plotted."""
+docdict[
+    "axes_cbar"
+] = """
+cbar_axes : Axes | None
+    Axes on which to draw the colorbar, otherwise the colormap takes
+    space from the main axes."""
 
 # ------------------------- Documentation functions --------------------------
 docdict_indented = {}

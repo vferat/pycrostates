@@ -43,8 +43,8 @@ def plot_raw_segmentation(
     %(tmin_raw)s
     %(tmax_raw)s
     %(cmap)s
-    axes : Axes | None
-    cbar_axes : Axes | None
+    %(axes_seg)s
+    %(axes_cbar)s
     %(block)s
     %(verbose)s
 
@@ -125,8 +125,8 @@ def plot_epoch_segmentation(
     %(n_clusters)s
     %(cluster_names)s
     %(cmap)s
-    axes : Axes | None
-    cbar_axes : Axes | None
+    %(axes_seg)s
+    %(axes_cbar)s
     %(block)s
     %(verbose)s
 

@@ -152,9 +152,7 @@ class _BaseSegmentation(ABC):
 
         Parameters
         ----------
-        axes : Axes | None
-            Either ``None`` to create a new figure or axes (or an array of
-            axes) on which the topographic map should be plotted.
+        %(axes_topo)s
         %(block)s
 
         Returns
@@ -381,16 +379,10 @@ class RawSegmentation(_BaseSegmentation):
         ----------
         %(tmin_raw)s
         %(tmax_raw)s
-        cmap : matplotlib colormap name
-            The mapping from label name to color space.
-        axes : Axes | None
-            Either ``None`` to create a new figure or axes on which the
-            segmentation is plotted.
-        cbar_axes : Axes | None
-            Axes on which to draw the colorbar, otherwise the colormap takes
-            space from the main axes.
-        block : bool
-            Whether to halt program execution until the figure is closed.
+        %(cmap)s
+        %(axes_seg)s
+        %(axes_cbar)s
+        %(block)s
         %(verbose)s
 
         Returns
@@ -472,16 +464,10 @@ class EpochsSegmentation(_BaseSegmentation):
 
         Parameters
         ----------
-        cmap : matplotlib colormap name
-            The mapping from label name to color space.
-        axes : Axes | None
-            Either none to create a new figure or axes on which the
-            segmentation is plotted.
-        cbar_axes : Axes | none
-            Axes on which to draw the colorbar, otherwise the colormap takes
-            space from the main axes.
-        block : bool
-            Whether to halt program execution until the figure is closed.
+        %(cmap)s
+        %(axes_seg)s
+        %(axes_cbar)s
+        %(block)s
         %(verbose)s
 
         Returns
