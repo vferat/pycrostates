@@ -94,7 +94,7 @@ class _BaseSegmentation(ABC):
         Parameters
         ----------
         norm_gfp : bool
-            If True, the Global Field Power (GFP) is normalized.
+            If True, the term:`global field power` (GFP) is normalized.
         return_dist : bool
             If True, return the parameters distributions.
 

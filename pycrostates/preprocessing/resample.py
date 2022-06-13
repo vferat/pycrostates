@@ -42,7 +42,7 @@ def resample(
     Parameters
     ----------
     inst : Raw | Epochs | ChData
-        Instance from which to extract GFP peaks.
+        Instance to resample.
     %(picks_all)s
     %(tmin_raw)s
     %(tmax_raw)s

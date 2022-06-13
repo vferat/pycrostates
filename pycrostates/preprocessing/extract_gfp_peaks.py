@@ -31,13 +31,13 @@ def extract_gfp_peaks(
 ) -> CHData:
     """GFP peaks extraction.
 
-    Extract global field power peaks from :class:`~mne.Epochs` or
+    Extract term:`global field power` (GFP) peaks from :class:`~mne.Epochs` or
     :class:`~mne.io.Raw`.
 
     Parameters
     ----------
     inst : Raw | Epochs
-        Instance from which to extract GFP peaks.
+        Instance from which to extract term:`global field power` (GFP) peaks.
     %(picks_all)s
     min_peak_distance : int
         Required minimal horizontal distance (>= 1) in samples between
