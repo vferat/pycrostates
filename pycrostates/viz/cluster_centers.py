@@ -1,6 +1,6 @@
 """Visualisation module for plotting cluster centers."""
 
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -9,20 +9,31 @@ from mne.io import Info
 from mne.viz import plot_topomap
 from numpy.typing import NDArray
 
+from ..io import ChInfo
 from ..utils._checks import _check_axes, _check_type
+from ..utils._docs import fill_doc
 
 
+@fill_doc
 def plot_cluster_centers(
     cluster_centers: NDArray[float],
-    info,
+    info: Union[Info, ChInfo],
     cluster_names: List[str] = None,
     axes: Optional[Axes] = None,
     *,
     block: bool = False,
     **kwargs,
 ):
-    """
-    Create topographic maps for cluster centers.
+    """Create topographic maps for cluster centers.
+
+    Parameters
+    ----------
+    %(cluster_centers)
+    info : Info | ChInfo
+        Info instance with a montage used to plot the topographic maps.
+    %(cluster_names)s
+    axes : Axes | None
+    block : bool
 
     Returns
     -------
@@ -30,7 +41,7 @@ def plot_cluster_centers(
         Matplotlib figure(s) on which topographic maps are plotted.
     """
     _check_type(cluster_centers, (np.ndarray,), "cluster_centers")
-    _check_type(info, (Info,), "info")
+    _check_type(info, (Info, ChInfo), "info")
     _check_type(cluster_names, (None, list, tuple), "cluster_names")
     if axes is not None:
         _check_axes(axes)

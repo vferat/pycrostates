@@ -30,7 +30,7 @@ class _BaseSegmentation(ABC):
     %(labels)s
     inst : Raw | Epochs
         MNE instance used to predict the segmentation.
-    %(cluster_centers_)s
+    %(cluster_centers)s
     %(cluster_names)s
     %(predict_parameters)
     """
@@ -326,16 +326,17 @@ class _BaseSegmentation(ABC):
         return self._cluster_names.copy()
 
 
+@fill_doc
 class RawSegmentation(_BaseSegmentation):
     """
     Contains the segmentation for a `~mne.io.Raw` instance.
 
     Parameters
     ----------
-    %(labels)s
+    %(labels_raw)s
     raw : Raw
         `~mne.io.Raw` instance used for prediction.
-    %(cluster_centers_)s
+    %(cluster_centers)s
     %(cluster_names)s
     %(predict_parameters)
     """
@@ -414,15 +415,16 @@ class RawSegmentation(_BaseSegmentation):
         return self._inst.copy()
 
 
+@fill_doc
 class EpochsSegmentation(_BaseSegmentation):
     """Contains the segmentation for an epoch instance.
 
     Parameters
     ----------
-    %(labels)s
+    %(labels_epo)s
     epochs : Epochs
         `~mne.Epochs` instance used for prediction.
-    %(cluster_centers_)s
+    %(cluster_centers)s
     %(cluster_names)s
     %(predict_parameters)
     """

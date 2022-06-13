@@ -10,11 +10,12 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 from numpy.typing import NDArray
 
+from ..utils._docs import fill_doc
 from ..utils._checks import _check_type
 from ..utils._logs import _set_verbose, logger
 
 
-# TODO: Add parameters to the docstring.
+@fill_doc
 def plot_raw_segmentation(
     labels: NDArray[int],
     raw: BaseRaw,
@@ -30,8 +31,22 @@ def plot_raw_segmentation(
     verbose: Optional[str] = None,
     **kwargs,
 ):
-    """
-    Plot raw segmentation.
+    """Plot raw segmentation.
+
+    Parameters
+    ----------
+    %(labels_raw)s
+    raw : Raw
+        MNE `~mne.io.Raw` instance.
+    %(n_clusters)s
+    %(cluster_names)s
+    %(tmin_raw)s
+    %(tmax_raw)s
+    %(cmap)s
+    axes : Axes | None
+    cbar_axes : Axes | None
+    block : bool
+    %(verbose)s
 
     Returns
     -------
@@ -85,7 +100,7 @@ def plot_raw_segmentation(
     return fig
 
 
-# TODO: Add parameters to the docstring.
+@fill_doc
 def plot_epoch_segmentation(
     labels: NDArray[int],
     epochs: BaseEpochs,
@@ -101,6 +116,19 @@ def plot_epoch_segmentation(
 ):
     """
     Plot epochs segmentation.
+
+    Parameters
+    ----------
+    %(labels_epo)s
+    epochs : Epochs
+        MNE `~mne.Epochs` instance.
+    %(n_clusters)s
+    %(cluster_names)s
+    %(cmap)s
+    axes : Axes | None
+    cbar_axes : Axes | None
+    block : bool
+    %(verbose)s
 
     Returns
     -------
@@ -187,7 +215,6 @@ def _plot_segmentation(
             "of clusters must be strictly positive."
         )
     _check_type(cluster_names, (None, list, tuple), "cluster_names")
-    # TODO: Add more option for cmap: list of colors, dict name/color?
     _check_type(cmap, (None, str), "cmap")
     _check_type(axes, (None, Axes), "ax")
     _check_type(cbar_axes, (None, Axes), "cbar_ax")
