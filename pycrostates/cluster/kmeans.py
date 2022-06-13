@@ -27,8 +27,8 @@ class ModKMeans(_BaseCluster):
     %(n_clusters)s
     n_init : int
         Number of time the k-means algorithm is run with different centroid
-        seeds. The final result will be the run with highest global explained
-        variance.
+        seeds. The final result will be the run with the highest Global
+        Explained Variance (GEV).
     max_iter : int
         Maximum number of iterations of the k-means algorithm for a single run.
     tol : float

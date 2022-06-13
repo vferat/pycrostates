@@ -262,10 +262,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         Parameters
         ----------
         mapping : dict
-            Mapping from the old names to the new names.
-            key: old name, value: new name.
+            Mapping from the old names to the new names. The keys are the old
+            names and the values are the new names.
         new_names : list | tuple
-            1D iterable containing the new cluster names.
+            1D iterable containing the new cluster names. The length of the
+            iterable should match the number of clusters.
 
         Notes
         -----
@@ -502,7 +503,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         Parameters
         ----------
         fname : path-like
-            Path to the .fif file where the clustering solution is saved.
+            Path to the ``.fif`` file where the clustering solution is saved.
         """
         self._check_fit()
         _check_type(fname, ("path-like",), "fname")
@@ -952,7 +953,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     # --------------------------------------------------------------------
     @property
     def n_clusters(self) -> int:
-        """Number of clusters, i.e. number of microstates.
+        """Number of clusters (number of microstates).
 
         :type: `int`
         """
@@ -1002,7 +1003,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @property
     def cluster_centers_(self) -> NDArray[float]:
-        """Fitted clusters, i.e. the mirostates maps.
+        """Fitted clusters (the microstates maps).
 
         Returns None if cluster algorithm has not been fitted.
 

@@ -94,7 +94,7 @@ class _BaseSegmentation(ABC):
         Parameters
         ----------
         norm_gfp : bool
-            If True, the term:`global field power` (GFP) is normalized.
+            If True, the :term:`global field power` (GFP) is normalized.
         return_dist : bool
             If True, return the parameters distributions.
 
@@ -157,7 +157,7 @@ class _BaseSegmentation(ABC):
 
         Returns
         -------
-        f : Figure
+        fig : Figure
             Matplotlib figure containing the topographic plots.
         """
         return plot_cluster_centers(
@@ -306,7 +306,7 @@ class _BaseSegmentation(ABC):
 
     @property
     def labels(self) -> NDArray[int]:
-        """Microstate label attributed to each sample, i.e. the segmentation.
+        """Microstate label attributed to each sample (the segmentation).
 
         :type: `~numpy.array`
         """
@@ -314,7 +314,7 @@ class _BaseSegmentation(ABC):
 
     @property
     def cluster_centers_(self) -> NDArray[float]:
-        """Fitted clusters, i.e. the mirostates maps.
+        """Fitted clusters (the mirostates maps).
 
         :type: `~numpy.array`
         """

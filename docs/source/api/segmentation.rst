@@ -1,8 +1,6 @@
 Segmentation
 ============
 
-:py:mod:`pycrostates.segmentation`:
-
 .. currentmodule:: pycrostates.segmentation
 
 .. automodule:: pycrostates.segmentation

@@ -1,8 +1,6 @@
 Datasets
 ========
 
-:py:mod:`pycrostates.datasets`:
-
 .. currentmodule:: pycrostates.datasets
 
 .. automodule:: pycrostates.datasets

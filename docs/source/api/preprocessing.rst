@@ -1,8 +1,6 @@
 Preprocessing
 =============
 
-:py:mod:`pycrostates.preprocessing`:
-
 .. currentmodule:: pycrostates.preprocessing
 
 .. automodule:: pycrostates.preprocessing
