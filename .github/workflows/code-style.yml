@@ -44,6 +44,6 @@ jobs:
         with:
           check_filenames: true
           check_hidden: true
-          skip: './.git,./build'
+          skip: ./.git,./build,./.github,*.bib
       - name: Run pydocstyle
         run: pydocstyle .
