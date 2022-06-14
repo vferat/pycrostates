@@ -1,8 +1,6 @@
 Metrics
 =======
 
-:py:mod:`pycrostates.metrics`:
-
 .. currentmodule:: pycrostates.metrics
 
 .. automodule:: pycrostates.metrics

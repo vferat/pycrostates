@@ -26,48 +26,25 @@ keys = (
 for key in keys:
     docdict[key] = docdict_mne[key]
 
-# TODO: sphinx :term:`data channels` in 'picks_all' to be inc.
-# TODO: :ref:`logging documentation <tut-logging>` in 'verbose' to be inc.
-
 # ---- Clusters ----
-docdict[
-    "fit_inst"
-] = """
-inst : Raw | Epochs
-    Instance containing data to transform to cluster-distance space
-    (absolute spatial correlation)."""
-docdict[
-    "predict_inst"
-] = """
-inst : Raw | Epochs
-    Instance containing data to predict."""
 docdict[
     "n_clusters"
 ] = """
 n_clusters : int
-    The number of clusters as well as the number of centroids (i.e.
-    Microstate topographies).
+    The number of clusters, i.e. the number of microstates, to look for.
 """
 docdict[
-    "random_seed"
+    "cluster_centers"
 ] = """
-random_seed : float
-    As estimation can be non-deterministic it can be useful to fix the
-    random state to have reproducible results.
-"""
+cluster_centers : Array (n_clusters, n_channels)
+    Fitted clusters, i.e. the microstates maps."""
 docdict[
-    "picks"
+    "cluster_names"
 ] = """
-picks : str | list | slice | None
-    Channels to include. Slices and lists of integers will be interpreted
-    as channel indices. In lists, channel type strings (e.g.,
-    ['meg', 'eeg']) will pick channels of those types, channel name strings
-    (e.g., ['MEG0111', 'MEG2623'] will pick the given channels.
-    Can also be the string values “all” to pick all channels, or “data” to
-    pick data channels. None will pick all channels.
-    Note that channels in info['bads'] will be included.
-    Default to 'eeg'.
-"""
+cluster_names : list | None
+    Name of the clusters."""
+
+# ---- Metrics -----
 docdict[
     "cluster"
 ] = """
@@ -76,6 +53,63 @@ cluster : :ref:`Clustering`.
     For more details about current clustering implementations,
     check the :ref:`Clustering` section of the documentation.
 """
+
+# ------ I/O -------
+docdict[
+    "fname_fiff"
+] = """
+fname : path-like
+    Path to the .fif file where the clustering solution is saved."""
+
+# -- Segmentation --
+docdict[
+    "labels_raw"
+] = """
+labels : Array (n_samples, )
+    Microstates labels attributed to each sample, i.e. the segmentation."""
+docdict[
+    "labels_epo"
+] = """
+labels : Array (n_epochs, n_samples)
+    Microstates labels attributed to each sample, i.e. the segmentation."""
+# TODO: predict_parameters docstring is missing.
+docdict[
+    "predict_parameters"
+] = """
+predict_parameters : dict | None"""
+
+# ------ Viz -------
+docdict[
+    "cmap"
+] = """
+cmap : str | None
+    The name of a colormap known to Matplotlib."""
+docdict[
+    "block"
+] = """
+block : bool
+    Whether to halt program execution until the figure is closed."""
+docdict[
+    "axes_topo"
+] = """
+axes : Axes | None
+    Either ``None`` to create a new figure or axes (or an array of
+    axes) on which the topographic map should be plotted. If the number of
+    microstates maps to plot is ``≥ 1``, an array of axes of size
+    ``n_clusters`` should be provided."""
+docdict[
+    "axes_seg"
+] = """
+axes : Axes | None
+    Either ``None`` to create a new figure or axes on which the
+    segmentation is plotted."""
+docdict[
+    "axes_cbar"
+] = """
+cbar_axes : Axes | None
+    Axes on which to draw the colorbar, otherwise the colormap takes
+    space from the main axes."""
+
 # ------------------------- Documentation functions --------------------------
 docdict_indented = {}
 

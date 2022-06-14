@@ -1,8 +1,6 @@
 Cluster
 =======
 
-:py:mod:`pycrostates.cluster`:
-
 .. currentmodule:: pycrostates.cluster
 
 .. automodule:: pycrostates.cluster

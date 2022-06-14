@@ -42,14 +42,11 @@ def resample(
     Parameters
     ----------
     inst : Raw | Epochs | ChData
-        Instance from which to extract GFP peaks.
+        Instance to resample.
     %(picks_all)s
     %(tmin_raw)s
     %(tmax_raw)s
-    reject_by_annotation : bool
-        Whether to reject by annotation. If True (default), segments annotated
-        with description starting with ‘bad’ are omitted. If False, no
-        rejection is done.
+    %(reject_by_annotation_raw)s
     n_resamples : int
         Number of resamples to draw. Each epoch can be used to fit a separate
         clustering solution. See notes for additional information.

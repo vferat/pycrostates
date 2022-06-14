@@ -17,24 +17,24 @@ from ...utils._config import get_config
 
 
 def data_path(subject_id: str, condition: str) -> Path:
-    """
-    Get path to local copy of preprocessed EEG recording from the LEMON dataset.
+    """Get path to local copy of preprocessed EEG recording from the LEMON dataset.
 
-    Get path to local copy of preprocessed EEG recording
-    from the mind-brain-body dataset of MRI, EEG, cognition, emotion,
-    and peripheral physiology in young and old adults dataset files.
-    If there is no local copy of the recording, this will fetch it from
-    the online repository and store it on disk.
+    Get path to local copy of preprocessed EEG recording from the
+    mind-brain-body dataset of MRI, EEG, cognition, emotion, and peripheral
+    physiology in young and old adults dataset files.
+    If there is no local copy of the recording, this function will fetch it
+    from the online repository and store it. The default location is
+    ``~/pycrostates_data``.
 
     Parameters
     ----------
     subject_id : str
-        The subject id to use.
-        For example '010276'.
+        The subject id to use. For example ``'010276'``.
         The list of available subjects can be found
         at https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Raw_BIDS_ID.
     condition : str
-        Can be 'EO' for eyes open condition or 'EC' for eyes closed condition.
+        Can be ``'EO'`` for eyes open condition or ``'EC'`` for eyes closed
+        condition.
 
     Returns
     -------
@@ -76,9 +76,8 @@ def data_path(subject_id: str, condition: str) -> Path:
 def standardize(raw: BaseRaw):
     """Standardize :class:`~mne.io.Raw` from the lemon dataset.
 
-    This function will interpolate missing channels from
-    the standard setup, then reorder channels and finally
-    reference to average.
+    This function will interpolate missing channels from the standard setup,
+    then reorder channels and finally reference to a common average.
 
     Parameters
     ----------
@@ -93,8 +92,8 @@ def standardize(raw: BaseRaw):
     Notes
     -----
     If you don't want to interpolate missing channels, you can use
-    :func:`mne.channels.equalize_channels` instead to have same electrodes
-    across recordings.
+    :func:`mne.channels.equalize_channels` instead to have the same electrodes
+    across different recordings.
     """
     raw = raw.copy()
     # fmt: off

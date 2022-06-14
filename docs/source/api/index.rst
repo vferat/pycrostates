@@ -14,8 +14,6 @@ This is the reference for classes (``CamelCase`` names) and functions
    :depth: 2
 
 
-:py:mod:`pycrostates`:
-
 .. automodule:: pycrostates
    :no-members:
    :no-inherited-members:

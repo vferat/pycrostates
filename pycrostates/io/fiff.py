@@ -34,6 +34,7 @@ from .. import __version__
 from .._typing import CHInfo
 from ..cluster import ModKMeans
 from ..utils._checks import _check_type, _check_value
+from ..utils._docs import fill_doc
 from ..utils._logs import logger
 
 # ----------------------------------------------------------------------------
@@ -66,6 +67,7 @@ FIFF_MNE_ICA_MISC_PARAMS -> fit variables (ending with '_')
 """
 
 
+@fill_doc
 def _write_cluster(
     fname: Union[str, Path],
     cluster_centers_: NDArray[float],
@@ -80,8 +82,7 @@ def _write_cluster(
 
     Parameters
     ----------
-    fname : path-like
-        Path to the .fif file where the clustering solution is saved.
+    %(fname_fiff)s
     cluster_centers_ : array
         Cluster centers as a numpy array of shape (n_clusters, n_channels).
     chinfo : ChInfo
@@ -217,13 +218,13 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
     return fit_parameters, fit_variables
 
 
+@fill_doc
 def _read_cluster(fname: Union[str, Path]):
     """Read clustering solution from disk.
 
     Parameters
     ----------
-    fname : path-like
-        Path to the .fif file where the clustering solution is saved.
+    %(fname_fiff)s
 
     Returns
     -------

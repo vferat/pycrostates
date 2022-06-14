@@ -1,8 +1,6 @@
 IO
 ==
 
-:py:mod:`pycrostates.io`:
-
 .. currentmodule:: pycrostates.io
 
 .. automodule:: pycrostates.io
@@ -11,6 +9,7 @@ IO
 
 .. autosummary::
    :toctree: generated/
-   
+
    ChInfo
+   ChData
    read_cluster

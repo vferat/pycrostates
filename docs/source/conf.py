@@ -118,10 +118,15 @@ html_theme_options = {
             "name": "GitHub",
             "url": "https://github.com/vferat/pycrostates",
             "icon": "fab fa-github-square",
+        },
+        {
+            "name": "Slack",
+            "url": "https://pycrostates.slack.com",
+            "icon": "fab fa-slack",
         }
     ],
     "external_links": [
-        {"name": "mne", "url": "https://mne.tools/stable/index.html"}
+        {"name": "MNE", "url": "https://mne.tools/stable/index.html"}
     ],
 }
 # Add any paths that contain custom static files (such as style sheets) here,

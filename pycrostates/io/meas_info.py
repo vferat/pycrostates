@@ -1,4 +1,4 @@
-"""Measurement information, similar to mne.Info instance."""
+"""Measurement information, similar to `mne.Info` instance."""
 
 from copy import deepcopy
 from numbers import Number
@@ -22,8 +22,10 @@ class ChInfo(CHInfo, Info):
 
     Similar to a mne.Info class, but without any temporal information. Only the
     channel-related information are present. A ChInfo can be created either:
-        - by providing an mne.Info class from which information are retrieved.
-        - by providing the ch_names and the ch_types to create a new instance
+        - by providing an `~mne.Info` class from which information are
+          retrieved.
+        - by providing the ``ch_names`` and the ``ch_types`` to create a new
+          instance.
     Only one of those 2 methods should be used at once.
 
     .. warning:: The only entry that should be manually changed by the user
@@ -35,14 +37,13 @@ class ChInfo(CHInfo, Info):
     Parameters
     ----------
     info : mne.Info | None
-        A mne measurement information instance from which channel-related
+        MNE measurement information instance from which channel-related
         variables are retrieved.
     ch_names : list of str | int | None
         Channel names. If an int, a list of channel names will be created
         from ``range(ch_names)``.
     ch_types : list of str | str | None
-        Channel types. If str, then all channels are assumed to be of the same
-        type.
+        Channel types. If str, all channels are assumed to be of the same type.
 
     Attributes
     ----------
@@ -138,33 +139,35 @@ class ChInfo(CHInfo, Info):
     """
 
     # valid items
+    # fmt: off
     _attributes = {
         "bads": _check_bads,
         "ch_names": "ch_names cannot be set directly. "
-        "Please use methods inst.add_channels(), "
-        "inst.drop_channels(), inst.pick_channels(), "
-        "inst.rename_channels(), inst.reorder_channels() "
-        "and inst.set_channel_types() instead.",
+                    "Please use methods inst.add_channels(), "
+                    "inst.drop_channels(), inst.pick_channels(), "
+                    "inst.rename_channels(), inst.reorder_channels() "
+                    "and inst.set_channel_types() instead.",
         "chs": "chs cannot be set directly. "
-        "Please use methods inst.add_channels(), "
-        "inst.drop_channels(), inst.pick_channels(), "
-        "inst.rename_channels(), inst.reorder_channels() "
-        "and inst.set_channel_types() instead.",
+               "Please use methods inst.add_channels(), "
+               "inst.drop_channels(), inst.pick_channels(), "
+               "inst.rename_channels(), inst.reorder_channels() "
+               "and inst.set_channel_types() instead.",
         "comps": "comps cannot be set directly. "
-        "Please use method Raw.apply_gradient_compensation() "
-        "instead.",
+                 "Please use method Raw.apply_gradient_compensation() "
+                 "instead.",
         "custom_ref_applied": "custom_ref_applied cannot be set directly. "
-        "Please use method inst.set_eeg_reference() "
-        "instead.",
+                              "Please use method inst.set_eeg_reference() "
+                              "instead.",
         "dig": "dig cannot be set directly. "
-        "Please use method inst.set_montage() instead.",
+               "Please use method inst.set_montage() instead.",
         "nchan": "nchan cannot be set directly. "
-        "Please use methods inst.add_channels(), "
-        "inst.drop_channels(), and inst.pick_channels() instead.",
+                 "Please use methods inst.add_channels(), "
+                 "inst.drop_channels(), and inst.pick_channels() instead.",
         "projs": "projs cannot be set directly. "
-        "Please use methods inst.add_proj() and inst.del_proj() "
-        "instead.",
+                 "Please use methods inst.add_proj() and inst.del_proj() "
+                 "instead.",
     }
+    # fmt: on
 
     def __init__(
         self,

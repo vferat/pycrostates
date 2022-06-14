@@ -29,26 +29,23 @@ def extract_gfp_peaks(
     reject_by_annotation: bool = True,
     verbose=None,
 ) -> CHData:
-    """GFP peaks extraction.
+    """:term:`GFP` peaks extraction.
 
-    Extract global field power peaks from :class:`mne.Epochs` or
+    Extract :term:`global field power` (GFP) peaks from :class:`~mne.Epochs` or
     :class:`~mne.io.Raw`.
 
     Parameters
     ----------
     inst : Raw | Epochs
-        Instance from which to extract GFP peaks.
+        Instance from which to extract :term:`global field power` (GFP) peaks.
     %(picks_all)s
     min_peak_distance : int
-        Required minimal horizontal distance (>= 1) in samples between
+        Required minimal horizontal distance (``≥ 1`) in samples between
         neighboring peaks. Smaller peaks are removed first until the condition
-        is fulfilled for all remaining peaks. Default to 2.
+        is fulfilled for all remaining peaks. Default to ``2``.
     %(tmin_raw)s
     %(tmax_raw)s
-    reject_by_annotation : bool
-        Whether to reject by annotation. If True (default), segments annotated
-        with description starting with ‘bad’ are omitted. If False, no
-        rejection is done.
+    %(reject_by_annotation_raw)s
     %(verbose)s
 
     Returns

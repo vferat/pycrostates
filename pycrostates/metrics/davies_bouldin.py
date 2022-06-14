@@ -14,7 +14,7 @@ from ..utils._docs import fill_doc
 def davies_bouldin_score(cluster):  # lower the better
     """Compute the Davies-Bouldin score.
 
-    This function is a proxy function for
+    This function is a wrapper around
     :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a
     fitted :ref:`Clustering` instance. It uses the absolute spatial correlation
     for distance computations.
@@ -33,7 +33,7 @@ def davies_bouldin_score(cluster):  # lower the better
     For more details regarding the implementation, please refer to
     :func:`sklearn.metrics.davies_bouldin_score`.
     This function was modified in order to use the absolute spatial correlation
-    for distance computations instead of euclidean distance.
+    for distance computations instead of the euclidean distance.
 
     References
     ----------

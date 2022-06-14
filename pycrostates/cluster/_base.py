@@ -179,19 +179,19 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         reject_by_annotation: bool = True,
         n_jobs: int = 1,
     ) -> NDArray[float]:
-        """
-        Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
+        """Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
 
         Parameters
         ----------
-        %(fit_inst)s
+        inst : Raw | Epochs
+            MNE `~mne.io.Raw` or `~mne.Epochs` object containing data to
+            transform to cluster-distance space (absolute spatial correlation).
         %(picks_all)s
         %(tmin_raw)s
         %(tmax_raw)s
         %(reject_by_annotation_raw)s
         %(n_jobs)s
         """
-        # TODO: Maybe those parameters should be moved here instead of docdict?
         from ..io import ChData, ChInfo
 
         n_jobs = _check_n_jobs(n_jobs)
@@ -256,17 +256,21 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 Tuple[str, ...],
             ]
         ] = None,
-    ):
-        """
-        Rename the clusters in-place.
+    ) -> None:
+        """Rename the clusters.
 
         Parameters
         ----------
         mapping : dict
-            Mapping from the old names to the new names.
-            key: old name, value: new name.
+            Mapping from the old names to the new names. The keys are the old
+            names and the values are the new names.
         new_names : list | tuple
-            1D iterable containing the new cluster names.
+            1D iterable containing the new cluster names. The length of the
+            iterable should match the number of clusters.
+
+        Notes
+        -----
+        Operates in-place.
         """
         self._check_fit()
 
@@ -322,9 +326,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 NDArray[int],
             ]
         ] = None,
-    ):
-        """
-        Reorder the clusters in-place. The positions are 0-indexed.
+    ) -> None:
+        """Reorder the clusters.
 
         Parameters
         ----------
@@ -333,6 +336,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             key: old position, value: new position.
         order : list of int | tuple of int | array of int
             1D iterable containing the new order.
+
+        Notes
+        -----
+        The positions are 0-indexed.
+        Operates in-place.
         """
         self._check_fit()
 
@@ -414,9 +422,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             Tuple[bool, ...],
             NDArray[bool],
         ],
-    ):
-        """
-        Invert map polarities for visualisation purposes. Operates in-place.
+    ) -> None:
+        """Invert map polarities for visualisation purposes.
 
         Parameters
         ----------
@@ -424,6 +431,10 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             List of bool of length ``n_clusters``.
             True will invert map polarity, while False will have no effect.
             If a bool is provided, it is applied to all maps.
+
+        Notes
+        -----
+        Operates in-place.
         """
         self._check_fit()
 
@@ -492,7 +503,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         Parameters
         ----------
         fname : path-like
-            Path to the .fif file where the clustering solution is saved.
+            Path to the ``.fif`` file where the clustering solution is saved.
         """
         self._check_fit()
         _check_type(fname, ("path-like",), "fname")
@@ -515,7 +526,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         Parameters
         ----------
-        %(predict_inst)s
+        inst : Raw | Epochs
+            MNE `~mne.io.Raw` or `~mne.Epochs` object containing the data to
+            use for prediction.
         %(picks_all)s
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing.
@@ -805,8 +818,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         tol: Union[int, float],
         half_window_size: int,
     ) -> NDArray[int]:
-        """
-        Apply smoothing. Adapted from [1].
+        """Apply smoothing.
+
+        Adapted from [1].
 
         References
         ----------
@@ -855,8 +869,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         data: NDArray[float],
         min_segment_length: int,
     ) -> NDArray[int]:
-        """
-        Reject segments that are too short.
+        """Reject segments that are too short.
 
         Reject segments that are too short by replacing the labels with the
         adjacent labels based on data correlation.
@@ -940,8 +953,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     # --------------------------------------------------------------------
     @property
     def n_clusters(self) -> int:
-        """
-        Cluster number.
+        """Number of clusters (number of microstates).
 
         :type: `int`
         """
@@ -949,8 +961,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @property
     def info(self):
-        """
-        Info instance with the channel information used to fit the instance.
+        """Info instance with the channel information used to fit the instance.
 
         :type: `~pycrostates.io.ChInfo`
         """
@@ -962,8 +973,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @property
     def fitted(self) -> bool:
-        """
-        Fitting state.
+        """Fitted state.
 
         :type: `bool`
         """
@@ -993,12 +1003,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @property
     def cluster_centers_(self) -> NDArray[float]:
-        """
-        Center of the clusters.
+        """Fitted clusters (the microstates maps).
 
         Returns None if cluster algorithm has not been fitted.
 
-        :type: `~numpy.array`
+        :type: `~numpy.array` (n_clusters, n_channels) | None
         """
         if self._cluster_centers_ is None:
             assert not self._fitted  # sanity-check
@@ -1008,10 +1017,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @property
     def fitted_data(self) -> NDArray[float]:
-        """
-        Return data array used to fit the clustering algorithm.
+        """Data array used to fit the clustering algorithm.
 
-        :type: `~numpy.array` shape (n_channels, n_samples)
+        :type: `~numpy.array` shape (n_channels, n_samples) | None
         """
         if self._fitted_data is None:
             assert not self._fitted  # sanity-check
@@ -1021,7 +1029,10 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @property
     def labels_(self) -> NDArray[int]:
-        """Labels fit variable."""
+        """Microstate label attributed to each sample of the fitted data.
+
+        :type: `~numpy.array` shape (n_samples, ) | None
+        """
         if self._labels_ is None:
             assert not self._fitted  # sanity-check
             logger.warning("Clustering algorithm has not been fitted.")
@@ -1030,12 +1041,19 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @property
     def cluster_names(self) -> List[str]:
-        """
-        Name of the clusters.
+        """Name of the clusters.
 
         :type: `list`
         """
         return self._cluster_names.copy()
+
+    @cluster_names.setter
+    def cluster_names(self, other: Any):
+        """Setter for the cluster names."""
+        logger.warning(
+            "The attribute 'cluster_names' can not be set directly. Please "
+            "use the 'rename_clusters' method instead."
+        )
 
     # --------------------------------------------------------------------
     @staticmethod

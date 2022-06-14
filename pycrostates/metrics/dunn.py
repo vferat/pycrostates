@@ -44,7 +44,6 @@ def dunn_score(cluster):  # higher the better
 
 
 def _dunn_score(X, labels):  # higher the better
-    # based on https://github.com/jqmviegas/jqm_cvi
     """Compute the Dunn index.
 
     Parameters
@@ -53,6 +52,10 @@ def _dunn_score(X, labels):  # higher the better
         np.array([N, p]) of all points
     labels: np.array
         np.array([N]) labels of all points
+
+    Notes
+    -----
+    Based on https://github.com/jqmviegas/jqm_cvi
     """
     distances = _distance_matrix(X)
     ks = np.sort(np.unique(labels))
