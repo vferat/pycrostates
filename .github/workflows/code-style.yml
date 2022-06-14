@@ -49,5 +49,6 @@ jobs:
           check_filenames: true
           check_hidden: true
           skip: './.git,./build'
+          ignore_words_list: Jaques
       - name: Run pydocstyle
         run: pydocstyle .
