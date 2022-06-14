@@ -43,6 +43,7 @@ Pycrostates implements multiple modules that allow researchers to apply microsta
 - the metrics module quantifies the quality of the fitted clustering algorithms.
 
 Additional modules help researchers to develop analysis pipelines:
+
 - the dataset module provides direct access to preprocessed data that can be used to test pipelines. As of writing, it supports the LEMON dataset [@babayan_mind-brain-body_2019] comprising preprocessed EEG recordings of 227 healthy participants.
 - the viz module provides visualization tools for performing microstate analyses.
 
@@ -57,6 +58,6 @@ With this contribution, the developer team is excited to provide the state of th
 
 # Acknowledgements
 
-Acknowledgements
+Pycrostates development is partly supported by the Swiss National Science Foundation (grant No. 320030_184677) and by the Human Neuroscience Platform, Fondation Campus Biotech Geneva, Geneva, Switzerland.
 
 # References
