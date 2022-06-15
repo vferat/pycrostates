@@ -1,16 +1,9 @@
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-
+[![PyPI version](https://badge.fury.io/py/pycrostates.svg)](https://badge.fury.io/py/pycrostates)
+[![Documentation Status](https://readthedocs.org/projects/pycrostates/badge/?version=latest)](https://pycrostates.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://dev.azure.com/vferat/pycrostates/_apis/build/status/vferat.pycrostates?branchName=main)](https://dev.azure.com/vferat/pycrostates/_build/latest?definitionId=1&branchName=main)
 [![codecov](https://codecov.io/gh/vferat/pycrostates/branch/master/graph/badge.svg?token=47COGGCGX8)](https://codecov.io/gh/vferat/pycrostates)
-[![Documentation Status](https://readthedocs.org/projects/pycrostates/badge/?version=latest)](https://pycrostates.readthedocs.io/en/latest/?badge=latest)
-
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/029e425f90614943b0a944e03922b637)](https://www.codacy.com/gh/vferat/pycrostates/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vferat/pycrostates&amp;utm_campaign=Badge_Grade)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
-
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Pycrostates
 ---
@@ -18,22 +11,26 @@
 An open-source Python package for analyzing EEG microstates developed to work with [MNE-python](https://mne.tools/stable/index.html).
 
 ## Documentation
+[![Documentation Status](https://readthedocs.org/projects/pycrostates/badge/?version=latest)](https://pycrostates.readthedocs.io/en/latest/?badge=latest)
 
 The documentation including tutorials and example can be found [here](https://pycrostates.readthedocs.io/en/master).
 
 ## Installation
+![PyPI - Downloads](https://img.shields.io/pypi/dm/pycrostates)
 
 Installation instructions can be found [here](https://pycrostates.readthedocs.io/en/master/install.html).
 
----
-<p float="left">
-    <a href="https://www.unige.ch/medecine/neuf/en/researc/grecherche/christoph-michel/">
-        <img src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/FBMLAB_logo.png" width="200" />
-    </a>
-    <a href="https://www.unige.ch/en/university/presentation/">
-        <img src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/UNIGE_logo.png" width="300" />
-    </a>
-</p>
+## Citing
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6642589.svg)](https://doi.org/10.5281/zenodo.6642589)
+[![status](https://joss.theoj.org/papers/be7e10c061e28f5694cb7366aef445a3/status.svg)](https://joss.theoj.org/papers/be7e10c061e28f5694cb7366aef445a3)
+
+
+## Contributing
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ## Contributors ✨
 
@@ -55,3 +52,16 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+
+## Acknowledgment
+---
+
+<p float="left">
+    <a href="https://www.unige.ch/medecine/neuf/en/researc/grecherche/christoph-michel/">
+        <img src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/FBMLAB_logo.png" width="200" />
+    </a>
+    <a href="https://www.unige.ch/en/university/presentation/">
+        <img src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/UNIGE_logo.png" width="300" />
+    </a>
+</p>
