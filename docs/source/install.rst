@@ -14,7 +14,7 @@ Dependencies
 * ``jinja2``
 
 We require that you use Python 3.7 or higher.
-You may choose to install ``mne-icalabel`` via conda or via pip.
+You may choose to install ``pycrostates`` via conda or via pip.
 
 pycrostates works best with the latest stable release of MNE-Python. To ensure
 MNE-Python is up-to-date, see their `installation instructions <https://mne.tools/stable/install/index.html>`_.
