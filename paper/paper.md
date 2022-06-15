@@ -8,11 +8,14 @@ tags:
   - microstates
   - brain
 authors:
-  - name: Victor Férat^[Co-first author]^[Corresponding author] # note this makes a footnote saying 'Co-first author'
+  - name: Victor Férat
     orcid: 0000-0003-1952-7657
+    corresponding: true
+    equal-contrib: true
     affiliation: 1
-  - name: Mathieu Scheltienne^[Co-first author] # note this makes a footnote saying 'Co-first author'
+  - name: Mathieu Scheltienne
     orcid: 0000-0001-8316-7436
+    equal-contrib: true
     affiliation: 2
   - name: Denis Brunet
     affiliation: "1, 3" # (Multiple affiliations must be quoted)
@@ -29,7 +32,7 @@ affiliations:
    index: 2
  - name: Centre for Biomedical Imaging (CIBM) Lausanne-Geneva, Geneva, Switzerland
    index: 3
-date: 30 May 2022
+date: 15 June 2022
 bibliography: paper.bib
 ---
 
