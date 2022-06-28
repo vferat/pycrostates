@@ -19,7 +19,7 @@ An open-source Python package for analyzing EEG microstates developed to work wi
 
 ## Documentation
 
-The documentation including tutorials and example can be found [here](https://pycrostates.readthedocs.io/en/master).
+The documentation including tutorials and example can be found [here](https://pycrostates.readthedocs.io/en/latest/).
 
 ## Installation
 
