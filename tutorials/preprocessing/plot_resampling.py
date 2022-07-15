@@ -5,6 +5,20 @@ Resampling
 This example demonstrates how to resemple a recording.
 """
 
+#%%
+# .. note::
+#
+#     The lemon datasets is composed of EEGLAB files. To use the MNE reader
+#     :func:`mne.io.read_raw_eeglab`, the ``pymatreader`` optional dependency
+#     is required. Use the following installation method appropriate for your
+#     environment:
+#
+#     - ``pip install pymatreader``
+#     - ``conda install -c conda-forge pymatreader``
+#
+#     Note that an environment created via the MNE installers includes
+#     ``pymatreader`` by default.
+
 import mne
 from mne.io import read_raw_eeglab
 
