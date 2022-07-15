@@ -11,7 +11,18 @@ and the variance expressed by the decomposition.
 """
 
 #%%
-# We first start by importing some EEG data
+# .. note::
+#
+#     The lemon datasets is composed of EEGLAB files. To use the MNE reader
+#     :func:`mne.io.read_raw_eeglab`, the ``pymatreader`` optional dependency
+#     is required. Use the following installation method appropriate for your
+#     environment:
+#
+#     - ``pip install pymatreader``
+#     - ``conda install -c conda-forge pymatreader``
+#
+#     Note that an environment created via the MNE installers includes
+#     ``pymatreader`` by default.
 
 import matplotlib.pyplot as plt
 from mne.io import read_raw_eeglab
@@ -36,7 +47,7 @@ raw.set_eeg_reference("average")
 #
 # We can apply these metrics on clustering solution
 # computed with different values of n_clusters and
-# analyse which give the best clustering solution. 
+# analyse which give the best clustering solution.
 from pycrostates.metrics import (
     silhouette_score,
     calinski_harabasz_score,

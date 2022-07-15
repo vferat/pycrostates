@@ -17,11 +17,11 @@ from ...utils._config import get_config
 
 
 def data_path(subject_id: str, condition: str) -> Path:
-    """Get path to local copy of preprocessed EEG recording from the LEMON dataset.
+    """Get path to a local copy of preprocessed EEG recording from the LEMON dataset.
 
-    Get path to local copy of preprocessed EEG recording from the
+    Get path to a local copy of preprocessed EEG recording from the
     mind-brain-body dataset of MRI, EEG, cognition, emotion, and peripheral
-    physiology in young and old adults dataset files.
+    physiology in young and old adults.
     If there is no local copy of the recording, this function will fetch it
     from the online repository and store it. The default location is
     ``~/pycrostates_data``.
@@ -47,6 +47,19 @@ def data_path(subject_id: str, condition: str) -> Path:
            A mind-brain-body dataset of MRI, EEG, cognition, emotion,
            and peripheral physiology in young and old adults. Sci Data 6, 180308 (2019).
            https://doi.org/10.1038/sdata.2018.308
+
+    Notes
+    -----
+    The lemon datasets is composed of EEGLAB files. To use the MNE reader
+    :func:`mne.io.read_raw_eeglab`, the ``pymatreader`` optional dependency
+    is required. Use the following installation method appropriate for your
+    environment:
+
+    - ``pip install pymatreader``
+    - ``conda install -c conda-forge pymatreader``
+
+    Note that an environment created via the MNE installers includes
+    ``pymatreader`` by default.
     """  # noqa: E501
     _check_type(subject_id, (str,), "subject_id")
     _check_type(condition, (str,), "condition")
