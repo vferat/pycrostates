@@ -15,6 +15,7 @@ An open-source Python package for analyzing EEG microstates developed to work wi
 
 The documentation including tutorials and example can be found [here](https://pycrostates.readthedocs.io/en/latest/).
 
+
 ## Installation
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/pycrostates)
 
@@ -31,6 +32,12 @@ Installation instructions can be found [here](https://pycrostates.readthedocs.io
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
+
+Pycrostates welcomes contributions from anyone interested in improving this project. These contributions can take the form of bug reports/fixes, feature requests/additions, documentation revision and new tutorials, ect..
+
+In all cases, it is recommended to [open a new issue](https://github.com/vferat/pycrostates/issues/new/choose) on Github to discuss the best way to integrate our contribution.
+
+Check the [Contribution Guide](https://github.com/vferat/pycrostates/blob/main/CONTRIBUTING.md) if you want to make a changes to Pycrostates
 
 ## Contributors ✨
 
