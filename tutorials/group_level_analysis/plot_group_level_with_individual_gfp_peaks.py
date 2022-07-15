@@ -13,8 +13,10 @@ by computing group level topogrpahies based on individual gfp peaks.
 #     :func:`mne.io.read_raw_eeglab`, the ``pymatreader`` optional dependency
 #     is required. Use the following installation method appropriate for your
 #     environment:
-#     - ``pip install pymatreader```
-#     - ``conda install -c conda-forge pymatreader```
+#
+#     - ``pip install pymatreader``
+#     - ``conda install -c conda-forge pymatreader``
+#
 #     Note that an environment created via the MNE installers includes
 #     ``pymatreader`` by default.
 
