@@ -5,15 +5,15 @@ Inspired from mne: https://mne.tools/stable/index.html
 Inspired from mne.utils.docs.py by Eric Larson <larson.eric.d@gmail.com>
 """
 import sys
-from typing import Callable, List
+from typing import Callable, Dict, List, Tuple
 
 from mne.utils.docs import docdict as docdict_mne
 
 # ------------------------- Documentation dictionary -------------------------
-docdict = {}
+docdict: Dict[str, str] = {}
 
 # ---- Documentation to inc. from MNE ----
-keys = (
+keys: Tuple[str, ...] = (
     "n_jobs",
     "picks_all",
     "random_state",
@@ -24,7 +24,14 @@ keys = (
 )
 
 for key in keys:
-    docdict[key] = docdict_mne[key]
+    entry = docdict_mne[key]
+    if ".. versionchanged::" in entry:
+        entry = entry.replace(
+            ".. versionchanged::", ".. versionchanged:: MNE "
+        )
+    if ".. versionadded::" in entry:
+        entry = entry.replace(".. versionadded::", ".. versionadded:: MNE ")
+    docdict[key] = entry
 
 # ---- Clusters ----
 docdict[
@@ -111,7 +118,7 @@ cbar_axes : Axes | None
     space from the main axes."""
 
 # ------------------------- Documentation functions --------------------------
-docdict_indented = {}
+docdict_indented: Dict[int, Dict[str, str]] = {}
 
 
 def fill_doc(f: Callable) -> Callable:
