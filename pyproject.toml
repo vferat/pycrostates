@@ -101,6 +101,7 @@ exclude = ['pycrostates*tests']
 
 [tool.setuptools.package-data]
 "pycrostates.datasets" = ["**/*.txt"]
+"pycrostates.html_templates" = ["repr/*.jinja"]
 
 [tool.black]
 line-length = 79
