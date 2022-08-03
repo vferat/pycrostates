@@ -19,6 +19,9 @@ You may choose to install ``pycrostates`` via conda or via pip.
 pycrostates works best with the latest stable release of MNE-Python. To ensure
 MNE-Python is up-to-date, see their `installation instructions <https://mne.tools/stable/install/index.html>`_.
 
+As of MNE-Python 1.1, ``pycrostates`` is distributed in the
+`MNE standalone installers <https://mne.tools/stable/install/installers.html>`_.
+
 Installation via Conda
 ----------------------
 
