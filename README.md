@@ -22,7 +22,7 @@ The documentation including tutorials and example can be found [here](https://py
 Installation instructions can be found [here](https://pycrostates.readthedocs.io/en/master/install.html).
 
 ## Citing
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6642589.svg)](https://doi.org/10.5281/zenodo.6642589)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6915329.svg)](https://doi.org/10.5281/zenodo.6915329)
 [![status](https://joss.theoj.org/papers/be7e10c061e28f5694cb7366aef445a3/status.svg)](https://joss.theoj.org/papers/be7e10c061e28f5694cb7366aef445a3)
 
 
