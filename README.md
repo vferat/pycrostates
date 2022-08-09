@@ -14,6 +14,8 @@
 
 ![Pycrostates_logo](./docs/_static/img/Pycrostates_logo_black.png#gh-light-mode-only)
 
+![Pycrostates_logo](./docs/_static/img/Pycrostates_logo_white.png#gh-dark-mode-only)
+
 # Pycrostates
 ---
 
