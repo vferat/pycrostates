@@ -25,6 +25,8 @@ Installation instructions can be found [here](https://pycrostates.readthedocs.io
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6915329.svg)](https://doi.org/10.5281/zenodo.6915329)
 [![status](https://joss.theoj.org/papers/be7e10c061e28f5694cb7366aef445a3/status.svg)](https://joss.theoj.org/papers/be7e10c061e28f5694cb7366aef445a3)
 
+To cite specific version numbers of the software, you can use the DOIs provided by [Zenodo](https://doi.org/10.5281/zenodo.6915329).
+The canonical journal article reference is currently under review at the [JOSS](https://joss.theoj.org/papers/be7e10c061e28f5694cb7366aef445a3) journal and can't be cited yet.
 
 ## Contributing
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
