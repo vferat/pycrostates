@@ -12,6 +12,8 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
+![Pycrostates_logo](./docs/_static/img/Pycrostates_logo_black.png#gh-light-mode-only)
+
 # Pycrostates
 ---
 
