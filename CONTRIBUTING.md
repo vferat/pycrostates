@@ -37,7 +37,7 @@ Once the contribution discussed, you can propose a change by creating a new pull
 
 Pycrostates uses [flake](https://github.com/PyCQA/flake8), [black](https://github.com/psf/black) and [isort](https://github.com/PyCQA/isort) to enforce code style.
 
-You can run theses tools from the pycrostates root directory using the corresponding command:
+You can run these tools from the pycrostates root directory using the corresponding command:
 
 - flake8
 
