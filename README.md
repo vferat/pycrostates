@@ -29,17 +29,18 @@ To cite specific version numbers of the software, you can use the DOIs provided 
 The canonical journal article reference is currently under review at the [JOSS](https://joss.theoj.org/papers/be7e10c061e28f5694cb7366aef445a3) journal and can't be cited yet.
 
 ## Contributing
+
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-Pycrostates welcomes contributions from anyone interested in improving this project. These contributions can take the form of bug reports/fixes, feature requests/additions, documentation revision and new tutorials, ect..
+Pycrostates welcomes contributions from anyone interested in improving this project. These contributions can take the form of bug reports/fixes, feature requests/additions, documentation revision and new tutorials.
 
 In all cases, it is recommended to [open a new issue](https://github.com/vferat/pycrostates/issues/new/choose) on Github to discuss the best way to integrate our contribution.
 
-Check the [Contribution Guide](https://github.com/vferat/pycrostates/blob/main/CONTRIBUTING.md) if you want to make a changes to Pycrostates
+Check the [Contribution Guide](https://github.com/vferat/pycrostates/blob/main/CONTRIBUTING.md) if you want to make a changes to Pycrostates.
 
 ## Contributors ✨
 

@@ -7,9 +7,9 @@ Once the contribution discussed, you can propose a change by creating a new pull
 
 - Clone your forked repository
 
-- We recommand to create a new branch on which you will make your changes
+- [OPTIONAL] create a new branch on which you will make your changes
 
-- We recommand to create a new environment, for exemple with Anaconda:
+- [OPTIONAL] create a new environment, for example with Anaconda:
 
     ```console
     conda create -n pycrostates_dev python=3.9
@@ -65,7 +65,7 @@ pytest pycrostates
 
 ## Building the documentation
 
-From within the `/docs` directroy:
+From within the `/docs` directory:
 
 ```console
 make html
