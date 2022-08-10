@@ -1,5 +1,6 @@
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![PyPI version](https://badge.fury.io/py/pycrostates.svg)](https://badge.fury.io/py/pycrostates)
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/pycrostates.svg)](https://anaconda.org/conda-forge/pycrostates)
 [![Documentation Status](https://readthedocs.org/projects/pycrostates/badge/?version=latest)](https://pycrostates.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://dev.azure.com/vferat/pycrostates/_apis/build/status/vferat.pycrostates?branchName=main)](https://dev.azure.com/vferat/pycrostates/_build/latest?definitionId=1&branchName=main)
 [![codecov](https://codecov.io/gh/vferat/pycrostates/branch/master/graph/badge.svg?token=47COGGCGX8)](https://codecov.io/gh/vferat/pycrostates)
