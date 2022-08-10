@@ -159,6 +159,8 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
     r"\.setdefault",
     r"\.update",
     r"\.values",
+    # copy methods
+    r"\.copy",
 }
 
 # -- sphinx-gallery ----------------------------------------------------------

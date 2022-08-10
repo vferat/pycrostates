@@ -55,7 +55,7 @@ cluster_names : list | None
 docdict[
     "cluster"
 ] = """
-cluster : :ref:`Clustering`.
+cluster : :ref:`Clustering`
     Fitted clustering algorithm from which to compute score.
     For more details about current clustering implementations,
     check the :ref:`Clustering` section of the documentation.
@@ -83,7 +83,8 @@ labels : array (n_epochs, n_samples)
 docdict[
     "predict_parameters"
 ] = """
-predict_parameters : dict | None"""
+predict_parameters : dict | None
+    The prediction parameters."""
 
 # ------ Viz -------
 docdict[

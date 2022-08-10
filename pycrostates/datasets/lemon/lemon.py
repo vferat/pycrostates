@@ -41,13 +41,6 @@ def data_path(subject_id: str, condition: str) -> Path:
     path : Path
         Path to a local copy of the requested recording.
 
-    References
-    ----------
-    .. [1] Babayan, A., Erbey, M., Kumral, D. et al.
-           A mind-brain-body dataset of MRI, EEG, cognition, emotion,
-           and peripheral physiology in young and old adults. Sci Data 6, 180308 (2019).
-           https://doi.org/10.1038/sdata.2018.308
-
     Notes
     -----
     The lemon datasets is composed of EEGLAB files. To use the MNE reader
@@ -60,6 +53,13 @@ def data_path(subject_id: str, condition: str) -> Path:
 
     Note that an environment created via the MNE installers includes
     ``pymatreader`` by default.
+
+    References
+    ----------
+    .. [1] Babayan, A., Erbey, M., Kumral, D. et al.
+           A mind-brain-body dataset of MRI, EEG, cognition, emotion,
+           and peripheral physiology in young and old adults. Sci Data 6, 180308 (2019).
+           https://doi.org/10.1038/sdata.2018.308
     """  # noqa: E501
     _check_type(subject_id, (str,), "subject_id")
     _check_type(condition, (str,), "condition")
