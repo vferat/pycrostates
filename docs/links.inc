@@ -9,11 +9,6 @@
    nipy, NIPY, Nipy, etc...
 
 
-.. citations
-
-.. _michel 2018: https://doi.org/10.1016/j.neuroimage.2017.11.062
-
-
 .. project
 
 .. _project pypi: https://pypi.org/project/pycrostates/

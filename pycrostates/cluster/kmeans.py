@@ -20,7 +20,7 @@ from ._base import _BaseCluster
 
 @fill_doc
 class ModKMeans(_BaseCluster):
-    """Modified K-Means clustering algorithms.
+    """Modified K-Means clustering algorithms\ :footcite:p:`391164`.
 
     Parameters
     ----------
@@ -38,11 +38,7 @@ class ModKMeans(_BaseCluster):
 
     References
     ----------
-    .. [1] `Pascual-Marqui RD, Michel CM, Lehmann D. (1995).
-       "Segmentation of brain electrical activity into microstates:
-        model estimation and validation.".
-       IEEE Trans Biomed Eng.
-       <https://doi.org/10.1109/10.391164>`_
+    .. footbibliography::
     """
 
     # TODO: docstring for tol doesn't look english

@@ -42,6 +42,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
     "nbsphinx",
+    "sphinxcontrib.bibtex",
     "sphinx_copybutton",
     "sphinx_design",
     "sphinx_gallery.gen_gallery",
@@ -164,6 +165,11 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
     # copy methods
     r"\.copy",
 }
+
+# -- sphinxcontrib-bibtex ----------------------------------------------------
+bibtex_bibfiles = ['../references.bib']
+bibtex_style = 'unsrt'
+bibtex_footbibliography_header = ''
 
 # -- sphinx-gallery ----------------------------------------------------------
 sphinx_gallery_conf = {

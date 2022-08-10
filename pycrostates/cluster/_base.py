@@ -825,11 +825,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         References
         ----------
         .. [1] R. D. Pascual-Marqui, C. M. Michel and D. Lehmann.
-            Segmentation of brain electrical activity into microstates:
-            model estimation and validation.
-            IEEE Transactions on Biomedical Engineering,
-            vol. 42, no. 7, pp. 658-665, July 1995,
-            https://doi.org/10.1109/10.391164.
+               Segmentation of brain electrical activity into microstates:
+               model estimation and validation.
+               IEEE Transactions on Biomedical Engineering,
+               vol. 42, no. 7, pp. 658-665, July 1995,
+               https://doi.org/10.1109/10.391164.
         """
         Ne, Nt = data.shape
         Nu = states.shape[0]
