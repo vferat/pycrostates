@@ -119,12 +119,20 @@ numpydoc_xref_aliases = {
     "Info": "mne.Info",
     "Raw": "mne.io.Raw",
     # Pycrostates:
-    "ChData": "pycrostates.io.ChData"
+    "ChData": "pycrostates.io.ChData",
+    "ChInfo": "pycrostates.io.ChInfo",
+    # Matplotlib
+    "Axes": "matplotlib.axes.Axes",
+    "Figure": "matplotlib.figure.Figure",
 }
 numpydoc_xref_ignore = {
     "instance",
     "of",
     "shape",
+    "n_channels",
+    "n_clusters",
+    "n_epochs",
+    "n_samples",
 }
 
 numpydoc_validate = True

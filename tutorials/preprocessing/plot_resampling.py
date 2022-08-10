@@ -54,7 +54,7 @@ resamples
 resamples = resample(raw, n_samples=150, coverage=0.5, random_state=40)
 resamples
 #%%
-# Finally, we can also use this function to resample :func:`~mne.epochs.Epochs`
+# Finally, we can also use this function to resample :class:`~mne.Epochs`
 
 epochs = mne.make_fixed_length_epochs(raw, duration=2, preload=True)
 resamples = resample(epochs, n_samples=150, coverage=0.5, random_state=40)
