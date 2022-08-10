@@ -23,7 +23,7 @@ The documentation including tutorials and example can be found [here](https://py
 
 ## Installation
 
-Installation instructions can be found [here](https://pycrostates.readthedocs.io/en/master/install.html).
+Installation instructions can be found [here](https://pycrostates.readthedocs.io/en/latest/install.html).
 
 ---
 <p float="left">
