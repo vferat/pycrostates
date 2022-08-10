@@ -28,6 +28,6 @@ jobs:
           python -m pip install --progress-bar off --upgrade pip setuptools wheel
           python -m pip install --progress-bar off .[doc]
       - name: Build doc
-        run: |
-          cd docs
-          make html
+        uses: ammaraskar/sphinx-action@0.4
+        with:
+          docs-folder: "docs/source"
