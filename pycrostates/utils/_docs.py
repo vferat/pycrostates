@@ -65,8 +65,8 @@ cluster : :ref:`Clustering`
 docdict[
     "fname_fiff"
 ] = """
-fname : path-like
-    Path to the .fif file where the clustering solution is saved."""
+fname : str | Path
+    Path to the ``.fif`` file where the clustering solution is saved."""
 
 # -- Segmentation --
 docdict[

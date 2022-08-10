@@ -23,5 +23,6 @@
 
 .. mne
 
+.. _mne stable: https://mne.tools/stable/index.html
 .. _mne install: https://mne.tools/stable/install/index.html
 .. _mne installers: https://mne.tools/stable/install/installers.html

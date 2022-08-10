@@ -80,6 +80,9 @@ autodoc_member_order = "groupwise"
 autosummary_generate = True
 autodoc_default_options = {"inherited-members": None}
 
+# -- autosectionlabels -------------------------------------------------------
+autosectionlabel_prefix_document = True
+
 # -- intersphinx -------------------------------------------------------------
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
@@ -92,7 +95,6 @@ intersphinx_mapping = {
     "sklearn": ("https://scikit-learn.org/stable/", None),
 }
 intersphinx_timeout = 5
-
 
 # -- numpydoc ----------------------------------------------------------------
 
