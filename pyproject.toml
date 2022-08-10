@@ -64,6 +64,8 @@ docs = [
     'pymatreader',
     'recommonmark',
     'sphinx',
+    'sphinx-design',
+    'sphinx-copybutton',
     'sphinx_gallery',
 ]
 style = [

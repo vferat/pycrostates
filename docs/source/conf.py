@@ -24,13 +24,16 @@ copyright = "2021, Victor Férat"
 author = "Victor Férat"
 
 # -- General configuration ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+
+# If your documentation needs a minimal Sphinx version, state it here.
+needs_sphinx = "5.0"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.doctest",
@@ -39,29 +42,45 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
     "nbsphinx",
+    "sphinx_copybutton",
+    "sphinx_design",
     "sphinx_gallery.gen_gallery",
     "recommonmark",
     "numpydoc",
 ]
 
+# Add any paths that contain templates here, relative to this directory.
+templates_path = ["_templates"]
 
-# sphinx
-master_doc = "index"
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+# This pattern also affects html_static_path and html_extra_path.
+exclude_patterns = []
 
-# autodoc
-autodoc_typehints = 'none'
+# Sphinx will warn about all references where the target cannot be found.
+nitpicky = True
 
-# pygments style
-pygments_style = "default"
+# The document name of the “root” document, that is, the document that contains
+# the root toctree directive.
+root_doc = "index"
 
 # A list of ignored prefixes for module index sorting.
 modindex_common_prefix = ["pycrostates."]
+
+# The style name to use for Pygments highlighting of source code. If not set,
+# either the theme’s default style or 'sphinx' is selected for HTML output.
+pygments_style = "default"
+
+# -- autodoc-autosummary -----------------------------------------------------
+# autodoc
+autodoc_typehints = 'none'
+autodoc_member_order = "groupwise"
 
 # autosummary
 autosummary_generate = True
 autodoc_default_options = {"inherited-members": None}
 
-# intersphinx_mapping
+# -- intersphinx -------------------------------------------------------------
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/devdocs", None),
@@ -72,13 +91,47 @@ intersphinx_mapping = {
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "sklearn": ("https://scikit-learn.org/stable/", None),
 }
+intersphinx_timeout = 5
 
-# numpy doc
+
+# -- numpydoc ----------------------------------------------------------------
+
+# https://numpydoc.readthedocs.io/en/latest/validation.html#validation-checks
+error_ignores = {
+    "GL01",  # docstring should start in the line immediately after the quotes
+    "EX01",  # section 'Examples' not found
+    "ES01",  # no extended summary found
+    "SA01",  # section 'See Also' not found
+    "RT02",  # The first line of the Returns section should contain only the type, unless multiple values are being returned  # noqa
+}
+
 numpydoc_class_members_toctree = False
 numpydoc_attributes_as_param_list = True
 numpydoc_xref_param_type = True
 
-# sphinx_gallery_conf
+numpydoc_xref_aliases = {
+    "Path": "pathlib.Path",
+}
+numpydoc_xref_ignore = {
+    "of",
+    "shape",
+}
+
+numpydoc_validate = True
+numpydoc_validation_checks = {"all"} | set(error_ignores)
+numpydoc_validation_exclude = {  # regex to ignore during docstring check
+    r"\.__getitem__",
+    r"\.__contains__",
+    r"\.__hash__",
+    r"\.__mul__",
+    r"\.__sub__",
+    r"\.__add__",
+    r"\.__iter__",
+    r"\.__div__",
+    r"\.__neg__",
+}
+
+# -- sphinx-gallery ----------------------------------------------------------
 sphinx_gallery_conf = {
     "examples_dirs": os.path.abspath(
         os.path.join(curdir, "..", "..", "tutorials")
@@ -97,19 +150,10 @@ sphinx_gallery_conf = {
     "doc_module": ("pycrostates",),
 }
 
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
 html_theme = "pydata_sphinx_theme"
 
 html_theme_options = {
