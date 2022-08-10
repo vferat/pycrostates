@@ -18,7 +18,8 @@ The documentation including tutorials and example can be found [here](https://py
 
 
 ## Installation
-![PyPI - Downloads](https://img.shields.io/pypi/dm/pycrostates)
+[![Downloads](https://pepy.tech/badge/pycrostates/month)](https://pepy.tech/project/pycrostates)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/pycrostates/badges/downloads.svg)](https://anaconda.org/conda-forge/pycrostates)
 
 Installation instructions can be found [here](https://pycrostates.readthedocs.io/en/master/install.html).
 
