@@ -30,7 +30,7 @@ class ModKMeans(_BaseCluster):
         seeds. The final result will be the run with the highest Global
         Explained Variance (GEV).
     max_iter : int
-        Maximum number of iterations of the k-means algorithm for a single run.
+        Maximum number of iterations of the K-means algorithm for a single run.
     tol : float
         Relative tolerance with regards estimate residual noise in the cluster
         centers of two consecutive iterations to declare convergence.
