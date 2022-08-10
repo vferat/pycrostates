@@ -13,35 +13,35 @@ Dependencies
 * ``decorator``
 * ``jinja2``
 
-We require that you use Python 3.7 or higher.
-You may choose to install ``pycrostates`` via conda or via pip.
+We require that you use Python ``3.7`` or higher.
 
 pycrostates works best with the latest stable release of MNE-Python. To ensure
 MNE-Python is up-to-date, see their `installation instructions <https://mne.tools/stable/install/index.html>`_.
 
-As of MNE-Python 1.1, ``pycrostates`` is distributed in the
-`MNE standalone installers <https://mne.tools/stable/install/installers.html>`_.
+.. tab-set::
 
-Installation via Conda
-----------------------
+    .. tab-item:: Pypi
 
-To install the latest stable version, use ``conda`` in your terminal:
+        .. code-block:: bash
 
-.. code-block:: bash
+            pip install stimuli
 
-    $ conda install -c conda-forge pycrostates
+    .. tab-item:: Conda
 
-Installation via Pip
---------------------
+        .. code-block:: bash
 
-To install the latest stable version, use ``pip`` in your terminal:
+            conda install -c conda-forge stimuli
 
-.. code-block:: bash
+    .. tab-item:: MNE installers
 
-    $ pip install pycrostates
+        As of MNE-Python 1.1, ``pycrostates`` is distributed in the
+        `MNE standalone installers <https://mne.tools/stable/install/installers.html>`_.
 
-To install the latest development version, run:
+        The installers create a conda environment with the entire MNE-ecosystem
+        setup, and more!
 
-.. code-block:: bash
+    .. tab-item:: Snapshot of the current version
 
-    $ pip install git+https://github.com/vferat/pycrostates
+        .. code-block:: bash
+
+            $ pip install git+https://github.com/vferat/pycrostates
