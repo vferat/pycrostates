@@ -1,3 +1,5 @@
+.. include:: ./links.inc
+
 Install
 =======
 
@@ -16,17 +18,21 @@ Dependencies
 We require that you use Python ``3.7`` or higher.
 
 pycrostates works best with the latest stable release of MNE-Python. To ensure
-MNE-Python is up-to-date, see their `installation instructions <https://mne.tools/stable/install/index.html>`_.
+MNE-Python is up-to-date, see `MNE installation instructions <mne install_>`_.
 
 .. tab-set::
 
     .. tab-item:: Pypi
+
+        ``pycrostates`` can be installed from `Pypi <project pypi_>`_:
 
         .. code-block:: bash
 
             pip install stimuli
 
     .. tab-item:: Conda
+
+        ``pycrostates`` can be installed from `conda-forge <project conda_>`_:
 
         .. code-block:: bash
 
@@ -35,12 +41,14 @@ MNE-Python is up-to-date, see their `installation instructions <https://mne.tool
     .. tab-item:: MNE installers
 
         As of MNE-Python 1.1, ``pycrostates`` is distributed in the
-        `MNE standalone installers <https://mne.tools/stable/install/installers.html>`_.
+        `MNE standalone installers <mne installers_>`_.
 
         The installers create a conda environment with the entire MNE-ecosystem
         setup, and more!
 
     .. tab-item:: Snapshot of the current version
+
+        ``pycrostates`` can be installed from `GitHub <project github_>`_:
 
         .. code-block:: bash
 
