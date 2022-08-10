@@ -1,7 +1,7 @@
+.. include:: ../links.inc
+
 Microstates
 ===========
-
-.. include:: ../links.inc
 
 What is EEG microstates ?
 ^^^^^^^^^^^^^^^^^^^^^^^^^
