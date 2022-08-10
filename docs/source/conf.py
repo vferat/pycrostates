@@ -110,9 +110,19 @@ numpydoc_attributes_as_param_list = True
 numpydoc_xref_param_type = True
 
 numpydoc_xref_aliases = {
+    # Python
     "Path": "pathlib.Path",
+    # MNE
+    "DigMontage": "mne.channels.DigMontage",
+    "Epochs": "mne.Epochs",
+    "Evoked": "mne.Evoked",
+    "Info": "mne.Info",
+    "Raw": "mne.io.Raw",
+    # Pycrostates:
+    "ChData": "pycrostates.io.ChData"
 }
 numpydoc_xref_ignore = {
+    "instance",
     "of",
     "shape",
 }
