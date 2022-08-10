@@ -27,7 +27,7 @@ class _BaseSegmentation(ABC):
 
     Parameters
     ----------
-    labels : Array (n_samples, ) or (n_epochs, n_samples)
+    labels : array (n_samples, ) or (n_epochs, n_samples)
         Microstates labels attributed to each sample, i.e. the segmentation.
     inst : Raw | Epochs
         MNE instance used to predict the segmentation.

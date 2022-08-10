@@ -43,7 +43,7 @@ n_clusters : int
 docdict[
     "cluster_centers"
 ] = """
-cluster_centers : Array (n_clusters, n_channels)
+cluster_centers : array (n_clusters, n_channels)
     Fitted clusters, i.e. the microstates maps."""
 docdict[
     "cluster_names"
@@ -72,12 +72,12 @@ fname : path-like
 docdict[
     "labels_raw"
 ] = """
-labels : Array (n_samples, )
+labels : array (n_samples, )
     Microstates labels attributed to each sample, i.e. the segmentation."""
 docdict[
     "labels_epo"
 ] = """
-labels : Array (n_epochs, n_samples)
+labels : array (n_epochs, n_samples)
     Microstates labels attributed to each sample, i.e. the segmentation."""
 # TODO: predict_parameters docstring is missing.
 docdict[
