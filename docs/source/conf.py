@@ -147,6 +147,17 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
     r"\.__iter__",
     r"\.__div__",
     r"\.__neg__",
+    # dict subclasses
+    r"\.clear",
+    r"\.get$",
+    r"\.fromkeys",
+    r"\.items",
+    r"\.keys",
+    r"\.pop",
+    r"\.popitem",
+    r"\.setdefault",
+    r"\.update",
+    r"\.values",
 }
 
 # -- sphinx-gallery ----------------------------------------------------------
