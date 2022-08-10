@@ -117,6 +117,7 @@ numpydoc_xref_aliases = {
     "Epochs": "mne.Epochs",
     "Evoked": "mne.Evoked",
     "Info": "mne.Info",
+    "Projection": "mne.Projection",
     "Raw": "mne.io.Raw",
     # Pycrostates:
     "ChData": "pycrostates.io.ChData",
