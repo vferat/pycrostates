@@ -17,7 +17,7 @@ from ...utils._config import get_config
 
 
 def data_path(subject_id: str, condition: str) -> Path:
-    """Get path to a local copy of preprocessed EEG recording from the LEMON dataset\ :footcite:p:`babayan_mind-brain-body_2019`.
+    r"""Get path to a local copy of preprocessed EEG recording from the LEMON dataset\ :footcite:p:`babayan_mind-brain-body_2019`.
 
     Get path to a local copy of preprocessed EEG recording from the
     mind-brain-body dataset of MRI, EEG, cognition, emotion, and peripheral
