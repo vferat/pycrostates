@@ -5,9 +5,9 @@ Once the contribution discussed, you can propose a change by creating a new pull
 
 - [Fork the Pycrostates Repository](https://github.com/vferat/pycrostates/fork) on Github.
 
-- Clone your forked repository
+- Clone your forked repository locally.
 
-- [OPTIONAL] create a new branch on which you will make your changes
+- [OPTIONAL] create a new branch on which you will add your changes.
 
 - [OPTIONAL] create a new environment, for example with Anaconda:
 
@@ -23,13 +23,13 @@ Once the contribution discussed, you can propose a change by creating a new pull
 
 - Navigate to the repository's root folder
 
-- Install pycrostates in editable mode:
+- Install pycrostates in editable mode with all optional dependencies:
 
     ```console
     pip install -e .[all]
     ```
 
-- Make your changes
+- Make your changes.
 
 - [Open a pull request](https://github.com/vferat/pycrostates/compare)
 

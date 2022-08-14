@@ -21,7 +21,7 @@ The documentation including tutorials and example can be found [here](https://py
 [![Downloads](https://pepy.tech/badge/pycrostates/month)](https://pepy.tech/project/pycrostates)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/pycrostates/badges/downloads.svg)](https://anaconda.org/conda-forge/pycrostates)
 
-Installation instructions can be found [here](https://pycrostates.readthedocs.io/en/master/install.html).
+Installation instructions can be found [here](https://pycrostates.readthedocs.io/en/latest/install.html).
 
 ## Citing
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6915329.svg)](https://doi.org/10.5281/zenodo.6915329)
@@ -40,7 +40,7 @@ The canonical journal article reference is currently under review at the [JOSS](
 
 Pycrostates welcomes contributions from anyone interested in improving this project. These contributions can take the form of bug reports/fixes, feature requests/additions, documentation revision and new tutorials.
 
-In all cases, it is recommended to [open a new issue](https://github.com/vferat/pycrostates/issues/new/choose) on Github to discuss the best way to integrate our contribution.
+In all cases, it is recommended to [open a new issue](https://github.com/vferat/pycrostates/issues/new/choose) on Github to discuss the best way to integrate a contribution.
 
 Check the [Contribution Guide](https://github.com/vferat/pycrostates/blob/main/CONTRIBUTING.md) if you want to make a changes to Pycrostates.
 
