@@ -7,7 +7,7 @@ What is EEG microstates ?
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Microstates analysis is a method allowing investigation of spatiotemporal
-characteristics of EEG recordings. It consists in breaking down the
+characteristics of EEG recordings. It consists of breaking down the
 multichannel EEG signal into a succession of quasi-stable state, each state
 being characterized by a spatial distribution of its scalp potentials also
 called microstate map or microstate topography.
@@ -32,7 +32,7 @@ spatial correlation is used as a measure of distance to carry out all
 computations. The absolute value is used in order to ignore the topography
 polarity.
 
-Pycrostates implements a conveniente class
+Pycrostates implements a convenient class
 :class:`pycrostates.cluster.ModKMeans` to perform clustering through
 the :meth:`pycrostates.cluster.ModKMeans.fit` method and backfitting through
 the :meth:`pycrostates.cluster.ModKMeans.predict` method. It also implements
