@@ -87,7 +87,7 @@ ModK.plot()
 
 #%%
 # Finally, the modified Kmeans can be used to predict the microstates
-# segmentation using the :meth:`ModK.predict` method. By default, semgents
+# segmentation using the :meth:`ModK.predict` method. By default, segments
 # annotated as bad will not be labeled, but this behavior can be changed with
 # the ``reject_by_annotation`` argument. Smoothing can be performed on the
 # output sequence by setting the ``factor`` argument ``> 0`` (no smoothing by
