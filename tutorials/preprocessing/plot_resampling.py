@@ -2,7 +2,7 @@
 Resampling
 ==========
 
-This example demonstrates how to resemple a recording.
+This example demonstrates how to resample a recording.
 """
 
 #%%
@@ -33,7 +33,7 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# We can now use the :func:`~pycrostates.preprocessing.resample`function to
+# We can now use the :func:`~pycrostates.preprocessing.resample` function to
 # draw n_resamples of n_samples for our recording where n_sample defines the
 # number of sample contained in each epoch and n_resamples defines the number of
 # epochs to draw.
