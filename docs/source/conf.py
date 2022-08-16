@@ -114,6 +114,7 @@ numpydoc_xref_param_type = True
 
 numpydoc_xref_aliases = {
     # Python
+    "bool": ":class:`python:bool`",
     "Path": "pathlib.Path",
     # MNE
     "DigMontage": "mne.channels.DigMontage",
