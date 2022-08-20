@@ -112,6 +112,7 @@ error_ignores = {
     "ES01",  # no extended summary found
     "SA01",  # section 'See Also' not found
     "RT02",  # The first line of the Returns section should contain only the type, unless multiple values are being returned  # noqa
+    "SA04",  # Missing description for See Also "{reference_name}" reference'Missing description for See Also "{reference_name}" reference  # noqa
 }
 
 numpydoc_class_members_toctree = False
@@ -171,10 +172,6 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
     r"\.values",
     # copy methods
     r"\.copy",
-    # mne methods
-    r"mne.channels\.make_standard_montage",
-    r"mne.channels\.make_dig_montage",
-    r"mne.channels\.read_custom_montage",
 }
 
 # -- sphinxcontrib-bibtex ----------------------------------------------------
