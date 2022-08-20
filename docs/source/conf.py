@@ -60,6 +60,7 @@ exclude_patterns = []
 
 # Sphinx will warn about all references where the target cannot be found.
 nitpicky = True
+nitpick_ignore = []
 
 # The document name of the “root” document, that is, the document that contains
 # the root toctree directive.
@@ -216,6 +217,19 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = [os.path.abspath(os.path.join(curdir, "../_static"))]
+html_css_files = [
+    'style.css',
+]
+# If true, links to the reST sources are added to the pages.
+html_show_sourcelink = False
+html_copy_source = False
+# variables to pass to HTML templating engine
+html_context = {
+    'build_dev_html': bool(int(os.environ.get('BUILD_DEV_HTML', False))),
+    'default_mode': 'auto',
+    'pygment_light_style': 'tango',
+    'pygment_dark_style': 'native',
+}
 
 
 def append_attr_meth_examples(app, what, name, obj, options, lines):
