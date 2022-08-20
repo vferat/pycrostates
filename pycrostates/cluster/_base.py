@@ -173,7 +173,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     def fit(
         self,
         inst: Union[BaseRaw, BaseEpochs, CHData],
-        picks: Picks = None,
+        picks: Picks = "eeg",
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,
         reject_by_annotation: bool = True,
@@ -186,7 +186,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         inst : Raw | Epochs
             MNE `~mne.io.Raw` or `~mne.Epochs` object containing data to
             transform to cluster-distance space (absolute spatial correlation).
-        %(picks_all)s
+        %(picks_eeg)s
         %(tmin_raw)s
         %(tmax_raw)s
         %(reject_by_annotation_raw)s
