@@ -225,8 +225,6 @@ html_show_sourcelink = False
 html_copy_source = False
 # variables to pass to HTML templating engine
 html_context = {
-    'build_dev_html': bool(int(os.environ.get('BUILD_DEV_HTML', False))),
-    'default_mode': 'auto',
     'pygment_light_style': 'tango',
     'pygment_dark_style': 'native',
 }
