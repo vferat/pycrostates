@@ -172,9 +172,9 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
     # copy methods
     r"\.copy",
     # mne methods
-    r"mne.channels.make_standard_montage",
-    r"mne.channels.make_dig_montage",
-    r"mne.channels.read_custom_montage",
+    r"mne.channels\.make_standard_montage",
+    r"mne.channels\.make_dig_montage",
+    r"mne.channels\.read_custom_montage",
 }
 
 # -- sphinxcontrib-bibtex ----------------------------------------------------
