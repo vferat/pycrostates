@@ -60,7 +60,12 @@ exclude_patterns = []
 
 # Sphinx will warn about all references where the target cannot be found.
 nitpicky = True
-nitpick_ignore = []
+nitpick_ignore = [
+    ("py:class", "None.  Remove all items from D."),
+    ("py:class", "a set-like object providing a view on D's items"),
+    ("py:class", "a set-like object providing a view on D's keys"),
+    ("py:class", "an object providing a view on D's values"),
+]
 
 # The document name of the “root” document, that is, the document that contains
 # the root toctree directive.
@@ -166,6 +171,10 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
     r"\.values",
     # copy methods
     r"\.copy",
+    # mne methods
+    r"mne.channels.make_standard_montage",
+    r"mne.channels.make_dig_montage",
+    r"mne.channels.read_custom_montage",
 }
 
 # -- sphinxcontrib-bibtex ----------------------------------------------------
