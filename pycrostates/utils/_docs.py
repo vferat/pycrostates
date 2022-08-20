@@ -119,7 +119,7 @@ cbar_axes : Axes | None
 
 # ------ Viz -------
 docdict[
-    "pick_eeg"
+    "picks_eeg"
 ] = """
     Channels to include. Slices and lists of integers will be interpreted
     as channel indices. In lists, channel type strings (e.g., ['meg', 'eeg'])
