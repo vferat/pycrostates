@@ -117,6 +117,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
 
     def pick(self, picks, exclude="bads"):
         """Pick a subset of channels.
+
         Parameters
         ----------
         %(picks_all)s
