@@ -4,7 +4,7 @@ from typing import Any, Union
 
 import numpy as np
 from mne.io import Info
-from mne.io.pick import _picks_to_idx
+from mne.io.pick import _picks_to_idx, pick_info
 from numpy.typing import NDArray
 
 from .._typing import CHData, CHInfo
@@ -114,6 +114,30 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         picks = _picks_to_idx(self._info, picks, none="all", exclude="bads")
         data = self._data.copy()
         return data[picks, :]
+
+    def pick(self, picks, none="all", exclude="bads"):
+        """Pick a subset of channels.
+        Parameters
+        ----------
+        %(picks_all)s
+        exclude : list | str
+            Set of channels to exclude, only used when picking based on
+            types (e.g., exclude="bads" when picks="meg").
+        %(verbose)s
+
+        Returns
+        -------
+        inst : `~pycrostates.io.ChData`
+            The modified instance.
+        """
+        picks = _picks_to_idx(self._info, picks, none=none, exclude=exclude)
+        data = self._data.copy()
+        data = data[picks, :]
+
+        info = pick_info(self._info, picks, copy=False)
+
+        self._data = data
+        self._info = info if isinstance(info, ChInfo) else ChInfo(info)
 
     # --------------------------------------------------------------------
     @property
