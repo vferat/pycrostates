@@ -18,8 +18,9 @@ ch_info = ChInfo(
     ch_names=["Fpz", "Cz", "CPz", "Oz", "M1", "M2"], ch_types="eeg"
 )
 ch_info_types = ChInfo(
-    ch_names=["Fpz", "Cz", "MEG01", "STIM01", "GRAD01", "EOG"], 
-    ch_types=["eeg", "eeg", "mag", "stim", "grad", "eog"])
+    ch_names=["Fpz", "Cz", "MEG01", "STIM01", "GRAD01", "EOG"],
+    ch_types=["eeg", "eeg", "mag", "stim", "grad", "eog"],
+)
 
 
 def test_ChData():
@@ -76,6 +77,7 @@ def test_ChData():
     assert ch_data1 != ch_data3
     assert ch_data1 != 101
 
+
 # pylint: disable=protected-access
 @pytest.mark.parametrize(
     "picks, exclude, ch_names",
@@ -96,6 +98,7 @@ def test_ChData_picks(picks, exclude, ch_names):
     ch_data.pick(picks, exclude=exclude)
     assert set(ch_data.info["ch_names"]) == set(ch_names)
     assert ch_data._data.shape[0] == len(ch_names)
+
 
 def test_ChData_invalid_arguments():
     """Test error raised when invalid arguments are provided to ChData."""

@@ -37,6 +37,7 @@ from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 
+
 # ----------------------------------------------------------------------------
 """
 To store a clustering solution, the FIFF tags for ICA are used.

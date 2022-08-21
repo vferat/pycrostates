@@ -173,9 +173,14 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         inst_.pick(picks)
         if len(inst_.get_channel_types(unique=True)) != 1:
             ch_types = inst_.get_channel_types(unique=False)
-            ch_types, counts =  np.unique(ch_types, return_counts=True)
-            channels_msg = ', '.join('%s %s channel(s)' % t for t in zip(counts, ch_types))
-            msg = f"Only one datatype can be fitted, but picks={picks} results in "
+            ch_types, counts = np.unique(ch_types, return_counts=True)
+            channels_msg = ", ".join(
+                "%s %s channel(s)" % t for t in zip(counts, ch_types)
+            )
+            msg = (
+                "Only one datatype can be fitted,"
+                + f"but picks={picks} results in "
+            )
             msg += channels_msg
             raise ValueError(msg)
 

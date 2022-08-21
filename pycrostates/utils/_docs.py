@@ -123,9 +123,9 @@ docdict[
 ] = """
 picks : str | list | slice | None
     Channels to include. Slices and lists of integers will be interpreted
-    as channel indices. Note that all channels must have the same data type.
-    In lists, channel name strings (e.g., ['Fp1', 'Fp2'] will pick the given channels.
-    "eeg" (default) will pick all eeg channels.
+    as channel indices. Note that all channels must have the same type.
+    In lists, channel name strings (e.g., ['Fp1', 'Fp2']
+    will pick the given channels. "eeg" (default) will pick all eeg channels.
     Note that channels in info['bads'] will be included if their
     names or indices are explicitly provided."""
 
