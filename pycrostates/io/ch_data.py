@@ -130,6 +130,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         inst : `~pycrostates.io.ChData`
             The modified instance.
         """
+        from .meas_info import ChInfo
         picks = _picks_to_idx(self._info, picks, none=none, exclude=exclude)
         data = self._data.copy()
         data = data[picks, :]
