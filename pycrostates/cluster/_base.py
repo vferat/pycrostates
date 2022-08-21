@@ -168,6 +168,16 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         assert self._fitted_data is not None
         assert self._labels_ is not None
 
+    def _check_picks(self, picks, inst):
+        inst_ = inst.copy()
+        if len(inst_.get_channel_types(unique=True)) != 1:
+            ch_types = inst_.get_channel_types(unique=False)
+            ch_types, counts =  np.unique(ch_types, return_counts=True)
+            channels_msg = ', '.join('%s %s channels' % t for t in zip(counts, ch_types))
+            msg = f"Only one datatype can be fitted, but picks={picks} results in"
+                  + channels_msg
+            raise ValueError()
+
     @abstractmethod
     @fill_doc
     def fit(
@@ -186,7 +196,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         inst : Raw | Epochs
             MNE `~mne.io.Raw` or `~mne.Epochs` object containing data to
             transform to cluster-distance space (absolute spatial correlation).
-        %(picks_eeg)s
+        %(picks_fit)s
         %(tmin_raw)s
         %(tmax_raw)s
         %(reject_by_annotation_raw)s
@@ -207,6 +217,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         info = inst.info
 
         # picks
+        self._check_picks(picks)
         picks_bads_inc = _picks_to_idx(info, picks, none="all", exclude=[])
         picks = _picks_to_idx(info, picks, none="all", exclude="bads")
         ch_not_used = set(picks_bads_inc) - set(picks)

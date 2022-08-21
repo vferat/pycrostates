@@ -119,15 +119,14 @@ cbar_axes : Axes | None
 
 # ------ Viz -------
 docdict[
-    "picks_eeg"
+    "picks_fit"
 ] = """
+picks : str | list | slice | None
     Channels to include. Slices and lists of integers will be interpreted
-    as channel indices. In lists, channel type strings (e.g., ['meg', 'eeg'])
-    will pick channels of those types, channel name strings
-    (e.g., ['MEG0111', 'MEG2623'] will pick the given channels.
-    Can also be the string values “all” to pick all channels,
-    or “data” to pick data channels. "eeg" (default) will pick all eeg
-    channels. Note that channels in info['bads'] will be included if their
+    as channel indices. Note that all channels must have the same data type.
+    In lists, channel name strings (e.g., ['Fp1', 'Fp2'] will pick the given channels.
+    "eeg" (default) will pick all eeg channels.
+    Note that channels in info['bads'] will be included if their
     names or indices are explicitly provided."""
 
 # ------------------------- Documentation functions --------------------------
