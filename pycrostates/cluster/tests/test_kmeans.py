@@ -798,6 +798,23 @@ def test_fit_with_bads(caplog):
     assert "Channels EEG 001, EEG 002 are set as bads" in caplog.text
     caplog.clear()
 
+def test_fit_picks():
+    raw = raw_meg.copy().pick_types(meg=True, eeg=True, eog=True)
+    ModK_ = ModKMeans(
+        n_clusters=n_clusters,
+        n_init=10,
+        max_iter=100,
+        tol=1e-4,
+        random_state=1,
+    )
+    with pytest.raises(ValueError):
+        ModK_.fit(raw, picks=None)  # fails -> MEG + EEG
+    with pytest.raises(ValueError):
+        ModK_.fit(raw, picks="meg")  # fails -> grad + mag
+    with pytest.raises(ValueError):
+        ModK_.fit(raw, picks="data")  # fails -> eeg + grad + mag
+    ModK_.fit(raw, picks="eeg")  # works
+    ModK_.fit(raw, picks="mag")  # works
 
 def test_predict(caplog):
     """Test predict method default behaviors."""
