@@ -17,6 +17,9 @@ info = create_info(
 ch_info = ChInfo(
     ch_names=["Fpz", "Cz", "CPz", "Oz", "M1", "M2"], ch_types="eeg"
 )
+ch_info_types = ChInfo(
+    ch_names=["Fpz", "Cz", "MEG01", "STIM01", "GRAD01", "EOG"], 
+    ch_types=["eeg", "eeg", "mag", "stim", "grad", "eog"])
 
 
 def test_ChData():
@@ -35,7 +38,7 @@ def test_ChData():
 
     # test ContainsMixin
     assert "eeg" in ch_data
-    assert "meg" not in ch_data
+    assert "bio" not in ch_data
 
     # test MontageMixin
     assert ch_data.get_montage() is None
@@ -73,6 +76,26 @@ def test_ChData():
     assert ch_data1 != ch_data3
     assert ch_data1 != 101
 
+# pylint: disable=protected-access
+@pytest.mark.parametrize(
+    "picks, exclude, ch_names",
+    [
+        ("eeg", [], ["Fpz", "Cz"]),
+        ("meg", [], ["MEG01", "GRAD01"]),
+        ("stim", [], ["STIM01"]),
+        ("data", [], ["Fpz", "Cz", "MEG01", "GRAD01"]),
+        ("all", [], ["Fpz", "Cz", "MEG01", "STIM01", "GRAD01", "EOG"]),
+        ("eeg", ["Fpz"], ["Cz"]),
+        ("data", ["Fpz"], ["Cz", "MEG01", "GRAD01"]),
+        ("all", ["Fpz"], ["Cz", "MEG01", "STIM01", "GRAD01", "EOG"]),
+    ],
+)
+def test_ChData_picks(picks, exclude, ch_names):
+    # test picks
+    ch_data = ChData(data, ch_info_types.copy())
+    ch_data.pick(picks, exclude=exclude)
+    assert set(ch_data.info["ch_names"]) == set(ch_names)
+    assert ch_data._data.shape[0] == len(ch_names)
 
 def test_ChData_invalid_arguments():
     """Test error raised when invalid arguments are provided to ChData."""
