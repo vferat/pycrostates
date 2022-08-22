@@ -34,8 +34,8 @@ polarity.
 
 Pycrostates implements a convenient class
 :class:`pycrostates.cluster.ModKMeans` to perform clustering through
-the :meth:`pycrostates.cluster.ModKMeans.fit` method and backfitting through
-the :meth:`pycrostates.cluster.ModKMeans.predict` method. It also implements
+the :meth:`~pycrostates.cluster.ModKMeans.fit` method and backfitting through
+the :meth:`~pycrostates.cluster.ModKMeans.predict` method. It also implements
 other methods to facilitate the analysis and display of results.
 
 References
