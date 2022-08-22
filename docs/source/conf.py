@@ -78,11 +78,7 @@ nitpick_ignore = [
 root_doc = "index"
 
 # A list of ignored prefixes for module index sorting.
-modindex_common_prefix = ["pycrostates."]
-
-# The style name to use for Pygments highlighting of source code. If not set,
-# either the theme’s default style or 'sphinx' is selected for HTML output.
-pygments_style = "default"
+modindex_common_prefix = [f"{package}."]
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -107,6 +103,7 @@ html_theme_options = {
         {"name": "MNE", "url": "https://mne.tools/stable/index.html"}
     ],
 }
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
@@ -116,20 +113,21 @@ html_css_files = ['style.css']
 html_show_sourcelink = False
 html_copy_source = False
 html_show_sphinx = False
+
 # variables to pass to HTML templating engine
 html_context = {
     'pygment_light_style': 'tango',
     'pygment_dark_style': 'native',
 }
 
-# -- autodoc-autosummary -----------------------------------------------------
+# -- autodoc -----------------------------------------------------------------
 # autodoc
-autoclass_content = "class"
 autodoc_typehints = 'none'
 autodoc_member_order = "groupwise"
 autodoc_warningiserror = True
+autoclass_content = "class"
 
-# autosummary
+# -- autosummary -------------------------------------------------------------
 autosummary_generate = True
 autodoc_default_options = {"inherited-members": None}
 
