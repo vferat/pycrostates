@@ -9,11 +9,14 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
+
 import os
+from datetime import date
 
 from recommonmark.transform import AutoStructify
 from sphinx_gallery.sorting import ExplicitOrder
+
+import pycrostates
 
 curdir = os.path.dirname(__file__)
 
@@ -21,8 +24,11 @@ curdir = os.path.dirname(__file__)
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "pycrostates"
-copyright = "2021, Victor Férat"
 author = "Victor Férat"
+copyright = f"{date.today().year}, {author}"
+release = pycrostates.__version__
+package = pycrostates.__name__
+gh_url = "https://github.com/vferat/pycrostates"
 
 # -- general configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -90,7 +96,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/vferat/pycrostates",
+            "url": gh_url,
             "icon": "fab fa-github-square",
         },
         {
