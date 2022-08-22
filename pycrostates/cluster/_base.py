@@ -1086,8 +1086,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 "%s %s channel(s)" % t for t in zip(counts, ch_types)
             )
             msg = (
-                "Only one datatype can be fitted,"
-                + f"but picks={picks} results in "
+                "Only one datatype can be fitted, but 'picks' results in "
             )
             msg += channels_msg
             raise ValueError(msg)
