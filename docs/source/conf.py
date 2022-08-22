@@ -216,6 +216,11 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
     r"\.values",
     # copy methods
     r"\.copy",
+    # segmentation classes
+    # TODO: the __init__.py methods should be refactored from *args, **kwargs
+    # to the actual list of arguments.
+    r"pycrostates.segmentation.EpochsSegmentation",
+    r"pycrostates.segmentation.RawSegmentation",
 }
 
 # -- sphinxcontrib-bibtex ----------------------------------------------------
