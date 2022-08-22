@@ -168,11 +168,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         assert self._fitted_data is not None
         assert self._labels_ is not None
 
-    def _check_picks(self, inst, picks):
-        inst_ = inst.copy()
-        inst_.pick(picks)
-        if len(inst_.get_channel_types(unique=True)) != 1:
-            ch_types = inst_.get_channel_types(unique=False)
+    @staticmethod
+    def _check_picks(info, picks):
+        info = pick_info(info, picks, copy=True)
+        if len(info.get_channel_types(unique=True)) != 1:
+            ch_types = info.get_channel_types(unique=False)
             ch_types, counts = np.unique(ch_types, return_counts=True)
             channels_msg = ", ".join(
                 "%s %s channel(s)" % t for t in zip(counts, ch_types)
