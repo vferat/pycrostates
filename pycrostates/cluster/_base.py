@@ -1085,8 +1085,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             channels_msg = ", ".join(
                 "%s %s channel(s)" % t for t in zip(counts, ch_types)
             )
-            msg = (
-                "Only one datatype can be fitted, but 'picks' results in "
-            )
+            msg = "Only one datatype can be fitted, but 'picks' results in "
             msg += channels_msg
             raise ValueError(msg)
