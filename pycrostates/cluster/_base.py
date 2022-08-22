@@ -251,7 +251,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             data = data.reshape(data.shape[0], -1)
 
         # store picks and info
-        self._info = ChInfo(info=pick_info(info, picks_bads_inc))
+        self._info = ChInfo(info=pick_info(info, picks))
         self._fitted_data = data
         return data
 
