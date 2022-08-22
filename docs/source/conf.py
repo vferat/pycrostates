@@ -83,6 +83,11 @@ root_doc = "index"
 # A list of ignored prefixes for module index sorting.
 modindex_common_prefix = [f"{package}."]
 
+# The name of a reST role (builtin or Sphinx extension) to use as the default
+# role, that is, for text marked up `like this`. This can be set to 'py:obj' to
+# make `filter` a cross-reference to the Python function “filter”.
+default_role = "py:obj"
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -170,6 +175,8 @@ numpydoc_xref_aliases = {
     # Pycrostates:
     "ChData": "pycrostates.io.ChData",
     "ChInfo": "pycrostates.io.ChInfo",
+    "RawSegmentation": "pycrostates.segmentation.RawSegmentation",
+    "EpochsSegmentation": "pycrostates.segmentation.EpochsSegmentation",
     # Matplotlib
     "Axes": "matplotlib.axes.Axes",
     "Figure": "matplotlib.figure.Figure",

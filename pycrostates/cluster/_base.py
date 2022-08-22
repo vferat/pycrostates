@@ -549,7 +549,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         Returns
         -------
-        segmentation : `RawSegmentation` | `EpochsSegmentation`
+        segmentation : RawSegmentation | EpochsSegmentation
             Microstate sequence derivated from instance data. Timepoints are
             labeled according to cluster centers number: 0 for the first
             center, 1 for the second, etc..
