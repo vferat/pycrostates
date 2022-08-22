@@ -168,22 +168,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         assert self._fitted_data is not None
         assert self._labels_ is not None
 
-    @staticmethod
-    def _check_picks(info, picks):
-        info = pick_info(info, picks, copy=True)
-        if len(info.get_channel_types(unique=True)) != 1:
-            ch_types = info.get_channel_types(unique=False)
-            ch_types, counts = np.unique(ch_types, return_counts=True)
-            channels_msg = ", ".join(
-                "%s %s channel(s)" % t for t in zip(counts, ch_types)
-            )
-            msg = (
-                "Only one datatype can be fitted,"
-                + f"but picks={picks} results in "
-            )
-            msg += channels_msg
-            raise ValueError(msg)
-
     @abstractmethod
     @fill_doc
     def fit(
@@ -231,9 +215,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         info = inst.info
 
         # picks
-        _BaseCluster._check_picks(inst.info, picks)
         picks_bads_inc = _picks_to_idx(info, picks, none="all", exclude=[])
         picks = _picks_to_idx(info, picks, none="all", exclude="bads")
+        _BaseCluster._check_picks(inst.info, picks)  # picks has to be idx
         ch_not_used = set(picks_bads_inc) - set(picks)
         if len(ch_not_used) != 0:
             if len(ch_not_used) == 1:
@@ -1091,3 +1075,19 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 f"Provided: '{n_clusters}'."
             )
         return n_clusters
+
+    @staticmethod
+    def _check_picks(info, picks):
+        info = pick_info(info, picks, copy=True)
+        if len(info.get_channel_types(unique=True)) != 1:
+            ch_types = info.get_channel_types(unique=False)
+            ch_types, counts = np.unique(ch_types, return_counts=True)
+            channels_msg = ", ".join(
+                "%s %s channel(s)" % t for t in zip(counts, ch_types)
+            )
+            msg = (
+                "Only one datatype can be fitted,"
+                + f"but picks={picks} results in "
+            )
+            msg += channels_msg
+            raise ValueError(msg)
