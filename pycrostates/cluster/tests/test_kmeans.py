@@ -808,11 +808,11 @@ def test_fit_picks():
         tol=1e-4,
         random_state=1,
     )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Only one datatype can be fitted"):
         ModK_.fit(raw, picks=None)  # fails -> MEG + EEG
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Only one datatype can be fitted"):
         ModK_.fit(raw, picks="meg")  # fails -> grad + mag
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Only one datatype can be fitted"):
         ModK_.fit(raw, picks="data")  # fails -> eeg + grad + mag
     ModK_.fit(raw, picks="eeg")  # works
     ModK_.fit(raw, picks="mag")  # works
