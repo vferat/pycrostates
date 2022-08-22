@@ -65,6 +65,7 @@ nitpick_ignore = [
     ("py:class", "a set-like object providing a view on D's items"),
     ("py:class", "a set-like object providing a view on D's keys"),
     ("py:class", "an object providing a view on D's values"),
+    ("py:class", "v, remove specified key and return the corresponding value."),  # noqa: E501
 ]
 
 # The document name of the “root” document, that is, the document that contains
