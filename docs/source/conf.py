@@ -70,7 +70,10 @@ nitpick_ignore = [
     ("py:class", "a set-like object providing a view on D's items"),
     ("py:class", "a set-like object providing a view on D's keys"),
     ("py:class", "an object providing a view on D's values"),
-    ("py:class", "v, remove specified key and return the corresponding value."),  # noqa: E501
+    (
+        "py:class",
+        "v, remove specified key and return the corresponding value.",
+    ),
 ]
 
 # The document name of the “root” document, that is, the document that contains
@@ -97,7 +100,7 @@ html_theme_options = {
             "name": "Slack",
             "url": "https://pycrostates.slack.com",
             "icon": "fab fa-slack",
-        }
+        },
     ],
     "external_links": [
         {"name": "MNE", "url": "https://mne.tools/stable/index.html"}
@@ -108,7 +111,7 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = [str(Path(__file__).parent.parent / "_static")]
-html_css_files = ['style.css']
+html_css_files = ["style.css"]
 # If true, links to the reST sources are added to the pages.
 html_show_sourcelink = False
 html_copy_source = False
@@ -116,13 +119,13 @@ html_show_sphinx = False
 
 # variables to pass to HTML templating engine
 html_context = {
-    'pygment_light_style': 'tango',
-    'pygment_dark_style': 'native',
+    "pygment_light_style": "tango",
+    "pygment_dark_style": "native",
 }
 
 # -- autodoc -----------------------------------------------------------------
 # autodoc
-autodoc_typehints = 'none'
+autodoc_typehints = "none"
 autodoc_member_order = "groupwise"
 autodoc_warningiserror = True
 autoclass_content = "class"
@@ -224,7 +227,7 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
 }
 
 # -- sphinxcontrib-bibtex ----------------------------------------------------
-bibtex_bibfiles = ['../references.bib']
+bibtex_bibfiles = ["../references.bib"]
 
 # -- sphinx-gallery ----------------------------------------------------------
 sphinx_gallery_conf = {
@@ -259,7 +262,11 @@ def append_attr_meth_examples(app, what, name, obj, options, lines):
 .. _sphx_glr_backreferences_{1}:
 .. rubric:: Examples using ``{0}``:
 .. minigallery:: {1}
-""".format(name.split(".")[-1], name).split("\n")
+""".format(
+                name.split(".")[-1], name
+            ).split(
+                "\n"
+            )
 
 
 # -- Auto-convert markdown pages to demo --------------------------------------
