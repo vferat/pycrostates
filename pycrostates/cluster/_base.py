@@ -917,7 +917,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
                 left = idx
                 right = idx + len(segment) - 1
-                new_segment = segmentation[left: right + 1]
+                new_segment = segmentation[left : right + 1]
 
                 while len(new_segment) != 0:
                     # compute correlation left/right side
@@ -952,7 +952,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                             left += 1
 
                     # crop segment
-                    new_segment = segmentation[left: right + 1]
+                    new_segment = segmentation[left : right + 1]
 
                 # segments that were too short might have become long enough,
                 # so list them again and check again.
