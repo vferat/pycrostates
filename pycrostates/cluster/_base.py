@@ -237,9 +237,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             )
             del msg
 
-        inst = inst.pick(picks)
-        if inst.info['bads'] != []:
-            if len(inst.info['bads']) == 1:
+        inst = inst.copy().pick(picks)
+        if inst.info["bads"] != []:
+            if len(inst.info["bads"]) == 1:
                 msg = (
                     "Channel %s is bad but was explicity set in 'picks' "
                     + "and therefore will be used during fitting."
@@ -249,10 +249,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                     "Channels %s are bad but were explicity set in 'picks' "
                     + "and therefore will be used during fitting."
                 )
-            logger.warning(
-                msg, ", ".join(inst.info['bads'])
-            )
-            del msg   
+            logger.warning(msg, ", ".join(inst.info["bads"]))
+            del msg
         # retrieve numpy array
         kwargs = (
             dict() if isinstance(inst, ChData) else dict(tmin=tmin, tmax=tmax)
@@ -611,6 +609,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         # check that the instance as the required channels (good + bads)
         # inst_info must have all the channels present in cluster_info
         _compare_infos(cluster_info=self._info, inst_info=inst.info)
+        if self._info["bads"] != []:
+            logger.warning(
+                f"Current fit contains bad(s) channel(s) "
+                f"{self._info['bads']} which will be used for prediction."
+            )
 
         if not include_bads:
             intersection = set(self._info["ch_names"]).intersection(
@@ -680,7 +683,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         raw: BaseRaw,
         picks_data: NDArray[int],
-        picks_cluster_centers: NDArray[int],
         factor: int,
         tol: Union[int, float],
         half_window_size: int,
@@ -702,7 +704,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         data = raw.get_data(picks=picks_data)
         # retrieve cluster_centers_ for picks
         cluster_centers_ = deepcopy(self._cluster_centers_)
-        cluster_centers_ = cluster_centers_[:, picks_cluster_centers]
 
         if reject_by_annotation:
             # retrieve onsets/ends for BAD annotations
@@ -750,7 +751,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         epochs: BaseEpochs,
         picks_data: NDArray[int],
-        picks_cluster_centers: NDArray[int],
         factor: int,
         tol: Union[int, float],
         half_window_size: int,
@@ -770,7 +770,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         data = epochs.get_data(picks=picks_data)
         # retrieve cluster_centers_ for picks
         cluster_centers_ = deepcopy(self._cluster_centers_)
-        cluster_centers_ = cluster_centers_[:, picks_cluster_centers]
 
         segments = []
         for epoch_data in data:
