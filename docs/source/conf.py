@@ -17,13 +17,14 @@ from sphinx_gallery.sorting import ExplicitOrder
 
 curdir = os.path.dirname(__file__)
 
-# -- Project information -----------------------------------------------------
+# -- project information -----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "pycrostates"
 copyright = "2021, Victor Férat"
 author = "Victor Férat"
 
-# -- General configuration ---------------------------------------------------
+# -- general configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -78,6 +79,44 @@ modindex_common_prefix = ["pycrostates."]
 # The style name to use for Pygments highlighting of source code. If not set,
 # either the theme’s default style or 'sphinx' is selected for HTML output.
 pygments_style = "default"
+
+# -- Options for HTML output -------------------------------------------------
+
+# The theme to use for HTML and HTML Help pages.  See the documentation for
+# a list of builtin themes.
+html_theme = "pydata_sphinx_theme"
+
+html_theme_options = {
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/vferat/pycrostates",
+            "icon": "fab fa-github-square",
+        },
+        {
+            "name": "Slack",
+            "url": "https://pycrostates.slack.com",
+            "icon": "fab fa-slack",
+        }
+    ],
+    "external_links": [
+        {"name": "MNE", "url": "https://mne.tools/stable/index.html"}
+    ],
+}
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+html_static_path = [os.path.abspath(os.path.join(curdir, "../_static"))]
+html_css_files = ['style.css']
+# If true, links to the reST sources are added to the pages.
+html_show_sourcelink = False
+html_copy_source = False
+html_show_sphinx = False
+# variables to pass to HTML templating engine
+html_context = {
+    'pygment_light_style': 'tango',
+    'pygment_dark_style': 'native',
+}
 
 # -- autodoc-autosummary -----------------------------------------------------
 # autodoc
@@ -195,45 +234,6 @@ sphinx_gallery_conf = {
     "reference_url": {"pycrostates": None},  # current lib uses None
     "backreferences_dir": "generated/backreferences",
     "doc_module": ("pycrostates",),
-}
-
-# -- Options for HTML output -------------------------------------------------
-
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-html_theme = "pydata_sphinx_theme"
-
-html_theme_options = {
-    "icon_links": [
-        {
-            "name": "GitHub",
-            "url": "https://github.com/vferat/pycrostates",
-            "icon": "fab fa-github-square",
-        },
-        {
-            "name": "Slack",
-            "url": "https://pycrostates.slack.com",
-            "icon": "fab fa-slack",
-        }
-    ],
-    "external_links": [
-        {"name": "MNE", "url": "https://mne.tools/stable/index.html"}
-    ],
-}
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = [os.path.abspath(os.path.join(curdir, "../_static"))]
-html_css_files = [
-    'style.css',
-]
-# If true, links to the reST sources are added to the pages.
-html_show_sourcelink = False
-html_copy_source = False
-# variables to pass to HTML templating engine
-html_context = {
-    'pygment_light_style': 'tango',
-    'pygment_dark_style': 'native',
 }
 
 
