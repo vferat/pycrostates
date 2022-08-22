@@ -86,9 +86,9 @@ def test_write_and_read(tmp_path, caplog):
     assert ModK1 == ModK2  # sanity-check
 
     # test prediction
-    segmentation = ModK.predict(raw2, picks="eeg")
-    segmentation1 = ModK1.predict(raw2, picks="eeg")
-    segmentation2 = ModK2.predict(raw2, picks="eeg")
+    segmentation = ModK.predict(raw2)
+    segmentation1 = ModK1.predict(raw2)
+    segmentation2 = ModK2.predict(raw2)
 
     assert np.allclose(segmentation._labels, segmentation1._labels)
     assert np.allclose(segmentation._labels, segmentation2._labels)
