@@ -223,7 +223,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         info = inst.info
 
         # picks
-        self._check_picks(inst, picks)
+        _BaseCluster._check_picks(inst.info, picks)
         picks_bads_inc = _picks_to_idx(info, picks, none="all", exclude=[])
         picks = _picks_to_idx(info, picks, none="all", exclude="bads")
         ch_not_used = set(picks_bads_inc) - set(picks)
