@@ -148,21 +148,11 @@ intersphinx_mapping = {
 intersphinx_timeout = 5
 
 # -- numpydoc ----------------------------------------------------------------
-
-# https://numpydoc.readthedocs.io/en/latest/validation.html#validation-checks
-error_ignores = {
-    "GL01",  # docstring should start in the line immediately after the quotes
-    "EX01",  # section 'Examples' not found
-    "ES01",  # no extended summary found
-    "SA01",  # section 'See Also' not found
-    "RT02",  # The first line of the Returns section should contain only the type, unless multiple values are being returned  # noqa
-    "SA04",  # Missing description for See Also "{reference_name}" reference'Missing description for See Also "{reference_name}" reference  # noqa
-}
-
 numpydoc_class_members_toctree = False
 numpydoc_attributes_as_param_list = True
-numpydoc_xref_param_type = True
 
+# x-ref
+numpydoc_xref_param_type = True
 numpydoc_xref_aliases = {
     # Python
     "bool": ":class:`python:bool`",
@@ -191,6 +181,16 @@ numpydoc_xref_ignore = {
     "n_samples",
 }
 
+# validate
+# https://numpydoc.readthedocs.io/en/latest/validation.html#validation-checks
+error_ignores = {
+    "GL01",  # docstring should start in the line immediately after the quotes
+    "EX01",  # section 'Examples' not found
+    "ES01",  # no extended summary found
+    "SA01",  # section 'See Also' not found
+    "RT02",  # The first line of the Returns section should contain only the type, unless multiple values are being returned  # noqa
+    "SA04",  # Missing description for See Also "{reference_name}" reference'Missing description for See Also "{reference_name}" reference  # noqa
+}
 numpydoc_validate = True
 numpydoc_validation_checks = {"all"} | set(error_ignores)
 numpydoc_validation_exclude = {  # regex to ignore during docstring check
