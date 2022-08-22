@@ -93,7 +93,7 @@ default_role = "py:obj"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 html_theme = "pydata_sphinx_theme"
-
+html_title = f"{project} {release}"
 html_theme_options = {
     "icon_links": [
         {
