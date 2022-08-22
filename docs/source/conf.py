@@ -134,10 +134,10 @@ autodoc_typehints = "none"
 autodoc_member_order = "groupwise"
 autodoc_warningiserror = True
 autoclass_content = "class"
+autodoc_default_options = {"inherited-members": None}
 
 # -- autosummary -------------------------------------------------------------
 autosummary_generate = True
-autodoc_default_options = {"inherited-members": None}
 
 # -- autosectionlabels -------------------------------------------------------
 autosectionlabel_prefix_document = True
