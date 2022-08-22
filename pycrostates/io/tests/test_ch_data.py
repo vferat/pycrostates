@@ -93,7 +93,7 @@ def test_ChData():
     ],
 )
 def test_ChData_picks(picks, exclude, ch_names):
-    # test picks
+    """Test pick method."""
     ch_data = ChData(data, ch_info_types.copy())
     ch_data.pick(picks, exclude=exclude)
     assert set(ch_data.info["ch_names"]) == set(ch_names)
