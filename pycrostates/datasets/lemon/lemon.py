@@ -31,7 +31,7 @@ def data_path(subject_id: str, condition: str) -> Path:
     subject_id : str
         The subject id to use. For example ``'010276'``.
         The list of available subjects can be found
-        at https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Raw_BIDS_ID.
+        on this `FTP server <https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Raw_BIDS_ID>`_.
     condition : str
         Can be ``'EO'`` for eyes open condition or ``'EC'`` for eyes closed
         condition.
