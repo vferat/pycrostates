@@ -228,8 +228,12 @@ bibtex_bibfiles = ['../references.bib']
 
 # -- sphinx-gallery ----------------------------------------------------------
 sphinx_gallery_conf = {
+    "backreferences_dir": "generated/backreferences",
+    "doc_module": ("pycrostates",),
     "examples_dirs": Path(__file__).parent.parent.parent / "tutorials",
     "gallery_dirs": "auto_tutorials",
+    "reference_url": {"pycrostates": None},  # current lib uses None
+    "remove_config_comments": True,
     "subsection_order": ExplicitOrder(
         [
             "../../tutorials/preprocessing",
@@ -238,9 +242,6 @@ sphinx_gallery_conf = {
             "../../tutorials/metrics",
         ]
     ),
-    "reference_url": {"pycrostates": None},  # current lib uses None
-    "backreferences_dir": "generated/backreferences",
-    "doc_module": ("pycrostates",),
 }
 
 
@@ -258,11 +259,7 @@ def append_attr_meth_examples(app, what, name, obj, options, lines):
 .. _sphx_glr_backreferences_{1}:
 .. rubric:: Examples using ``{0}``:
 .. minigallery:: {1}
-""".format(
-                name.split(".")[-1], name
-            ).split(
-                "\n"
-            )
+""".format(name.split(".")[-1], name).split("\n")
 
 
 # -- Auto-convert markdown pages to demo --------------------------------------
