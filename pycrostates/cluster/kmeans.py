@@ -20,7 +20,9 @@ from ._base import _BaseCluster
 
 @fill_doc
 class ModKMeans(_BaseCluster):
-    r"""Modified K-Means clustering algorithms\ :footcite:p:`391164`.
+    r"""Modified K-Means clustering algorithms.
+
+    See :footcite:t:`391164` for additional information.
 
     Parameters
     ----------

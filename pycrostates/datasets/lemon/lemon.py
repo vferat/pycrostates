@@ -17,11 +17,11 @@ from ...utils._config import get_config
 
 
 def data_path(subject_id: str, condition: str) -> Path:
-    r"""Get path to a local copy of preprocessed EEG recording from the LEMON dataset\ :footcite:p:`babayan_mind-brain-body_2019`.
+    r"""Get path to a local copy of preprocessed EEG recording from the LEMON dataset.
 
     Get path to a local copy of preprocessed EEG recording from the
     mind-brain-body dataset of MRI, EEG, cognition, emotion, and peripheral
-    physiology in young and old adults.
+    physiology in young and old adults\ :footcite:p:`babayan_mind-brain-body_2019`.
     If there is no local copy of the recording, this function will fetch it
     from the online repository and store it. The default location is
     ``~/pycrostates_data``.
