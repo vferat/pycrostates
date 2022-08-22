@@ -241,12 +241,12 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         if inst.info["bads"] != []:
             if len(inst.info["bads"]) == 1:
                 msg = (
-                    "Channel %s is bad but was explicity set in 'picks' "
+                    "Channel %s is bad but was explicitly set in 'picks' "
                     + "and therefore will be used during fitting."
                 )
             else:
                 msg = (
-                    "Channels %s are bad but were explicity set in 'picks' "
+                    "Channels %s are bad but were explicitly set in 'picks' "
                     + "and therefore will be used during fitting."
                 )
             logger.warning(msg, ", ".join(inst.info["bads"]))
