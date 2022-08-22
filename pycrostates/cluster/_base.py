@@ -253,7 +253,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         # store picks and info
         self._info = ChInfo(info=pick_info(info, picks_bads_inc))
         self._fitted_data = data
-
         return data
 
     def rename_clusters(
@@ -595,7 +594,24 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         # check that the instance as the required channels (good + bads)
         # inst_info must have all the channels present in cluster_info
         _compare_infos(cluster_info=self._info, inst_info=inst.info)
+
+        good_channels = [
+            ch for ch in self._info["ch_names"] if ch not in self._info["bads"]
+        ]
+        intersection = good_channels.intersection(inst.info["bads"])
+        if len(intersection) > 0:
+            if len(intersection) == 1:
+                msg = (f"Cannot create segmentation from instance: "
+                      f"channel {intersection} is set as bad, "
+                      f"but was used during fitting.")
+            else:
+                msg = (f"Cannot create segmentation from instance: "
+                      f"channels {intersection} are set as bad, "
+                      f"but were used during fitting.")
+            raise ValueError(msg)
+
         picks_ = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
+
         ch_ = [
             ch
             for k, ch in enumerate(inst.info["ch_names"])
@@ -621,9 +637,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             if k in picks_ and ch not in self._info["bads"]
         ]
         picks_data = _picks_to_idx(inst.info, picks_, none="all", exclude=[])
-        good_channels = [
-            ch for ch in self._info["ch_names"] if ch not in self._info["bads"]
-        ]
+
         picks_cluster_centers = np.array(
             [good_channels.index(ch) for ch in picks_]
         )
