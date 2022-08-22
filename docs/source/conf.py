@@ -10,15 +10,13 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-import os
 from datetime import date
+from pathlib import Path
 
 from recommonmark.transform import AutoStructify
 from sphinx_gallery.sorting import ExplicitOrder
 
 import pycrostates
-
-curdir = os.path.dirname(__file__)
 
 # -- project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -112,7 +110,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = [os.path.abspath(os.path.join(curdir, "../_static"))]
+html_static_path = [str(Path(__file__).parent.parent / "_static")]
 html_css_files = ['style.css']
 # If true, links to the reST sources are added to the pages.
 html_show_sourcelink = False
@@ -225,9 +223,7 @@ bibtex_bibfiles = ['../references.bib']
 
 # -- sphinx-gallery ----------------------------------------------------------
 sphinx_gallery_conf = {
-    "examples_dirs": os.path.abspath(
-        os.path.join(curdir, "..", "..", "tutorials")
-    ),
+    "examples_dirs": Path(__file__).parent.parent.parent / "tutorials",
     "gallery_dirs": "auto_tutorials",
     "subsection_order": ExplicitOrder(
         [
@@ -250,14 +246,8 @@ def append_attr_meth_examples(app, what, name, obj, options, lines):
     # the .. include:: lines, so we need to do it.
     # Eventually this could perhaps live in SG.
     if what in ("attribute", "method"):
-        size = os.path.getsize(
-            os.path.join(
-                os.path.dirname(__file__),
-                "generated",
-                "backreferences",
-                "%s.examples" % (name,),
-            )
-        )
+        backrefs = Path(__file__).parent / "generated" / "backreferences"
+        size = (backrefs / f"{name}.examples").stat().st_size
         if size > 0:
             lines += """
 .. _sphx_glr_backreferences_{1}:
