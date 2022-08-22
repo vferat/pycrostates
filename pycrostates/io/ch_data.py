@@ -132,8 +132,10 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
             The modified instance.
         """
         picks = _picks_to_idx(self._info, picks, exclude=exclude)
-        self._info = pick_info(self._info, picks, copy=False)
-        self._data = data[picks, :]
+        info = pick_info(self._info, picks, copy=False)
+        data = self._data[picks, :]
+        self._info = info
+        self._data = data
         return self
 
     # --------------------------------------------------------------------
