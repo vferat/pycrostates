@@ -124,8 +124,10 @@ html_context = {
 
 # -- autodoc-autosummary -----------------------------------------------------
 # autodoc
+autoclass_content = "class"
 autodoc_typehints = 'none'
 autodoc_member_order = "groupwise"
+autodoc_warningiserror = True
 
 # autosummary
 autosummary_generate = True
