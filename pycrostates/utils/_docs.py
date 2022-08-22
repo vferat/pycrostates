@@ -117,18 +117,6 @@ cbar_axes : Axes | None
     Axes on which to draw the colorbar, otherwise the colormap takes
     space from the main axes."""
 
-# ------ Viz -------
-docdict[
-    "picks_fit"
-] = """
-picks : str | list | slice | None
-    Channels to include. Slices and lists of integers will be interpreted
-    as channel indices. Note that all channels must have the same type.
-    In lists, channel name strings (e.g., ['Fp1', 'Fp2']
-    will pick the given channels. "eeg" (default) will pick all eeg channels.
-    Note that channels in info['bads'] will be included if their
-    names or indices are explicitly provided."""
-
 # ------------------------- Documentation functions --------------------------
 docdict_indented: Dict[int, Dict[str, str]] = {}
 

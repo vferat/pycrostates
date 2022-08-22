@@ -202,7 +202,13 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         inst : Raw | Epochs
             MNE `~mne.io.Raw` or `~mne.Epochs` object containing data to
             transform to cluster-distance space (absolute spatial correlation).
-        %(picks_fit)s
+        picks : str | list | slice | None
+            Channels to include. Slices and lists of integers will be interpreted
+            as channel indices. Note that all channels must have the same type.
+            In lists, channel name strings (e.g., ['Fp1', 'Fp2']
+            will pick the given channels. "eeg" (default) will pick all eeg channels.
+            Note that channels in info['bads'] will be included if their
+            names or indices are explicitly provided.
         %(tmin_raw)s
         %(tmax_raw)s
         %(reject_by_annotation_raw)s
