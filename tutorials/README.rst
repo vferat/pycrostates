@@ -1,4 +1,5 @@
-Gallery
-========
+Tutorials
+=========
 
-Below is a gallery of examples.
+These tutorials provide narrative explanations, sample code, and expected
+output for the most common ``pycrostates`` analysis tasks.

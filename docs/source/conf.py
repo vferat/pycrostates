@@ -61,7 +61,7 @@ templates_path = ["_templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 
 # Sphinx will warn about all references where the target cannot be found.
 nitpicky = True
@@ -240,8 +240,10 @@ bibtex_bibfiles = ["../references.bib"]
 sphinx_gallery_conf = {
     "backreferences_dir": "generated/backreferences",
     "doc_module": ("pycrostates",),
-    "examples_dirs": Path(__file__).parent.parent.parent / "tutorials",
-    "gallery_dirs": "auto_tutorials",
+    "examples_dirs": [str(Path(__file__).parent.parent.parent / "tutorials")],
+    "gallery_dirs": ["auto_tutorials"],
+    "line_numbers": False,  # messes with style
+    "plot_gallery": "True",  # Avoid annoying Unicode/bool default warning
     "reference_url": {"pycrostates": None},  # current lib uses None
     "remove_config_comments": True,
     "subsection_order": ExplicitOrder(
