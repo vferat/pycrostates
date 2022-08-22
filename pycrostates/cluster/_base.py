@@ -520,7 +520,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     def predict(
         self,
         inst: Union[BaseRaw, BaseEpochs],
-        picks: Picks = None,
+        include_bads: bool = False,
         factor: int = 0,
         half_window_size: int = 3,
         tol: Union[int, float] = 10e-6,
@@ -537,7 +537,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         inst : Raw | Epochs
             MNE `~mne.io.Raw` or `~mne.Epochs` object containing the data to
             use for prediction.
-        %(picks_all)s
+        include_bads: bool
+            Either to include or not bad channels from instance for prediction.
+            Default to False.
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing.
         half_window_size : int
@@ -595,51 +597,27 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         # inst_info must have all the channels present in cluster_info
         _compare_infos(cluster_info=self._info, inst_info=inst.info)
 
-        good_channels = [
-            ch for ch in self._info["ch_names"] if ch not in self._info["bads"]
-        ]
-        intersection = good_channels.intersection(inst.info["bads"])
-        if len(intersection) > 0:
-            if len(intersection) == 1:
-                msg = (f"Cannot create segmentation from instance: "
-                      f"channel {intersection} is set as bad, "
-                      f"but was used during fitting.")
-            else:
-                msg = (f"Cannot create segmentation from instance: "
-                      f"channels {intersection} are set as bad, "
-                      f"but were used during fitting.")
-            raise ValueError(msg)
-
-        picks_ = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
-
-        ch_ = [
-            ch
-            for k, ch in enumerate(inst.info["ch_names"])
-            if k in picks_ and ch in self._info["bads"]
-        ]
-        if 1 == len(ch_):
-            logger.warning(
-                "Picked channel %s was set as "
-                "bads during fitting and will be ignored.",
-                ch_[0],
+        if not include_bads:
+            intersection = set(self._info["ch_names"]).intersection(
+                inst.info["bads"]
             )
-        elif 1 < len(ch_):
-            logger.warning(
-                "Picked channels %s were set as "
-                "bads during fitting and will be ignored.",
-                ", ".join(ch_),
-            )
-
-        # remove channels that were bads during fitting from picks
-        picks_ = [
-            ch
-            for k, ch in enumerate(inst.info["ch_names"])
-            if k in picks_ and ch not in self._info["bads"]
-        ]
-        picks_data = _picks_to_idx(inst.info, picks_, none="all", exclude=[])
-
-        picks_cluster_centers = np.array(
-            [good_channels.index(ch) for ch in picks_]
+            if len(intersection) > 0:
+                if len(intersection) == 1:
+                    msg = (
+                        f"Cannot create segmentation from instance: "
+                        f"channel {intersection} is set as bad, "
+                        f"but was used during fitting."
+                    )
+                else:
+                    msg = (
+                        f"Cannot create segmentation from instance: "
+                        f"channels {intersection} are set as bad, "
+                        f"but were used during fitting."
+                    )
+                raise ValueError(msg)
+        exclude = "bads" if not include_bads else []
+        picks_ = _picks_to_idx(
+            inst.info, self._info["ch_names"], none="all", exclude=exclude
         )
 
         # logging messages
@@ -663,8 +641,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         if isinstance(inst, BaseRaw):
             segmentation = self._predict_raw(
                 inst,
-                picks_data,
-                picks_cluster_centers,
+                picks_,
                 factor,
                 tol,
                 half_window_size,
@@ -675,8 +652,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         elif isinstance(inst, BaseEpochs):
             segmentation = self._predict_epochs(
                 inst,
-                picks_data,
-                picks_cluster_centers,
+                picks_,
                 factor,
                 tol,
                 half_window_size,
