@@ -131,16 +131,9 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         inst : `~pycrostates.io.ChData`
             The modified instance.
         """
-        from .meas_info import ChInfo
-
         picks = _picks_to_idx(self._info, picks, exclude=exclude)
-        data = self._data.copy()
-        data = data[picks, :]
-
-        info = pick_info(self._info, picks, copy=False)
-
-        self._data = data
-        self._info = info if isinstance(info, ChInfo) else ChInfo(info)
+        self._info = pick_info(self._info, picks, copy=False)
+        self._data = data[picks, :]
         return self
 
     # --------------------------------------------------------------------
