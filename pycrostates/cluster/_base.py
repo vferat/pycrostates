@@ -617,7 +617,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         info = pick_info(inst.info, sel=picks_, copy=True)
 
         # missing channel(s)
-        missing_ch = list(set(self._info['ch_names']) - set(info['ch_names']))
+        missing_ch = list(set(self._info["ch_names"]) - set(info["ch_names"]))
         if missing_ch != []:
             if len(missing_ch) == 1:
                 msg = f"Missing channel {missing_ch[0]}"
@@ -627,7 +627,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             del msg
 
         # unused channel(s)
-        unused_ch = list(set(info['ch_names']) - set(self._info['ch_names']))
+        unused_ch = list(set(info["ch_names"]) - set(self._info["ch_names"]))
         if unused_ch != []:
             if len(unused_ch) == 1:
                 msg = "Picked channel %s will not be used for prediction"

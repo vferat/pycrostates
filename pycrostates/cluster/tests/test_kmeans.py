@@ -9,10 +9,10 @@ import numpy as np
 import pytest
 from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
-from mne import Annotations, Epochs, make_fixed_length_events, create_info
+from mne import Annotations, Epochs, create_info, make_fixed_length_events
 from mne.channels import DigMontage
 from mne.datasets import testing
-from mne.io import read_raw_fif, RawArray
+from mne.io import RawArray, read_raw_fif
 from mne.io.pick import _picks_to_idx
 
 from pycrostates import __version__
@@ -1038,7 +1038,8 @@ def test_predict_invalid_arguments():
         ModK.predict(raw_eeg, reject_by_annotation=1)
     with pytest.raises(ValueError, match="'reject_by_annotation' can be"):
         ModK.predict(raw_eeg, reject_by_annotation="101")
-    
+
+
 def test_n_jobs():
     """Test that n_jobs=2 works."""
     ModK_ = ModKMeans(
