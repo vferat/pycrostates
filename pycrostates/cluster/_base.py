@@ -605,27 +605,29 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 msg = "Current fit contains bad channel %s which will be used for prediction"
             else:
                 msg = "Current fit contains bad channels %s which will be used for prediction"
-            logger.warning(msg, ", ".join(ch_name for ch_name in self._info["bads"]))
+            logger.warning(
+                msg, ", ".join(ch_name for ch_name in self._info["bads"])
+            )
             del msg
 
         # check that the instance as the required channels (good + bads)
         # inst_info must have all the channels present in cluster_info
-        picks = self._info['ch_names'] if picks is None else picks
+        picks = self._info["ch_names"] if picks is None else picks
         picks_ = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
-        info = pick_info(inst,info, sel=picks_, copy=True)
-        
+        info = pick_info(inst.info, sel=picks_, copy=True)
+
         # missing channel(s)
-        missing_ch = list(set(self._info) - set(info))
+        missing_ch = list(set(self._info['ch_names']) - set(info['ch_names']))
         if missing_ch != []:
             if len(missing_ch) == 1:
-                msg = "Missing channel %s"
+                msg = f"Missing channel {missing_ch[0]}"
             else:
-                msg = "Missing channels %s"
-            logger.warning(msg, ", ".join(ch_name for ch_name in missing_ch))
+                msg = f"Missing channels {missing_ch}"
+            raise ValueError(msg)
             del msg
 
         # unused channel(s)
-        unused_ch = list(set(info) - set(self._info))
+        unused_ch = list(set(info['ch_names']) - set(self._info['ch_names']))
         if unused_ch != []:
             if len(unused_ch) == 1:
                 msg = "Picked channel %s will not be used for prediction"
@@ -633,70 +635,22 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 msg = "Picked channel %s will not be used for prediction"
             logger.warning(msg, ", ".join(ch_name for ch_name in unused_ch))
             del msg
-            
-    
+
         if info["bads"] != []:
             if len(info["bads"]) == 1:
-                msg = "Channel %s is set as bad and will be used for prediction"
+                msg = (
+                    "Channel %s is set as bad and will be used for prediction"
+                )
             else:
-                msg = "Channel %s are set as bad and will be used for prediction"
+                msg = (
+                    "Channel %s are set as bad and will be used for prediction"
+                )
             logger.warning(msg, ", ".join(ch_name for ch_name in info["bads"]))
             del msg
 
-        
-
-
-
-
-        good_channels = [
-            ch for ch in self._info["ch_names"] if ch not in self._info["bads"]
-        ]
-        intersection = good_channels.intersection(inst.info["bads"])
-        if len(intersection) > 0:
-            if len(intersection) == 1:
-                msg = (
-                    f"Cannot create segmentation from instance: "
-                    f"channel {intersection} is set as bad, "
-                    f"but was used during fitting."
-                )
-            else:
-                msg = (
-                    f"Cannot create segmentation from instance: "
-                    f"channels {intersection} are set as bad, "
-                    f"but were used during fitting."
-                )
-            raise ValueError(msg)
-
-        picks_ = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
-
-        ch_ = [
-            ch
-            for k, ch in enumerate(inst.info["ch_names"])
-            if k in picks_ and ch in self._info["bads"]
-        ]
-        if 1 == len(ch_):
-            logger.warning(
-                "Picked channel %s was set as "
-                "bads during fitting and will be ignored.",
-                ch_[0],
-            )
-        elif 1 < len(ch_):
-            logger.warning(
-                "Picked channels %s were set as "
-                "bads during fitting and will be ignored.",
-                ", ".join(ch_),
-            )
-
-        # remove channels that were bads during fitting from picks
-        picks_ = [
-            ch
-            for k, ch in enumerate(inst.info["ch_names"])
-            if k in picks_ and ch not in self._info["bads"]
-        ]
-        picks_data = _picks_to_idx(inst.info, picks_, none="all", exclude=[])
-
-        picks_cluster_centers = np.array(
-            [good_channels.index(ch) for ch in picks_]
+        # same pick order between slef and inst
+        picks_data = _picks_to_idx(
+            inst.info, self._info["ch_names"], none="all", exclude=[]
         )
 
         # logging messages
@@ -721,7 +675,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             segmentation = self._predict_raw(
                 inst,
                 picks_data,
-                picks_cluster_centers,
                 factor,
                 tol,
                 half_window_size,
@@ -733,7 +686,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             segmentation = self._predict_epochs(
                 inst,
                 picks_data,
-                picks_cluster_centers,
                 factor,
                 tol,
                 half_window_size,
@@ -746,7 +698,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         raw: BaseRaw,
         picks_data: NDArray[int],
-        picks_cluster_centers: NDArray[int],
         factor: int,
         tol: Union[int, float],
         half_window_size: int,
@@ -768,7 +719,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         data = raw.get_data(picks=picks_data)
         # retrieve cluster_centers_ for picks
         cluster_centers_ = deepcopy(self._cluster_centers_)
-        cluster_centers_ = cluster_centers_[:, picks_cluster_centers]
 
         if reject_by_annotation:
             # retrieve onsets/ends for BAD annotations
@@ -816,7 +766,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         epochs: BaseEpochs,
         picks_data: NDArray[int],
-        picks_cluster_centers: NDArray[int],
         factor: int,
         tol: Union[int, float],
         half_window_size: int,
@@ -836,7 +785,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         data = epochs.get_data(picks=picks_data)
         # retrieve cluster_centers_ for picks
         cluster_centers_ = deepcopy(self._cluster_centers_)
-        cluster_centers_ = cluster_centers_[:, picks_cluster_centers]
 
         segments = []
         for epoch_data in data:
