@@ -603,6 +603,16 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         # inst_info must have all the channels present in cluster_info
         _compare_infos(cluster_info=self._info, inst_info=inst.info)
 
+        # warn if bad channels in self._info['bads]
+        if self._info["bads"] != []:
+            if len(self._info["bads"]) == 1:
+                msg = "Current fit contains bad channel %s which will be used for prediction"
+            else:
+                msg = "Current fit contains bad channels %s which will be used for prediction"
+            logger.warning(msg, ", ".join(ch_name for ch_name inself._info["bads"]))
+            del msg
+
+
         good_channels = [
             ch for ch in self._info["ch_names"] if ch not in self._info["bads"]
         ]
