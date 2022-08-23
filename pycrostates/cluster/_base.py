@@ -251,7 +251,15 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             data = data.reshape(data.shape[0], -1)
 
         # store picks and info
-        self._info = ChInfo(info=pick_info(info, picks))
+        info = pick_info(info, picks, copy=True)
+        if info["bads"] != []:
+            if len(info["bads"]) == 1:
+                msg = "Channel %s is set as bad and will be used for fitting"
+            else:
+                msg = "Channel %s are set as bad and will be used for fitting"
+            logger.warning(msg, ", ".join(ch_name for ch_name in info["bads"]))
+            del msg
+        self._info = ChInfo(info=info)
         self._fitted_data = data
         return data
 
@@ -601,13 +609,17 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         intersection = good_channels.intersection(inst.info["bads"])
         if len(intersection) > 0:
             if len(intersection) == 1:
-                msg = (f"Cannot create segmentation from instance: "
-                      f"channel {intersection} is set as bad, "
-                      f"but was used during fitting.")
+                msg = (
+                    f"Cannot create segmentation from instance: "
+                    f"channel {intersection} is set as bad, "
+                    f"but was used during fitting."
+                )
             else:
-                msg = (f"Cannot create segmentation from instance: "
-                      f"channels {intersection} are set as bad, "
-                      f"but were used during fitting.")
+                msg = (
+                    f"Cannot create segmentation from instance: "
+                    f"channels {intersection} are set as bad, "
+                    f"but were used during fitting."
+                )
             raise ValueError(msg)
 
         picks_ = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
