@@ -843,7 +843,7 @@ def test_predict_default_picks(caplog):
 
 
 def test_picks_fit(caplog):
-    # ---- Test with different datatypes ----
+    # ---- Test with different picks and bads ----
     """Test fitting with different picks."""
     raw = raw_meg.copy().pick_types(meg=True, eeg=True, eog=True)
     ModK_ = ModKMeans(
@@ -877,7 +877,7 @@ def test_picks_fit(caplog):
     ModK = ModK_.copy()
     ModK.fit(raw, picks="eeg")
     assert ModK.info["ch_names"] == ["Fp1", "CP1", "CP2"]
-    assert "Fp2 will not be used for fitting" in caplog.text
+    assert "Channel Fp2 is set as bad and ignored" in caplog.text
     caplog.clear()
 
     # Predict
@@ -887,24 +887,18 @@ def test_picks_fit(caplog):
     ModK.predict(
         raw_predict, picks="eeg"
     )  # -> works, with warning that Fp2 is missing from ModK.info
-    assert ModK.info["ch_names"] == ["Fp1", "CP1", "CP2"]
-    assert "Fp2 will not be used for fitting" in caplog.text
+    assert "Fp2 will not be used for prediction" in caplog.text
     caplog.clear()
 
     ModK.predict(
         raw_predict, picks=["Fp1", "CP1", "CP2"]
     )  # -> works, same channels as ModK.info
-    assert ModK.info["ch_names"] == ["Fp1", "CP1", "CP2"]
-    assert "Fp2 will not be used for fitting" not in caplog.text
     caplog.clear()
 
     raw_predict.info["bads"] = ["Fp2"]
     ModK.predict(
         raw_predict, picks="eeg"
     )  # -> works, same channels as ModK.info
-    assert ModK.info["ch_names"] == ["Fp1", "CP1", "CP2"]
-    assert "Fp2 will not be used for fitting" not in caplog.text
-    caplog.clear()
 
     raw_predict.info["bads"] = ["Fp1"]
     with pytest.raises(ValueError, match="Fp1 not in inst.info"):
@@ -916,7 +910,6 @@ def test_picks_fit(caplog):
     ModK.predict(
         raw_predict, picks=["Fp1", "CP1", "CP2"]
     )  # works, with warning because you predict based on a bad channel Fp1
-    assert ModK.info["ch_names"] == ["Fp1", "CP1", "CP2"]
     assert "Fp1 is set as bad" not in caplog.text
     caplog.clear()
 
@@ -961,7 +954,7 @@ def test_picks_fit(caplog):
     ModK = ModK_.copy()
     ModK.fit(raw, picks=["Fp1", "Fp2", "CP2", "CP1"])
     assert ModK.info["ch_names"] == ["Fp1", "Fp2", "CP2", "CP1"]
-    assert "Fp2 is set as bad and will be used for fitting" in caplog.text
+    assert "Using bad channel Fp2 for fitting" in caplog.text
     caplog.clear()
 
     # overall, same channels in the instance used for prediction
@@ -970,7 +963,7 @@ def test_picks_fit(caplog):
     ModK.predict(
         raw_predict, picks="eeg"
     )  # -> works, with warning because a channel is bads in ModK.info
-    predict_warning = "Fp2 is set as bad and will be used for fitting"
+    predict_warning = "Fp2 is set as bad and will be used for prediction"
     assert predict_warning in caplog.text
     caplog.clear()
 
