@@ -887,7 +887,7 @@ def test_picks_fit(caplog):
     ModK.predict(
         raw_predict, picks="eeg"
     )  # -> works, with warning that Fp2 is missing from ModK.info
-    assert "Fp2 will not be used for prediction" in caplog.text
+    assert "Picked channel Fp2 will not be used for prediction" in caplog.text
     caplog.clear()
 
     ModK.predict(
@@ -901,7 +901,7 @@ def test_picks_fit(caplog):
     )  # -> works, same channels as ModK.info
 
     raw_predict.info["bads"] = ["Fp1"]
-    with pytest.raises(ValueError, match="Fp1 not in inst.info"):
+    with pytest.raises(ValueError, match="Missing channel Fp2"):
         ModK.predict(
             raw_predict, picks="eeg"
         )  # -> fails, because ModK.info includes Fp1 which is bad in prediction instance
@@ -913,7 +913,7 @@ def test_picks_fit(caplog):
     assert "Fp1 is set as bad" not in caplog.text
     caplog.clear()
 
-    with pytest.raises(ValueError, match="channel Fp1 is set as bad, "):
+    with pytest.raises(ValueError, match="Missing Fp1"):
         ModK.predict(
             raw_predict, picks=["CP2", "CP1"]
         )  # -> fails, because ModK.info includes Fp1 which is missing from prediction instance selection
@@ -930,7 +930,7 @@ def test_picks_fit(caplog):
         raw_predict, picks="eeg"
     )  # -> works, with warning because Fpz, Fp2 are missing from ModK.info
 
-    with pytest.raises(ValueError, match="Fp1 not in picked channels"):
+    with pytest.raises(ValueError, match="Missing channel Fp1"):
         ModK.predict(
             raw_predict, picks=["Fp2", "Fpz", "CP2", "CP1"]
         )  # -> fails, because ModK.info includes Fp1 which is missing from prediction instance selection
@@ -940,7 +940,7 @@ def test_picks_fit(caplog):
         raw_predict, picks=["Fp1", "Fpz", "CP2", "CP1"]
     )  # -> works, with warning because Fpz is missing from ModK.info
     assert (
-        "Channel Fp1 is not in Cluster info, predicting on a subset of channels"
+        "Picked channel Fp1 will not be used for prediction"
         not in caplog.text
     )
     caplog.clear()
@@ -974,13 +974,13 @@ def test_picks_fit(caplog):
     assert predict_warning in caplog.text
     caplog.clear()
 
-    with pytest.raises(ValueError, match="Fp2 not in picks"):
+    with pytest.raises(ValueError, match="Missing channel Fp2"):
         ModK.predict(
             raw_predict, picks=["Fp1", "CP2", "CP1"]
         )  # -> fails, because Fp2 is used in ModK.info
 
     raw_predict.info["bads"] = ["Fp2"]
-    with pytest.raises(ValueError, match="Fp2 not in picks"):
+    with pytest.raises(ValueError, match="Missing channel Fp2"):
         ModK.predict(
             raw_predict, picks="eeg"
         )  # -> fails, because Fp2 is used in ModK.info
@@ -993,12 +993,12 @@ def test_picks_fit(caplog):
     caplog.clear()
 
     raw_predict.info["bads"] = ["Fp1"]
-    with pytest.raises(ValueError, match="Fp1 not in picks"):
+    with pytest.raises(ValueError, match="Missing channel Fp1"):
         ModK.predict(
             raw_predict, picks="eeg"
         )  # -> fails, because ModK.info includes Fp1 which is bad in prediction instance()
 
-    with pytest.raises(ValueError, match="Fp2 not in picks"):
+    with pytest.raises(ValueError, match="Missing channel Fp2"):
         ModK.predict(
             raw_predict, picks=["Fp1", "CP2", "CP1"]
         )  # -> fails, because ModK.info includes bad Fp2
@@ -1008,7 +1008,7 @@ def test_picks_fit(caplog):
         raw_predict, picks=["Fp1", "Fp2", "CP2", "CP1"]
     )  # -> works, because same channels as ModK.info (with 2 warning for Fp1 and Fp2)
     assert predict_warning in caplog.text
-    assert "predicting based on a subset of channels"
+    assert "Channel Fp1 is set as bad and will be used for prediction"
     caplog.clear()
 
 

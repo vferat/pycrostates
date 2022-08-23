@@ -256,7 +256,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             if len(info["bads"]) == 1:
                 msg = "Channel %s is set as bad and will be used for fitting"
             else:
-                msg = "Channel %s are set as bad and will be used for fitting"
+                msg = "Channels %s are set as bad and will be used for fitting"
             logger.warning(msg, ", ".join(ch_name for ch_name in info["bads"]))
             del msg
         self._info = ChInfo(info=info)
@@ -599,18 +599,53 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         elif reject_by_annotation is None:
             reject_by_annotation = False
 
-        # check that the instance as the required channels (good + bads)
-        # inst_info must have all the channels present in cluster_info
-        _compare_infos(cluster_info=self._info, inst_info=inst.info)
-
         # warn if bad channels in self._info['bads]
         if self._info["bads"] != []:
             if len(self._info["bads"]) == 1:
                 msg = "Current fit contains bad channel %s which will be used for prediction"
             else:
                 msg = "Current fit contains bad channels %s which will be used for prediction"
-            logger.warning(msg, ", ".join(ch_name for ch_name inself._info["bads"]))
+            logger.warning(msg, ", ".join(ch_name for ch_name in self._info["bads"]))
             del msg
+
+        # check that the instance as the required channels (good + bads)
+        # inst_info must have all the channels present in cluster_info
+        picks = self._info['ch_names'] if picks is None else picks
+        picks_ = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
+        info = pick_info(inst,info, sel=picks_, copy=True)
+        
+        # missing channel(s)
+        missing_ch = list(set(self._info) - set(info))
+        if missing_ch != []:
+            if len(missing_ch) == 1:
+                msg = "Missing channel %s"
+            else:
+                msg = "Missing channels %s"
+            logger.warning(msg, ", ".join(ch_name for ch_name in missing_ch))
+            del msg
+
+        # unused channel(s)
+        unused_ch = list(set(info) - set(self._info))
+        if unused_ch != []:
+            if len(unused_ch) == 1:
+                msg = "Picked channel %s will not be used for prediction"
+            else:
+                msg = "Picked channel %s will not be used for prediction"
+            logger.warning(msg, ", ".join(ch_name for ch_name in unused_ch))
+            del msg
+            
+    
+        if info["bads"] != []:
+            if len(info["bads"]) == 1:
+                msg = "Channel %s is set as bad and will be used for prediction"
+            else:
+                msg = "Channel %s are set as bad and will be used for prediction"
+            logger.warning(msg, ", ".join(ch_name for ch_name in info["bads"]))
+            del msg
+
+        
+
+
 
 
         good_channels = [
