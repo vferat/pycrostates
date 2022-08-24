@@ -1,5 +1,11 @@
 Overview
 ========
+.. image:: _static/img/Pycrostates_logo_white.png
+    :class: only-dark
+
+.. image:: _static/img/Pycrostates_logo_black.png
+    :class: only-light
+
 
 An open-source Python package for analyzing EEG microstates developed to work
 with `MNE-python <https://mne.tools/stable/index.html>`_.
