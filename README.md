@@ -13,9 +13,9 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/LouPlanchamp/pycrostates/dev_logo/docs/_static/img/Pycrostates_logo_white.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/LouPlanchamp/pycrostates/dev_logo/docs/_static/img/Pycrostates_logo_black.png">
-  <img alt="Pycrostate logo" src="https://raw.githubusercontent.com/Lou_Planchamp/pycrostates/dev_logo/docs/_static/img/Pycrostates_logo_black.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_white.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_black.png">
+  <img alt="Pycrostate logo" src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_black.png">
 </picture>
 
 # Pycrostates
