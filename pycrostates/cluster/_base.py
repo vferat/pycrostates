@@ -545,7 +545,16 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         inst : Raw | Epochs
             MNE `~mne.io.Raw` or `~mne.Epochs` object containing the data to
             use for prediction.
-        %(picks_all)s
+        picks : str | list | slice | None
+            Channels to include. Slices and lists of integers will be
+            interpreted as channel indices.
+            Channel name strings (e.g., ['Fp1', 'Fp2'])
+            will pick the given channels. Can also be the string values “all”
+            to pick all channels, or “data” to pick data channels.
+            None (default) will pick all channels used during fitting
+            (e.g., self.info['ch_names]).
+            Note that channels in info['bads'] will be included if their
+            names or indices are explicitly provided.
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing.
         half_window_size : int
@@ -624,13 +633,39 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         # missing channel(s)
         missing_ch = list(set(self._info["ch_names"]) - set(info["ch_names"]))
-        if missing_ch != []:
-            if len(missing_ch) == 1:
-                msg = f"Missing channel {missing_ch[0]}"
+        # check if missing channel(s) exist(s).
+        missing_existing_channel = list(set(missing_ch) & set(inst.ch_names))
+        missing_others = list(set(missing_ch) - set(missing_existing_channel))
+
+        # Missing channels error
+        if missing_others != []:
+            if len(missing_others) == 1:
+                msg = f"Missing channel {missing_others[0]}"
             else:
-                msg = f"Missing channels {missing_ch}"
+                msg = f"Missing channels {missing_others}"
             raise ValueError(msg)
-            del msg
+
+        # Missing channels because of bad error
+        if missing_existing_channel != []:
+            if len(missing_existing_channel) == 1:
+                msg = (
+                    "Cannot predict because channel "
+                    + f"{missing_existing_channel[0]} is not in picks "
+                    + "but exist in inst."
+                    + " To include it, either remove it from "
+                    + "'inst.info['bads'] or provide its name "
+                    + "explicitly in the 'picks' argument."
+                )
+            else:
+                msg = (
+                    "Cannot predict because channels "
+                    + f"{missing_existing_channel} are not in picks "
+                    + "but exist in inst."
+                    + " To include them, either remove them from "
+                    + "'inst.info['bads'] or provide their names "
+                    + "explicitly in the 'picks' argument."
+                )
+            raise ValueError(msg)
 
         # unused channel(s)
         unused_ch = list(set(info["ch_names"]) - set(self._info["ch_names"]))
