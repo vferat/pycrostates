@@ -36,6 +36,15 @@
         "review",
         "test"
       ]
+    },
+    {
+      "login": "LouPlanchamp",
+      "name": "Lou",
+      "avatar_url": "https://avatars.githubusercontent.com/u/107875645?v=4",
+      "profile": "https://github.com/LouPlanchamp",
+      "contributions": [
+        "design"
+      ]
     }
   ],
   "contributorsPerLine": 7,
