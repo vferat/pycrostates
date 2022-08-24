@@ -1,6 +1,3 @@
-Pycrostates
-===========
-
 .. image:: _static/img/Pycrostates_logo_white.png
     :class: only-dark
 
