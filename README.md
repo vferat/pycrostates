@@ -12,9 +12,11 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-![Pycrostates_logo](./docs/_static/img/Pycrostates_logo_black.png#gh-light-mode-only)
-
-![Pycrostates_logo](./docs/_static/img/Pycrostates_logo_white.png#gh-dark-mode-only)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_white.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_black.png">
+  <img alt="Pycrostate logo" src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_black.png">
+</picture>
 
 # Pycrostates
 ---
