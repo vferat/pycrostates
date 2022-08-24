@@ -15,7 +15,7 @@ from scipy.signal import convolve2d
 
 from .._typing import CHData, Picks
 from ..segmentation import EpochsSegmentation, RawSegmentation
-from ..utils import _compare_infos, _corr_vectors
+from ..utils import _corr_vectors
 from ..utils._checks import (
     _check_n_jobs,
     _check_reject_by_annotation,
@@ -602,9 +602,15 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         # warn if bad channels in self._info['bads]
         if self._info["bads"] != []:
             if len(self._info["bads"]) == 1:
-                msg = "Current fit contains bad channel %s which will be used for prediction"
+                msg = (
+                    "Current fit contains bad channel %s"
+                    + " which will be used for prediction"
+                )
             else:
-                msg = "Current fit contains bad channels %s which will be used for prediction"
+                msg = (
+                    "Current fit contains bad channels %s"
+                    + " which will be used for prediction"
+                )
             logger.warning(
                 msg, ", ".join(ch_name for ch_name in self._info["bads"])
             )
