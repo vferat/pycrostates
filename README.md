@@ -6,6 +6,12 @@
 [![codecov](https://codecov.io/gh/vferat/pycrostates/branch/master/graph/badge.svg?token=47COGGCGX8)](https://codecov.io/gh/vferat/pycrostates)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/029e425f90614943b0a944e03922b637)](https://www.codacy.com/gh/vferat/pycrostates/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vferat/pycrostates&amp;utm_campaign=Badge_Grade)
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_white.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_black.png">
+  <img alt="Pycrostate logo" src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_black.png">
+</picture>
+
 # Pycrostates
 ---
 

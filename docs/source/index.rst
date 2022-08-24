@@ -1,5 +1,9 @@
-Pycrostates
-===========
+.. image:: _static/img/Pycrostates_logo_white.png
+    :class: only-dark
+
+.. image:: _static/img/Pycrostates_logo_black.png
+    :class: only-light
+
 
 .. include:: overview.rst
 
