@@ -148,6 +148,7 @@ def test_ModKMeans():
     )
 
     # Test fit on ChData
+    ModK1.fitted = False
     ModK1.fit(ch_data, n_jobs=1)
     _check_fitted(ModK1)
     assert ModK1._cluster_centers_.shape == (
@@ -900,72 +901,61 @@ def test_picks_fit_predict(caplog):
         ModK_.fit(raw, picks="data")  # fails -> eeg + grad + mag
 
     # test valid fit
+    ModK_.fit(raw, picks="mag")  # works
+    ModK_.fitted = False
     ModK_.fit(raw, picks="eeg")  # works
     ModK_.fitted = False
-    ModK_.fit(raw, picks="mag")  # works
+
+    # create mock raw for fitting
     info_ = create_info(
         ["Fp1", "Fp2", "CP1", "CP2"], sfreq=1024, ch_types="eeg"
     )
     info_.set_montage("standard_1020")
     data = np.random.randn(4, 1024 * 10)
 
-    # ---- Ignore bad channel Fp2 during fitting ----
-    # Fit
+    # Ignore bad channel Fp2 during fitting
     info = info_.copy()
     info["bads"] = ["Fp2"]
     raw = RawArray(data, info)
 
-    ModK_ = ModK.copy()
+    caplog.clear()
     ModK_.fit(raw, picks="eeg")
     assert ModK_.info["ch_names"] == ["Fp1", "CP1", "CP2"]
-    assert "Channel Fp2 is set as bad and ignored" in caplog.text
+    assert "The channel Fp2 is set as bad and ignored" in caplog.text
     caplog.clear()
 
-    # Predict
-    # overall, same channels in the instance used for prediction
+    # predict with the same channels in the instance used for prediction
     info = info_.copy()
     raw_predict = RawArray(data, info)
-    ModK_.predict(
-        raw_predict, picks="eeg"
-    )  # -> works, with warning that Fp2 is missing from ModK.info
-    assert "Picked channel Fp2 will not be used for prediction" in caplog.text
     caplog.clear()
-
-    ModK_.predict(
-        raw_predict, picks=["Fp1", "CP1", "CP2"]
-    )  # -> works, same channels as ModK.info
+    ModK_.predict(raw_predict, picks="eeg")  # -> warning for selected Fp2
+    assert "Fp2 which was not used during fitting" in caplog.text
     caplog.clear()
-
-    raw_predict.info["bads"] = ["Fp2"]
-    ModK_.predict(
-        raw_predict, picks="eeg"
-    )  # -> works, same channels as ModK.info
-
-    raw_predict.info["bads"] = ["Fp1"]
-    with pytest.raises(
-        ValueError, match="Cannot predict because channel Fp1 is not in"
-    ):
-        ModK_.predict(raw_predict, picks="eeg")
-    # fails, because ModK.info includes Fp1
-    # which is bad in prediction instance
-    caplog.clear()
-
     ModK_.predict(raw_predict, picks=["Fp1", "CP1", "CP2"])
-    # works, with warning because you predict based on a bad channel Fp1
-    assert (
-        "Channel Fp1 is set as bad and will be used for prediction"
-        in caplog.text
-    )
+    assert "Fp2 which was not used during fitting" not in caplog.text
+    caplog.clear()
+    raw_predict.info["bads"] = ["Fp2"]
+    ModK_.predict(raw_predict, picks="eeg")
+    assert "Fp2 which was not used during fitting" not in caplog.text
+
+    # predict with a channel used for fitting that is now missing
+    # fails, because ModK.info includes Fp1 which is bad in prediction instance
+    raw_predict.info["bads"] = ["Fp1"]
+    with pytest.raises(ValueError, match="Fp1 is required to predict"):
+        ModK_.predict(raw_predict, picks="eeg")
     caplog.clear()
 
-    with pytest.raises(
-        ValueError, match="Cannot predict because channel Fp1 is not in"
-    ):
-        ModK_.predict(raw_predict, picks=["CP2", "CP1"])
-    # fails, because ModK.info includes Fp1 which is missing
-    # from prediction instance selection
+    # predict with a channel used for fitting that is now bad
+    ModK_.predict(raw_predict, picks=["Fp1", "CP1", "CP2"])
+    assert "Fp1 is set as bad in the instance but was selected" in caplog.text
+    caplog.clear()
 
-    # One additional channel in the instance used for prediction.
+    # fails, because ModK_.info includes Fp1 which is missing from prediction
+    # instance selection
+    with pytest.raises(ValueError, match="Fp1 is required to predict"):
+        ModK_.predict(raw_predict, picks=["CP2", "CP1"])
+
+    # Try with one additional channel in the instance used for prediction.
     info_ = create_info(
         ["Fp1", "Fp2", "Fpz", "CP2", "CP1"], sfreq=1024, ch_types="eeg"
     )
@@ -973,107 +963,88 @@ def test_picks_fit_predict(caplog):
     data = np.random.randn(5, 1024 * 10)
     raw_predict = RawArray(data, info_)
 
+    # works, with warning because Fpz, Fp2 are missing from ModK_.info
+    caplog.clear()
     ModK_.predict(raw_predict, picks="eeg")
-    # works, with warning because Fpz, Fp2 are missing from ModK.info
-
-    with pytest.raises(
-        ValueError, match="Cannot predict because channel Fp1 is not in"
-    ):
-        ModK_.predict(raw_predict, picks=["Fp2", "Fpz", "CP2", "CP1"])
-    # -> fails, because ModK.info includes Fp1 which is missing
-    # from prediction instance selection
+    assert "Fp2, Fpz which were not used during fitting" in caplog.text
     caplog.clear()
 
+    # fails, because ModK_.info includes Fp1 which is missing from prediction
+    # instance selection
+    with pytest.raises(ValueError, match="Fp1 is required to predict"):
+        ModK_.predict(raw_predict, picks=["Fp2", "Fpz", "CP2", "CP1"])
+    caplog.clear()
+
+    # works, with warning because Fpz is missing from ModK_.info
     ModK_.predict(raw_predict, picks=["Fp1", "Fpz", "CP2", "CP1"])
-    # -> works, with warning because Fpz is missing from ModK.info
+    assert "Fpz which was not used during fitting" in caplog.text
+    caplog.clear()
 
+    # try with a missing channel from the prediction instance
+    # fails, because Fp1 is used in ModK.info
     raw_predict.drop_channels(["Fp1"])
-    with pytest.raises(ValueError, match="Missing channel Fp1"):
+    with pytest.raises(ValueError, match="Fp1 was used during fitting but is missing"):
         ModK_.predict(raw_predict, picks="eeg")
-    # -> fails, because Fp1 is used in ModK.info
 
-    # -> works, with warning because Fpz is missing from ModK.info
-    # ---- Use bad channel Fp2 during fitting ----
-    # Fit
+    # set a bad channel during fitting
     info = info_.copy()
     info["bads"] = ["Fp2"]
     raw = RawArray(data, info)
 
-    ModK_ = ModK.copy()
+    ModK_.fitted = False
+    caplog.clear()
     ModK_.fit(raw, picks=["Fp1", "Fp2", "CP2", "CP1"])
     assert ModK_.info["ch_names"] == ["Fp1", "Fp2", "CP2", "CP1"]
-    assert (
-        "Channel Fp2 is set as bad and will be used for fitting" in caplog.text
-    )
+    assert "Fp2 is set as bad and will be used" in caplog.text
     caplog.clear()
 
-    # overall, same channels in the instance used for prediction
+    # predict with the same channels in the instance used for prediction
     info = info_.copy()
     raw_predict = RawArray(data, info)
+    # works, with warning because a channel is bads in ModK_.info
+    caplog.clear()
     ModK_.predict(raw_predict, picks="eeg")
-    # -> works, with warning because a channel
-    # is bads in ModK.info
-    predict_warning = (
-        "Current fit contains bad channel Fp2"
-        + " which will be used for prediction"
-    )
+    predict_warning = "fit contains bad channel Fp2 which will be used"
     assert predict_warning in caplog.text
     caplog.clear()
 
+    # works, with warning because a channel is bads in ModK_.info
     raw_predict.info["bads"] = []
     ModK_.predict(raw_predict, picks=["Fp1", "Fp2", "CP2", "CP1"])
-    # -> works, with warning because a channel is bads in ModK.info
     assert predict_warning in caplog.text
     caplog.clear()
 
-    with pytest.raises(
-        ValueError, match="Cannot predict because channel Fp2 is not in"
-    ):
+    # fails, because Fp2 is used in ModK_.info
+    with pytest.raises(ValueError, match="Fp2 is required to predict"):
         ModK_.predict(raw_predict, picks=["Fp1", "CP2", "CP1"])
-    # -> fails, because Fp2 is used in ModK.info
-    assert predict_warning in caplog.text
-    caplog.clear()
 
+    # fails, because Fp2 is used in ModK_.info
     raw_predict.info["bads"] = ["Fp2"]
-    with pytest.raises(
-        ValueError, match="Cannot predict because channel Fp2 is not in"
-    ):
+    with pytest.raises(ValueError, match="Fp2 is required to predict"):
         ModK_.predict(raw_predict, picks="eeg")
-    # -> fails, because Fp2 is used in ModK.info
-    assert predict_warning in caplog.text
-    caplog.clear()
 
+    # works, because same channels as ModK_.info
+    caplog.clear()
     ModK_.predict(raw_predict, picks=["Fp1", "Fp2", "CP2", "CP1"])
-    # -> works, because same channels as ModK.info
     assert predict_warning in caplog.text
+    assert "Fp2 is set as bad in the instance but was selected" in caplog.text
     caplog.clear()
 
+    # fails, because ModK_.info includes Fp1 which is bad in prediction
+    # instance
     raw_predict.info["bads"] = ["Fp1"]
-    with pytest.raises(
-        ValueError, match="Cannot predict because channel Fp1 is not in"
-    ):
+    with pytest.raises(ValueError, match="Fp1 is required to predict because"):
         ModK_.predict(raw_predict, picks="eeg")
-    # -> fails, because ModK.info includes Fp1
-    # which is bad in prediction instance()
-    assert predict_warning in caplog.text
-    caplog.clear()
 
-    with pytest.raises(
-        ValueError, match="Cannot predict because channel Fp2 is not in"
-    ):
+    # fails, because ModK_.info includes bad Fp2
+    with pytest.raises(ValueError, match="Fp2 is required to predict"):
         ModK_.predict(raw_predict, picks=["Fp1", "CP2", "CP1"])
-    # -> fails, because ModK.info includes bad Fp2
-    assert predict_warning in caplog.text
-    caplog.clear()
 
+    # works, because same channels as ModK_.info (with warnings for Fp1, Fp2)
+    caplog.clear()
     ModK_.predict(raw_predict, picks=["Fp1", "Fp2", "CP2", "CP1"])
-    # -> works, because same channels as
-    # ModK.info (with 2 warning for Fp1 and Fp2)
     assert predict_warning in caplog.text
-    assert (
-        "Channel Fp1 is set as bad and will be used for prediction"
-        in caplog.text
-    )
+    assert "Fp1 is set as bad in the instance but was selected" in caplog.text
     caplog.clear()
 
 

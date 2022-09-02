@@ -217,6 +217,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         """
         from ..io import ChData, ChInfo
 
+        self._check_unfitted()
         n_jobs = _check_n_jobs(n_jobs)
         _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
         if isinstance(inst, (BaseRaw, BaseEpochs)):
@@ -236,13 +237,13 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         if len(ch_not_used) != 0:
             if len(ch_not_used) == 1:
                 msg = (
-                    "Channel %s is set as bad and ignored. To include "
+                    "The channel %s is set as bad and ignored. To include "
                     "it, either remove it from inst.info['bads'] or "
                     "provide it explicitly in the 'picks' argument."
                 )
             else:
                 msg = (
-                    "Channels %s are set as bads and ignored. To "
+                    "The channels %s are set as bads and ignored. To "
                     "include them, either remove them from "
                     "inst.info['bads'] or provide them "
                     "explicitly in the 'picks' argument."
@@ -662,6 +663,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         # error for required channels missing from the provided instance
         if len(missing_non_existing_channel) != 0:
+            missing_non_existing_channel = list(missing_non_existing_channel)
             if len(missing_non_existing_channel) == 1:
                 msg = (
                     f"The channel {missing_non_existing_channel[0]} was used "
@@ -669,14 +671,15 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 )
             else:
                 msg = (
-                    f"The channels {list(missing_non_existing_channel)} were "
-                    "used during fitting but are missing from the provided "
+                    f"The channels {missing_non_existing_channel} were used "
+                    "during fitting but are missing from the provided "
                     "instance."
                 )
             raise ValueError(msg)
 
         # error for required channels not picked from the provided instance
         if len(missing_existing_channel) != 0:
+            missing_existing_channel = list(missing_existing_channel)
             if len(missing_existing_channel) == 1:
                 msg = (
                     f"The channel {missing_existing_channel[0]} is required "
@@ -688,13 +691,12 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 )
             else:
                 msg = (
-                    f"The channels {list(missing_existing_channel)} are "
-                    "required to predict because they were included during "
-                    "fitting. The provided 'picks' argument does not select "
-                    f"{list(missing_existing_channel)}. To include then, "
-                    "either remove them from inst.info['bads'] or provide "
-                    "their names or indices explicitly in the 'picks' "
-                    "argument."
+                    f"The channels {missing_existing_channel} are required "
+                    " to predict because they were included during fitting. "
+                    "The provided 'picks' argument does not select "
+                    f"{missing_existing_channel}. To include then, either "
+                    "remove them from inst.info['bads'] or provide their "
+                    "names or indices explicitly in the 'picks' argument."
                 )
             raise ValueError(msg)
 
