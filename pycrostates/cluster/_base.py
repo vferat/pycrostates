@@ -223,14 +223,14 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             if len(ch_not_used) == 1:
                 msg = (
                     "Channel %s is set as bad and ignored. To include "
-                    "it, either remove it from 'inst.info['bads'] or "
+                    "it, either remove it from inst.info['bads'] or "
                     "provide it explicitly in the 'picks' argument."
                 )
             else:
                 msg = (
                     "Channels %s are set as bads and ignored. To "
                     "include them, either remove them from "
-                    "'inst.info['bads'] or provide them "
+                    "inst.info['bads'] or provide them "
                     "explicitly in the 'picks' argument."
                 )
             logger.warning(
@@ -254,10 +254,14 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         info = pick_info(inst.info, picks, copy=True)
         if info["bads"] != []:
             if len(info["bads"]) == 1:
-                msg = "Channel %s is set as bad and will be used for fitting."
+                msg = (
+                    "The channel %s is set as bad and will be used for "
+                    "fitting."
+                )
             else:
                 msg = (
-                    "Channels %s are set as bad and will be used for fitting."
+                    "The channels %s are set as bad and will be used for "
+                    "fitting."
                 )
             logger.warning(msg, ", ".join(ch_name for ch_name in info["bads"]))
             del msg
@@ -713,7 +717,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             logger.warning(msg, ", ".join(ch_name for ch_name in info["bads"]))
             del msg
 
-        # same pick order between self and inst
+        # the check before made sure the instance and self had the same channel
+        # selected for both the fitting and the prediction. To ensure the same
+        # pick order between self and instance, we use self._info["ch_names"].
         picks_data = _picks_to_idx(
             inst.info, self._info["ch_names"], none="all", exclude=[]
         )
