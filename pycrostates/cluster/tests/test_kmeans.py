@@ -972,7 +972,10 @@ def test_picks_fit_predict(caplog):
     # works, with warning because Fpz, Fp2 are missing from ModK_.info
     caplog.clear()
     ModK_.predict(raw_predict, picks="eeg")
-    assert "Fp2, Fpz which were not used during fitting" in caplog.text
+    # handle non-deterministic sets
+    msg1 = "Fp2, Fpz which were not used during fitting"
+    msg2 = "Fpz, Fp2 which were not used during fitting"
+    assert msg1 in caplog.text or msg2 in caplog.text
     caplog.clear()
 
     # fails, because ModK_.info includes Fp1 which is missing from prediction
