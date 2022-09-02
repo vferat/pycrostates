@@ -211,9 +211,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 reject_by_annotation
             )
 
-        # retrieve info
-        info = inst.info
-
         # picks
         picks_bads_inc = _picks_to_idx(
             inst.info, picks, none="all", exclude=[]
@@ -236,7 +233,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                     "explicitly in the 'picks' argument."
                 )
             logger.warning(
-                msg, ", ".join(info["ch_names"][k] for k in ch_not_used)
+                msg, ", ".join(inst.info["ch_names"][k] for k in ch_not_used)
             )
             del msg
 
@@ -253,12 +250,14 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             data = data.reshape(data.shape[0], -1)
 
         # store picks and info
-        info = pick_info(info, picks, copy=True)
+        info = pick_info(inst.info, picks, copy=True)
         if info["bads"] != []:
             if len(info["bads"]) == 1:
-                msg = "Channel %s is set as bad and will be used for fitting"
+                msg = "Channel %s is set as bad and will be used for fitting."
             else:
-                msg = "Channels %s are set as bad and will be used for fitting"
+                msg = (
+                    "Channels %s are set as bad and will be used for fitting."
+                )
             logger.warning(msg, ", ".join(ch_name for ch_name in info["bads"]))
             del msg
         self._info = ChInfo(info=info)

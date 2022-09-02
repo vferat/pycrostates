@@ -89,6 +89,9 @@ def test_check_picks_uniqueness():
     _BaseCluster._check_picks_uniqueness(info, picks)
     picks = _picks_to_idx(info, "meg")
     _BaseCluster._check_picks_uniqueness(info, picks)
+    info["bads"] = [info.ch_names[-1]]
+    picks = _picks_to_idx(info, "data")
+    _BaseCluster._check_picks_uniqueness(info, picks)
 
     # invalid
     info = create_info(5, 1000, ["eeg", "eeg", "eog", "ecg", "grad"])
