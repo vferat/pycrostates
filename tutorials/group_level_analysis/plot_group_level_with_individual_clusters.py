@@ -36,6 +36,7 @@ subject_ids = ["010020", "010021", "010022", "010023", "010024"]
 # Then we concatenate individual topographies into
 # a single dataset and submit it for a second round of
 # clustering (group level analysis).
+
 import numpy as np
 
 ModK = ModKMeans(n_clusters=5, random_state=42)
@@ -64,7 +65,8 @@ ModK.fit(group_cluster_centers, n_jobs=n_jobs)
 ModK.plot()
 
 #%%
-# We can reorganize our clustering results to our needs
+# We can reorganize our clustering results to our needs.
+
 ModK.reorder_clusters(order=[2, 3, 4, 1, 0])
 ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
 ModK.plot()
