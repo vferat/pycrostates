@@ -610,17 +610,17 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         elif reject_by_annotation is None:
             reject_by_annotation = False
 
-        # warn if bad channels in self._info['bads]
+        # warn if bad channels in self._info['bads']
         if self._info["bads"] != []:
             if len(self._info["bads"]) == 1:
                 msg = (
-                    "Current fit contains bad channel %s"
-                    + " which will be used for prediction"
+                    "The current fit contains bad channel %s"
+                    + " which will be used for prediction."
                 )
             else:
                 msg = (
-                    "Current fit contains bad channels %s"
-                    + " which will be used for prediction"
+                    "The current fit contains bad channels %s"
+                    + " which will be used for prediction."
                 )
             logger.warning(
                 msg, ", ".join(ch_name for ch_name in self._info["bads"])
@@ -628,70 +628,92 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             del msg
 
         # check that the instance as the required channels (good + bads)
-        # inst_info must have all the channels present in cluster_info
+        # inst.info must have all the channels that were used for fitting and
+        # are saved in self._info
         picks = self._info["ch_names"] if picks is None else picks
-        picks_ = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
-        info = pick_info(inst.info, sel=picks_, copy=True)
+        picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
+        info = pick_info(inst.info, sel=picks, copy=True)
 
-        # missing channel(s)
-        missing_ch = list(set(self._info["ch_names"]) - set(info["ch_names"]))
-        # check if missing channel(s) exist(s).
-        missing_existing_channel = list(set(missing_ch) & set(inst.ch_names))
-        missing_others = list(set(missing_ch) - set(missing_existing_channel))
+        # look for channels used during fit that are missing in the selected
+        # channels from instance
+        missing_ch = set(self._info["ch_names"]) - set(info["ch_names"])
+        # check if the missing channels are present in instance and are not
+        # selected by the provided picks
+        missing_existing_channel = missing_ch & set(inst.ch_names)
+        missing_non_existing_channel = missing_ch - missing_existing_channel
 
-        # Missing channels error
-        if missing_others != []:
-            if len(missing_others) == 1:
-                msg = f"Missing channel {missing_others[0]}"
+        # error for required channels missing from the provided instance
+        if len(missing_non_existing_channel) != 0:
+            if len(missing_non_existing_channel) == 1:
+                msg = (
+                    f"The channel {missing_non_existing_channel[0]} was used "
+                    "during fitting but is missing from the provided instance."
+                )
             else:
-                msg = f"Missing channels {missing_others}"
+                msg = (
+                    f"The channels {list(missing_non_existing_channel)} were "
+                    "used during fitting but are missing from the provided "
+                    "instance."
+                )
             raise ValueError(msg)
 
-        # Missing channels because of bad error
-        if missing_existing_channel != []:
+        # error for required channels not picked from the provided instance
+        if len(missing_existing_channel) != 0:
             if len(missing_existing_channel) == 1:
                 msg = (
-                    "Cannot predict because channel "
-                    + f"{missing_existing_channel[0]} is not in picks "
-                    + "but exist in inst."
-                    + " To include it, either remove it from "
-                    + "'inst.info['bads'] or provide its name "
-                    + "explicitly in the 'picks' argument."
+                    f"The channel {missing_existing_channel[0]} is required "
+                    "to predict because it was included during fitting. The "
+                    "provided 'picks' argument does not select "
+                    f"{missing_existing_channel[0]}. To include it, either "
+                    "remove it from inst.info['bads'] or provide its name or "
+                    "indice explicitly in the 'picks' argument."
                 )
             else:
                 msg = (
-                    "Cannot predict because channels "
-                    + f"{missing_existing_channel} are not in picks "
-                    + "but exist in inst."
-                    + " To include them, either remove them from "
-                    + "'inst.info['bads'] or provide their names "
-                    + "explicitly in the 'picks' argument."
+                    f"The channels {list(missing_existing_channel)} are "
+                    "required to predict because they were included during "
+                    "fitting. The provided 'picks' argument does not select "
+                    f"{list(missing_existing_channel)}. To include then, "
+                    "either remove them from inst.info['bads'] or provide "
+                    "their names or indices explicitly in the 'picks' "
+                    "argument."
                 )
             raise ValueError(msg)
 
-        # unused channel(s)
-        unused_ch = list(set(info["ch_names"]) - set(self._info["ch_names"]))
-        if unused_ch != []:
+        # unused channel(s), present in inst.info but not present in self._info
+        unused_ch = set(info["ch_names"]) - set(self._info["ch_names"])
+        if len(unused_ch) != 0:
             if len(unused_ch) == 1:
-                msg = "Picked channel %s will not be used for prediction"
+                msg = (
+                    "The provided instance and the 'picks' argument results "
+                    "in the selection of %s which was not used during "
+                    "fitting. Thus, it will not be used for prediction."
+                )
             else:
-                msg = "Picked channel %s will not be used for prediction"
+                msg = (
+                    "The provided instance and the 'picks' argument results "
+                    "in the selection of %s which were not used during "
+                    "fitting. Thus, they will not be used for prediction."
+                )
             logger.warning(msg, ", ".join(ch_name for ch_name in unused_ch))
             del msg
 
-        if info["bads"] != []:
+        # check and warn if bad channels have been selected
+        if len(info["bads"]) != 0:
             if len(info["bads"]) == 1:
                 msg = (
-                    "Channel %s is set as bad and will be used for prediction"
+                    "The channel %s is set as bad in the instance but was "
+                    "selected. It will be used for prediction."
                 )
             else:
                 msg = (
-                    "Channel %s are set as bad and will be used for prediction"
+                    "The channels %s are set as bad in the instance but were "
+                    "selected. They will be used for prediction."
                 )
             logger.warning(msg, ", ".join(ch_name for ch_name in info["bads"]))
             del msg
 
-        # same pick order between slef and inst
+        # same pick order between self and inst
         picks_data = _picks_to_idx(
             inst.info, self._info["ch_names"], none="all", exclude=[]
         )
