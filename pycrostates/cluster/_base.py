@@ -191,8 +191,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             Channels to include. Note that all channels selected must have the
             same type. Slices and lists of integers will be interpreted as
             channel indices. In lists, channel name strings (e.g.
-            ``['Fp1', 'Fp2']``) will pick the given channels. ``"eeg"``
-            (default) will pick all eeg channels.
+            ``['Fp1', 'Fp2']``) will pick the given channels. Can also be the
+            string values “all” to pick all channels, or “data” to pick data
+            channels. ``"eeg"`` (default) will pick all eeg channels.
             Note that channels in ``info['bads']`` will be included if their
             names or indices are explicitly provided.
         %(tmin_raw)s
@@ -547,14 +548,14 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             MNE `~mne.io.Raw` or `~mne.Epochs` object containing the data to
             use for prediction.
         picks : str | list | slice | None
-            Channels to include. Slices and lists of integers will be
-            interpreted as channel indices.
-            Channel name strings (e.g., ['Fp1', 'Fp2'])
-            will pick the given channels. Can also be the string values “all”
-            to pick all channels, or “data” to pick data channels.
-            None (default) will pick all channels used during fitting
-            (e.g., self.info['ch_names]).
-            Note that channels in info['bads'] will be included if their
+            Channels to include. Note that all channels selected must have the
+            same type. Slices and lists of integers will be interpreted as
+            channel indices. In lists, channel name strings (e.g.
+            ``['Fp1', 'Fp2']``) will pick the given channels.
+            Can also be the string values “all” to pick all channels, or “data”
+            to pick data channels. ``None`` (default) will pick all channels
+            used during fitting (e.g., ``self.info['ch_names']``).
+            Note that channels in ``info['bads']`` will be included if their
             names or indices are explicitly provided.
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing.
@@ -569,7 +570,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             this value, it will be recursively reasigned to neighbouring
             segments based on absolute spatial correlation.
         reject_edges : bool
-            If True, set first and last segments to unlabeled.
+            If ``True``, set first and last segments to unlabeled.
         %(reject_by_annotation_raw)s
         %(verbose)s
 
@@ -577,9 +578,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         -------
         segmentation : `RawSegmentation` | `EpochsSegmentation`
             Microstate sequence derivated from instance data. Timepoints are
-            labeled according to cluster centers number: 0 for the first
-            center, 1 for the second, etc..
-            -1 is used for unlabeled time points.
+            labeled according to cluster centers number: ``0`` for the first
+            center, ``1`` for the second, etc..
+            ``-1`` is used for unlabeled time points.
         """
         # TODO: reject_by_annotation_raw doc probably doesn't match the correct
         # argument types.
