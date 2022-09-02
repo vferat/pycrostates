@@ -168,6 +168,20 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         assert self._fitted_data is not None
         assert self._labels_ is not None
 
+    def _check_unfitted(self):
+        """Check if the cluster is unfitted."""
+        if self.fitted:
+            raise RuntimeError(
+                "Clustering algorithm must be unfitted before using "
+                f"{self.__class__.__name__}. You can set the property "
+                "'.fitted' to False if you want to remove the instance fit."
+            )
+        # sanity-check
+        assert self._cluster_centers_ is None
+        assert self._info is None
+        assert self._fitted_data is None
+        assert self._labels_ is None
+
     @abstractmethod
     @fill_doc
     def fit(

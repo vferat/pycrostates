@@ -728,6 +728,44 @@ def test_fit_data_shapes():
     assert np.isclose(fitted_data_5_end, ModK_rej_5_end._fitted_data).all()
 
 
+def test_refit():
+    """Test that re-fit does not overwrite the current instance."""
+    raw = raw_meg.copy().pick_types(meg=True, eeg=True, eog=True)
+    ModK_ = ModKMeans(
+        n_clusters=n_clusters,
+        n_init=10,
+        max_iter=100,
+        tol=1e-4,
+        random_state=1,
+    )
+    ModK_.fit(raw, picks="eeg")
+    eeg_ch_names = ModK_.info["ch_names"]
+    eeg_cluster_centers = ModK_.cluster_centers_
+    ModK_.fitted = False  # unfit
+    ModK_.fit(raw, picks="mag")
+    mag_ch_names = ModK_.info["ch_names"]
+    mag_cluster_centers = ModK_.cluster_centers_
+    assert eeg_ch_names != mag_ch_names
+    assert eeg_cluster_centers.shape != mag_cluster_centers.shape
+
+    # invalid
+    raw = raw_meg.copy().pick_types(meg=True, eeg=True, eog=True)
+    ModK_ = ModKMeans(
+        n_clusters=n_clusters,
+        n_init=10,
+        max_iter=100,
+        tol=1e-4,
+        random_state=1,
+    )
+    ModK_.fit(raw, picks="eeg")  # works
+    eeg_ch_names = ModK_.info["ch_names"]
+    eeg_cluster_centers = ModK_.cluster_centers_
+    with pytest.raises(RuntimeError, match="must be unfitted"):
+        ModK_.fit(raw, picks="mag")  # works
+    assert eeg_ch_names == ModK_.info["ch_names"]
+    assert np.allclose(eeg_cluster_centers, ModK_.cluster_centers_)
+
+
 def test_predict_default(caplog):
     """Test predict method default behaviors."""
     # raw, no smoothing, no_edge
@@ -842,9 +880,8 @@ def test_predict_default(caplog):
     assert not np.isclose(segmentation2._labels, segmentation3._labels).all()
 
 
-def test_picks_fit(caplog):
-    # ---- Test with different picks and bads ----
-    """Test fitting with different picks."""
+def test_picks_fit_predict(caplog):
+    """Test fitting and prediction with different picks."""
     raw = raw_meg.copy().pick_types(meg=True, eeg=True, eog=True)
     ModK_ = ModKMeans(
         n_clusters=n_clusters,
@@ -853,13 +890,18 @@ def test_picks_fit(caplog):
         tol=1e-4,
         random_state=1,
     )
-    with pytest.raises(ValueError, match="Only one datatype can be fitted"):
-        ModK_.fit(raw, picks=None)  # fails -> MEG + EEG
-    with pytest.raises(ValueError, match="Only one datatype can be fitted"):
+
+    # test invalid fit
+    with pytest.raises(ValueError, match="Only one datatype can be selected for fitting"):
+        ModK_.fit(raw, picks=None)  # fails -> eeg + grad + mag
+    with pytest.raises(ValueError, match="Only one datatype can be selected for fitting"):
         ModK_.fit(raw, picks="meg")  # fails -> grad + mag
-    with pytest.raises(ValueError, match="Only one datatype can be fitted"):
+    with pytest.raises(ValueError, match="Only one datatype can be selected for fitting"):
         ModK_.fit(raw, picks="data")  # fails -> eeg + grad + mag
+
+    # test valid fit
     ModK_.fit(raw, picks="eeg")  # works
+    ModK_.fitted = False
     ModK_.fit(raw, picks="mag")  # works
     info_ = create_info(
         ["Fp1", "Fp2", "CP1", "CP2"], sfreq=1024, ch_types="eeg"
