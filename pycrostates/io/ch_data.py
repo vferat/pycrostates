@@ -123,13 +123,13 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         %(picks_all)s
         exclude : list | str
             Set of channels to exclude, only used when picking based on
-            types (e.g., exclude="bads" when picks="meg").
+            types (e.g., ``exclude="bads"`` when ``picks="meg"``).
         %(verbose)s
 
         Returns
         -------
-        inst : `~pycrostates.io.ChData`
-            The modified instance.
+        inst : ChData
+            The instance modified in-place.
         """
         picks = _picks_to_idx(self._info, picks, exclude=exclude)
         info = pick_info(self._info, picks, copy=False)
@@ -143,6 +143,6 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
     def info(self) -> CHInfo:
         """Atemporal measurement information.
 
-        :type: `~pycrostates.io.ChInfo`
+        :type: ChInfo
         """
         return self._info

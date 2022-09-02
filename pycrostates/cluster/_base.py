@@ -183,17 +183,17 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         Parameters
         ----------
-        inst : Raw | Epochs
-            MNE `~mne.io.Raw` or `~mne.Epochs` object containing data to
-            transform to cluster-distance space (absolute spatial correlation).
+        inst : Raw | Epochs | ChData
+            MNE `~mne.io.Raw`, `~mne.Epochs` or `~pycrostates.io.ChData`object
+            containing data to transform to cluster-distance space (absolute
+            spatial correlation).
         picks : str | list | slice | None
-            Channels to include. Slices and lists of integers
-            will be interpreted as channel indices. Note that all
-            channels must have the same type.
-            In lists, channel name strings (e.g., ['Fp1', 'Fp2']
-            will pick the given channels. "eeg" (default) will pick
-            all eeg channels.
-            Note that channels in info['bads'] will be included if their
+            Channels to include. Note that all channels selected must have the
+            same type. Slices and lists of integers will be interpreted as
+            channel indices. In lists, channel name strings (e.g.
+            ``['Fp1', 'Fp2']``) will pick the given channels. ``"eeg"``
+            (default) will pick all eeg channels.
+            Note that channels in ``info['bads']`` will be included if their
             names or indices are explicitly provided.
         %(tmin_raw)s
         %(tmax_raw)s
