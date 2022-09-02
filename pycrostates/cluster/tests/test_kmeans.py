@@ -893,11 +893,17 @@ def test_picks_fit_predict(caplog):
     )
 
     # test invalid fit
-    with pytest.raises(ValueError, match="Only one datatype can be selected for fitting"):
+    with pytest.raises(
+        ValueError, match="Only one datatype can be selected for fitting"
+    ):
         ModK_.fit(raw, picks=None)  # fails -> eeg + grad + mag
-    with pytest.raises(ValueError, match="Only one datatype can be selected for fitting"):
+    with pytest.raises(
+        ValueError, match="Only one datatype can be selected for fitting"
+    ):
         ModK_.fit(raw, picks="meg")  # fails -> grad + mag
-    with pytest.raises(ValueError, match="Only one datatype can be selected for fitting"):
+    with pytest.raises(
+        ValueError, match="Only one datatype can be selected for fitting"
+    ):
         ModK_.fit(raw, picks="data")  # fails -> eeg + grad + mag
 
     # test valid fit
@@ -983,7 +989,9 @@ def test_picks_fit_predict(caplog):
     # try with a missing channel from the prediction instance
     # fails, because Fp1 is used in ModK.info
     raw_predict.drop_channels(["Fp1"])
-    with pytest.raises(ValueError, match="Fp1 was used during fitting but is missing"):
+    with pytest.raises(
+        ValueError, match="Fp1 was used during fitting but is missing"
+    ):
         ModK_.predict(raw_predict, picks="eeg")
 
     # set a bad channel during fitting
