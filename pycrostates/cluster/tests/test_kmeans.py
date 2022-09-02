@@ -728,7 +728,7 @@ def test_fit_data_shapes():
     assert np.isclose(fitted_data_5_end, ModK_rej_5_end._fitted_data).all()
 
 
-def test_predict_default_picks(caplog):
+def test_predict_default(caplog):
     """Test predict method default behaviors."""
     # raw, no smoothing, no_edge
     segmentation = ModK.predict(raw_eeg, factor=0, reject_edges=False)
