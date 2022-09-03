@@ -21,5 +21,5 @@ with `MNE-python <mne stable_>`_.
 
    install.rst
    microstates.rst
-   auto_tutorials/index
+   generated/auto_tutorials/index
    api/index

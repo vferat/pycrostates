@@ -10,11 +10,11 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
+import sys
 from datetime import date
 from pathlib import Path
 
-from recommonmark.transform import AutoStructify
-from sphinx_gallery.sorting import ExplicitOrder
+from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
 
 import pycrostates
 
@@ -32,7 +32,11 @@ gh_url = "https://github.com/vferat/pycrostates"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = "4.0"
+needs_sphinx = "5.0"
+
+# The document name of the “root” document, that is, the document that contains
+# the root toctree directive.
+root_doc = "index"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -41,26 +45,19 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.autosectionlabel",
-    "sphinx.ext.doctest",
-    "sphinx.ext.coverage",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
-    "nbsphinx",
+    # "nbsphinx",
     "sphinxcontrib.bibtex",
     "sphinx_copybutton",
     "sphinx_design",
     "sphinx_gallery.gen_gallery",
-    "recommonmark",
+    "sphinx_issues",
     "numpydoc",
 ]
 
-# Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 
 # Sphinx will warn about all references where the target cannot be found.
@@ -76,10 +73,6 @@ nitpick_ignore = [
     ),
 ]
 
-# The document name of the “root” document, that is, the document that contains
-# the root toctree directive.
-root_doc = "index"
-
 # A list of ignored prefixes for module index sorting.
 modindex_common_prefix = [f"{package}."]
 
@@ -88,10 +81,7 @@ modindex_common_prefix = [f"{package}."]
 # make `filter` a cross-reference to the Python function “filter”.
 default_role = "py:obj"
 
-# -- Options for HTML output -------------------------------------------------
-
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
+# -- options for HTML output -------------------------------------------------
 html_theme = "pydata_sphinx_theme"
 html_title = f"{project} {release}"
 html_theme_options = {
@@ -154,6 +144,9 @@ intersphinx_mapping = {
     "sklearn": ("https://scikit-learn.org/stable/", None),
 }
 intersphinx_timeout = 5
+
+# -- sphinx-issues -----------------------------------------------------------
+issues_github_path = gh_url.split("http://github.com/")[-1]
 
 # -- numpydoc ----------------------------------------------------------------
 numpydoc_class_members_toctree = False
@@ -241,11 +234,12 @@ sphinx_gallery_conf = {
     "backreferences_dir": "generated/backreferences",
     "doc_module": ("pycrostates",),
     "examples_dirs": [str(Path(__file__).parent.parent.parent / "tutorials")],
-    "gallery_dirs": ["auto_tutorials"],
+    "gallery_dirs": ["generated/auto_tutorials"],
     "line_numbers": False,  # messes with style
-    "plot_gallery": "True",  # Avoid annoying Unicode/bool default warning
-    "reference_url": {"pycrostates": None},  # current lib uses None
+    "plot_gallery": True,
+    "reference_url": dict(pycrostates=None),  # documented lib uses None
     "remove_config_comments": True,
+    "show_memory": sys.platform == "linux",
     "subsection_order": ExplicitOrder(
         [
             "../../tutorials/preprocessing",
@@ -254,6 +248,7 @@ sphinx_gallery_conf = {
             "../../tutorials/metrics",
         ]
     ),
+    "within_subsection_order": FileNameSortKey,
 }
 
 
@@ -276,9 +271,3 @@ def append_attr_meth_examples(app, what, name, obj, options, lines):
             ).split(
                 "\n"
             )
-
-
-# -- Auto-convert markdown pages to demo --------------------------------------
-def setup(app):
-    app.connect("autodoc-process-docstring", append_attr_meth_examples)
-    app.add_transform(AutoStructify)
