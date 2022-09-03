@@ -80,7 +80,6 @@ default_role = "py:obj"
 
 # -- options for HTML output -------------------------------------------------
 html_theme = "pydata_sphinx_theme"
-html_title = f"{project} {release}"
 html_theme_options = {
     "logo": {
         "image_light": "img/Pycrostates_logo_black.png",
@@ -290,6 +289,10 @@ sphinx_gallery_conf = {
     "backreferences_dir": "generated/backreferences",
     "doc_module": ("pycrostates",),
     "examples_dirs": [str(Path(__file__).parent.parent.parent / "tutorials")],
+    "exclude_implicit_doc": {
+        r"pycrostates.CHData",
+        r"pycrostates.ChData.get_data",
+    },
     "gallery_dirs": ["generated/auto_tutorials"],
     "line_numbers": False,  # messes with style
     "plot_gallery": True,
