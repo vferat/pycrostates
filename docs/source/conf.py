@@ -256,6 +256,13 @@ def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
     if domain != "py":
         return None  # only document python objects
 
+    module = info["module"].split(".")[0]
+    if module not in gh_urls:
+        raise RuntimeError(
+            "This module is not configured in 'linkcode_resolve'. Please edit "
+            "the documentation 'conf.py' file."
+        )
+
     # retrieve pyobject and file
     try:
         pyobject = import_module(info["module"])
@@ -264,9 +271,6 @@ def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
         while hasattr(pyobject, '__wrapped__'):
             pyobject = pyobject.__wrapped__
         fname = inspect.getsourcefile(pyobject).replace("\\", "/")
-        print (info)
-        print (fname)
-        print ("------------------------------------------------------------")
     except Exception:
         # Either the object could not be loaded or the file was not found.
         # For instance, properties will raise.
@@ -282,20 +286,11 @@ def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
     else:
         return None  # alternatively, link to a maint/version branch
 
-    module = info["module"].split(".")[0]
     while module in fname:
         fname = fname.split(module)[-1]
     assert fname[0] == "/"  # sanity-check, file separator
     fname = fname[1:]
-
-    if module not in gh_urls:
-        raise RuntimeError(
-            "This module is not configured in 'linkcode_resolve'. Please edit "
-            "the documentation 'conf.py' file."
-        )
-
-    url = f"{gh_urls[module]}/blob/{branch}/{package}/{fname}#{lines}"
-    return url
+    return f"{gh_urls[module]}/blob/{branch}/{package}/{fname}#{lines}"
 
 
 # -- sphinx-gallery ----------------------------------------------------------
@@ -309,7 +304,7 @@ sphinx_gallery_conf = {
     },
     "gallery_dirs": ["generated/auto_tutorials"],
     "line_numbers": False,  # messes with style
-    "plot_gallery": False,
+    "plot_gallery": True,
     "reference_url": dict(pycrostates=None),  # documented lib uses None
     "remove_config_comments": True,
     "show_memory": sys.platform == "linux",
