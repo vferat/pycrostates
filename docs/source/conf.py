@@ -232,6 +232,11 @@ bibtex_bibfiles = ["../references.bib"]
 # -- sphinx.ext.linkcode -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/linkcode.html
 
+gh_urls = {
+    package: gh_url,
+    "mne": "https://github.com/mne-tools/mne-python",
+}
+
 
 def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
     """Determine the URL corresponding to a Python object.
@@ -253,8 +258,7 @@ def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
 
     # retrieve pyobject and file
     try:
-        module = import_module(info["module"])
-        pyobject = module
+        pyobject = import_module(info["module"])
         for elt in info["fullname"].split("."):
             pyobject = getattr(pyobject, elt)
         while hasattr(pyobject, '__wrapped__'):
@@ -277,13 +281,20 @@ def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
         branch = "main"
     else:
         return None  # alternatively, link to a maint/version branch
-    try:
-        fname = fname.split(f"/{package}/{package}/")[1]
-        url = f"{gh_url}/blob/{branch}/{package}/{fname}#{lines}"
-    except IndexError:
-        # this is an MNE function
-        fname = fname.split("/mne/")[1]
-        url = f"https://github.com/mne-tools/mne-python/blob/{branch}/mne/{fname}#{lines}"  # noqa
+
+    module = info["module"].split(".")[0]
+    while module in fname:
+        fname = fname.split(module)[-1]
+    assert fname[0] == "/"  # sanity-check, file separator
+    fname = fname[1:]
+
+    if module not in gh_urls:
+        raise RuntimeError(
+            "This module is not configured in 'linkcode_resolve'. Please edit "
+            "the documentation 'conf.py' file."
+        )
+
+    url = f"{gh_urls[module]}/blob/{branch}/{package}/{fname}#{lines}"
     return url
 
 
