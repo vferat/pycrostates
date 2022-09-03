@@ -179,13 +179,13 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         reject_by_annotation: bool = True,
         n_jobs: int = 1,
     ) -> NDArray[float]:
-        """Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
+        """Compute cluster centers.
 
         Parameters
         ----------
-        inst : Raw | Epochs
-            MNE `~mne.io.Raw` or `~mne.Epochs` object containing data to
-            transform to cluster-distance space (absolute spatial correlation).
+        inst : Raw | Epochs | ChData
+            MNE `~mne.io.Raw`, `~mne.Epochs` or `~pycrostates.io.ChData`
+            object containing data from which to compute topographies.
         %(picks_all)s
         %(tmin_raw)s
         %(tmax_raw)s

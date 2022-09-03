@@ -31,7 +31,7 @@ class _BaseSegmentation(ABC):
         Microstates labels attributed to each sample, i.e. the segmentation.
     inst : Raw | Epochs
         MNE instance used to predict the segmentation.
-    %(cluster_centers)s
+    %(cluster_centers_seg)s
     %(cluster_names)s
     %(predict_parameters)s
     """
@@ -315,9 +315,11 @@ class _BaseSegmentation(ABC):
         """
         return self._labels.copy()
 
+    @fill_doc
     @property
     def cluster_centers_(self) -> NDArray[float]:
-        """Fitted clusters (the mirostates maps).
+        """ Cluster centers (the mirostates maps)
+        used to compute the segmentation.
 
         :type: `~numpy.array`
         """
@@ -335,14 +337,14 @@ class _BaseSegmentation(ABC):
 @fill_doc
 class RawSegmentation(_BaseSegmentation):
     """
-    Contains the segmentation for a `~mne.io.Raw` instance.
+    Contains the segmentation of a `~mne.io.Raw` instance.
 
     Parameters
     ----------
     %(labels_raw)s
     raw : Raw
         `~mne.io.Raw` instance used for prediction.
-    %(cluster_centers)s
+    %(cluster_centers_seg)s
     %(cluster_names)s
     %(predict_parameters)s
     """
@@ -411,20 +413,20 @@ class RawSegmentation(_BaseSegmentation):
     # --------------------------------------------------------------------
     @property
     def raw(self) -> BaseRaw:
-        """Raw instance."""
+        """`~mne.io.Raw` instance from which the segmentation was computed."""
         return self._inst.copy()
 
 
 @fill_doc
 class EpochsSegmentation(_BaseSegmentation):
-    """Contains the segmentation for an epoch instance.
+    """Contains the segmentation of an `~mne.Epochs` instance.
 
     Parameters
     ----------
     %(labels_epo)s
     epochs : Epochs
         `~mne.Epochs` instance used for prediction.
-    %(cluster_centers)s
+    %(cluster_centers_seg)s
     %(cluster_names)s
     %(predict_parameters)s
     """
@@ -494,5 +496,5 @@ class EpochsSegmentation(_BaseSegmentation):
     # --------------------------------------------------------------------
     @property
     def epochs(self) -> BaseEpochs:
-        """Epochs instance."""
+        """`~mne.Epochs` instance from which the segmentation was computed."""
         return self._inst.copy()

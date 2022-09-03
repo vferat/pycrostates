@@ -70,6 +70,11 @@ fname : str | Path
 
 # -- Segmentation --
 docdict[
+    "cluster_centers_seg"
+] = """
+cluster_centers : array (n_clusters, n_channels)
+     Clusters, i.e. the microstates maps used to compute the segmentation."""
+docdict[
     "labels_raw"
 ] = """
 labels : array (n_samples, )
