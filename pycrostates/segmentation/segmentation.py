@@ -318,7 +318,7 @@ class _BaseSegmentation(ABC):
     @fill_doc
     @property
     def cluster_centers_(self) -> NDArray[float]:
-        """ Cluster centers (the mirostates maps)
+        """Cluster centers (i.e topographies)
         used to compute the segmentation.
 
         :type: `~numpy.array`
@@ -327,7 +327,7 @@ class _BaseSegmentation(ABC):
 
     @property
     def cluster_names(self) -> List[str]:
-        """Name of the clusters.
+        """Name of the cluster centers.
 
         :type: `list`
         """
