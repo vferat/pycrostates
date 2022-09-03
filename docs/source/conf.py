@@ -237,7 +237,7 @@ sphinx_gallery_conf = {
     },
     "gallery_dirs": ["generated/auto_tutorials"],
     "line_numbers": False,  # messes with style
-    "plot_gallery": False,
+    "plot_gallery": True,
     "reference_url": dict(pycrostates=None),  # documented lib uses None
     "remove_config_comments": True,
     "show_memory": sys.platform == "linux",
