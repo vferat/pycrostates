@@ -39,12 +39,12 @@ subject_ids = ["010020", "010021", "010022", "010023", "010024"]
 
 import numpy as np
 
-ModK = ModKMeans(n_clusters=5, random_state=42)
 n_jobs = 2
 
 individual_cluster_centers = list()
 for subject_id in subject_ids:
     # Load Data
+    ModK = ModKMeans(n_clusters=5, random_state=42)
     raw_fname = lemon.data_path(subject_id=subject_id, condition=condition)
     raw = read_raw_eeglab(raw_fname, preload=True)
     raw = lemon.standardize(raw)
@@ -60,7 +60,9 @@ for subject_id in subject_ids:
 
 group_cluster_centers = np.hstack(individual_cluster_centers)
 group_cluster_centers = ChData(group_cluster_centers, ModK.info)
+
 # Group level clustering
+ModK = ModKMeans(n_clusters=5, random_state=42)
 ModK.fit(group_cluster_centers, n_jobs=n_jobs)
 ModK.plot()
 
