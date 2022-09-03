@@ -7,7 +7,7 @@ from typing import List, Optional, Tuple, Union
 import numpy as np
 from mne.io import Info
 from mne.io.constants import FIFF
-from mne.io.meas_info import _check_bads, _check_ch_keys, _unique_channel_names
+from mne.io.meas_info import _check_bads, _check_ch_keys, _check_dev_head_t, _unique_channel_names
 from mne.io.pick import get_channel_type_constants
 from mne.io.proj import Projection
 from mne.io.tag import _ch_coord_dict
@@ -58,10 +58,18 @@ class ChInfo(CHInfo, Info):
     comps : list of dict
         CTF software gradient compensation data.
         See Notes for more information.
+    ctf_head_t : dict | None
+        The transformation from 4D/CTF head coordinates to Neuromag head
+        coordinates. This is only present in 4D/CTF data.
     custom_ref_applied : int
         Whether a custom (=other than average) reference has been applied to
         the EEG data. This flag is checked by some algorithms that require an
         average reference to be set.
+    dev_ctf_t : dict | None
+        The transformation from device coordinates to 4D/CTF head coordinates.
+        This is only present in 4D/CTF data.
+    dev_head_t : dict | None
+        The device to head transformation.
     dig : tuple of dict | None
         The Polhemus digitization data in head coordinates.
         See Notes for more information.
@@ -155,9 +163,12 @@ class ChInfo(CHInfo, Info):
         "comps": "comps cannot be set directly. "
                  "Please use method Raw.apply_gradient_compensation() "
                  "instead.",
+        "ctf_head_t": "ctf_head_t cannot be set directly.",
         "custom_ref_applied": "custom_ref_applied cannot be set directly. "
                               "Please use method inst.set_eeg_reference() "
                               "instead.",
+        "dev_ctf_t": "dev_ctf_t cannot be set directly.",
+        "dev_head_t": _check_dev_head_t,
         "dig": "dig cannot be set directly. "
                "Please use method inst.set_montage() instead.",
         "nchan": "nchan cannot be set directly. "
@@ -208,6 +219,9 @@ class ChInfo(CHInfo, Info):
         self["custom_ref_applied"] = info["custom_ref_applied"]
         self["bads"] = info["bads"]
         self["chs"] = info["chs"]
+        self["dev_ctf_t"] = info["dev_ctf_t"]
+        self["dev_ctf_t"] = info["dev_ctf_t"]
+        self["dev_head_t"] = info["dev_head_t"]
         self["dig"] = info["dig"]
         self["comps"] = info["comps"]
         self["projs"] = info["projs"]
@@ -248,6 +262,11 @@ class ChInfo(CHInfo, Info):
         # init empty bads
         self["bads"] = []  # mutable, as this can be changed by the user
 
+        # init empty coordinate transformation
+        self["dev_ctf_t"] = None
+        self["dev_ctf_t"] = None
+        self["dev_head_t"] = None
+
         # create chs information
         self["chs"] = []
         ch_types_dict = get_channel_type_constants(include_defaults=True)
@@ -281,9 +300,6 @@ class ChInfo(CHInfo, Info):
                 logno=ci + 1,
             )
             self["chs"].append(chan_info)
-
-        # convert to immutable
-        self["chs"] = self["chs"]
 
         # add empty dig
         self["dig"] = None
@@ -343,7 +359,8 @@ class ChInfo(CHInfo, Info):
             if self["custom_ref_applied"] != other["custom_ref_applied"]:
                 return False
 
-            # TODO: Compare projs and compensation grades.
+            # TODO: Compare projs, compensation grades, and coordinate
+            # transformations
 
             if self["bads"] != other["bads"]:
                 logger.warning("Both info do not have the same bad channels.")
