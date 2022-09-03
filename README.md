@@ -6,6 +6,12 @@
 [![codecov](https://codecov.io/gh/vferat/pycrostates/branch/master/graph/badge.svg?token=47COGGCGX8)](https://codecov.io/gh/vferat/pycrostates)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/029e425f90614943b0a944e03922b637)](https://www.codacy.com/gh/vferat/pycrostates/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vferat/pycrostates&amp;utm_campaign=Badge_Grade)
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_white.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_black.png">
+  <img alt="Pycrostate logo" src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_black.png">
+</picture>
+
 # Pycrostates
 ---
 
@@ -35,7 +41,7 @@ The canonical journal article reference is currently under review at the [JOSS](
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Pycrostates welcomes contributions from anyone interested in improving this project. These contributions can take the form of bug reports/fixes, feature requests/additions, documentation revision and new tutorials.
@@ -55,6 +61,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://vferat.github.io/about/"><img src="https://avatars.githubusercontent.com/u/28844486?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Victor Férat</b></sub></a><br /><a href="https://github.com/vferat/pycrostates/commits?author=vferat" title="Tests">⚠️</a> <a href="https://github.com/vferat/pycrostates/commits?author=vferat" title="Code">💻</a> <a href="https://github.com/vferat/pycrostates/commits?author=vferat" title="Documentation">📖</a> <a href="#ideas-vferat" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-vferat" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-vferat" title="Maintenance">🚧</a> <a href="#projectManagement-vferat" title="Project Management">📆</a> <a href="https://github.com/vferat/pycrostates/pulls?q=is%3Apr+reviewed-by%3Avferat" title="Reviewed Pull Requests">👀</a></td>
     <td align="center"><a href="https://github.com/mscheltienne"><img src="https://avatars.githubusercontent.com/u/73893616?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mathieu Scheltienne</b></sub></a><br /><a href="https://github.com/vferat/pycrostates/commits?author=mscheltienne" title="Code">💻</a> <a href="https://github.com/vferat/pycrostates/commits?author=mscheltienne" title="Documentation">📖</a> <a href="#ideas-mscheltienne" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-mscheltienne" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-mscheltienne" title="Maintenance">🚧</a> <a href="#projectManagement-mscheltienne" title="Project Management">📆</a> <a href="https://github.com/vferat/pycrostates/pulls?q=is%3Apr+reviewed-by%3Amscheltienne" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/vferat/pycrostates/commits?author=mscheltienne" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/LouPlanchamp"><img src="https://avatars.githubusercontent.com/u/107875645?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Lou</b></sub></a><br /><a href="#design-LouPlanchamp" title="Design">🎨</a></td>
   </tr>
 </table>
 

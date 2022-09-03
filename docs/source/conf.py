@@ -82,6 +82,10 @@ default_role = "py:obj"
 html_theme = "pydata_sphinx_theme"
 html_title = f"{project} {release}"
 html_theme_options = {
+    "logo": {
+        "image_light": "img/Pycrostates_logo_black.png",
+        "image_dark": "img/Pycrostates_logo_white.png",
+    },
     "icon_links": [
         {
             "name": "GitHub",
@@ -302,7 +306,6 @@ sphinx_gallery_conf = {
     ),
     "within_subsection_order": FileNameSortKey,
 }
-
 
 def append_attr_meth_examples(app, what, name, obj, options, lines):
     """Append SG examples backreferences to method and attr docstrings."""

@@ -39,7 +39,7 @@ classifiers = [
     'Topic :: Scientific/Engineering',
 ]
 dependencies = [
-    'numpy>=1.20.0',
+    'numpy>=1.21',
     'scipy',
     'mne>=1.0.0',
     'joblib',
