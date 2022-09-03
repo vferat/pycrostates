@@ -260,6 +260,9 @@ def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
         while hasattr(pyobject, '__wrapped__'):
             pyobject = pyobject.__wrapped__
         fname = inspect.getsourcefile(pyobject).replace("\\", "/")
+        print (info)
+        print (fname)
+        print ("------------------------------------------------------------")
     except Exception:
         # Either the object could not be loaded or the file was not found.
         # For instance, properties will raise.
@@ -295,7 +298,7 @@ sphinx_gallery_conf = {
     },
     "gallery_dirs": ["generated/auto_tutorials"],
     "line_numbers": False,  # messes with style
-    "plot_gallery": True,
+    "plot_gallery": False,
     "reference_url": dict(pycrostates=None),  # documented lib uses None
     "remove_config_comments": True,
     "show_memory": sys.platform == "linux",
