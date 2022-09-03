@@ -3,10 +3,10 @@
 Pycrostates
 ===========
 
-.. image:: _static/img/Pycrostates_logo_white.png
+.. image:: ../_static/img/Pycrostates_logo_white.png
     :class: only-dark
 
-.. image:: _static/img/Pycrostates_logo_black.png
+.. image:: ../_static/img/Pycrostates_logo_black.png
     :class: only-light
 
 An open-source Python package for analyzing EEG microstates developed to work
