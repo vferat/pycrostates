@@ -4,15 +4,13 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# -- Path setup --------------------------------------------------------------
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-
+import inspect
 import sys
 from datetime import date
+from importlib import import_module
 from pathlib import Path
+from typing import Dict, Optional
 
 from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
 
@@ -43,18 +41,17 @@ root_doc = "index"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.autosummary",
     "sphinx.ext.autosectionlabel",
-    "sphinx.ext.mathjax",
-    "sphinx.ext.viewcode",
+    "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
-    # "nbsphinx",
+    "sphinx.ext.linkcode",
+    "sphinx.ext.mathjax",
+    "numpydoc",
     "sphinxcontrib.bibtex",
     "sphinx_copybutton",
     "sphinx_design",
     "sphinx_gallery.gen_gallery",
     "sphinx_issues",
-    "numpydoc",
 ]
 
 templates_path = ["_templates"]
@@ -229,6 +226,61 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
 # -- sphinxcontrib-bibtex ----------------------------------------------------
 bibtex_bibfiles = ["../references.bib"]
 
+# -- sphinx.ext.linkcode -----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/extensions/linkcode.html
+
+
+def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
+    """Determine the URL corresponding to a Python object.
+
+    Parameters
+    ----------
+    domain : str
+        One of 'py', 'c', 'cpp', 'javascript'.
+    info : dict
+        With keys "module" and "fullname".
+
+    Returns
+    -------
+    url : str | None
+        The code URL. If None, no link is added.
+    """
+    if domain != "py":
+        return None  # only document python objects
+
+    # retrieve pyobject and file
+    try:
+        module = import_module(info["module"])
+        pyobject = module
+        for elt in info["fullname"].split("."):
+            pyobject = getattr(pyobject, elt)
+        while hasattr(pyobject, '__wrapped__'):
+            pyobject = pyobject.__wrapped__
+        fname = inspect.getsourcefile(pyobject).replace("\\", "/")
+    except Exception:
+        # Either the object could not be loaded or the file was not found.
+        # For instance, properties will raise.
+        return None
+
+    # retrieve start/stop lines
+    source, start_line = inspect.getsourcelines(pyobject)
+    lines = "L%d-L%d" % (start_line, start_line + len(source) - 1)
+
+    # create URL
+    if "dev" in release:
+        branch = "main"
+    else:
+        return None  # alternatively, link to a maint/version branch
+    try:
+        fname = fname.split(f"/{package}/{package}/")[1]
+        url = f"{gh_url}/blob/{branch}/{package}/{fname}#{lines}"
+    except IndexError:
+        # this is an MNE function
+        fname = fname.split("/mne/")[1]
+        url = f"https://github.com/mne-tools/mne-python/blob/{branch}/mne/{fname}#{lines}"  # noqa
+    return url
+
+
 # -- sphinx-gallery ----------------------------------------------------------
 sphinx_gallery_conf = {
     "backreferences_dir": "generated/backreferences",
@@ -236,7 +288,7 @@ sphinx_gallery_conf = {
     "examples_dirs": [str(Path(__file__).parent.parent.parent / "tutorials")],
     "gallery_dirs": ["generated/auto_tutorials"],
     "line_numbers": False,  # messes with style
-    "plot_gallery": True,
+    "plot_gallery": False,
     "reference_url": dict(pycrostates=None),  # documented lib uses None
     "remove_config_comments": True,
     "show_memory": sys.platform == "linux",

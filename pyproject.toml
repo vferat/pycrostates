@@ -55,12 +55,9 @@ dependencies = [
 [project.optional-dependencies]
 build = ['build', 'twine']
 docs = [
-    'm2r2',
     'memory-profiler',
-    'nbsphinx',
     'numpydoc',
     'pandas',
-    'pillow',
     'pydata-sphinx-theme',
     'pymatreader',
     'sphinx',
