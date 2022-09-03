@@ -7,7 +7,7 @@ Dependencies
 ------------
 
 * ``mne`` (>=1.0)
-* ``numpy`` (>=1.20)
+* ``numpy`` (>=1.21)
 * ``scipy``
 * ``scikit-learn``
 * ``matplotlib``
