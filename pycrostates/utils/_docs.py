@@ -55,7 +55,7 @@ cluster_names : list | None
 docdict[
     "cluster"
 ] = """
-cluster : :ref:`Clustering`
+cluster : :ref:`cluster`
     Fitted clustering algorithm from which to compute score.
     For more details about current clustering implementations,
     check the :ref:`Clustering` section of the documentation.
