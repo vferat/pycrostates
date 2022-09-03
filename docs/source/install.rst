@@ -28,7 +28,7 @@ MNE-Python is up-to-date, see `MNE installation instructions <mne install_>`_.
 
         .. code-block:: bash
 
-            pip install stimuli
+            pip install pycrostates
 
     .. tab-item:: Conda
 
@@ -36,7 +36,7 @@ MNE-Python is up-to-date, see `MNE installation instructions <mne install_>`_.
 
         .. code-block:: bash
 
-            conda install -c conda-forge stimuli
+            conda install -c conda-forge pycrostates
 
     .. tab-item:: MNE installers
 
