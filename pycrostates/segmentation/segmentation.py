@@ -315,7 +315,6 @@ class _BaseSegmentation(ABC):
         """
         return self._labels.copy()
 
-    @fill_doc
     @property
     def cluster_centers_(self) -> NDArray[float]:
         """Cluster centers (i.e topographies)
