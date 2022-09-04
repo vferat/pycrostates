@@ -56,7 +56,7 @@ for subject_id in subject_ids:
     gfp_peaks = extract_gfp_peaks(raw)
     # Subject level clustering
     ModK.fit(gfp_peaks, n_jobs=n_jobs)
-    individual_cluster_centers.append(gfp_peaks.get_data())
+    individual_cluster_centers.append(ModK.cluster_centers_.T)
 
 group_cluster_centers = np.hstack(individual_cluster_centers)
 group_cluster_centers = ChData(group_cluster_centers, ModK.info)
@@ -69,8 +69,8 @@ ModK.plot()
 #%%
 # We can reorganize our clustering results to our needs.
 
-ModK.reorder_clusters(order=[2, 3, 4, 1, 0])
-ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
+ModK.reorder_clusters(order=[4, 2, 0, 1, 3])
+ModK.rename_clusters(new_names=["MS1", "MS2", "MS3", "MS4", "MS5"])
 ModK.plot()
 
 #%%
