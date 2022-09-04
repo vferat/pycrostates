@@ -41,7 +41,7 @@ gfp_data = extract_gfp_peaks(raw, min_peak_distance=3)
 gfp_data
 
 #%%
-# This function can also be used on :func:`~mne.epochs.Epochs`
+# This function can also be used on :class:`~mne.Epochs`
 
 epochs = mne.make_fixed_length_epochs(raw, duration=2, preload=True)
 gfp_data = extract_gfp_peaks(epochs, min_peak_distance=3)

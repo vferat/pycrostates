@@ -1,3 +1,5 @@
+.. include:: ../links.inc
+
 Install
 =======
 
@@ -5,7 +7,7 @@ Dependencies
 ------------
 
 * ``mne`` (>=1.0)
-* ``numpy`` (>=1.20)
+* ``numpy`` (>=1.21)
 * ``scipy``
 * ``scikit-learn``
 * ``matplotlib``
@@ -13,35 +15,41 @@ Dependencies
 * ``decorator``
 * ``jinja2``
 
-We require that you use Python 3.7 or higher.
-You may choose to install ``pycrostates`` via conda or via pip.
+We require that you use Python ``3.7`` or higher.
 
 pycrostates works best with the latest stable release of MNE-Python. To ensure
-MNE-Python is up-to-date, see their `installation instructions <https://mne.tools/stable/install/index.html>`_.
+MNE-Python is up-to-date, see `MNE installation instructions <mne install_>`_.
 
-As of MNE-Python 1.1, ``pycrostates`` is distributed in the
-`MNE standalone installers <https://mne.tools/stable/install/installers.html>`_.
+.. tab-set::
 
-Installation via Conda
-----------------------
+    .. tab-item:: Pypi
 
-To install the latest stable version, use ``conda`` in your terminal:
+        ``pycrostates`` can be installed from `Pypi <project pypi_>`_:
 
-.. code-block:: bash
+        .. code-block:: bash
 
-    $ conda install -c conda-forge pycrostates
+            pip install pycrostates
 
-Installation via Pip
---------------------
+    .. tab-item:: Conda
 
-To install the latest stable version, use ``pip`` in your terminal:
+        ``pycrostates`` can be installed from `conda-forge <project conda_>`_:
 
-.. code-block:: bash
+        .. code-block:: bash
 
-    $ pip install pycrostates
+            conda install -c conda-forge pycrostates
 
-To install the latest development version, run:
+    .. tab-item:: MNE installers
 
-.. code-block:: bash
+        As of MNE-Python 1.1, ``pycrostates`` is distributed in the
+        `MNE standalone installers <mne installers_>`_.
 
-    $ pip install git+https://github.com/vferat/pycrostates
+        The installers create a conda environment with the entire MNE-ecosystem
+        setup, and more!
+
+    .. tab-item:: Snapshot of the current version
+
+        ``pycrostates`` can be installed from `GitHub <project github_>`_:
+
+        .. code-block:: bash
+
+            $ pip install git+https://github.com/vferat/pycrostates
