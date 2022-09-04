@@ -20,6 +20,7 @@ project = "pycrostates"
 author = "Victor Férat"
 copyright = f"{date.today().year}, {author}"
 release = pycrostates.__version__
+version = pycrostates.__version__
 package = pycrostates.__name__
 gh_url = "https://github.com/vferat/pycrostates"
 
