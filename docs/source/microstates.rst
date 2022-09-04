@@ -1,10 +1,10 @@
+.. include:: ../links.inc
+
 Microstates
 ===========
 
-.. include:: ../links.inc
-
 What is EEG microstates ?
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 Microstates analysis is a method allowing investigation of spatiotemporal
 characteristics of EEG recordings. It consists of breaking down the
@@ -15,10 +15,10 @@ called microstate map or microstate topography.
 .. sidebar:: Looking for more information?
 
     If you are looking to learn more about microstates we recommend you to read
-    the following review: `michel 2018`_.
+    the following review: :footcite:t:`MICHEL2018577`.
 
 How to compute EEG microstates ?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------
 
 This decomposition is based on two consecutive steps: the clustering which
 allows to define topographies that best represent the studied data and the
@@ -34,6 +34,11 @@ polarity.
 
 Pycrostates implements a convenient class
 :class:`pycrostates.cluster.ModKMeans` to perform clustering through
-the :meth:`pycrostates.cluster.ModKMeans.fit` method and backfitting through
-the :meth:`pycrostates.cluster.ModKMeans.predict` method. It also implements
+the :meth:`~pycrostates.cluster.ModKMeans.fit` method and backfitting through
+the :meth:`~pycrostates.cluster.ModKMeans.predict` method. It also implements
 other methods to facilitate the analysis and display of results.
+
+References
+----------
+
+.. footbibliography::

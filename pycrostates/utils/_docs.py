@@ -43,7 +43,7 @@ n_clusters : int
 docdict[
     "cluster_centers"
 ] = """
-cluster_centers : Array (n_clusters, n_channels)
+cluster_centers : array (n_clusters, n_channels)
     Fitted clusters, i.e. the microstates maps."""
 docdict[
     "cluster_names"
@@ -55,7 +55,7 @@ cluster_names : list | None
 docdict[
     "cluster"
 ] = """
-cluster : :ref:`Clustering`.
+cluster : :ref:`cluster`
     Fitted clustering algorithm from which to compute score.
     For more details about current clustering implementations,
     check the :ref:`Clustering` section of the documentation.
@@ -65,25 +65,31 @@ cluster : :ref:`Clustering`.
 docdict[
     "fname_fiff"
 ] = """
-fname : path-like
-    Path to the .fif file where the clustering solution is saved."""
+fname : str | Path
+    Path to the ``.fif`` file where the clustering solution is saved."""
 
 # -- Segmentation --
 docdict[
+    "cluster_centers_seg"
+] = """
+cluster_centers : array (n_clusters, n_channels)
+     Clusters, i.e. the microstates maps used to compute the segmentation."""
+docdict[
     "labels_raw"
 ] = """
-labels : Array (n_samples, )
+labels : array (n_samples, )
     Microstates labels attributed to each sample, i.e. the segmentation."""
 docdict[
     "labels_epo"
 ] = """
-labels : Array (n_epochs, n_samples)
+labels : array (n_epochs, n_samples)
     Microstates labels attributed to each sample, i.e. the segmentation."""
 # TODO: predict_parameters docstring is missing.
 docdict[
     "predict_parameters"
 ] = """
-predict_parameters : dict | None"""
+predict_parameters : dict | None
+    The prediction parameters."""
 
 # ------ Viz -------
 docdict[

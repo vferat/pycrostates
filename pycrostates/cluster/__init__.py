@@ -1,4 +1,4 @@
-"""Module dedicated to clusering algorithms.
+"""Module dedicated to clustering algorithms.
 """
 
 from .kmeans import ModKMeans  # noqa: F401

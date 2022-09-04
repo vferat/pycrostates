@@ -1,4 +1,2 @@
 Clustering
 ==========
-
-Clustering tutorials

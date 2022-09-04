@@ -17,11 +17,11 @@ from ...utils._config import get_config
 
 
 def data_path(subject_id: str, condition: str) -> Path:
-    """Get path to a local copy of preprocessed EEG recording from the LEMON dataset.
+    r"""Get path to a local copy of preprocessed EEG recording from the LEMON dataset.
 
     Get path to a local copy of preprocessed EEG recording from the
     mind-brain-body dataset of MRI, EEG, cognition, emotion, and peripheral
-    physiology in young and old adults.
+    physiology in young and old adults\ :footcite:p:`babayan_mind-brain-body_2019`.
     If there is no local copy of the recording, this function will fetch it
     from the online repository and store it. The default location is
     ``~/pycrostates_data``.
@@ -31,7 +31,7 @@ def data_path(subject_id: str, condition: str) -> Path:
     subject_id : str
         The subject id to use. For example ``'010276'``.
         The list of available subjects can be found
-        at https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Raw_BIDS_ID.
+        on this `FTP server <https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Raw_BIDS_ID>`_.
     condition : str
         Can be ``'EO'`` for eyes open condition or ``'EC'`` for eyes closed
         condition.
@@ -40,13 +40,6 @@ def data_path(subject_id: str, condition: str) -> Path:
     -------
     path : Path
         Path to a local copy of the requested recording.
-
-    References
-    ----------
-    .. [1] Babayan, A., Erbey, M., Kumral, D. et al.
-           A mind-brain-body dataset of MRI, EEG, cognition, emotion,
-           and peripheral physiology in young and old adults. Sci Data 6, 180308 (2019).
-           https://doi.org/10.1038/sdata.2018.308
 
     Notes
     -----
@@ -60,6 +53,10 @@ def data_path(subject_id: str, condition: str) -> Path:
 
     Note that an environment created via the MNE installers includes
     ``pymatreader`` by default.
+
+    References
+    ----------
+    .. footbibliography::
     """  # noqa: E501
     _check_type(subject_id, (str,), "subject_id")
     _check_type(condition, (str,), "condition")

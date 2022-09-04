@@ -9,12 +9,15 @@
    nipy, NIPY, Nipy, etc...
 
 
-.. python
+.. project
 
-.. _`mne-python`: http://mne.tools/mne-python-intro
+.. _project pypi: https://pypi.org/project/pycrostates/
+.. _project conda: https://anaconda.org/conda-forge/pycrostates
+.. _project github: https://github.com/vferat/pycrostates
 
 
-.. citations
+.. mne
 
-.. _`michel 2018`: https://doi.org/10.1016/j.neuroimage.2017.11.062
-
+.. _mne stable: https://mne.tools/stable/index.html
+.. _mne install: https://mne.tools/stable/install/index.html
+.. _mne installers: https://mne.tools/stable/install/installers.html
