@@ -113,6 +113,10 @@ exclude_patterns = []
 html_theme = "pydata_sphinx_theme"
 
 html_theme_options = {
+    "logo": {
+        "image_light": "img/Pycrostates_logo_black.png",
+        "image_dark": "img/Pycrostates_logo_white.png",
+    },
     "icon_links": [
         {
             "name": "GitHub",
