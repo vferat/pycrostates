@@ -2,6 +2,8 @@
 
 import numpy as np
 import pytest
+from mne import create_info
+from mne.io.pick import _picks_to_idx
 
 from pycrostates.cluster._base import _BaseCluster
 
@@ -67,6 +69,41 @@ def test_reject_short_segments():
     )
     segmentation = _BaseCluster._reject_short_segments(segmentation, data, 3)
     assert [0, 0, 1, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2] == segmentation
+
+
+def test_check_picks_uniqueness():
+    """Test method _check_picks_uniqueness."""
+    # valid
+    info = create_info(5, 1000, "eeg")
+    picks = _picks_to_idx(info, "eeg")
+    _BaseCluster._check_picks_uniqueness(info, picks)
+    picks = _picks_to_idx(info, "all")
+    _BaseCluster._check_picks_uniqueness(info, picks)
+
+    info = create_info(5, 1000, ["eeg", "eeg", "eog", "ecg", "grad"])
+    picks = _picks_to_idx(info, "eeg")
+    _BaseCluster._check_picks_uniqueness(info, picks)
+    picks = _picks_to_idx(info, "eog")
+    _BaseCluster._check_picks_uniqueness(info, picks)
+    picks = _picks_to_idx(info, "ecg")
+    _BaseCluster._check_picks_uniqueness(info, picks)
+    picks = _picks_to_idx(info, "meg")
+    _BaseCluster._check_picks_uniqueness(info, picks)
+    info["bads"] = [info.ch_names[-1]]
+    picks = _picks_to_idx(info, "data")
+    _BaseCluster._check_picks_uniqueness(info, picks)
+
+    # invalid
+    info = create_info(5, 1000, ["eeg", "eeg", "eog", "ecg", "grad"])
+    picks = _picks_to_idx(info, "data")
+    with pytest.raises(ValueError, match="Only one datatype can be selected"):
+        _BaseCluster._check_picks_uniqueness(info, picks)
+    picks = _picks_to_idx(info, "all")
+    with pytest.raises(ValueError, match="Only one datatype can be selected"):
+        _BaseCluster._check_picks_uniqueness(info, picks)
+    picks = _picks_to_idx(info, [1, 2, 3])
+    with pytest.raises(ValueError, match="Only one datatype can be selected"):
+        _BaseCluster._check_picks_uniqueness(info, picks)
 
 
 # TODO: Add tests for _smooth_segmentation and _segment?

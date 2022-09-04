@@ -35,7 +35,7 @@ raw.set_eeg_reference('average')
 #%%
 # We can now use the :func:`~pycrostates.preprocessing.resample` function to
 # draw ``n_resamples`` of ``n_samples`` for our recording where ``n_samples``
-# defines the number of sample contained in each epoch and ``n_resamples``
+# defines the number of samples contained in each epoch and ``n_resamples``
 # defines the number of epochs to draw.
 
 from pycrostates.preprocessing import resample
@@ -49,10 +49,13 @@ resamples
 
 resamples = resample(raw, n_resamples=10, coverage=0.5, random_state=40)
 resamples
-#%% or by setting ``n_samples`` and ``coverage``:
+
+#%%
+# or by setting ``n_samples`` and ``coverage``:
 
 resamples = resample(raw, n_samples=150, coverage=0.5, random_state=40)
 resamples
+
 #%%
 # Finally, we can also use this function to resample :class:`~mne.Epochs`
 

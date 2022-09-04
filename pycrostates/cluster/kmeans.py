@@ -141,7 +141,7 @@ class ModKMeans(_BaseCluster):
     def fit(
         self,
         inst: Union[BaseRaw, BaseEpochs],
-        picks: Picks = None,
+        picks: Picks = "eeg",
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,
         reject_by_annotation: bool = True,

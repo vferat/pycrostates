@@ -36,14 +36,15 @@ subject_ids = ["010020", "010021", "010022", "010023", "010024"]
 # Then we concatenate individual topographies into
 # a single dataset and submit it for a second round of
 # clustering (group level analysis).
+
 import numpy as np
 
-ModK = ModKMeans(n_clusters=5, random_state=42)
 n_jobs = 2
 
 individual_cluster_centers = list()
 for subject_id in subject_ids:
     # Load Data
+    ModK = ModKMeans(n_clusters=5, random_state=42)
     raw_fname = lemon.data_path(subject_id=subject_id, condition=condition)
     raw = read_raw_eeglab(raw_fname, preload=True)
     raw = lemon.standardize(raw)
@@ -55,18 +56,21 @@ for subject_id in subject_ids:
     gfp_peaks = extract_gfp_peaks(raw)
     # Subject level clustering
     ModK.fit(gfp_peaks, n_jobs=n_jobs)
-    individual_cluster_centers.append(gfp_peaks.get_data())
+    individual_cluster_centers.append(ModK.cluster_centers_.T)
 
 group_cluster_centers = np.hstack(individual_cluster_centers)
 group_cluster_centers = ChData(group_cluster_centers, ModK.info)
+
 # Group level clustering
+ModK = ModKMeans(n_clusters=5, random_state=42)
 ModK.fit(group_cluster_centers, n_jobs=n_jobs)
 ModK.plot()
 
 #%%
-# We can reorganize our clustering results to our needs
-ModK.reorder_clusters(order=[2, 3, 4, 1, 0])
-ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
+# We can reorganize our clustering results to our needs.
+
+ModK.reorder_clusters(order=[4, 2, 0, 1, 3])
+ModK.rename_clusters(new_names=["MS1", "MS2", "MS3", "MS4", "MS5"])
 ModK.plot()
 
 #%%
