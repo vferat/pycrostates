@@ -193,12 +193,12 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         reject_by_annotation: bool = True,
         n_jobs: int = 1,
     ) -> NDArray[float]:
-        """Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
+        """Compute cluster centers.
 
         Parameters
         ----------
         inst : Raw | Epochs | ChData
-            MNE `~mne.io.Raw`, `~mne.Epochs` or `~pycrostates.io.ChData`object
+            MNE `~mne.io.Raw`, `~mne.Epochs` or `~pycrostates.io.ChData` object
             containing data to transform to cluster-distance space (absolute
             spatial correlation).
         picks : str | list | slice | None
@@ -595,7 +595,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         Returns
         -------
-        segmentation : `RawSegmentation` | `EpochsSegmentation`
+        segmentation : RawSegmentation | EpochsSegmentation
             Microstate sequence derivated from instance data. Timepoints are
             labeled according to cluster centers number: ``0`` for the first
             center, ``1`` for the second, etc..
@@ -940,11 +940,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         References
         ----------
         .. [1] R. D. Pascual-Marqui, C. M. Michel and D. Lehmann.
-            Segmentation of brain electrical activity into microstates:
-            model estimation and validation.
-            IEEE Transactions on Biomedical Engineering,
-            vol. 42, no. 7, pp. 658-665, July 1995,
-            https://doi.org/10.1109/10.391164.
+               Segmentation of brain electrical activity into microstates:
+               model estimation and validation.
+               IEEE Transactions on Biomedical Engineering,
+               vol. 42, no. 7, pp. 658-665, July 1995,
+               https://doi.org/10.1109/10.391164.
         """
         Ne, Nt = data.shape
         Nu = states.shape[0]

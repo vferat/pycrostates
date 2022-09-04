@@ -20,7 +20,9 @@ from ._base import _BaseCluster
 
 @fill_doc
 class ModKMeans(_BaseCluster):
-    """Modified K-Means clustering algorithms.
+    r"""Modified K-Means clustering algorithm.
+
+    See :footcite:t:`391164` for additional information.
 
     Parameters
     ----------
@@ -30,7 +32,7 @@ class ModKMeans(_BaseCluster):
         seeds. The final result will be the run with the highest Global
         Explained Variance (GEV).
     max_iter : int
-        Maximum number of iterations of the k-means algorithm for a single run.
+        Maximum number of iterations of the K-means algorithm for a single run.
     tol : float
         Relative tolerance with regards estimate residual noise in the cluster
         centers of two consecutive iterations to declare convergence.
@@ -38,11 +40,7 @@ class ModKMeans(_BaseCluster):
 
     References
     ----------
-    .. [1] `Pascual-Marqui RD, Michel CM, Lehmann D. (1995).
-       "Segmentation of brain electrical activity into microstates:
-        model estimation and validation.".
-       IEEE Trans Biomed Eng.
-       <https://doi.org/10.1109/10.391164>`_
+    .. footbibliography::
     """
 
     # TODO: docstring for tol doesn't look english

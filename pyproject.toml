@@ -55,16 +55,17 @@ dependencies = [
 [project.optional-dependencies]
 build = ['build', 'twine']
 docs = [
-    'm2r2',
-    'nbsphinx',
+    'memory-profiler',
     'numpydoc',
     'pandas',
-    'pillow',
     'pydata-sphinx-theme',
     'pymatreader',
-    'recommonmark',
     'sphinx',
+    'sphinxcontrib-bibtex',
+    'sphinx-copybutton',
+    'sphinx-design',
     'sphinx_gallery',
+    'sphinx-issues',
 ]
 style = [
     'black',

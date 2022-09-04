@@ -27,11 +27,11 @@ class _BaseSegmentation(ABC):
 
     Parameters
     ----------
-    labels : Array (n_samples, ) or (n_epochs, n_samples)
+    labels : array (n_samples, ) or (n_epochs, n_samples)
         Microstates labels attributed to each sample, i.e. the segmentation.
     inst : Raw | Epochs
         MNE instance used to predict the segmentation.
-    %(cluster_centers)s
+    %(cluster_centers_seg)s
     %(cluster_names)s
     %(predict_parameters)s
     """
@@ -105,34 +105,37 @@ class _BaseSegmentation(ABC):
             Keys are named as follow: ``'{microstate name}_{parameter}'``.
 
             Available parameters are listed below:
-                'mean_corr' : Mean correlation
-                    Mean correlation value of each time point assigned to a
-                    given state.
-                'gev' : Global explained variance
-                    Total explained variance expressed by a given state.
-                    It is the sum of global explained variance values of each
-                    time point assigned to a given state.
-                'timecov' : Time coverage
-                    The proportion of time during which a given state is
-                    active. This metric is expressed in percentage (%%).
-                'meandurs' : Mean duration
-                    Mean temporal duration segments assigned to a given state.
-                    This metric is expressed in seconds (s).
-                'occurrences' : occurrences
-                    Mean number of segment assigned to a given state per
-                    second. This metrics is expressed in segment per second
-                    ( . / s).
-            If return_dist is set to True, also return the following
+
+            * mean_corr : Mean correlation
+                  Mean correlation value of each time point assigned to a
+                  given state.
+            * gev : Global explained variance
+                   Total explained variance expressed by a given state.
+                   It is the sum of global explained variance values of each
+                   time point assigned to a given state.
+            * timecov : Time coverage
+                   The proportion of time during which a given state is
+                   active. This metric is expressed in percentage (%%).
+            * meandurs : Mean duration
+                   Mean temporal duration segments assigned to a given state.
+                   This metric is expressed in seconds (s).
+            * occurrences : occurrences
+                   Mean number of segment assigned to a given state per
+                   second. This metrics is expressed in segment per second
+                   ( . / s).
+
+            If return_dist is set to ``True``, also return the following
             distributions:
-                'dist_corr' : Distribution of correlations
-                    Correlation values of each time point assigned to a given
-                    state.
-                'dist_gev' : Distribution of global explained variances
-                    Global explained variance values of each time point
-                    assigned to a given state.
-                'dist_durs' : Distribution of durations.
-                    Duration of each segments assigned to a given state.
-                    Each value is expressed in seconds (s).
+
+            * dist_corr : Distribution of correlations
+                   Correlation values of each time point assigned to a given
+                   state.
+            * dist_gev : Distribution of global explained variances
+                   Global explained variance values of each time point
+                   assigned to a given state.
+            * dist_durs : Distribution of durations.
+                   Duration of each segments assigned to a given state.
+                   Each value is expressed in seconds (s).
         """
         return _BaseSegmentation._compute_microstate_parameters(
             self._labels.copy(),
@@ -314,7 +317,8 @@ class _BaseSegmentation(ABC):
 
     @property
     def cluster_centers_(self) -> NDArray[float]:
-        """Fitted clusters (the mirostates maps).
+        """Cluster centers (i.e topographies)
+        used to compute the segmentation.
 
         :type: `~numpy.array`
         """
@@ -322,7 +326,7 @@ class _BaseSegmentation(ABC):
 
     @property
     def cluster_names(self) -> List[str]:
-        """Name of the clusters.
+        """Name of the cluster centers.
 
         :type: `list`
         """
@@ -332,14 +336,14 @@ class _BaseSegmentation(ABC):
 @fill_doc
 class RawSegmentation(_BaseSegmentation):
     """
-    Contains the segmentation for a `~mne.io.Raw` instance.
+    Contains the segmentation of a `~mne.io.Raw` instance.
 
     Parameters
     ----------
     %(labels_raw)s
     raw : Raw
         `~mne.io.Raw` instance used for prediction.
-    %(cluster_centers)s
+    %(cluster_centers_seg)s
     %(cluster_names)s
     %(predict_parameters)s
     """
@@ -408,20 +412,20 @@ class RawSegmentation(_BaseSegmentation):
     # --------------------------------------------------------------------
     @property
     def raw(self) -> BaseRaw:
-        """Raw instance."""
+        """`~mne.io.Raw` instance from which the segmentation was computed."""
         return self._inst.copy()
 
 
 @fill_doc
 class EpochsSegmentation(_BaseSegmentation):
-    """Contains the segmentation for an epoch instance.
+    """Contains the segmentation of an `~mne.Epochs` instance.
 
     Parameters
     ----------
     %(labels_epo)s
     epochs : Epochs
         `~mne.Epochs` instance used for prediction.
-    %(cluster_centers)s
+    %(cluster_centers_seg)s
     %(cluster_names)s
     %(predict_parameters)s
     """
@@ -491,5 +495,5 @@ class EpochsSegmentation(_BaseSegmentation):
     # --------------------------------------------------------------------
     @property
     def epochs(self) -> BaseEpochs:
-        """Epochs instance."""
+        """`~mne.Epochs` instance from which the segmentation was computed."""
         return self._inst.copy()

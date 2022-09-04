@@ -53,9 +53,9 @@ def resample(
     n_samples : int
         Length of each epoch (in samples). See notes for additional
         information.
-    coverage : float (strictly positive)
-        Ratio between resampling data size and size of the original recording.
-        See notes for additional information.
+    coverage : float
+        Strictly positive ratio between resampling data size and size of the
+        original recording. See notes for additional information.
     replace : bool
         Whether or not to allow resampling with replacement.
     %(random_state)s

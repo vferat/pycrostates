@@ -47,6 +47,8 @@ def plot_raw_segmentation(
     %(axes_cbar)s
     %(block)s
     %(verbose)s
+    **kwargs
+        Kwargs are passed to ``axes.plot``.
 
     Returns
     -------
@@ -129,6 +131,8 @@ def plot_epoch_segmentation(
     %(axes_cbar)s
     %(block)s
     %(verbose)s
+    **kwargs
+        Kwargs are passed to ``axes.plot``.
 
     Returns
     -------

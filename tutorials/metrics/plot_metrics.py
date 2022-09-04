@@ -63,7 +63,7 @@ davies_bouldin_scores = []
 
 for k in cluster_numbers:
     ModK = ModKMeans(n_clusters=k, random_state=42)
-    ModK.fit(raw, n_jobs=12)
+    ModK.fit(raw, n_jobs=2)
     # silhouettee
     silhouette_scores.append(silhouette_score(ModK))
     # calinski and harabasz
