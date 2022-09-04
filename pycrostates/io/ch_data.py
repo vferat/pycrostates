@@ -115,6 +115,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         data = self._data.copy()
         return data[picks, :]
 
+    @fill_doc
     def pick(self, picks, exclude="bads"):
         """Pick a subset of channels.
 
@@ -124,7 +125,6 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         exclude : list | str
             Set of channels to exclude, only used when picking based on
             types (e.g., ``exclude="bads"`` when ``picks="meg"``).
-        %(verbose)s
 
         Returns
         -------
