@@ -10,6 +10,7 @@ from scipy.signal import find_peaks
 
 from .._typing import CHData, Picks
 from ..utils._checks import (
+    _check_picks_uniqueness,
     _check_reject_by_annotation,
     _check_tmin_tmax,
     _check_type,
@@ -22,7 +23,7 @@ from ..utils._logs import logger, verbose
 @verbose
 def extract_gfp_peaks(
     inst: Union[BaseRaw, BaseEpochs],
-    picks: Picks = None,
+    picks: Picks = "eeg",
     min_peak_distance: int = 2,
     tmin: Optional[float] = None,
     tmax: Optional[float] = None,
@@ -70,7 +71,7 @@ def extract_gfp_peaks(
 
     # retrieve picks
     picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
-
+    _check_picks_uniqueness(inst.info, picks)
     # retrieve data array
     kwargs = (
         dict()

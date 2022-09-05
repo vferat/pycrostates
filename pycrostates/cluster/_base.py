@@ -18,6 +18,7 @@ from ..segmentation import EpochsSegmentation, RawSegmentation
 from ..utils import _corr_vectors
 from ..utils._checks import (
     _check_n_jobs,
+    _check_picks_uniqueness,
     _check_reject_by_annotation,
     _check_tmin_tmax,
     _check_type,
@@ -232,7 +233,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             inst.info, picks, none="all", exclude=[]
         )
         picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
-        _BaseCluster._check_picks_uniqueness(inst.info, picks)
+        _check_picks_uniqueness(inst.info, picks)
         ch_not_used = set(picks_bads_inc) - set(picks)
         if len(ch_not_used) != 0:
             if len(ch_not_used) == 1:
@@ -1181,18 +1182,3 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 f"Provided: '{n_clusters}'."
             )
         return n_clusters
-
-    @staticmethod
-    def _check_picks_uniqueness(info, picks):
-        info = pick_info(info, picks, copy=True)
-        if len(info.get_channel_types(unique=True)) != 1:
-            ch_types = info.get_channel_types(unique=False)
-            ch_types, counts = np.unique(ch_types, return_counts=True)
-            channels_msg = ", ".join(
-                "%s '%s' channel(s)" % t for t in zip(counts, ch_types)
-            )
-            msg = (
-                "Only one datatype can be selected for fitting, but 'picks' "
-                f"results in {channels_msg}."
-            )
-            raise ValueError(msg)
