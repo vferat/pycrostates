@@ -283,6 +283,7 @@ def _check_tmin_tmax(inst, tmin, tmax):
 
 
 def _check_picks_uniqueness(info, picks):
+    """Check that the provided picks yield a single channel type."""
     info = pick_info(info, picks, copy=True)
     if len(info.get_channel_types(unique=True)) != 1:
         ch_types = info.get_channel_types(unique=False)
