@@ -24,6 +24,7 @@ from ..utils._logs import logger, verbose
 def extract_gfp_peaks(
     inst: Union[BaseRaw, BaseEpochs],
     picks: Picks = "eeg",
+    return_all: bool = False,
     min_peak_distance: int = 2,
     tmin: Optional[float] = None,
     tmax: Optional[float] = None,
@@ -40,7 +41,8 @@ def extract_gfp_peaks(
     inst : Raw | Epochs
         Instance from which to extract :term:`global field power` (GFP) peaks.
     picks : str | list | slice | None
-        Channels to include. Note that all channels selected must have the
+        Channels to use for GFP computation.
+        Note that all channels selected must have the
         same type. Slices and lists of integers will be interpreted as
         channel indices. In lists, channel name strings (e.g.
         ``['Fp1', 'Fp2']``) will pick the given channels. Can also be the
@@ -48,6 +50,11 @@ def extract_gfp_peaks(
         channels. ``"eeg"`` (default) will pick all eeg channels.
         Note that channels in ``info['bads']`` will be included if their
         names or indices are explicitly provided.
+    return_all : bool
+        If True, output ChData instance will include all channels.
+        If False, output ChData instance will only include channels
+        used for GFP computation (i.e picks).
+        Default to False.
     min_peak_distance : int
         Required minimal horizontal distance (``≥ 1`) in samples between
         neighboring peaks. Smaller peaks are removed first until the condition
@@ -79,6 +86,7 @@ def extract_gfp_peaks(
 
     # retrieve picks
     picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
+    picks_all = _picks_to_idx(inst.info, inst.ch_names, none="all", exclude="bads")
     _check_picks_uniqueness(inst.info, picks)
     # retrieve data array
     kwargs = (
@@ -87,15 +95,28 @@ def extract_gfp_peaks(
         else dict(reject_by_annotation=reject_by_annotation)
     )
     data = inst.get_data(picks=picks, tmin=tmin, tmax=tmax, **kwargs)
+    if return_all:
+        data_all = inst.get_data(
+            picks=picks_all, tmin=tmin, tmax=tmax, **kwargs
+        )
     assert data.ndim in (2, 3)  # sanity-check
 
     # extract GFP peaks
     if data.ndim == 2:
-        peaks = _extract_gfp_peaks(data, min_peak_distance)
+        ind_peaks = _extract_gfp_peaks(data, min_peak_distance)
+        if return_all:
+            peaks = data_all[:, ind_peaks]
+        else:
+            peaks = data[:, ind_peaks]
     elif data.ndim == 3:
         peaks = list()  # run epoch per epoch
         for k in range(data.shape[0]):
-            peaks.append(_extract_gfp_peaks(data[k, :, :], min_peak_distance))
+            ind_peaks = _extract_gfp_peaks(data[k, :, :], min_peak_distance)
+            print(ind_peaks)
+            if return_all:
+                peaks.append(data_all[k, :, ind_peaks].T) # TODO: why .T
+            else:
+                peaks.append(data[k, :, ind_peaks].T)
         peaks = np.hstack(peaks)
 
     n_samples = data.shape[-1]
@@ -109,7 +130,10 @@ def extract_gfp_peaks(
         peaks.shape[1] / n_samples * 100,
     )
 
-    return ChData(peaks, pick_info(inst.info, picks))
+    if return_all:
+        return ChData(peaks, pick_info(inst.info, picks_all))
+    else:
+        return ChData(peaks, pick_info(inst.info, picks))
 
 
 def _extract_gfp_peaks(
@@ -128,9 +152,9 @@ def _extract_gfp_peaks(
 
     Returns
     -------
-    data : array of shape (n_channels, n_samples)
-        The data points at the GFP peaks.
+    peaks : array of shape (n_picks)
+        The indices when peaks occur.
     """
     gfp = np.std(data, axis=0)
     peaks, _ = find_peaks(gfp, distance=min_peak_distance)
-    return data[:, peaks]
+    return peaks
