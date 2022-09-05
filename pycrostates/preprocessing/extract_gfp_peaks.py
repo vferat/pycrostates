@@ -39,7 +39,15 @@ def extract_gfp_peaks(
     ----------
     inst : Raw | Epochs
         Instance from which to extract :term:`global field power` (GFP) peaks.
-    %(picks_all)s
+    picks : str | list | slice | None
+        Channels to include. Note that all channels selected must have the
+        same type. Slices and lists of integers will be interpreted as
+        channel indices. In lists, channel name strings (e.g.
+        ``['Fp1', 'Fp2']``) will pick the given channels. Can also be the
+        string values “all” to pick all channels, or “data” to pick data
+        channels. ``"eeg"`` (default) will pick all eeg channels.
+        Note that channels in ``info['bads']`` will be included if their
+        names or indices are explicitly provided.
     min_peak_distance : int
         Required minimal horizontal distance (``≥ 1`) in samples between
         neighboring peaks. Smaller peaks are removed first until the condition
