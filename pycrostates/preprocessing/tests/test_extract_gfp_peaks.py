@@ -42,7 +42,7 @@ def test_extract_gfp(inst, caplog):
     # with return_all
     ch_data = extract_gfp_peaks(inst, picks=inst.ch_names[0], return_all=True)
     assert isinstance(ch_data, ChData)
-    assert ch_data.info['ch_names'] == inst.ch_names
+    assert ch_data.info["ch_names"] == inst.ch_names
 
     # with tmin/tmax
     tmin = None

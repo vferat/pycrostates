@@ -86,7 +86,9 @@ def extract_gfp_peaks(
 
     # retrieve picks
     picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
-    picks_all = _picks_to_idx(inst.info, inst.ch_names, none="all", exclude="bads")
+    picks_all = _picks_to_idx(
+        inst.info, inst.ch_names, none="all", exclude="bads"
+    )
     _check_picks_uniqueness(inst.info, picks)
     # retrieve data array
     kwargs = (
@@ -114,7 +116,7 @@ def extract_gfp_peaks(
             ind_peaks = _extract_gfp_peaks(data[k, :, :], min_peak_distance)
             print(ind_peaks)
             if return_all:
-                peaks.append(data_all[k, :, ind_peaks].T) # TODO: why .T
+                peaks.append(data_all[k, :, ind_peaks].T)  # TODO: why .T
             else:
                 peaks.append(data[k, :, ind_peaks].T)
         peaks = np.hstack(peaks)
