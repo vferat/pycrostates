@@ -2,8 +2,6 @@
 
 import numpy as np
 import pytest
-from mne import create_info
-from mne.io.pick import _picks_to_idx
 
 from pycrostates.cluster._base import _BaseCluster
 
