@@ -80,7 +80,7 @@ def test_write_and_read(tmp_path, caplog):
     assert "Reading clustering solution" in caplog.text
     assert version == __version__
 
-    # compare
+    # compare (also compares the ChInfo)
     assert ModK == ModK1
     assert ModK == ModK2
     assert ModK1 == ModK2  # sanity-check
