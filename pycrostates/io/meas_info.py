@@ -7,7 +7,12 @@ from typing import List, Optional, Tuple, Union
 import numpy as np
 from mne.io import Info
 from mne.io.constants import FIFF
-from mne.io.meas_info import _check_bads, _check_ch_keys, _check_dev_head_t, _unique_channel_names
+from mne.io.meas_info import (
+    _check_bads,
+    _check_ch_keys,
+    _check_dev_head_t,
+    _unique_channel_names,
+)
 from mne.io.pick import get_channel_type_constants
 from mne.io.proj import Projection
 from mne.io.tag import _ch_coord_dict
@@ -216,15 +221,17 @@ class ChInfo(CHInfo, Info):
 
     def _init_from_info(self, info: Info):
         """Init instance from mne Info."""
-        self["custom_ref_applied"] = info["custom_ref_applied"]
-        self["bads"] = info["bads"]
+        self["custom_ref_applied"] = info.get(
+            "custom_ref_applied", FIFF.FIFFV_MNE_CUSTOM_REF_OFF
+        )
+        self["bads"] = info.get("bads", [])
         self["chs"] = info["chs"]
-        self["dev_ctf_t"] = info["dev_ctf_t"]
-        self["dev_ctf_t"] = info["dev_ctf_t"]
-        self["dev_head_t"] = info["dev_head_t"]
-        self["dig"] = info["dig"]
-        self["comps"] = info["comps"]
-        self["projs"] = info["projs"]
+        self["ctf_head_t"] = info.get("ctf_head_t", None)
+        self["dev_ctf_t"] = info.get("dev_ctf_t", None)
+        self["dev_head_t"] = info.get("dev_head_t", None)
+        self["dig"] = info.get("dig", None)
+        self["comps"] = info.get("comps", [])
+        self["projs"] = info.get("projs", [])
         self._update_redundant()
 
     def _init_from_channels(
