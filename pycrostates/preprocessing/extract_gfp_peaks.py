@@ -110,12 +110,12 @@ def extract_gfp_peaks(
     elif isinstance(inst, BaseEpochs):
         peaks = list()  # run epoch per epoch
         for k in range(len(inst)):
-            data = np.squeeze(inst[k].get_data(picks=picks, **kwargs))
+            data = inst[k].get_data(picks=picks, **kwargs)[0, :, :]
             # data is 2D, of shape (n_channels, n_samples)
             ind_peaks = _extract_gfp_peaks(data, min_peak_distance)
             if return_all:
                 del data  # free up memory
-                data = np.squeeze(inst[k].get_data(picks=picks_all, **kwargs))
+                data = inst[k].get_data(picks=picks_all, **kwargs)[0, :, :]
             peaks.append(data[:, ind_peaks])
         peaks = np.hstack(peaks)
 
