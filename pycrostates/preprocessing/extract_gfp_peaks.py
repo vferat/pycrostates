@@ -116,7 +116,7 @@ def extract_gfp_peaks(
             if return_all:
                 del data  # free up memory
                 data = np.squeeze(inst[k].get_data(picks=picks_all, **kwargs))
-            peaks.append(data[:, ind_peaks].T)
+            peaks.append(data[:, ind_peaks])
         peaks = np.hstack(peaks)
 
     n_samples = inst.times.size
@@ -130,7 +130,7 @@ def extract_gfp_peaks(
         peaks.shape[1] / n_samples * 100,
     )
 
-    info = pick_info(inst.info, picks=picks_all if return_all else picks)
+    info = pick_info(inst.info, picks_all if return_all else picks)
     return ChData(peaks, info)
 
 
