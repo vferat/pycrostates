@@ -893,17 +893,11 @@ def test_picks_fit_predict(caplog):
     )
 
     # test invalid fit
-    with pytest.raises(
-        ValueError, match="Only one datatype can be selected for fitting"
-    ):
+    with pytest.raises(ValueError, match="Only one datatype can be selected"):
         ModK_.fit(raw, picks=None)  # fails -> eeg + grad + mag
-    with pytest.raises(
-        ValueError, match="Only one datatype can be selected for fitting"
-    ):
+    with pytest.raises(ValueError, match="Only one datatype can be selected"):
         ModK_.fit(raw, picks="meg")  # fails -> grad + mag
-    with pytest.raises(
-        ValueError, match="Only one datatype can be selected for fitting"
-    ):
+    with pytest.raises(ValueError, match="Only one datatype can be selected"):
         ModK_.fit(raw, picks="data")  # fails -> eeg + grad + mag
 
     # test valid fit
