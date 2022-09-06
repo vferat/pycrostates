@@ -119,7 +119,7 @@ def extract_gfp_peaks(
             peaks.append(data[:, ind_peaks].T)
         peaks = np.hstack(peaks)
 
-    n_samples = data.shape[-1]
+    n_samples = inst.times.size
     if isinstance(inst, BaseEpochs):
         n_samples *= len(inst)
     logger.info(
@@ -130,10 +130,8 @@ def extract_gfp_peaks(
         peaks.shape[1] / n_samples * 100,
     )
 
-    if return_all:
-        return ChData(peaks, pick_info(inst.info, picks_all))
-    else:
-        return ChData(peaks, pick_info(inst.info, picks))
+    info = pick_info(inst.info, picks=picks_all if return_all else picks)
+    return ChData(peaks, info)
 
 
 def _extract_gfp_peaks(
