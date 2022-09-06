@@ -366,19 +366,12 @@ class ChInfo(CHInfo, Info):
             if self["custom_ref_applied"] != other["custom_ref_applied"]:
                 return False
 
-            # compare projs
-            if self["projs"] != other["projs"]:
-                return False
-
             # compare coordinate transformation
-            if self["ctf_head_t"] != other["ctf_head_t"]:
-                return False
-            if self["dev_ctf_t"] != other["dev_ctf_t"]:
-                return False
-            if self["dev_head_t"] != other["dev_head_t"]:
-                return False
+            for transform in ("ctf_head_t", "dev_ctf_t", "dev_head_t"):
+                if self[transform] != other[transform]:
+                    return False
 
-            # TODO: compare compensation grades
+            # TODO: compare compensation grades and projs
 
             if self["bads"] != other["bads"]:
                 logger.warning("Both info do not have the same bad channels.")
