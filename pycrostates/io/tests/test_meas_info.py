@@ -1,7 +1,6 @@
 """Test meas_info.py"""
 
 from collections import OrderedDict
-from pathlib import Path
 
 import numpy as np
 import pytest
@@ -20,7 +19,7 @@ logger.propagate = True
 
 directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
-raw = read_raw_fif(fname, preload=True)
+raw = read_raw_fif(fname, preload=False)
 
 
 def test_create_from_info():
@@ -41,6 +40,9 @@ def test_create_from_info():
     assert chinfo["dig"] is None
     assert chinfo["custom_ref_applied"] == FIFF.FIFFV_MNE_CUSTOM_REF_OFF
     assert chinfo["nchan"] == 3
+    assert chinfo["ctf_head_t"] is None
+    assert chinfo["dev_ctf_t"] is None
+    assert chinfo["dev_head_t"] is None
 
     # test changing a value from info
     with info._unlock():
@@ -62,6 +64,9 @@ def test_create_from_info():
         assert not all(np.isnan(elt) for elt in ch["loc"])
     assert chinfo["dig"] is not None
     assert chinfo["nchan"] == 3
+    assert chinfo["ctf_head_t"] is None
+    assert chinfo["dev_ctf_t"] is None
+    assert chinfo["dev_head_t"] is None
 
     # test with multiple channel types
     ch_names = [f"MEG{n:03}" for n in range(1, 10)] + ["EOG001"]
@@ -95,12 +100,17 @@ def test_create_from_info():
         assert ch["ch_name"] == ch_names[k]
         assert all(np.isnan(elt) for elt in ch["loc"])
 
-    # test with a file with projs
-    directory = Path(testing.data_path()) / "MEG" / "sample"
-    fname = directory / "sample_audvis_trunc_raw.fif"
-    raw = read_raw_fif(fname, preload=True)
+    # test with a file with projs and coordinate transformation
     chinfo = ChInfo(info=raw.info)
     assert chinfo["projs"] == raw.info["projs"]
+    assert chinfo["ctf_head_t"] is not None
+    assert chinfo["dev_ctf_t"] is None
+    assert chinfo["dev_head_t"] is not None
+    assert chinfo["dev_head_t"]["from"] == raw.info["dev_head_t"]["from"]
+    assert chinfo["dev_head_t"]["to"] == raw.info["dev_head_t"]["to"]
+    assert np.isclose(
+        chinfo["dev_head_t"]["trans"], raw.info["dev_head_t"]["trans"]
+    )
 
 
 def test_create_from_info_invalid_arguments():
