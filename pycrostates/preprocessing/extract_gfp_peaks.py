@@ -51,10 +51,10 @@ def extract_gfp_peaks(
         Note that channels in ``info['bads']`` will be included if their
         names or indices are explicitly provided.
     return_all : bool
-        If True, output ChData instance will include all channels.
-        If False, output ChData instance will only include channels
-        used for GFP computation (i.e picks).
-        Default to False.
+        If True, the returned `~pycrostates.io.ChData` instance will 
+        include all channels.
+        If False (default), the returned `~pycrostates.io.ChData` instance will
+        only include channels used for GFP computation (i.e ``picks``).
     min_peak_distance : int
         Required minimal horizontal distance (``≥ 1`) in samples between
         neighboring peaks. Smaller peaks are removed first until the condition
