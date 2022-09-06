@@ -90,35 +90,33 @@ def extract_gfp_peaks(
         inst.info, inst.ch_names, none="all", exclude="bads"
     )
     _check_picks_uniqueness(inst.info, picks)
-    # retrieve data array
-    kwargs = (
-        dict()
-        if isinstance(inst, BaseEpochs)
-        else dict(reject_by_annotation=reject_by_annotation)
-    )
-    data = inst.get_data(picks=picks, tmin=tmin, tmax=tmax, **kwargs)
-    if return_all:
-        data_all = inst.get_data(
-            picks=picks_all, tmin=tmin, tmax=tmax, **kwargs
-        )
-    assert data.ndim in (2, 3)  # sanity-check
+
+    # set kwargs for .get_data()
+    kwargs = dict(tmin=tmin, tmax=tmax)
+    if isinstance(inst, BaseRaw):
+        kwargs["reject_by_annotation"] = reject_by_annotation
 
     # extract GFP peaks
-    if data.ndim == 2:
+    if isinstance(inst, BaseRaw):
+        # retrieve data array on which we look for GFP peaks
+        data = inst.get_data(picks=picks, **kwargs)
+        # retrieve indices of GFP peaks
         ind_peaks = _extract_gfp_peaks(data, min_peak_distance)
+        # retrieve the peaks data
         if return_all:
-            peaks = data_all[:, ind_peaks]
-        else:
-            peaks = data[:, ind_peaks]
-    elif data.ndim == 3:
+            del data  # free up memory
+            data = inst.get_data(picks=picks_all, **kwargs)
+        peaks = data[:, ind_peaks]
+    elif isinstance(inst, BaseEpochs):
         peaks = list()  # run epoch per epoch
-        for k in range(data.shape[0]):
-            ind_peaks = _extract_gfp_peaks(data[k, :, :], min_peak_distance)
-            print(ind_peaks)
+        for k in range(len(inst)):
+            data = np.squeeze(inst[k].get_data(picks=picks, **kwargs))
+            # data is 2D, of shape (n_channels, n_samples)
+            ind_peaks = _extract_gfp_peaks(data, min_peak_distance)
             if return_all:
-                peaks.append(data_all[k, :, ind_peaks].T)  # TODO: why .T
-            else:
-                peaks.append(data[k, :, ind_peaks].T)
+                del data  # free up memory
+                data = np.squeeze(inst[k].get_data(picks=picks_all, **kwargs))
+            peaks.append(data[:, ind_peaks].T)
         peaks = np.hstack(peaks)
 
     n_samples = data.shape[-1]
