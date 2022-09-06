@@ -51,7 +51,7 @@ def extract_gfp_peaks(
         Note that channels in ``info['bads']`` will be included if their
         names or indices are explicitly provided.
     return_all : bool
-        If True, the returned `~pycrostates.io.ChData` instance will 
+        If True, the returned `~pycrostates.io.ChData` instance will
         include all channels.
         If False (default), the returned `~pycrostates.io.ChData` instance will
         only include channels used for GFP computation (i.e ``picks``).
