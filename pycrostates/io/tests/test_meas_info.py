@@ -201,7 +201,7 @@ def test_create_from_channels():
     assert chinfo["nchan"] == 3
 
 
-def test_Create_from_channels_invalid_arguments():
+def test_create_from_channels_invalid_arguments():
     """Test creation of a ChInfo from channel names and types with invalid
     args."""
     ch_names = ["1", "2", "3"]
