@@ -109,7 +109,7 @@ def extract_gfp_peaks(
         peaks = data[:, ind_peaks]
     elif isinstance(inst, BaseEpochs):
         peaks = list()  # run epoch per epoch
-        for k in range(len(inst)):
+        for k in range(len(inst)):  # pylint: disable=consider-using-enumerate
             data = inst[k].get_data(picks=picks, **kwargs)[0, :, :]
             # data is 2D, of shape (n_channels, n_samples)
             ind_peaks = _extract_gfp_peaks(data, min_peak_distance)
