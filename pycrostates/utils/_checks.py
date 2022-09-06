@@ -291,8 +291,7 @@ def _check_picks_uniqueness(info, picks):
         channels_msg = ", ".join(
             "%s '%s' channel(s)" % t for t in zip(counts, ch_types)
         )
-        msg = (
-            "Only one datatype can be selected for fitting, but 'picks' "
+        raise ValueError(
+            "Only one datatype can be selected, but 'picks' "
             f"results in {channels_msg}."
         )
-        raise ValueError(msg)
