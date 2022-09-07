@@ -21,6 +21,7 @@ from mne.io.write import (
     end_block,
     start_and_end_file,
     start_block,
+    write_coord_trans,
     write_dig_points,
     write_double_matrix,
     write_id,
@@ -418,6 +419,16 @@ def _write_meas_info(fid, info: CHInfo):
     comps = info["comps"]
     write_ctf_comp(fid, comps)
 
+    # Coordinate transformations if the HPI result block was not there
+    if info["dev_head_t"] is not None:
+        write_coord_trans(fid, info["dev_head_t"])
+
+    if info["ctf_head_t"] is not None:
+        write_coord_trans(fid, info["ctf_head_t"])
+
+    if info["dev_ctf_t"] is not None:
+        write_coord_trans(fid, info["dev_ctf_t"])
+
 
 def _read_meas_info(fid, tree):
     """Read the measurement info.
@@ -453,6 +464,9 @@ def _read_meas_info(fid, tree):
 
     # Read measurement info
     nchan = None
+    dev_head_t = None
+    ctf_head_t = None
+    dev_ctf_t = None
     chs = []
     custom_ref_applied = FIFF.FIFFV_MNE_CUSTOM_REF_OFF
     for k in range(meas_info["nent"]):
