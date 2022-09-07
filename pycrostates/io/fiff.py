@@ -538,7 +538,7 @@ def _read_meas_info(fid, tree):
     info["custom_ref_applied"] = custom_ref_applied
 
     # add coordinate transformation
-    info["dev_head_t"] = dev_head_t
+    info["dev_head_t"] = Transform("meg", "head") if dev_head_t is None else dev_head_t
     info["ctf_head_t"] = ctf_head_t
     info["dev_ctf_t"] = dev_ctf_t
     if dev_head_t is not None and ctf_head_t is not None and dev_ctf_t is None:
