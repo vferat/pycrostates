@@ -34,6 +34,8 @@ def plot_cluster_centers(
     %(cluster_names)s
     %(axes_topo)s
     %(block)s
+    **kwargs
+        Kwargs are passed to :func:`mne.viz.plot_topomap`.
 
     Returns
     -------

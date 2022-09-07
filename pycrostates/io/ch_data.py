@@ -4,7 +4,7 @@ from typing import Any, Union
 
 import numpy as np
 from mne.io import Info
-from mne.io.pick import _picks_to_idx
+from mne.io.pick import _picks_to_idx, pick_info
 from numpy.typing import NDArray
 
 from .._typing import CHData, CHInfo
@@ -115,11 +115,34 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         data = self._data.copy()
         return data[picks, :]
 
+    @fill_doc
+    def pick(self, picks, exclude="bads"):
+        """Pick a subset of channels.
+
+        Parameters
+        ----------
+        %(picks_all)s
+        exclude : list | str
+            Set of channels to exclude, only used when picking based on
+            types (e.g., ``exclude="bads"`` when ``picks="meg"``).
+
+        Returns
+        -------
+        inst : ChData
+            The instance modified in-place.
+        """
+        picks = _picks_to_idx(self._info, picks, exclude=exclude)
+        info = pick_info(self._info, picks, copy=False)
+        data = self._data[picks, :]
+        self._info = info
+        self._data = data
+        return self
+
     # --------------------------------------------------------------------
     @property
     def info(self) -> CHInfo:
         """Atemporal measurement information.
 
-        :type: `~pycrostates.io.ChInfo`
+        :type: ChInfo
         """
         return self._info

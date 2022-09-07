@@ -1,6 +1,6 @@
 """
 Group level analysis from individual gfp peaks
-====================
+==============================================
 
 In this tutorial, we will learn how to conduct group level analysis
 by computing group level topographies based on individual gfp peaks.

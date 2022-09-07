@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 from matplotlib.axes import Axes
+from mne import pick_info
 from mne.utils import check_random_state
 
 
@@ -279,3 +280,18 @@ def _check_tmin_tmax(inst, tmin, tmax):
             f"{inst.times[-1]}s instance."
         )
     return tmin, tmax
+
+
+def _check_picks_uniqueness(info, picks):
+    """Check that the provided picks yield a single channel type."""
+    info = pick_info(info, picks, copy=True)
+    if len(info.get_channel_types(unique=True)) != 1:
+        ch_types = info.get_channel_types(unique=False)
+        ch_types, counts = np.unique(ch_types, return_counts=True)
+        channels_msg = ", ".join(
+            "%s '%s' channel(s)" % t for t in zip(counts, ch_types)
+        )
+        raise ValueError(
+            "Only one datatype can be selected, but 'picks' "
+            f"results in {channels_msg}."
+        )

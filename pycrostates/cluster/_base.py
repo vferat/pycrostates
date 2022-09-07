@@ -15,9 +15,10 @@ from scipy.signal import convolve2d
 
 from .._typing import CHData, Picks
 from ..segmentation import EpochsSegmentation, RawSegmentation
-from ..utils import _compare_infos, _corr_vectors
+from ..utils import _corr_vectors
 from ..utils._checks import (
     _check_n_jobs,
+    _check_picks_uniqueness,
     _check_reject_by_annotation,
     _check_tmin_tmax,
     _check_type,
@@ -168,25 +169,48 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         assert self._fitted_data is not None
         assert self._labels_ is not None
 
+    def _check_unfitted(self):
+        """Check if the cluster is unfitted."""
+        if self.fitted:
+            raise RuntimeError(
+                "Clustering algorithm must be unfitted before using "
+                f"{self.__class__.__name__}. You can set the property "
+                "'.fitted' to False if you want to remove the instance fit."
+            )
+        # sanity-check
+        assert self._cluster_centers_ is None
+        assert self._info is None
+        assert self._fitted_data is None
+        assert self._labels_ is None
+
     @abstractmethod
     @fill_doc
     def fit(
         self,
         inst: Union[BaseRaw, BaseEpochs, CHData],
-        picks: Picks = None,
+        picks: Picks = "eeg",
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,
         reject_by_annotation: bool = True,
         n_jobs: int = 1,
     ) -> NDArray[float]:
-        """Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
+        """Compute cluster centers.
 
         Parameters
         ----------
-        inst : Raw | Epochs
-            MNE `~mne.io.Raw` or `~mne.Epochs` object containing data to
-            transform to cluster-distance space (absolute spatial correlation).
-        %(picks_all)s
+        inst : Raw | Epochs | ChData
+            MNE `~mne.io.Raw`, `~mne.Epochs` or `~pycrostates.io.ChData` object
+            containing data to transform to cluster-distance space (absolute
+            spatial correlation).
+        picks : str | list | slice | None
+            Channels to include. Note that all channels selected must have the
+            same type. Slices and lists of integers will be interpreted as
+            channel indices. In lists, channel name strings (e.g.
+            ``['Fp1', 'Fp2']``) will pick the given channels. Can also be the
+            string values “all” to pick all channels, or “data” to pick data
+            channels. ``"eeg"`` (default) will pick all eeg channels.
+            Note that channels in ``info['bads']`` will be included if their
+            names or indices are explicitly provided.
         %(tmin_raw)s
         %(tmax_raw)s
         %(reject_by_annotation_raw)s
@@ -194,6 +218,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         """
         from ..io import ChData, ChInfo
 
+        self._check_unfitted()
         n_jobs = _check_n_jobs(n_jobs)
         _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
         if isinstance(inst, (BaseRaw, BaseEpochs)):
@@ -203,29 +228,29 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 reject_by_annotation
             )
 
-        # retrieve info
-        info = inst.info
-
         # picks
-        picks_bads_inc = _picks_to_idx(info, picks, none="all", exclude=[])
-        picks = _picks_to_idx(info, picks, none="all", exclude="bads")
+        picks_bads_inc = _picks_to_idx(
+            inst.info, picks, none="all", exclude=[]
+        )
+        picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
+        _check_picks_uniqueness(inst.info, picks)
         ch_not_used = set(picks_bads_inc) - set(picks)
         if len(ch_not_used) != 0:
             if len(ch_not_used) == 1:
                 msg = (
-                    "Channel %s is set as bad and ignored. To include "
-                    + "it, either remove it from 'inst.info['bads'] or "
-                    + "provide its name explicitly in the 'picks' argument."
+                    "The channel %s is set as bad and ignored. To include "
+                    "it, either remove it from inst.info['bads'] or "
+                    "provide it explicitly in the 'picks' argument."
                 )
             else:
                 msg = (
-                    "Channels %s are set as bads and ignored. To "
-                    + "include them, either remove them from "
-                    + "'inst.info['bads'] or provide their names "
-                    + "explicitly in the 'picks' argument."
+                    "The channels %s are set as bads and ignored. To "
+                    "include them, either remove them from "
+                    "inst.info['bads'] or provide them "
+                    "explicitly in the 'picks' argument."
                 )
             logger.warning(
-                msg, ", ".join(info["ch_names"][k] for k in ch_not_used)
+                msg, ", ".join(inst.info["ch_names"][k] for k in ch_not_used)
             )
             del msg
 
@@ -242,9 +267,22 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             data = data.reshape(data.shape[0], -1)
 
         # store picks and info
-        self._info = ChInfo(info=pick_info(info, picks_bads_inc))
+        info = pick_info(inst.info, picks, copy=True)
+        if info["bads"] != []:
+            if len(info["bads"]) == 1:
+                msg = (
+                    "The channel %s is set as bad and will be used for "
+                    "fitting."
+                )
+            else:
+                msg = (
+                    "The channels %s are set as bad and will be used for "
+                    "fitting."
+                )
+            logger.warning(msg, ", ".join(ch_name for ch_name in info["bads"]))
+            del msg
+        self._info = ChInfo(info=info)
         self._fitted_data = data
-
         return data
 
     def rename_clusters(
@@ -529,7 +567,16 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         inst : Raw | Epochs
             MNE `~mne.io.Raw` or `~mne.Epochs` object containing the data to
             use for prediction.
-        %(picks_all)s
+        picks : str | list | slice | None
+            Channels to include. Note that all channels selected must have the
+            same type. Slices and lists of integers will be interpreted as
+            channel indices. In lists, channel name strings (e.g.
+            ``['Fp1', 'Fp2']``) will pick the given channels.
+            Can also be the string values “all” to pick all channels, or “data”
+            to pick data channels. ``None`` (default) will pick all channels
+            used during fitting (e.g., ``self.info['ch_names']``).
+            Note that channels in ``info['bads']`` will be included if their
+            names or indices are explicitly provided.
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing.
         half_window_size : int
@@ -543,17 +590,17 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             this value, it will be recursively reasigned to neighbouring
             segments based on absolute spatial correlation.
         reject_edges : bool
-            If True, set first and last segments to unlabeled.
+            If ``True``, set first and last segments to unlabeled.
         %(reject_by_annotation_raw)s
         %(verbose)s
 
         Returns
         -------
-        segmentation : `RawSegmentation` | `EpochsSegmentation`
+        segmentation : RawSegmentation | EpochsSegmentation
             Microstate sequence derivated from instance data. Timepoints are
-            labeled according to cluster centers number: 0 for the first
-            center, 1 for the second, etc..
-            -1 is used for unlabeled time points.
+            labeled according to cluster centers number: ``0`` for the first
+            center, ``1`` for the second, etc..
+            ``-1`` is used for unlabeled time points.
         """
         # TODO: reject_by_annotation_raw doc probably doesn't match the correct
         # argument types.
@@ -583,40 +630,115 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         elif reject_by_annotation is None:
             reject_by_annotation = False
 
-        # check that the instance as the required channels (good + bads)
-        # inst_info must have all the channels present in cluster_info
-        _compare_infos(cluster_info=self._info, inst_info=inst.info)
-        picks_ = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
-        ch_ = [
-            ch
-            for k, ch in enumerate(inst.info["ch_names"])
-            if k in picks_ and ch in self._info["bads"]
-        ]
-        if 1 == len(ch_):
+        # warn if bad channels in self._info['bads']
+        if self._info["bads"] != []:
+            if len(self._info["bads"]) == 1:
+                msg = (
+                    "The current fit contains bad channel %s"
+                    + " which will be used for prediction."
+                )
+            else:
+                msg = (
+                    "The current fit contains bad channels %s"
+                    + " which will be used for prediction."
+                )
             logger.warning(
-                "Picked channel %s was set as "
-                "bads during fitting and will be ignored.",
-                ch_[0],
+                msg, ", ".join(ch_name for ch_name in self._info["bads"])
             )
-        elif 1 < len(ch_):
-            logger.warning(
-                "Picked channels %s were set as "
-                "bads during fitting and will be ignored.",
-                ", ".join(ch_),
-            )
+            del msg
 
-        # remove channels that were bads during fitting from picks
-        picks_ = [
-            ch
-            for k, ch in enumerate(inst.info["ch_names"])
-            if k in picks_ and ch not in self._info["bads"]
-        ]
-        picks_data = _picks_to_idx(inst.info, picks_, none="all", exclude=[])
-        good_channels = [
-            ch for ch in self._info["ch_names"] if ch not in self._info["bads"]
-        ]
-        picks_cluster_centers = np.array(
-            [good_channels.index(ch) for ch in picks_]
+        # check that the instance as the required channels (good + bads)
+        # inst.info must have all the channels that were used for fitting and
+        # are saved in self._info
+        picks = self._info["ch_names"] if picks is None else picks
+        picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
+        info = pick_info(inst.info, sel=picks, copy=True)
+
+        # look for channels used during fit that are missing in the selected
+        # channels from instance
+        missing_ch = set(self._info["ch_names"]) - set(info["ch_names"])
+        # check if the missing channels are present in instance and are not
+        # selected by the provided picks
+        missing_existing_channel = missing_ch & set(inst.ch_names)
+        missing_non_existing_channel = missing_ch - missing_existing_channel
+
+        # error for required channels missing from the provided instance
+        if len(missing_non_existing_channel) != 0:
+            missing_non_existing_channel = list(missing_non_existing_channel)
+            if len(missing_non_existing_channel) == 1:
+                msg = (
+                    f"The channel {missing_non_existing_channel[0]} was used "
+                    "during fitting but is missing from the provided instance."
+                )
+            else:
+                msg = (
+                    f"The channels {missing_non_existing_channel} were used "
+                    "during fitting but are missing from the provided "
+                    "instance."
+                )
+            raise ValueError(msg)
+
+        # error for required channels not picked from the provided instance
+        if len(missing_existing_channel) != 0:
+            missing_existing_channel = list(missing_existing_channel)
+            if len(missing_existing_channel) == 1:
+                msg = (
+                    f"The channel {missing_existing_channel[0]} is required "
+                    "to predict because it was included during fitting. The "
+                    "provided 'picks' argument does not select "
+                    f"{missing_existing_channel[0]}. To include it, either "
+                    "remove it from inst.info['bads'] or provide its name or "
+                    "indice explicitly in the 'picks' argument."
+                )
+            else:
+                msg = (
+                    f"The channels {missing_existing_channel} are required "
+                    " to predict because they were included during fitting. "
+                    "The provided 'picks' argument does not select "
+                    f"{missing_existing_channel}. To include then, either "
+                    "remove them from inst.info['bads'] or provide their "
+                    "names or indices explicitly in the 'picks' argument."
+                )
+            raise ValueError(msg)
+
+        # unused channel(s), present in inst.info but not present in self._info
+        unused_ch = set(info["ch_names"]) - set(self._info["ch_names"])
+        if len(unused_ch) != 0:
+            if len(unused_ch) == 1:
+                msg = (
+                    "The provided instance and the 'picks' argument results "
+                    "in the selection of %s which was not used during "
+                    "fitting. Thus, it will not be used for prediction."
+                )
+            else:
+                msg = (
+                    "The provided instance and the 'picks' argument results "
+                    "in the selection of %s which were not used during "
+                    "fitting. Thus, they will not be used for prediction."
+                )
+            logger.warning(msg, ", ".join(ch_name for ch_name in unused_ch))
+            del msg
+
+        # check and warn if bad channels have been selected
+        if len(info["bads"]) != 0:
+            if len(info["bads"]) == 1:
+                msg = (
+                    "The channel %s is set as bad in the instance but was "
+                    "selected. It will be used for prediction."
+                )
+            else:
+                msg = (
+                    "The channels %s are set as bad in the instance but were "
+                    "selected. They will be used for prediction."
+                )
+            logger.warning(msg, ", ".join(ch_name for ch_name in info["bads"]))
+            del msg
+
+        # the check before made sure the instance and self had the same channel
+        # selected for both the fitting and the prediction. To ensure the same
+        # pick order between self and instance, we use self._info["ch_names"].
+        picks_data = _picks_to_idx(
+            inst.info, self._info["ch_names"], none="all", exclude=[]
         )
 
         # logging messages
@@ -641,7 +763,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             segmentation = self._predict_raw(
                 inst,
                 picks_data,
-                picks_cluster_centers,
                 factor,
                 tol,
                 half_window_size,
@@ -653,7 +774,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             segmentation = self._predict_epochs(
                 inst,
                 picks_data,
-                picks_cluster_centers,
                 factor,
                 tol,
                 half_window_size,
@@ -666,7 +786,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         raw: BaseRaw,
         picks_data: NDArray[int],
-        picks_cluster_centers: NDArray[int],
         factor: int,
         tol: Union[int, float],
         half_window_size: int,
@@ -688,7 +807,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         data = raw.get_data(picks=picks_data)
         # retrieve cluster_centers_ for picks
         cluster_centers_ = deepcopy(self._cluster_centers_)
-        cluster_centers_ = cluster_centers_[:, picks_cluster_centers]
 
         if reject_by_annotation:
             # retrieve onsets/ends for BAD annotations
@@ -736,7 +854,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         epochs: BaseEpochs,
         picks_data: NDArray[int],
-        picks_cluster_centers: NDArray[int],
         factor: int,
         tol: Union[int, float],
         half_window_size: int,
@@ -756,7 +873,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         data = epochs.get_data(picks=picks_data)
         # retrieve cluster_centers_ for picks
         cluster_centers_ = deepcopy(self._cluster_centers_)
-        cluster_centers_ = cluster_centers_[:, picks_cluster_centers]
 
         segments = []
         for epoch_data in data:
@@ -825,11 +941,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         References
         ----------
         .. [1] R. D. Pascual-Marqui, C. M. Michel and D. Lehmann.
-            Segmentation of brain electrical activity into microstates:
-            model estimation and validation.
-            IEEE Transactions on Biomedical Engineering,
-            vol. 42, no. 7, pp. 658-665, July 1995,
-            https://doi.org/10.1109/10.391164.
+               Segmentation of brain electrical activity into microstates:
+               model estimation and validation.
+               IEEE Transactions on Biomedical Engineering,
+               vol. 42, no. 7, pp. 658-665, July 1995,
+               https://doi.org/10.1109/10.391164.
         """
         Ne, Nt = data.shape
         Nu = states.shape[0]

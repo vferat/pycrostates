@@ -25,12 +25,15 @@ from ..utils._logs import logger
 class ChInfo(CHInfo, Info):
     """Atemporal measurement information.
 
-    Similar to a mne.Info class, but without any temporal information. Only the
-    channel-related information are present. A ChInfo can be created either:
-        - by providing an `~mne.Info` class from which information are
-          retrieved.
-        - by providing the ``ch_names`` and the ``ch_types`` to create a new
-          instance.
+    Similar to a :class:`mne.Info` class, but without any temporal information.
+    Only the channel-related information are present. A
+    :class:`~pycrostates.io.ChInfo` can be created either:
+
+    - by providing a :class:`~mne.Info` class from which information are
+      retrieved.
+    - by providing the ``ch_names`` and the ``ch_types`` to create a new
+      instance.
+
     Only one of those 2 methods should be used at once.
 
     .. warning:: The only entry that should be manually changed by the user
@@ -41,7 +44,7 @@ class ChInfo(CHInfo, Info):
 
     Parameters
     ----------
-    info : mne.Info | None
+    info : Info | None
         MNE measurement information instance from which channel-related
         variables are retrieved.
     ch_names : list of str | int | None
