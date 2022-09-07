@@ -8,12 +8,14 @@ import pytest
 from matplotlib import pyplot as plt
 from mne import EpochsArray, create_info
 from mne.io import RawArray
+from mne.io.pick import _picks_to_idx
 from numpy.random import PCG64, Generator
 from numpy.random.mtrand import RandomState
 
 from pycrostates.utils._checks import (
     _check_axes,
     _check_n_jobs,
+    _check_picks_uniqueness,
     _check_random_state,
     _check_reject_by_annotation,
     _check_tmin_tmax,
@@ -202,3 +204,38 @@ def test_check_tmin_tmax():
         ValueError, match="Argument 'tmin' must be shorter than"
     ):
         _check_tmin_tmax(epochs, 2, None)
+
+
+def test_check_picks_uniqueness():
+    """Test _check_picks_uniqueness."""
+    # valid
+    info = create_info(5, 1000, "eeg")
+    picks = _picks_to_idx(info, "eeg")
+    _check_picks_uniqueness(info, picks)
+    picks = _picks_to_idx(info, "all")
+    _check_picks_uniqueness(info, picks)
+
+    info = create_info(5, 1000, ["eeg", "eeg", "eog", "ecg", "grad"])
+    picks = _picks_to_idx(info, "eeg")
+    _check_picks_uniqueness(info, picks)
+    picks = _picks_to_idx(info, "eog")
+    _check_picks_uniqueness(info, picks)
+    picks = _picks_to_idx(info, "ecg")
+    _check_picks_uniqueness(info, picks)
+    picks = _picks_to_idx(info, "meg")
+    _check_picks_uniqueness(info, picks)
+    info["bads"] = [info.ch_names[-1]]
+    picks = _picks_to_idx(info, "data")
+    _check_picks_uniqueness(info, picks)
+
+    # invalid
+    info = create_info(5, 1000, ["eeg", "eeg", "eog", "ecg", "grad"])
+    picks = _picks_to_idx(info, "data")
+    with pytest.raises(ValueError, match="Only one datatype can be selected"):
+        _check_picks_uniqueness(info, picks)
+    picks = _picks_to_idx(info, "all")
+    with pytest.raises(ValueError, match="Only one datatype can be selected"):
+        _check_picks_uniqueness(info, picks)
+    picks = _picks_to_idx(info, [1, 2, 3])
+    with pytest.raises(ValueError, match="Only one datatype can be selected"):
+        _check_picks_uniqueness(info, picks)
