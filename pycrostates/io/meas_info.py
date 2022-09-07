@@ -273,7 +273,7 @@ class ChInfo(CHInfo, Info):
         self["bads"] = []  # mutable, as this can be changed by the user
 
         # init empty coordinate transformation
-        self["dev_ctf_t"] = None
+        self["ctf_head_t"] = None
         self["dev_ctf_t"] = None
         self["dev_head_t"] = None
 
