@@ -16,6 +16,7 @@ from mne.io.meas_info import (
 from mne.io.pick import get_channel_type_constants
 from mne.io.proj import Projection
 from mne.io.tag import _ch_coord_dict
+from mne.transforms import Transform
 
 from .._typing import CHInfo
 from ..utils._checks import _check_type, _IntLike
@@ -231,7 +232,7 @@ class ChInfo(CHInfo, Info):
         self["chs"] = info["chs"]
         self["ctf_head_t"] = info.get("ctf_head_t", None)
         self["dev_ctf_t"] = info.get("dev_ctf_t", None)
-        self["dev_head_t"] = info.get("dev_head_t", None)
+        self["dev_head_t"] = info.get("dev_head_t", Transform("meg", "head"))
         self["dig"] = info.get("dig", None)
         self["comps"] = info.get("comps", [])
         self["projs"] = info.get("projs", [])
@@ -275,7 +276,7 @@ class ChInfo(CHInfo, Info):
         # init empty coordinate transformation
         self["ctf_head_t"] = None
         self["dev_ctf_t"] = None
-        self["dev_head_t"] = None
+        self["dev_head_t"] = Transform("meg", "head")
 
         # create chs information
         self["chs"] = []
