@@ -9,6 +9,7 @@ from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import read_raw_fif
 from mne.io.constants import FIFF
+from mne.transforms import Transform
 
 from pycrostates.io import ChInfo
 from pycrostates.utils._logs import logger, set_log_level
@@ -42,7 +43,7 @@ def test_create_from_info():
     assert chinfo["nchan"] == 3
     assert chinfo["ctf_head_t"] is None
     assert chinfo["dev_ctf_t"] is None
-    assert chinfo["dev_head_t"] is None
+    assert chinfo["dev_head_t"] == Transform("meg", "head")
 
     # test changing a value from info
     with info._unlock():
@@ -66,7 +67,7 @@ def test_create_from_info():
     assert chinfo["nchan"] == 3
     assert chinfo["ctf_head_t"] is None
     assert chinfo["dev_ctf_t"] is None
-    assert chinfo["dev_head_t"] is None
+    assert chinfo["dev_head_t"] == Transform("meg", "head")
 
     # test with multiple channel types
     ch_names = [f"MEG{n:03}" for n in range(1, 10)] + ["EOG001"]
@@ -103,14 +104,9 @@ def test_create_from_info():
     # test with a file with projs and coordinate transformation
     chinfo = ChInfo(info=raw.info)
     assert chinfo["projs"] == raw.info["projs"]
-    assert chinfo["ctf_head_t"] is not None
+    assert chinfo["ctf_head_t"] is None
     assert chinfo["dev_ctf_t"] is None
-    assert chinfo["dev_head_t"] is not None
-    assert chinfo["dev_head_t"]["from"] == raw.info["dev_head_t"]["from"]
-    assert chinfo["dev_head_t"]["to"] == raw.info["dev_head_t"]["to"]
-    assert np.isclose(
-        chinfo["dev_head_t"]["trans"], raw.info["dev_head_t"]["trans"]
-    )
+    assert chinfo["dev_head_t"] == raw.info["dev_head_t"]
 
 
 def test_create_from_info_invalid_arguments():
