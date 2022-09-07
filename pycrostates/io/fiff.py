@@ -513,29 +513,6 @@ def _read_meas_info(fid, tree):
     if len(chs) != nchan:
         raise ValueError("Incorrect number of channel definitions found")
 
-    if dev_head_t is None or ctf_head_t is None:
-        hpi_result = dir_tree_find(meas_info, FIFF.FIFFB_HPI_RESULT)
-        if len(hpi_result) == 1:
-            hpi_result = hpi_result[0]
-            for k in range(hpi_result["nent"]):
-                kind = hpi_result["directory"][k].kind
-                pos = hpi_result["directory"][k].pos
-                if kind == FIFF.FIFF_COORD_TRANS:
-                    tag = read_tag(fid, pos)
-                    cand = tag.data
-                    if (
-                        cand["from"] == FIFF.FIFFV_COORD_DEVICE
-                        and cand["to"] == FIFF.FIFFV_COORD_HEAD
-                        and dev_head_t is None
-                    ):
-                        dev_head_t = cand
-                    elif (
-                        cand["from"] == FIFF.FIFFV_MNE_COORD_CTF_HEAD
-                        and cand["to"] == FIFF.FIFFV_COORD_HEAD
-                        and ctf_head_t is None
-                    ):
-                        ctf_head_t = cand
-
     # Locate the Polhemus data
     dig = _read_dig_fif(fid, meas_info)
 
