@@ -30,5 +30,5 @@ Bugs
 
 API changes
 ~~~~~~~~~~~
-- Change ``picks`` parameter in :meth:`pycrostate.cluster._Base.fit` and :meth:`pycrostate.cluster._Base.predict` (by `Mathieu Scheltienne`_ and `Victor Férat`_)
-- Change ``picks`` parameter in :func:`pycrostate.preprocessing.extract_gfp_peaks` to force only one datatype in picks. Also add ``return_all`` parameter (by `Mathieu Scheltienne`_ and `Victor Férat`_)
+- Change ``picks`` parameter in :meth:`pycrostates.cluster.ModKMeans.fit` (pycrostates.cluster._BaseCluster.fit) and :meth:`pycrostates.cluster.ModKMeans.predict` (pycrostates.cluster._BaseCluster.predict) (by `Mathieu Scheltienne`_ and `Victor Férat`_)
+- Change ``picks`` parameter in :func:`pycrostates.preprocessing.extract_gfp_peaks` to force only one datatype in picks. Also add ``return_all`` parameter (by `Mathieu Scheltienne`_ and `Victor Férat`_)
