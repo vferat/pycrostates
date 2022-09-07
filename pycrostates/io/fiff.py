@@ -21,6 +21,7 @@ from mne.io.write import (
     end_block,
     start_and_end_file,
     start_block,
+    write_coord_trans,
     write_dig_points,
     write_double_matrix,
     write_id,
@@ -28,6 +29,7 @@ from mne.io.write import (
     write_name_list,
     write_string,
 )
+from mne.transforms import Transform, invert_transform
 from numpy.typing import NDArray
 
 from .. import __version__
@@ -417,6 +419,16 @@ def _write_meas_info(fid, info: CHInfo):
     comps = info["comps"]
     write_ctf_comp(fid, comps)
 
+    # Coordinate transformations if the HPI result block was not there
+    if info["dev_head_t"] is not None:
+        write_coord_trans(fid, info["dev_head_t"])
+
+    if info["ctf_head_t"] is not None:
+        write_coord_trans(fid, info["ctf_head_t"])
+
+    if info["dev_ctf_t"] is not None:
+        write_coord_trans(fid, info["dev_ctf_t"])
+
 
 def _read_meas_info(fid, tree):
     """Read the measurement info.
@@ -452,6 +464,9 @@ def _read_meas_info(fid, tree):
 
     # Read measurement info
     nchan = None
+    dev_head_t = None
+    ctf_head_t = None
+    dev_ctf_t = None
     chs = []
     custom_ref_applied = FIFF.FIFFV_MNE_CUSTOM_REF_OFF
     for k in range(meas_info["nent"]):
@@ -466,6 +481,29 @@ def _read_meas_info(fid, tree):
         elif kind == FIFF.FIFF_MNE_CUSTOM_REF:
             tag = read_tag(fid, pos)
             custom_ref_applied = int(tag.data)
+        elif kind == FIFF.FIFF_COORD_TRANS:
+            tag = read_tag(fid, pos)
+            cand = tag.data
+            if (
+                cand["from"] == FIFF.FIFFV_COORD_DEVICE
+                and cand["to"] == FIFF.FIFFV_COORD_HEAD
+            ):
+                dev_head_t = cand
+            elif (
+                cand["from"] == FIFF.FIFFV_COORD_HEAD
+                and cand["to"] == FIFF.FIFFV_COORD_DEVICE
+            ):
+                dev_head_t = invert_transform(cand)
+            elif (
+                cand["from"] == FIFF.FIFFV_MNE_COORD_CTF_HEAD
+                and cand["to"] == FIFF.FIFFV_COORD_HEAD
+            ):
+                ctf_head_t = cand
+            elif (
+                cand["from"] == FIFF.FIFFV_MNE_COORD_CTF_DEVICE
+                and cand["to"] == FIFF.FIFFV_MNE_COORD_CTF_HEAD
+            ):
+                dev_ctf_t = cand
 
     # Check that we have everything we need
     if nchan is None:
@@ -498,9 +536,18 @@ def _read_meas_info(fid, tree):
     info["projs"] = projs
     info["comps"] = comps
     info["custom_ref_applied"] = custom_ref_applied
+
+    # add coordinate transformation
+    info["dev_head_t"] = dev_head_t
+    info["ctf_head_t"] = ctf_head_t
+    info["dev_ctf_t"] = dev_ctf_t
+    if dev_head_t is not None and ctf_head_t is not None and dev_ctf_t is None:
+        head_ctf_trans = np.linalg.inv(ctf_head_t["trans"])
+        dev_ctf_trans = np.dot(head_ctf_trans, info["dev_head_t"]["trans"])
+        info["dev_ctf_t"] = Transform("meg", "ctf_head", dev_ctf_trans)
+
     info._check_consistency()
     info._unlocked = False
-
     return ChInfo(info)
 
 
