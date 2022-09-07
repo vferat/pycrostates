@@ -28,6 +28,7 @@ from mne.io.write import (
     write_name_list,
     write_string,
 )
+from mne.transforms import Transform, invert_transform
 from numpy.typing import NDArray
 
 from .. import __version__
@@ -466,6 +467,29 @@ def _read_meas_info(fid, tree):
         elif kind == FIFF.FIFF_MNE_CUSTOM_REF:
             tag = read_tag(fid, pos)
             custom_ref_applied = int(tag.data)
+        elif kind == FIFF.FIFF_COORD_TRANS:
+            tag = read_tag(fid, pos)
+            cand = tag.data
+            if (
+                cand["from"] == FIFF.FIFFV_COORD_DEVICE
+                and cand["to"] == FIFF.FIFFV_COORD_HEAD
+            ):
+                dev_head_t = cand
+            elif (
+                cand["from"] == FIFF.FIFFV_COORD_HEAD
+                and cand["to"] == FIFF.FIFFV_COORD_DEVICE
+            ):
+                dev_head_t = invert_transform(cand)
+            elif (
+                cand["from"] == FIFF.FIFFV_MNE_COORD_CTF_HEAD
+                and cand["to"] == FIFF.FIFFV_COORD_HEAD
+            ):
+                ctf_head_t = cand
+            elif (
+                cand["from"] == FIFF.FIFFV_MNE_COORD_CTF_DEVICE
+                and cand["to"] == FIFF.FIFFV_MNE_COORD_CTF_HEAD
+            ):
+                dev_ctf_t = cand
 
     # Check that we have everything we need
     if nchan is None:
@@ -474,6 +498,29 @@ def _read_meas_info(fid, tree):
         raise ValueError("Channel information not defined")
     if len(chs) != nchan:
         raise ValueError("Incorrect number of channel definitions found")
+
+    if dev_head_t is None or ctf_head_t is None:
+        hpi_result = dir_tree_find(meas_info, FIFF.FIFFB_HPI_RESULT)
+        if len(hpi_result) == 1:
+            hpi_result = hpi_result[0]
+            for k in range(hpi_result["nent"]):
+                kind = hpi_result["directory"][k].kind
+                pos = hpi_result["directory"][k].pos
+                if kind == FIFF.FIFF_COORD_TRANS:
+                    tag = read_tag(fid, pos)
+                    cand = tag.data
+                    if (
+                        cand["from"] == FIFF.FIFFV_COORD_DEVICE
+                        and cand["to"] == FIFF.FIFFV_COORD_HEAD
+                        and dev_head_t is None
+                    ):
+                        dev_head_t = cand
+                    elif (
+                        cand["from"] == FIFF.FIFFV_MNE_COORD_CTF_HEAD
+                        and cand["to"] == FIFF.FIFFV_COORD_HEAD
+                        and ctf_head_t is None
+                    ):
+                        ctf_head_t = cand
 
     # Locate the Polhemus data
     dig = _read_dig_fif(fid, meas_info)
@@ -498,9 +545,18 @@ def _read_meas_info(fid, tree):
     info["projs"] = projs
     info["comps"] = comps
     info["custom_ref_applied"] = custom_ref_applied
+
+    # add coordinate transformation
+    info["dev_head_t"] = dev_head_t
+    info["ctf_head_t"] = ctf_head_t
+    info["dev_ctf_t"] = dev_ctf_t
+    if dev_head_t is not None and ctf_head_t is not None and dev_ctf_t is None:
+        head_ctf_trans = np.linalg.inv(ctf_head_t["trans"])
+        dev_ctf_trans = np.dot(head_ctf_trans, info["dev_head_t"]["trans"])
+        info["dev_ctf_t"] = Transform("meg", "ctf_head", dev_ctf_trans)
+
     info._check_consistency()
     info._unlocked = False
-
     return ChInfo(info)
 
 
