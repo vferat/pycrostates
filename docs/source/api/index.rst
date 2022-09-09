@@ -2,9 +2,9 @@
 
 .. _api_reference:
 
-====================
-Python API Reference
-====================
+=============
+API Reference
+=============
 
 This is the reference for classes (``CamelCase`` names) and functions
 (``underscore_case`` names) of pycrostates.

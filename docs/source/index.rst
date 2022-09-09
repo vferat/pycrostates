@@ -29,3 +29,4 @@ with `MNE-python <mne stable_>`_.
    microstates.rst
    generated/auto_tutorials/index
    api/index
+   dev/index
