@@ -10,8 +10,8 @@ from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import read_raw_fif
 from mne.io.constants import FIFF
-from mne.utils import check_version
 from mne.transforms import Transform
+from mne.utils import check_version
 
 from pycrostates.io import ChInfo
 from pycrostates.utils._logs import logger, set_log_level

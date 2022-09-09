@@ -16,8 +16,8 @@ from mne.io.meas_info import (
 from mne.io.pick import get_channel_type_constants
 from mne.io.proj import Projection
 from mne.io.tag import _ch_coord_dict
-from mne.utils import check_version
 from mne.transforms import Transform
+from mne.utils import check_version
 
 from .._typing import CHInfo
 from ..utils._checks import _check_type, _IntLike
