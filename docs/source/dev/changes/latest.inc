@@ -14,7 +14,7 @@
        - description of enhancement/bugfix/API change (:gh:`xxxx` by
          :newcontrib:`Firstname Lastname`)
 
-   Also add a corresponding entry for yourself in doc/changes/names.inc
+   Also add a corresponding entry for yourself in docs/dev/changes/names.inc
 
 .. _current:
 
