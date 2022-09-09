@@ -11,8 +11,7 @@
    the relevant section (Enhancements / Bugs / API changes), and should look
    like this (where xxxx is the pull request number):
 
-       - description of enhancement/bugfix/API change (:gh:`xxxx` by
-         :newcontrib:`Firstname Lastname`)
+       - description of enhancement/bugfix/API change (:pr:`xxxx` by `Firstname Lastname`_)
 
    Also add a corresponding entry for yourself in docs/dev/changes/names.inc
 
