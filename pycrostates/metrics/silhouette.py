@@ -11,7 +11,7 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def silhouette_score(cluster):  # higher the better
-    """Compute the mean Silhouette Coefficient.
+    """Compute the mean Silhouette Coefficient [1]_.
 
     This function is a wrapper around :func:`sklearn.metrics.silhouette_score`
     that applies directly to a fitted :ref:`Clustering` instance. It uses the
@@ -35,11 +35,7 @@ def silhouette_score(cluster):  # higher the better
 
     References
     ----------
-    .. [1] `Peter J. Rousseeuw (1987).
-       "Silhouettes: a Graphical Aid to the Interpretation and Validation of
-       Cluster Analysis".
-       Computational and Applied Mathematics 20: 53-65.
-       <https://doi.org/10.1016/0377-0427(87)90125-7>`_
+    .. [1] :cite:t: `ROUSSEEUW198753`
     """
     _check_type(cluster, (_BaseCluster,), item_name="cluster")
     cluster._check_fit()
