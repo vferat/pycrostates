@@ -3,7 +3,7 @@ Group level analysis from individual gfp peaks
 ==============================================
 
 In this tutorial, we will learn how to conduct group level analysis
-by computing group level topographies based on individual gfp peaks.
+by computing group level topographies based on individual :term:GFP peaks.
 """
 
 #%%
@@ -32,7 +32,7 @@ subject_ids = ["010020", "010021", "010022", "010023", "010024"]
 
 #%%
 # In this example, we first extract individual
-# GFP peaks. Then we concatenate them into
+# :term:GFP peaks. Then we concatenate them into
 # a single dataset in order to submit it to
 # clustering (group level analysis).
 

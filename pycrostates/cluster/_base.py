@@ -200,8 +200,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         ----------
         inst : Raw | Epochs | ChData
             MNE `~mne.io.Raw`, `~mne.Epochs` or `~pycrostates.io.ChData` object
-            containing data to transform to cluster-distance space (absolute
-            spatial correlation).
+            from which to extract :term:`cluster centers`.
         picks : str | list | slice | None
             Channels to include. Note that all channels selected must have the
             same type. Slices and lists of integers will be interpreted as
@@ -461,7 +460,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             NDArray[bool],
         ],
     ) -> None:
-        """Invert map polarities for visualisation purposes.
+        """Invert map polarities.
+
 
         Parameters
         ----------
@@ -473,6 +473,13 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         Notes
         -----
         Operates in-place.
+
+        Notes
+        -----
+        Inverting polarities has no effect on the other steps
+        of the analysis as polarity is ignore in the current methodology.
+        This function is only used for tuning visualization
+        (i.e. to generate figures for an article).
         """
         self._check_fit()
 
@@ -505,7 +512,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             if invert[k]:
                 self._cluster_centers_[k] = -cluster
 
-    def plot(self, axes: Optional[Axes] = None, *, block: bool = False):
+    def plot(
+        self, axes: Optional[Axes] = None, *, block: bool = False, **kwargs
+    ):
         """
         Plot cluster centers as topographic maps.
 
@@ -516,6 +525,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             on which the topographic map should be plotted.
         block : bool
             Whether to halt program execution until the figure is closed.
+        **kwargs
+            Kwargs are passed to :func:`mne.viz.plot_topomap`.
 
         Returns
         -------
@@ -531,6 +542,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             self._cluster_names,
             axes,
             block=block,
+            **kwargs,
         )
 
     @abstractmethod

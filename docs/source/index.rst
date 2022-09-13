@@ -26,7 +26,7 @@ with `MNE-python <mne stable_>`_.
    :hidden:
 
    install.rst
-   microstates.rst
+   microstates/index.rst
    generated/auto_tutorials/index
    api/index
    dev/index
