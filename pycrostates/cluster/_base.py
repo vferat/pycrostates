@@ -462,7 +462,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     ) -> None:
         """Invert map polarities.
 
-
         Parameters
         ----------
         invert : bool | list of bool | array of bool
@@ -474,12 +473,10 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         -----
         Operates in-place.
 
-        Notes
-        -----
         Inverting polarities has no effect on the other steps
-        of the analysis as polarity is ignore in the current methodology.
+        of the analysis as polarity is ignored in the current methodology.
         This function is only used for tuning visualization
-        (i.e. to generate figures for an article).
+        (i.e. for visual inspection and/or to generate figure for an article).
         """
         self._check_fit()
 
@@ -564,7 +561,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         inst: Union[BaseRaw, BaseEpochs],
         picks: Picks = None,
         factor: int = 0,
-        half_window_size: int = 3,
+        half_window_size: int = 1,
         tol: Union[int, float] = 10e-6,
         min_segment_length: int = 0,
         reject_edges: bool = True,
@@ -573,6 +570,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         verbose: Optional[str] = None,
     ):
         """Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
+
+        Segment instance into microstate sequence using the segmentation smoothing
+        algorithm introduce in [1]_.
 
         Parameters
         ----------
@@ -591,10 +591,13 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             names or indices are explicitly provided.
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing.
+            Default to 0.
         half_window_size : int
             Number of samples used for the half window size while smoothing
-            labels. Has no ffect if ``factor=0``. The half window size is
-            defined as ``window_size = 2 * half_window_size + 1``.
+            labels. The half window size is defined as
+            ``window_size = 2 * half_window_size + 1``.
+            Has no ffect if ``factor=0`` (default).
+            Default to 1.
         tol : float
             Convergence tolerance.
         min_segment_length : int
@@ -613,6 +616,10 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             labeled according to cluster centers number: ``0`` for the first
             center, ``1`` for the second, etc..
             ``-1`` is used for unlabeled time points.
+
+        References
+        ----------
+        .. [1] :cite:t:`Marqui1995`
         """
         # TODO: reject_by_annotation_raw doc probably doesn't match the correct
         # argument types.
