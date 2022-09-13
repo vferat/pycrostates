@@ -12,10 +12,10 @@ the number of clusters center.
 # %%
 # Pycrostates implements several metrics to evaluate the quality of
 # clustering solutions without knowing the ground truth:
-# - The silhouette score :py:func:`pycrostates.metrics.silhouette_score`(higher the better)
-# - The Calinski Harabasz score :py:func:`pycrostates.metrics.calinski_harabasz_score`(higher the better)
-# - The Dunn score :py:func:`pycrostates.metrics.dunn_score`(higher the better)
-# - The Davies Bouldin score :py:func:`pycrostates.metrics.davies_bouldin_score`(lower the better)
+# * The silhouette score :func:`~pycrostates.metrics.silouhette.silhouette_score`(higher the better)
+# * The Calinski Harabasz score :func:`~pycrostates.metrics.calinski_harabasz.calinski_harabasz_score`(higher the better)
+# * The Dunn score :func:`~pycrostates.metrics.dunn.dunn_score`(higher the better)
+# * The Davies Bouldin score func:`~pycrostates.metrics.davies_bouldin.davies_bouldin_score`(lower the better)
 #
 # Those metrics can directly be applied to a fitted clustering algortihm
 # such as the :py:class:`~pycrostates.cluster.ModKmeans`
@@ -52,10 +52,10 @@ raw.set_eeg_reference("average")
 # study more give more explanation about each of this metrics
 # before showing an application case to determine the optimal number of cluster
 # (i.e microstate topographies) `n_clusters` while performing clustering with
-# the :py:class:`~pycrostates.cluster.ModKmeans` algorithm. 
+# the :class:`~pycrostates.cluster.ModKmeans` algorithm. 
 # For computation cost reasons, we start by computing
 # each of the score on the clustering reuslts of
-# a :py:class:`~pycrostates.cluster.ModKmeans` fitted for 
+# a :class:`~pycrostates.cluster.ModKmeans` fitted for 
 # different values of `n_clusters`
 
 from pycrostates.metrics import (
@@ -129,7 +129,7 @@ plt.show()
 # The Dunn score or Dunn index defined as
 # a ratio of the smallest inter-cluster distance to the largest intra-cluster distance.
 # Overall, it summurizes how well clusters are farther apart and less dispersed.
-# Higher Dunn score relates to a model with better clustering
+# Higher Dunn score relates to a model with better clustering.
 
 plt.figure()
 plt.scatter(cluster_numbers, dunn_scores)
@@ -137,6 +137,9 @@ plt.xlabel('n_clusters')
 plt.ylabel('Dunn score')
 plt.show()
 
+# In this example, we can observe that a number of `n_clusters = 8`
+# gives an highest score compared to other solutions thuse indicating
+# a better clustering
 #%%
 # The Davies-Bouldin score
 # ------------------------
@@ -146,8 +149,7 @@ plt.show()
 # to between-cluster distances.
 # Overall, it summurizes how well clsuters are farther apart and less dispersed.
 # Lower Davies-Bouldin index relates to a model with better
-#  separation between the clusters, ``0`` being the lowest score possible.
-
+# separation between the clusters, ``0`` being the lowest score possible.
 
 plt.figure()
 plt.scatter(cluster_numbers, davies_bouldin_scores)
@@ -156,10 +158,12 @@ plt.ylabel('Davies Bouldin score')
 plt.show()
 
 #%%
+# Conclusion
+# ----------
 # As can be seen, there is no global consensus on which ``n_cluster`` value to choose.
 # The silhoutette score seems to be in favor of
 # ``n_clusters=3``, Calinski Harabasz score for ``n_clusters=4``,
-# Dunns core for ``n_clusters=8`` and Davies Bouldin score for ``n_clusters= 3 or 4``.
+# Dunns score for ``n_clusters=8`` and Davies Bouldin score for ``n_clusters= 3 or 4``.
 # Each of these scores provides similar but different information
 # about the quality of the clustering.
 # 
