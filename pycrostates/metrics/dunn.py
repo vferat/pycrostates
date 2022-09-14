@@ -10,7 +10,7 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def dunn_score(cluster):  # higher the better
-    """Compute the Dunn index score.
+    """Compute the Dunn index score [1]_.
 
     Parameters
     ----------
@@ -27,10 +27,7 @@ def dunn_score(cluster):  # higher the better
 
     References
     ----------
-    .. [1] `J. C. Dunn (1974).
-       "Well-Separated Clusters and Optimal Fuzzy Partitions".
-       Journal of Cybernetics.
-       <https://doi.org/10.1080/01969727408546059>`_
+    .. [1] :cite:cts:`Dunn`
     """
     _check_type(cluster, (_BaseCluster,), item_name="cluster")
     cluster._check_fit()
