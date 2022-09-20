@@ -10,5 +10,5 @@ Glossary
     
     cluster centers
         Arithmetic mean of all the points belonging to the cluster.
-        In the context microstate analysis, it corresponds to the microstates topographies.
+        In the context of microstate analysis, it corresponds to the microstates topographies.
     

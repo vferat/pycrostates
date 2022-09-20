@@ -35,10 +35,10 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# The modified Kmeans can be instantiated with the number of cluster centers
+# The modified K-means can be instantiated with the number of cluster centers
 # ``n_clusters`` to compute. By default, the modified K-means will only work
 # with EEG data, but this can be modified thanks to the ``picks`` parameter.
-# A random_state can be defined during class definition in order to have
+# A ``random_state`` can be defined during class definition in order to have
 # reproducible results.
 from pycrostates.preprocessing import resample
 

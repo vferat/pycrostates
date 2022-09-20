@@ -18,7 +18,7 @@ the number of clusters center.
 # * The Davies Bouldin score func:`~pycrostates.metrics.davies_bouldin.davies_bouldin_score`(lower the better)
 #
 # Those metrics can directly be applied to a fitted clustering algortihm
-# such as the :py:class:`~pycrostates.cluster.ModKmeans`
+# such as the :py:class:`~pycrostates.cluster.ModKmeans`.
 #
 # .. note::
 #
@@ -54,7 +54,7 @@ raw.set_eeg_reference("average")
 # (i.e microstate topographies) `n_clusters` while performing clustering with
 # the :class:`~pycrostates.cluster.ModKmeans` algorithm. 
 # For computation cost reasons, we start by computing
-# each of the score on the clustering reuslts of
+# each of the score on the clustering results of
 # a :class:`~pycrostates.cluster.ModKmeans` fitted for 
 # different values of `n_clusters`
 
@@ -101,7 +101,7 @@ plt.show()
 
 # In this example, we can observe that a number of `n_clusters = 3`
 # gives an highest score compared to other solutions thuse indicating
-# a better  cluster separation and high cluster density.
+# a better cluster separation and high cluster density.
 # Note than solutions for `n_clusters = 2`
 # and `n_clusters = 4` centers give score in the same order of magnitude
 
@@ -147,7 +147,7 @@ plt.show()
 # each cluster with its most similar cluster,
 # where similarity is the ratio of within-cluster distances
 # to between-cluster distances.
-# Overall, it summurizes how well clsuters are farther apart and less dispersed.
+# Overall, it summurizes how well clusters are farther apart and less dispersed.
 # Lower Davies-Bouldin index relates to a model with better
 # separation between the clusters, ``0`` being the lowest score possible.
 
