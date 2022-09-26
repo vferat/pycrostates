@@ -10,10 +10,10 @@ the clustering results.
 #%%
 # .. note::
 #
-#     The lemon datasets is composed of EEGLAB files. To use the MNE reader
-#     :func:`mne.io.read_raw_eeglab`, the ``pymatreader`` optional dependency
-#     is required. Use the following installation method appropriate for your
-#     environment:
+#     The lemon datasets used in this tutorial is composed of EEGLAB files. To
+#     use the MNE reader :func:`mne.io.read_raw_eeglab`, the ``pymatreader``
+#     optional dependency is required. Use the following installation method
+#     appropriate for your environment:
 #
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
