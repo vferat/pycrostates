@@ -829,24 +829,21 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         if reject_by_annotation:
             # retrieve onsets/ends for BAD annotations
-            onsets, ends = _annotations_starts_stops(raw, ["BAD"])
-            onsets = onsets.tolist() + [data.shape[-1] - 1]
-            ends = [0] + ends.tolist()
-
+            onsets, ends = _annotations_starts_stops(raw, ["BAD"], invert=True)
             segmentation = np.full(data.shape[-1], -1)
 
             for onset, end in zip(onsets, ends):
                 # small segments can't be smoothed
-                if factor != 0 and onset - end < 2 * half_window_size + 1:
+                if factor != 0 and end - onset < 2 * half_window_size + 1:
                     continue
 
-                data_ = data[:, end:onset]
+                data_ = data[:, onset:end]
                 segment = _BaseCluster._segment(
                     data_, cluster_centers_, factor, tol, half_window_size
                 )
                 if reject_edges:
                     segment = _BaseCluster._reject_edge_segments(segment)
-                segmentation[end:onset] = segment
+                segmentation[onset:end] = segment
 
         else:
             segmentation = _BaseCluster._segment(
