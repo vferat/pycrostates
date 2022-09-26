@@ -1,31 +1,30 @@
 """
-Evaluating clustering results.
-==============================
+Evaluating clustering results
+=============================
 
-Since microstate analysis is based on an empirical model,
-it is impossible to know the ground truth label of each sample.
-It is therefore necessary to rely on reliable metrics in order to evaluate
-the relevance of the parameters used in our model, and more particularly
-the number of clusters center.
+Since microstate analysis is based on an empirical model, it is impossible to
+know the ground truth label of each sample. It is therefore necessary to rely
+on reliable metrics in order to evaluate the relevance of the parameters used
+in our model, and more particularly the number of :term:`cluster centers`.
 """
 
 # %%
 # Pycrostates implements several metrics to evaluate the quality of
 # clustering solutions without knowing the ground truth:
-# * The silhouette score :func:`~pycrostates.metrics.silouhette.silhouette_score`(higher the better)
-# * The Calinski Harabasz score :func:`~pycrostates.metrics.calinski_harabasz.calinski_harabasz_score`(higher the better)
-# * The Dunn score :func:`~pycrostates.metrics.dunn.dunn_score`(higher the better)
-# * The Davies Bouldin score func:`~pycrostates.metrics.davies_bouldin.davies_bouldin_score`(lower the better)
+# * The Silhouette score :func:`~pycrostates.metrics.silhouette_score` (higher the better)
+# * The Calinski-Harabasz score :func:`~pycrostates.metrics.calinski_harabasz_score` (higher the better)
+# * The Dunn score :func:`~pycrostates.metrics.dunn_score` (higher the better)
+# * The Davies-Bouldin score func:`~pycrostates.metrics.davies_bouldin_score` (lower the better)
 #
 # Those metrics can directly be applied to a fitted clustering algortihm
-# such as the :py:class:`~pycrostates.cluster.ModKmeans`.
+# such as the :py:class:`~pycrostates.cluster.ModKMeans`.
 #
 # .. note::
 #
-#     The lemon datasets is composed of EEGLAB files. To use the MNE reader
-#     :func:`mne.io.read_raw_eeglab`, the ``pymatreader`` optional dependency
-#     is required. Use the following installation method appropriate for your
-#     environment:
+#     The lemon datasets used in this tutorial is composed of EEGLAB files. To
+#     use the MNE reader :func:`mne.io.read_raw_eeglab`, the ``pymatreader``
+#     optional dependency is required. Use the following installation method
+#     appropriate for your environment:
 #
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
@@ -48,15 +47,14 @@ raw.pick("eeg")
 raw.set_eeg_reference("average")
 
 # %%
-# In this exemple , we will use a single subject EEG recording in order to
-# study more give more explanation about each of this metrics
-# before showing an application case to determine the optimal number of cluster
-# (i.e microstate topographies) ``n_clusters`` while performing clustering with
-# the :class:`~pycrostates.cluster.ModKmeans` algorithm.
-# For computation cost reasons, we start by computing
-# each of the score on the clustering results of
-# a :class:`~pycrostates.cluster.ModKMeans` fitted for
-# different values of ``n_clusters`.`
+# In this example, we will use a single subject EEG recording in order to give
+# more explanation about each of this metrics before showing an application
+# case to determine the optimal number of :term:`cluster centers`
+# ``n_clusters`` while fitting with the :class:`~pycrostates.cluster.ModKMeans`
+# algorithm.
+# For computation cost reasons, we start by computing each of the score on the
+# clustering results of a :class:`~pycrostates.cluster.ModKMeans` fitted for
+# different values of ``n_clusters``.
 
 from pycrostates.metrics import (
     silhouette_score,
