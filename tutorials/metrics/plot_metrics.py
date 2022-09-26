@@ -108,7 +108,7 @@ plt.show()
 # The Calinski-Harabasz score is the ratio of the sum of between-clusters
 # dispersion and of within-cluster dispersion for all clusters (where
 # dispersion is defined as the sum of correlations squared).
-# As the silouhette score, it also summarizes how well clusters are dense and
+# As the silhouette score, it also summarizes how well clusters are dense and
 # well separated. Higher values indicates higher cluster density and better
 # separation.
 
