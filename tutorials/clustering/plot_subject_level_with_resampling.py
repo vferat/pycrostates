@@ -35,7 +35,7 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# Resampling can be usefull to study the stability and reliability of clustering results.
+# Resampling can be useful to study the stability and reliability of clustering results.
 # In this example, we will split our data in ``n_resamples`` resamples each containing
 # ``n_samples`` randomly selected from the original recording.
 #
@@ -54,7 +54,7 @@ resamples = resample(
     raw, n_resamples=10, n_samples=1000, random_state=42
 )
 
-#%% We can compute the :term:`cluster centers` on each of the resample: 
+#%% We can compute the :term:`cluster centers` on each of the resample:
 
 resample_results = []
 for resample in resamples:
@@ -62,7 +62,7 @@ for resample in resamples:
     ModK.fit(resample, n_jobs=2)
     ModK.plot()
     resample_results.append(ModK.cluster_centers_)
- 
+
 
 #%%
 # As we can see, each resampling solution explain about 70% of the resample.

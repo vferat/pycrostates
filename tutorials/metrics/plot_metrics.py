@@ -17,7 +17,7 @@ in our model, and more particularly the number of :term:`cluster centers`.
 # * The Dunn score :func:`~pycrostates.metrics.dunn_score` (higher the better)
 # * The Davies-Bouldin score func:`~pycrostates.metrics.davies_bouldin_score` (lower the better)
 #
-# Those metrics can directly be applied to a fitted clustering algortihm
+# Those metrics can directly be applied to a fitted clustering algorithm
 # such as the :py:class:`~pycrostates.cluster.ModKMeans`.
 #
 # .. note::
@@ -149,7 +149,7 @@ plt.show()
 # with its most similar cluster, where similarity is the ratio of
 # intra-cluster distances to inter-cluster distances.
 # Overall, it summarizes how well clusters are farther apart and less
-# dispersed. Lower values indicates a better seperation, ``0`` being the lowest
+# dispersed. Lower values indicates a better separation, ``0`` being the lowest
 # score possible.
 
 plt.figure()

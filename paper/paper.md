@@ -95,7 +95,7 @@ Pycrostates is based on the robust MNE-Python ecosystem and complements it with
 simple tools for developing integrated microstates analysis pipelines. It
 offers flexible classes, enabling group level analysis and advanced
 segmentation features such as smoothing and small segment rejection which are
-especially usefull for handling low signal to noise datapoints occuring during
+especially useful for handling low signal to noise datapoints occurring during
 microstate polarity inversions.
 
 Pycrostates API can replicate most of the analyses proposed in the literature
