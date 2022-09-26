@@ -35,10 +35,15 @@ raw.set_eeg_reference('average')
 
 #%%
 # The modified K-means can be instantiated with the number of
-# :term:`cluster centers` ``n_clusters`` to compute. By default, the modified
-# K-means will only work with EEG data, but this can be modified with the
-# ``picks`` argument. A ``random_state`` can be defined during class definition
-# in order to have reproducible results between fits.
+# :term:`cluster centers` ``n_clusters`` to fit. By default, the modified
+# K-means will only work with EEG data, but other channel types can be selected
+# with the ``picks`` argument.
+#
+# .. note::
+#
+#     A K-means algorithm starts with a random initialization. Thus, 2 separate
+#     fit will not yield the same :term:`cluster centers`. To achieve
+#     reproductible fits, the ``random_state`` argument can be used.
 
 n_clusters = 5
 ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
@@ -50,6 +55,7 @@ ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
 #
 # .. note::
 #
+#     Fitting a clustering algorithm is a computationaly expensive operation.
 #     Depending on your configuration, you can change the argument ``n_jobs``
 #     to take advantage of multiprocessing to reduce computation time.
 
@@ -63,21 +69,19 @@ ModK.fit(raw, n_jobs=5)
 ModK.plot()
 
 #%%
-# The :term:`cluster centers` can be retrueved as a numpy array with the
+# The :term:`cluster centers` can be retrieved as a numpy array with the
 # ``cluster_centers_`` attribute.
 
 ModK.cluster_centers_
 
 #%%
-# Clusters centers can be reordered using
-# :meth:`pycrostates.cluster.ModKMeans.reorder_clusters`.
+# By default, the :term:`cluster centers` are named from ``0`` to
+# ``n_clusters - 1`` and are ordered based on the fit. You can reorder
+# (:meth:`pycrostates.cluster.ModKMeans.reorder_clusters`) and
+# rename (:meth:`pycrostates.cluster.ModKMeans.rename_clusters`) each
+# microstates to match your preference.
 
 ModK.reorder_clusters(order=[3, 0, 1, 2, 4])
-ModK.plot()
-
-#%%
-# and renamed using :meth:`pycrostates.cluster.ModKMeans.rename_clusters`.
-
 ModK.rename_clusters(new_names=['A', 'B', 'C', 'D', 'F'])
 ModK.plot()
 
@@ -98,8 +102,8 @@ ModK.plot()
 # performed on the output sequence by setting the ``factor`` argument ``> 0``
 # (no smoothing by default ``factor=0``) while the ``half_window_size``
 # parameter is used to specify the smoothing temporal span. Finally, the
-# ``reject_edges`` argument allows prevent the assignment of the first and last
-# segment of each recording (or each epoch) as these can be incomplete. It
+# ``reject_edges`` argument is used to prevent the assignment of the first and
+# last segment of each recording (or each epoch) as these can be incomplete. It
 # should have little impact for `~mne.io.Raw` objects, but can be important
 # when working with `~mne.Epochs`.
 
