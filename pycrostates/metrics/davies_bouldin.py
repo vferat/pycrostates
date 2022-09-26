@@ -12,12 +12,12 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def davies_bouldin_score(cluster):  # lower the better
-    """Compute the Davies-Bouldin score\ :footcite:p:`Davies-Bouldin`.
+    """Compute the Davies-Bouldin score.
 
-    This function is a wrapper around
-    :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a
-    fitted :ref:`Clustering` instance. It uses the absolute spatial correlation
-    for distance computations.
+    This function computes the Davies-Bouldin
+    score\ :footcite:p:`Davies-Bouldin` with
+    :func:`sklearn.metrics.davies_bouldin_score` from a fitted
+    :ref:`Clustering` instance.
 
     Parameters
     ----------

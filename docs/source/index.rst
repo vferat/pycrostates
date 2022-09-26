@@ -24,6 +24,7 @@ with `MNE-python <mne stable_>`_.
 
 .. toctree::
    :hidden:
+   :maxdepth: 0
 
    install.rst
    microstates/index.rst

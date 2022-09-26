@@ -11,11 +11,12 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def silhouette_score(cluster):  # higher the better
-    """Compute the mean Silhouette Coefficient\ :footcite:p:`Silhouettes`.
+    """Compute the mean Silhouette Coefficient.
 
-    This function is a wrapper around :func:`sklearn.metrics.silhouette_score`
-    that applies directly to a fitted :ref:`Clustering` instance. It uses the
-    absolute spatial correlation for distance computations.
+    This function computes the Silhouette
+    Coefficient\ :footcite:p:`Silhouettes` with
+    :func:`sklearn.metrics.silhouette_score` from a fitted
+    :ref:`Clustering` instance.
 
     Parameters
     ----------
