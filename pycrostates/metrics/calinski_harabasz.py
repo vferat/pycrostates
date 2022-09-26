@@ -12,7 +12,7 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def calinski_harabasz_score(cluster):  # higher the better
-    """Compute the Calinski and Harabasz score [1]_.
+    """Compute the Calinski-Harabasz score\ :footcite:p:`Calinski-Harabasz`.
 
     This function is a wrapper around
     :func:`sklearn.metrics.calinski_harabasz_score` that applies directly to a
@@ -25,7 +25,7 @@ def calinski_harabasz_score(cluster):  # higher the better
     Returns
     -------
     score : float
-        The resulting Calinski and Harabasz score.
+        The resulting Calinski-Harabasz score.
 
     Notes
     -----
@@ -34,7 +34,7 @@ def calinski_harabasz_score(cluster):  # higher the better
 
     References
     ----------
-    .. [1] :cite:cts:`Calinski-Harabasz`
+    .. footbibliography::
     """
     _check_type(cluster, (_BaseCluster,), item_name="cluster")
     cluster._check_fit()

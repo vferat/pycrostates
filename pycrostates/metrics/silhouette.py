@@ -11,7 +11,7 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def silhouette_score(cluster):  # higher the better
-    """Compute the mean Silhouette Coefficient [1]_.
+    """Compute the mean Silhouette Coefficient\ :footcite:p:`Silhouettes`.
 
     This function is a wrapper around :func:`sklearn.metrics.silhouette_score`
     that applies directly to a fitted :ref:`Clustering` instance. It uses the
@@ -35,7 +35,7 @@ def silhouette_score(cluster):  # higher the better
 
     References
     ----------
-    .. [1] :cite:cts:`Silhouettes`
+    .. footbibliography::
     """
     _check_type(cluster, (_BaseCluster,), item_name="cluster")
     cluster._check_fit()

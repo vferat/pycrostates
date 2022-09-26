@@ -1,18 +1,18 @@
 """
-The ModKmeans object
+The ModKMeans object
 ====================
 
-This tutorial introduces the :class:`pycrostates.cluster.ModKMeans`
-structure in detail.
+This tutorial introduces the main clustering object
+:class:`pycrostates.cluster.ModKMeans` structure in detail.
 """
 
 #%%
 # .. note::
 #
-#     The lemon datasets is composed of EEGLAB files. To use the MNE reader
-#     :func:`mne.io.read_raw_eeglab`, the ``pymatreader`` optional dependency
-#     is required. Use the following installation method appropriate for your
-#     environment:
+#     The lemon datasets used in this tutorial is composed of EEGLAB files. To
+#     use the MNE reader :func:`mne.io.read_raw_eeglab`, the ``pymatreader``
+#     optional dependency is required. Use the following installation method
+#     appropriate for your environment:
 #
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
@@ -34,11 +34,11 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# The modified Kmeans can be instantiated with the number of cluster centers
-# ``n_clusters`` to compute. By default, the modified K-means will only work
-# with EEG data, but this can be modified thanks to the ``picks`` parameter.
-# A random_state can be defined during class definition in order to have
-# reproducible results.
+# The modified K-means can be instantiated with the number of
+# :term:`cluster centers` ``n_clusters`` to compute. By default, the modified
+# K-means will only work with EEG data, but this can be modified with the
+# ``picks`` argument. A ``random_state`` can be defined during class definition
+# in order to have reproducible results between fits.
 
 n_clusters = 5
 ModK = ModKMeans(n_clusters=n_clusters, random_state=42)

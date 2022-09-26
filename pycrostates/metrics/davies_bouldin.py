@@ -12,7 +12,7 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def davies_bouldin_score(cluster):  # lower the better
-    """Compute the Davies-Bouldin score [1]_.
+    """Compute the Davies-Bouldin score\ :footcite:p:`Davies-Bouldin`.
 
     This function is a wrapper around
     :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a
@@ -37,7 +37,7 @@ def davies_bouldin_score(cluster):  # lower the better
 
     References
     ----------
-    .. [1] :cite:cts:`Davies-Bouldin`
+    .. footbibliography::
     """
     _check_type(cluster, (_BaseCluster,), item_name="cluster")
     cluster._check_fit()

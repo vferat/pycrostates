@@ -51,12 +51,12 @@ raw.set_eeg_reference("average")
 # In this exemple , we will use a single subject EEG recording in order to
 # study more give more explanation about each of this metrics
 # before showing an application case to determine the optimal number of cluster
-# (i.e microstate topographies) `n_clusters` while performing clustering with
-# the :class:`~pycrostates.cluster.ModKmeans` algorithm. 
+# (i.e microstate topographies) ``n_clusters`` while performing clustering with
+# the :class:`~pycrostates.cluster.ModKmeans` algorithm.
 # For computation cost reasons, we start by computing
 # each of the score on the clustering results of
-# a :class:`~pycrostates.cluster.ModKmeans` fitted for 
-# different values of `n_clusters`
+# a :class:`~pycrostates.cluster.ModKMeans` fitted for
+# different values of ``n_clusters`.`
 
 from pycrostates.metrics import (
     silhouette_score,
@@ -99,11 +99,11 @@ plt.xlabel('n_clusters')
 plt.ylabel('Silhouette score')
 plt.show()
 
-# In this example, we can observe that a number of `n_clusters = 3`
+# In this example, we can observe that a number of ``n_clusters = 3``
 # gives an highest score compared to other solutions thuse indicating
 # a better cluster separation and high cluster density.
-# Note than solutions for `n_clusters = 2`
-# and `n_clusters = 4` centers give score in the same order of magnitude
+# Note than solutions for ``n_clusters = 2``
+# and ``n_clusters = 4`` centers give score in the same order of magnitude.
 
 # %%
 # The Calinski Harabasz score
@@ -120,7 +120,7 @@ plt.xlabel('n_clusters')
 plt.ylabel('Calinski Harabasz score')
 plt.show()
 
-# In this example, we can observe that a number of `n_clusters = 4`
+# In this example, we can observe that a number of ``n_clusters = 4``
 # gives an highest score compared to other solutions thuse indicating
 # a better cluster separation and high cluster density.
 #%%
@@ -166,10 +166,10 @@ plt.show()
 # Dunns score for ``n_clusters=8`` and Davies Bouldin score for ``n_clusters= 3 or 4``.
 # Each of these scores provides similar but different information
 # about the quality of the clustering.
-# 
+#
 # Note that for microstate analysis the choice of the number
 # of cluster centers is also
-# a trade off between the quality of the clustering, 
+# a trade off between the quality of the clustering,
 # interpretations that can be made of it,
 # and the variance expressed by the current clustering.
 # This is why there is no perfect solution and score

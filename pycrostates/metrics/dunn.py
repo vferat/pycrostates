@@ -10,7 +10,7 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def dunn_score(cluster):  # higher the better
-    """Compute the Dunn index score [1]_.
+    """Compute the Dunn index score\ :footcite:p:`Dunn`.
 
     Parameters
     ----------
@@ -27,7 +27,7 @@ def dunn_score(cluster):  # higher the better
 
     References
     ----------
-    .. [1] :cite:cts:`Dunn`
+    .. footbibliography::
     """
     _check_type(cluster, (_BaseCluster,), item_name="cluster")
     cluster._check_fit()
