@@ -80,3 +80,7 @@ all_resampling_results = ChData(all_resampling_results, ModK.info)
 ModK = ModKMeans(n_clusters=5, random_state=42)
 ModK.fit(all_resampling_results, n_jobs=2)
 ModK.plot()
+
+# .. note::
+#      This method can also be used for group level analysis by mixing individual resampling results
+#      together.
