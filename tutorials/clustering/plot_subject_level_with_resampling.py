@@ -35,16 +35,26 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# The modified K-means can be instantiated with the number of cluster centers
-# ``n_clusters`` to compute. By default, the modified K-means will only work
-# with EEG data, but this can be modified thanks to the ``picks`` parameter.
-# A ``random_state`` can be defined during class definition in order to have
-# reproducible results.
+# Resampling can be usefull to study the stability and reliability of clustering results.
+# In this example, we will split our data in ``n_resamples`` resamples each containing
+# ``n_samples`` randomly selected from the original recording.
+#
+# .. note::
+#
+#      This method can also be used on GFP peaks only !
+#      """
+#      gfp_peaks = pycrostates.preprocessing.extract_gfp_peaks(raw)
+#      resamples = resample(
+#      raw, n_resamples=10, n_samples=1000, random_state=42
+#      )
+#      """
 from pycrostates.preprocessing import resample
 
 resamples = resample(
     raw, n_resamples=10, n_samples=1000, random_state=42
 )
+
+#%% We can compute the :term:`cluster centers` on each of the resample: 
 
 resample_results = []
 for resample in resamples:
@@ -52,10 +62,15 @@ for resample in resamples:
     ModK.fit(resample, n_jobs=2)
     ModK.plot()
     resample_results.append(ModK.cluster_centers_)
-    
+ 
 
 #%%
-# We can reorganize our clustering results to our needs.
+# As we can see, each resampling solution explain about 70% of the resample.
+# However, topographies can vary a lot from one solution to another.
+# The sparsity of results reveals how data sampling may influence
+# the results of microstates analysis.
+# To tackle this issue, one solution could be to compute a second round
+# of clustering on the concatenated resample solutions.
 import numpy as np
 from pycrostates.io import ChData
 
