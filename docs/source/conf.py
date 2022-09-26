@@ -225,8 +225,6 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
 
 # -- sphinxcontrib-bibtex ----------------------------------------------------
 bibtex_bibfiles = ["../references.bib"]
-bibtex_reference_style = "author_year"
-bibtex_default_style = "plain"
 
 # -- sphinx-gallery ----------------------------------------------------------
 sphinx_gallery_conf = {
