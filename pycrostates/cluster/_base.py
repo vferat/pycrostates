@@ -523,7 +523,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         block : bool
             Whether to halt program execution until the figure is closed.
         **kwargs
-            Kwargs are passed to :func:`mne.viz.plot_topomap`.
+            Additional keyword arguments are passed to
+            :func:`mne.viz.plot_topomap`.
 
         Returns
         -------
@@ -595,9 +596,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         half_window_size : int
             Number of samples used for the half window size while smoothing
             labels. The half window size is defined as
-            ``window_size = 2 * half_window_size + 1``.
-            Has no ffect if ``factor=0`` (default).
-            Default to 1.
+            ``window_size = 2 * half_window_size + 1``. It has no effect if
+            ``factor=0`` (default). Default to 1.
         tol : float
             Convergence tolerance.
         min_segment_length : int
