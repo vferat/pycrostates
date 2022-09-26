@@ -28,7 +28,7 @@ from pycrostates.datasets import lemon
 
 raw_fname = lemon.data_path(subject_id='010017', condition='EC')
 raw = read_raw_eeglab(raw_fname, preload=True)
-raw.crop(0, 30)
+raw.crop(0, 10)
 
 raw.pick('eeg')
 raw.set_eeg_reference('average')
@@ -44,23 +44,27 @@ n_clusters = 5
 ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
 
 #%%
-# Most methods need the modified K-means to be fitted. This can be done with
-# either :class:`mne.io.Raw` or :class:`mne.epochs.Epochs` data structures.
-# Note that, depending on your setup, you can change ``n_jobs=1`` in order to
-# use parallel processing and reduce computation time.
+# Most methods need the modified K-means to be fitted. A clustering algorithm
+# can be fitted with either a :class:`~mne.io.Raw`, :class:`~mne.epochs.Epochs`
+# of :class:`~pycrostates.io.ChData` object.
+#
+# .. note::
+#
+#     Depending on your configuration, you can change the argument ``n_jobs``
+#     to take advantage of multiprocessing to reduce computation time.
 
 ModK.fit(raw, n_jobs=5)
 
 #%%
-# Now that our algorithm is fitted, we can visualize the cluster centers, also
-# called microstate maps or microstate topographies using
-# :meth:`pycrostates.cluster.ModKMeans.plot`.
+# Now that our algorithm is fitted, we can visualize the
+# :term:`cluster centers`, also called microstate maps or microstate
+# topographies using :meth:`pycrostates.cluster.ModKMeans.plot`.
 
 ModK.plot()
 
 #%%
-# One can access the cluster centers as a numpy array thanks to the
-# ``cluster_centers_`` attribute:
+# The :term:`cluster centers` can be retrueved as a numpy array with the
+# ``cluster_centers_`` attribute.
 
 ModK.cluster_centers_
 
@@ -68,7 +72,7 @@ ModK.cluster_centers_
 # Clusters centers can be reordered using
 # :meth:`pycrostates.cluster.ModKMeans.reorder_clusters`.
 
-ModK.reorder_clusters(order=[3, 2, 4, 0, 1])
+ModK.reorder_clusters(order=[3, 0, 1, 2, 4])
 ModK.plot()
 
 #%%
@@ -78,7 +82,7 @@ ModK.rename_clusters(new_names=['A', 'B', 'C', 'D', 'F'])
 ModK.plot()
 
 #%%
-# Maps polarities can be inverted using
+# The map polarities can be inverted using the
 # :meth:`pycrostates.cluster.ModKMeans.invert_polarity`.
 # method. Note that it only affects visualization, it has not effect during
 # backfitting as polarities are ignored.
@@ -94,9 +98,10 @@ ModK.plot()
 # performed on the output sequence by setting the ``factor`` argument ``> 0``
 # (no smoothing by default ``factor=0``) while the ``half_window_size``
 # parameter is used to specify the smoothing temporal span. Finally, the
-# ``reject_edges`` argument allows not to assign the first and last segment of
-# each recording (or each epoch) as these can be incomplete. It should have
-# little impact for raw, but can be important when working with epochs.
+# ``reject_edges`` argument allows prevent the assignment of the first and last
+# segment of each recording (or each epoch) as these can be incomplete. It
+# should have little impact for `~mne.io.Raw` objects, but can be important
+# when working with `~mne.Epochs`.
 
 segmentation = ModK.predict(raw, reject_by_annotation=True, factor=10,
                             half_window_size=10, min_segment_length=5,
