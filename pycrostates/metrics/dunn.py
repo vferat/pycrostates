@@ -10,7 +10,7 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def dunn_score(cluster):  # higher the better
-    """Compute the Dunn index score.
+    r"""Compute the Dunn index score.
 
     This function computes the Dunn index score\ :footcite:p:`Dunn` from a
     fitted :ref:`Clustering` instance.

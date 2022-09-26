@@ -12,7 +12,7 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def calinski_harabasz_score(cluster):  # higher the better
-    """Compute the Calinski-Harabasz score.
+    r"""Compute the Calinski-Harabasz score.
 
     This function computes the Calinski-Harabasz
     score\ :footcite:p:`Calinski-Harabasz` with

@@ -570,10 +570,10 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         *,
         verbose: Optional[str] = None,
     ):
-        """Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
+        r"""Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
 
-        Segment instance into microstate sequence using the segmentation smoothing
-        algorithm introduce in [1]_.
+        Segment instance into microstate sequence using the segmentation
+        smoothing algorithm\ :footcite:p:`Marqui1995`.
 
         Parameters
         ----------
@@ -619,7 +619,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         References
         ----------
-        .. [1] :cite:t:`Marqui1995`
+        .. footbibliography::
         """
         # TODO: reject_by_annotation_raw doc probably doesn't match the correct
         # argument types.

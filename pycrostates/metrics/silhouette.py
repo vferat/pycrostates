@@ -11,7 +11,7 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def silhouette_score(cluster):  # higher the better
-    """Compute the mean Silhouette Coefficient.
+    r"""Compute the mean Silhouette Coefficient.
 
     This function computes the Silhouette
     Coefficient\ :footcite:p:`Silhouettes` with

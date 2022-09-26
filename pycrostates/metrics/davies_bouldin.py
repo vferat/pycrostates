@@ -12,7 +12,7 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def davies_bouldin_score(cluster):  # lower the better
-    """Compute the Davies-Bouldin score.
+    r"""Compute the Davies-Bouldin score.
 
     This function computes the Davies-Bouldin
     score\ :footcite:p:`Davies-Bouldin` with
