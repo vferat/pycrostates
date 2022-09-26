@@ -68,7 +68,7 @@ Additional modules help researchers to develop analysis pipelines:
 By design, Pycrostates is not restricted to EEG data. Its API is build on top
 of the robust MNE-Python [@gramfort_meg_2013] ecosystem enabling a seamless
 integration of microstates analysis. It's modular design supports all data
-typesnfrom MNE-Python and future improvements and additions such as different
+types from MNE-Python and future improvements and additions such as different
 clustering algorithms or new tools for sequences analysis such as Markov
 chains.
 
@@ -77,10 +77,10 @@ chains.
 Currently, several software and libraries are available to perform EEG
 microstates analysis: Cartool [@brunet_spatiotemporal_nodate], Thomas Koening's
 MATLAB microstates EEGLab toolbox (https://www.thomaskoenig.ch/index.php/software/microstates-in-eeglab),
-Andreas Trier Poulsen's MATLAB microstates EEGLab toolbox
+or Andreas Trier Poulsen's MATLAB microstates EEGLab toolbox
 [@poulsen_microstate_2018]. In the last few years, the Python programming
 language ecosystem has expanded considerably, especially in scientific fields.
-The MNE-Python [@gramfort_meg_2013] library stands out for the analysis of
+MNE-Python [@gramfort_meg_2013] stands out for the analysis of
 human neurophysiological data. Current Python implementations of microstate
 analysis include the python 2 library from Frederic von Wegner
 [@von_wegner_information-theoretical_2018], Neurokit [@Makowski2021neurokit],
@@ -99,8 +99,8 @@ especially usefull for handling low signal to noise datapoints occuring during
 microstate polarity inversions.
 
 Pycrostates API can replicate most of the analyses proposed in the literature
-[@MICHEL2018577] and in standard but non-python packages
-Cartool [@brunet_spatiotemporal_nodate], MATLAB microstates EEGLab toolboxes.
+[@MICHEL2018577] and in standard but non-python packages such as
+Cartool [@brunet_spatiotemporal_nodate] or MATLAB microstates EEGLab toolboxes.
 Pycrostates is built with a modular and scalable design, following modern
 development methods and standards to facilitate its maintenance and evolution
 over time. It offers a solid basis to the open-source community to use
