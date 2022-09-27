@@ -1,6 +1,6 @@
 """
-Global field power peaks extraction
-===================================
+Global Field Power peaks
+========================
 
 This example demonstrates how to extract Global Field Power (:term:`GFP`) peaks
 from an EEG recording.
@@ -51,7 +51,7 @@ gfp_data = extract_gfp_peaks(raw, min_peak_distance=3)
 gfp_data
 
 #%%
-# :term:`GFP` peaks can also be extracted from a :class:`~mne.Epochs` object.
+# :term:`GFP` peaks can also be extracted from an :class:`~mne.Epochs` object.
 
 epochs = mne.make_fixed_length_epochs(raw, duration=2, preload=True)
 gfp_data = extract_gfp_peaks(epochs, min_peak_distance=3)
@@ -72,7 +72,7 @@ resample[0]
 
 from pycrostates.cluster import ModKMeans
 ModK = ModKMeans(n_clusters=5, random_state=42)
-ModK.fit(gfp_data, n_jobs=5)
+ModK.fit(gfp_data, n_jobs=5, verbose="WARNING")
 ModK.plot()
 
 #%%
