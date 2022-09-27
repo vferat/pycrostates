@@ -61,7 +61,8 @@ gfp_data
 # gfp_data can the be used for otherp reprocessing steps such as :func:`~pycrostates.preprocessing.resample`
 
 from pycrostates.preprocessing import resample
-resample = resample(gfp_data, n_resamples=1, n_samples=100) #extract 1 resample of  100 random high gfp samples.
+# extract 1 resample of  100 random high gfp samples.
+resample = resample(gfp_data, n_resamples=1, n_samples=100)
 resample[0]
 
 #%%
