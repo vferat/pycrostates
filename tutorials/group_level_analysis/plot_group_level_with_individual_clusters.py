@@ -77,9 +77,8 @@ ModK.rename_clusters(new_names=["MS1", "MS2", "MS3", "MS4", "MS5"])
 ModK.plot()
 
 #%%
-# We can now backfit the group level maps
-# to each individual recording and extract
-# microstate parameters.
+# We can now backfit the group level maps to each individual recording and
+# extract microstate parameters.
 
 import pandas as pd
 
