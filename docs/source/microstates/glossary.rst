@@ -10,6 +10,13 @@ Glossary
         global field power (GFP) are known to represent the portions of EEG
         data with highest signal-to-noise ratio :cite:`KOENIG20161104`
 
+    GEV
+        Global explained variance
+        Total explained variance expressed by a given state.
+        Conputed as sum of the explained variance 
+        multiplied by the :term:`GFP` of each sample
+        assigned to a given state.
+    
     cluster centers
         Arithmetic mean of all the points belonging to the cluster. In the
         context of microstate analysis, it corresponds to the microstates
