@@ -42,12 +42,18 @@ in our model, and more particularly the number of :term:`cluster centers`.
 #     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
 
+# sphinx_gallery_thumbnail_number = 2
+
 import matplotlib.pyplot as plt
+import numpy as np
+from mne import set_log_level
 from mne.io import read_raw_eeglab
 
 from pycrostates.cluster import ModKMeans
 from pycrostates.datasets import lemon
 
+
+set_log_level("ERROR")  # reduce verbosity
 
 raw_fname = lemon.data_path(subject_id="010017", condition="EO")
 raw = read_raw_eeglab(raw_fname, preload=True)
@@ -55,7 +61,48 @@ raw.crop(0, 30)
 raw.pick("eeg")
 raw.set_eeg_reference("average")
 
+#%%
+# Silhouette score
+# ----------------
+# The Silhouette score\ :footcite:p:`Silhouettes` focuses on 2 metrics: the
+# intra-cluster distance and the inter-cluster distance. It summarizes how well
+# clusters are dense and well separated.
+#
+# The silhouette score is bounded between ``-1`` (low cluster separation)
+# to ``1`` (high cluster separation).
+
 # %%
+# Calinski-Harabasz score
+# -----------------------
+# The Calinski-Harabasz score\ :footcite:p:`Calinski-Harabasz` is the ratio of
+# the sum of inter-cluster dispersion and of intra-cluster dispersion for all
+# clusters (where the dispersion is defined as the sum of correlations
+# squared). As the silhouette score, it also summarizes how well clusters are
+# dense and well separated. Higher values indicates higher cluster density and
+# better separation.
+
+#%%
+# Dunn score
+# ----------
+#
+# The Dunn score\ :footcite:p:`Dunn` is defined as a ratio of the smallest
+# inter-cluster distance to the largest intra-cluster distance. Overall, it
+# summarizes how well clusters are farther apart and less dispersed. Higher
+# values indicates a better separation.
+
+#%%
+# Davies-Bouldin score
+# --------------------
+# The Davies-Bouldin score\ :footcite:p:`Davies-Bouldin` is defined as the
+# average similarity measure of each cluster with its most similar cluster,
+# where similarity is the ratio of intra-cluster distances to inter-cluster
+# distances. Overall, it summarizes how well clusters are farther apart and
+# less dispersed. Lower values indicates a better separation, ``0`` being the
+# lowest score possible.
+
+# %%
+# Compute scores
+# --------------
 # In this example, we will use a single subject EEG recording in order to give
 # more explanation about each of this metrics before showing an application
 # case to determine the optimal number of :term:`cluster centers`
@@ -73,95 +120,93 @@ from pycrostates.metrics import (
 )
 
 cluster_numbers = range(2, 9)
-scores = dict(silhouette=[], calinski_harabasaz=[], dunn=[], davies_bouldin=[])
-for n_clusters in cluster_numbers:
+scores = {
+    "Silhouette": np.zeros(len(cluster_numbers)),
+    "Calinski-Harabasaz": np.zeros(len(cluster_numbers)),
+    "Dunn": np.zeros(len(cluster_numbers)),
+    "Davies-Bouldin": np.zeros(len(cluster_numbers)),
+}
+for k, n_clusters in enumerate(cluster_numbers):
     # fit K-means algorithm with a set number of cluster centers
     ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
-    ModK.fit(raw, n_jobs=2)
+    ModK.fit(raw, n_jobs=2, verbose="WARNING")
 
     # compute scores
-    scores["silhouette"].append(silhouette_score(ModK))
-    scores["calinski_harabasaz"].append(calinski_harabasz_score(ModK))
-    scores["dunn"].append(dunn_score(ModK))
-    scores["davies_bouldin"].append(davies_bouldin_score(ModK))
+    scores["Silhouette"][k] = silhouette_score(ModK)
+    scores["Calinski-Harabasaz"][k] = calinski_harabasz_score(ModK)
+    scores["Dunn"][k] = dunn_score(ModK)
+    scores["Davies-Bouldin"][k] = davies_bouldin_score(ModK)
 
 #%%
-# Silhouette score
-# ----------------
-# The Silhouette score\ :footcite:p:`Silhouettes` focuses on 2 metrics: the
-# intra-cluster distance and the inter-cluster distance. It summarizes how well
-# clusters are dense and well separated.
-#
-# The silhouette score is bounded between ``-1`` (low cluster separation)
-# to ``1`` (high cluster separation).
+# Plot individual scores
+# ----------------------
+# We can plot the different scores with :func:`matplotlib.pyplot.bar`.
 
-plt.figure()
-plt.scatter(cluster_numbers, scores["silhouette"])
-plt.xlabel('n_clusters')
-plt.ylabel('Silhouette score')
+f, ax = plt.subplots(2, 2, sharex=True)
+for k, (score, values) in enumerate(scores.items()):
+    ax[k // 2, k % 2].bar(x=cluster_numbers, height=values)
+    ax[k // 2, k % 2].set_title(score)
+plt.text(
+    0.03, 0.5, "Score",
+    horizontalalignment='center',
+    verticalalignment='center',
+    rotation=90,
+    fontdict=dict(size=14),
+    transform=f.transFigure,
+)
+plt.text(
+    0.5, 0.03, "Number of clusters",
+    horizontalalignment='center',
+    verticalalignment='center',
+    fontdict=dict(size=14),
+    transform=f.transFigure,
+)
 plt.show()
 
 #%%
-# In this example, we can observe that a number of ``n_clusters = 3``
-# gives the highest score compared to other solutions thus indicating
-# a better cluster separation and high cluster density.
-# Note than solutions for ``n_clusters = 2`` and ``n_clusters = 4`` centers
-# give score in the same order of magnitude.
+# Compare scores
+# --------------
+# We can compare the different scores on a barplot using
+# :func:`matplotlib.pyplot.bar`. However, each score spans a different scale,
+# often several order of magnitude different from the others. First, we will
+# normalize each score to unit norm. Except for Davies-Bouldin score, the
+# general rule is the higher the better. Thus, the Davies-Bouldin scores will
+# be inverted.
 
-# %%
-# Calinski-Harabasz score
-# -----------------------
-# The Calinski-Harabasz score\ :footcite:p:`Calinski-Harabasz` is the ratio of
-# the sum of inter-clusters dispersion and of intra-cluster dispersion for all
-# clusters (where the dispersion is defined as the sum of correlations
-# squared). As the silhouette score, it also summarizes how well clusters are
-# dense and well separated. Higher values indicates higher cluster density and
-# better separation.
+# normalize scores using sklearn
+from sklearn.preprocessing import normalize
+scores = {score: normalize(value[:, np.newaxis], axis=0).ravel()
+          for score, value in scores.items()}
+# invert davies-bouldin scores
+scores["Davies-Bouldin"] = 1 - scores["Davies-Bouldin"]
 
-plt.scatter(cluster_numbers, scores["calinski_harabasaz"])
-plt.xlabel('n_clusters')
-plt.ylabel('Calinski Harabasz score')
-plt.show()
+# set width of a bar and define colors
+barWidth = 0.2
+colors = ["#4878D0", "#EE854A", "#6ACC64", "#D65F5F"]
 
-#%%
-# In this example, we can observe that a number of ``n_clusters = 4``
-# gives the highest score compared to other solutions thus indicating
-# a better cluster separation and higher cluster density.
-
-#%%
-# Dunn score
-# ----------
-#
-# The Dunn score\ :footcite:p:`Dunn` is defined as a ratio of the smallest
-# inter-cluster distance to the largest intra-cluster distance. Overall, it
-# summarizes how well clusters are farther apart and less dispersed. Higher
-# values indicates a better separation.
-
-plt.figure()
-plt.scatter(cluster_numbers, scores["dunn"])
-plt.xlabel('n_clusters')
-plt.ylabel('Dunn score')
-plt.show()
-
-#%%
-# In this example, we can observe that a number of ``n_clusters = 8``
-# gives the highest score compared to other solutions thus indicating
-# a better cluster separation.
-
-#%%
-# Davies-Bouldin score
-# --------------------
-# The Davies-Bouldin score\ :footcite:p:`Davies-Bouldin` is defined as the
-# average similarity measure of each cluster with its most similar cluster,
-# where similarity is the ratio of intra-cluster distances to inter-cluster
-# distances. Overall, it summarizes how well clusters are farther apart and
-# less dispersed. Lower values indicates a better separation, ``0`` being the
-# lowest score possible.
-
-plt.figure()
-plt.scatter(cluster_numbers, scores["davies_bouldin"])
-plt.xlabel('n_clusters')
-plt.ylabel('Davies Bouldin score')
+# create figure
+plt.figure(figsize=(10, 8))
+# create the position of the bars on the X-axis
+x = [[elt + k * barWidth for elt in np.arange(len(cluster_numbers))]
+     for k in range(len(scores))]
+# create plots
+for k, (score, values) in enumerate(scores.items()):
+    plt.bar(
+        x=x[k],
+        height=values,
+        width=barWidth,
+        edgecolor="grey",
+        color=colors[k],
+        label=score,
+    )
+# add labels and legend
+plt.xlabel("Number of clusters")
+plt.ylabel("Score normalize to unit norm")
+plt.xticks(
+    [pos + 1.5 * barWidth for pos in range(len(cluster_numbers))],
+    [str(k) for k in cluster_numbers],
+)
+plt.legend()
 plt.show()
 
 #%%
@@ -179,10 +224,9 @@ plt.show()
 # a trade off between the quality of the clustering,
 # interpretations that can be made of it,
 # and the variance expressed by the current clustering.
-# This is why there is no perfect solution and score
-# and why it is up to the person who conducts the analysis
-# to evaluate the most judicious choice,
-# by exploring for example several clustering solutions.
+# There is not ideal solution and it is up to the person who conducts the
+# analysis to evaluate the most judicious choice, by exploring for example
+# several clustering solutions.
 
 #%%
 # References
