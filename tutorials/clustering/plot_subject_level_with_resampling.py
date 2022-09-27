@@ -37,7 +37,7 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# Resampling is a technic which consist of selecting a subset of 
+# Resampling is a technique which consist of selecting a subset of 
 # dataset several times. This method can be useful to study the
 # stability and reliability of clustering results.
 # In this example, we will split our data in ``n_resamples`` resamples each containing
