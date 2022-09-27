@@ -83,8 +83,6 @@ ModK.plot()
 # to each individual recording and extract
 # microstate parameters.
 
-import pandas as pd
-
 ms_data = list()
 for subject_id in subject_ids:
     # Load Data
@@ -98,6 +96,17 @@ for subject_id in subject_ids:
     d = segmentation.compute_parameters()
     d["subject_id"] = subject_id
     ms_data.append(d)
+    
+#%%
+# From this point on, we can start to visualize our results
+# and do your statistical analysis. For exemple we can
+# plot the :term:`GEV` of microstate class.
 
-ms_data = pd.DataFrame(ms_data)
-ms_data
+import matplotlib.pyplot as plt
+
+data = np.array([[d['A_gev'], d['B_gev'], d['C_gev'], d['D_gev'], d['F_gev']] for d in ms_data])
+
+fig, ax = plt.subplots()
+ax.set_title('Global Explained Variance (%)')
+ax.violinplot(data)
+ax.set_xticklabels([""] + ModK.cluster_names)

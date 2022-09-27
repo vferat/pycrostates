@@ -80,8 +80,6 @@ ModK.plot()
 # We can now backfit the group level maps to each individual recording and
 # extract microstate parameters.
 
-import pandas as pd
-
 ms_data = list()
 for subject_id in subject_ids:
     # Load Data
@@ -96,5 +94,16 @@ for subject_id in subject_ids:
     d["subject_id"] = subject_id
     ms_data.append(d)
 
-ms_data = pd.DataFrame(ms_data)
-ms_data
+#%%
+# From this point on, we can start to visualize our results
+# and do your statistical analysis. For exemple we can
+# plot the :term:`GEV` of microstate class.
+
+import matplotlib.pyplot as plt
+
+data = np.array([[d['MS1_gev'], d['MS2_gev'], d['MS3_gev'], d['MS4_gev'], d['MS5_gev']] for d in ms_data])
+
+fig, ax = plt.subplots()
+ax.set_title('Global Explained Variance (%)')
+ax.violinplot(data)
+ax.set_xticklabels([""] + ModK.cluster_names)
