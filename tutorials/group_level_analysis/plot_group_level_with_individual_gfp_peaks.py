@@ -7,9 +7,7 @@ by computing group level topographies based on individual :term:`GFP` peaks.
 """
 
 #%%
-# .. Links
-#
-# .. _`mne installers`: https://mne.tools/stable/install/installers.html
+# .. include:: ../../../../links.inc
 
 #%%
 # .. note::
@@ -25,6 +23,7 @@ by computing group level topographies based on individual :term:`GFP` peaks.
 #     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
 
+import numpy as np
 from mne.io import read_raw_eeglab
 
 from pycrostates.cluster import ModKMeans
@@ -37,29 +36,22 @@ condition = "EO"
 subject_ids = ["010020", "010021", "010022", "010023", "010024"]
 
 #%%
-# In this example, we first extract individual
-# :term:`GFP` peaks. Then we concatenate them into
-# a single dataset in order to submit it to
-# clustering (group level analysis).
-
-import numpy as np
-
-ModK = ModKMeans(n_clusters=5, random_state=42)
-n_jobs = 2
+# In this example, we start by extracting the individual :term:`GFP` peaks and
+# concatenating them into a single dataset. The totality of :term:`GFP` peaks
+# is used in the group level analysis to fit a clustering algorithm.
 
 individual_gfp_peaks = list()
 for subject_id in subject_ids:
-    # Load Data
+    # load Data
     raw_fname = lemon.data_path(subject_id=subject_id, condition=condition)
     raw = read_raw_eeglab(raw_fname, preload=True)
     raw = lemon.standardize(raw)
     raw.pick("eeg")
-    # For sake of time, we only use 30s of recording.
-    raw.crop(0, 30)
+    raw.crop(0, 30)  # crop the dataset to speed up computation
     raw.set_eeg_reference("average")
-    # Extract GFP peaks
+    # extract GFP peaks
     gfp_peaks = extract_gfp_peaks(raw)
-    # Equalize peak number across subjects
+    # equalize peak number across subjects by resampling
     gfp_peaks = resample(
         gfp_peaks, n_resamples=1, n_samples=880, random_state=42
     )[0]
@@ -67,21 +59,24 @@ for subject_id in subject_ids:
 
 individual_gfp_peaks = np.hstack(individual_gfp_peaks)
 individual_gfp_peaks = ChData(individual_gfp_peaks, raw.info)
-# Group level clustering
-ModK.fit(individual_gfp_peaks, n_jobs=n_jobs)
+
+# group level clustering
+ModK = ModKMeans(n_clusters=5, random_state=42)
+ModK.fit(individual_gfp_peaks, n_jobs=2)
 ModK.plot()
 
 #%%
-# We can reorganize our clustering results to our needs.
+# The :term:`cluster centers` can be re-organize to our needs.
 
 ModK.reorder_clusters(order=[0, 2, 4, 3, 1])
 ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
 ModK.plot()
 
 #%%
-# We can now backfit the group level maps
-# to each individual recording and extract
-# microstate parameters.
+# We can now use this fitted clustering algorithm to predict the segmentation
+# on each individual. This is also referred to as backfitting the group level
+# maps to each individual recording. Finally, we can extract microstate
+# parameters from the backfitted segmentations.
 
 ms_data = list()
 for subject_id in subject_ids:

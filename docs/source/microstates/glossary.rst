@@ -8,7 +8,7 @@ Glossary
         Global Field Power. For EEG data, it is computed as the standard
         deviation of the sensors at a given timepoint. Local maxima of the
         global field power (GFP) are known to represent the portions of EEG
-        data with highest signal-to-noise ratio :cite:`KOENIG20161104`
+        data with highest signal-to-noise ratio (:cite:t:`KOENIG20161104`).
 
     GEV
         Global explained variance

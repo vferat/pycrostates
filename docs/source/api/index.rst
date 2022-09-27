@@ -13,12 +13,6 @@ This is the reference for classes (``CamelCase`` names) and functions
    :local:
    :depth: 2
 
-
-.. automodule:: pycrostates
-   :no-members:
-   :no-inherited-members:
-
-
 .. toctree::
     :maxdepth: 2
 

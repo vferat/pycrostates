@@ -7,9 +7,7 @@ from an EEG recording.
 """
 
 #%%
-# .. Links
-#
-# .. _`mne installers`: https://mne.tools/stable/install/installers.html
+# .. include:: ../../../../links.inc
 
 #%%
 # .. note::

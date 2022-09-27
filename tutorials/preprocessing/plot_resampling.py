@@ -6,9 +6,7 @@ This example demonstrates how to resample a recording.
 """
 
 #%%
-# .. Links
-#
-# .. _`mne installers`: https://mne.tools/stable/install/installers.html
+# .. include:: ../../../../links.inc
 
 #%%
 # .. note::

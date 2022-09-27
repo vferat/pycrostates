@@ -7,9 +7,7 @@ by computing group-level topographies based on individual clusters.
 """
 
 #%%
-# .. Links
-#
-# .. _`mne installers`: https://mne.tools/stable/install/installers.html
+# .. include:: ../../../../links.inc
 
 #%%
 # .. note::
@@ -77,8 +75,10 @@ ModK.rename_clusters(new_names=["MS1", "MS2", "MS3", "MS4", "MS5"])
 ModK.plot()
 
 #%%
-# We can now backfit the group level maps to each individual recording and
-# extract microstate parameters.
+# We can now use this fitted clustering algorithm to predict the segmentation
+# on each individual. This is also referred to as backfitting the group level
+# maps to each individual recording. Finally, we can extract microstate
+# parameters from the backfitted segmentations.
 
 ms_data = list()
 for subject_id in subject_ids:
