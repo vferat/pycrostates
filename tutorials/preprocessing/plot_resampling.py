@@ -21,7 +21,7 @@ This example demonstrates how to resample a recording.
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
 #
-#     Note that an environment created via the `MNE installers`_. includes
+#     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
 
 import mne

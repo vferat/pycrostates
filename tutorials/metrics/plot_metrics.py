@@ -17,14 +17,14 @@ in our model, and more particularly the number of :term:`cluster centers`.
 # Pycrostates implements several metrics to evaluate the quality of
 # clustering solutions without knowing the ground truth:
 #
-# * Silhouette score\ :footcite:p:`Silhouettes`
+# * Silhouette score\ :footcite:p:`Silhouettes`:
 #   :func:`~pycrostates.metrics.silhouette_score` (higher the better)
-# * Calinski-Harabasz score\ :footcite:p:`Calinski-Harabasz`
+# * Calinski-Harabasz score\ :footcite:p:`Calinski-Harabasz`:
 #   :func:`~pycrostates.metrics.calinski_harabasz_score` (higher the better)
-# * Dunn score\ :footcite:p:`Dunn`
+# * Dunn score\ :footcite:p:`Dunn`:
 #   :func:`~pycrostates.metrics.dunn_score` (higher the better)
 # * Davies-Bouldin score\ :footcite:p:`Davies-Bouldin`:
-#   func:`~pycrostates.metrics.davies_bouldin_score` (lower the better)
+#   :func:`~pycrostates.metrics.davies_bouldin_score` (lower the better)
 #
 # Those metrics can directly be applied to a fitted clustering algorithm
 # such as the :py:class:`~pycrostates.cluster.ModKMeans`.
@@ -39,7 +39,7 @@ in our model, and more particularly the number of :term:`cluster centers`.
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
 #
-#     Note that an environment created via the `MNE installers`_. includes
+#     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
 
 import matplotlib.pyplot as plt
@@ -59,11 +59,11 @@ raw.set_eeg_reference("average")
 # In this example, we will use a single subject EEG recording in order to give
 # more explanation about each of this metrics before showing an application
 # case to determine the optimal number of :term:`cluster centers`
-# ``n_clusters`` while fitting with the :class:`~pycrostates.cluster.ModKMeans`
+# ``n_clusters`` while fitting a :class:`~pycrostates.cluster.ModKMeans`
 # algorithm.
 # For this example, we start by computing each of the score on the clustering
 # results of a :class:`~pycrostates.cluster.ModKMeans` fitted for different
-# values of ``n_clusters``.
+# ``n_clusters`` ranging from 2 to 8.
 
 from pycrostates.metrics import (
     silhouette_score,
@@ -72,7 +72,7 @@ from pycrostates.metrics import (
     davies_bouldin_score,
 )
 
-cluster_numbers = range(2, 10)
+cluster_numbers = range(2, 9)
 scores = dict(silhouette=[], calinski_harabasaz=[], dunn=[], davies_bouldin=[])
 for n_clusters in cluster_numbers:
     # fit K-means algorithm with a set number of cluster centers
@@ -88,14 +88,12 @@ for n_clusters in cluster_numbers:
 #%%
 # The Silhouette score
 # --------------------
-# Silhouette analysis includes two measures:
+# The Silhouette score\ :footcite:p:`Silhouettes` focuses on 2 metrics: the
+# intra-cluster distance and the inter-cluster distance. It summarizes how well
+# clusters are dense and well separated.
 #
-# - intra-cluster distance
-# - inter-cluster distance
-#
-# Overall, it summarizes how well clusters are dense and well separated.
-# The silhouette score is bounded between ``-1`` for poor clustering
-# to ``1`` for well separated clusters.
+# The silhouette score is bounded between ``-1`` (low cluster separation)
+# to ``1`` (high cluster separation).
 
 plt.figure()
 plt.scatter(cluster_numbers, scores["silhouette"])
@@ -113,12 +111,12 @@ plt.show()
 # %%
 # The Calinski-Harabasz score
 # ---------------------------
-# The Calinski-Harabasz score is the ratio of the sum of between-clusters
-# dispersion and of within-cluster dispersion for all clusters (where
-# dispersion is defined as the sum of correlations squared).
-# As the silhouette score, it also summarizes how well clusters are dense and
-# well separated. Higher values indicates higher cluster density and better
-# separation.
+# The Calinski-Harabasz score\ :footcite:p:`Calinski-Harabasz` is the ratio of
+# the sum of inter-clusters dispersion and of intra-cluster dispersion for all
+# clusters (where the dispersion is defined as the sum of correlations
+# squared). As the silhouette score, it also summarizes how well clusters are
+# dense and well separated. Higher values indicates higher cluster density and
+# better separation.
 
 plt.scatter(cluster_numbers, scores["calinski_harabasaz"])
 plt.xlabel('n_clusters')
@@ -134,10 +132,10 @@ plt.show()
 # The Dunn score
 # --------------
 #
-# The Dunn score is defined as a ratio of the smallest inter-cluster distance
-# to the largest intra-cluster distance. Overall, it summarizes how well
-# clusters are farther apart and less dispersed. Higher values indicates a
-# better separation.
+# The Dunn score\ :footcite:p:`Dunn` is defined as a ratio of the smallest
+# inter-cluster distance to the largest intra-cluster distance. Overall, it
+# summarizes how well clusters are farther apart and less dispersed. Higher
+# values indicates a better separation.
 
 plt.figure()
 plt.scatter(cluster_numbers, scores["dunn"])
@@ -153,12 +151,12 @@ plt.show()
 #%%
 # The Davies-Bouldin score
 # ------------------------
-# Davies-Bouldin is defined as the average similarity measure of each cluster
-# with its most similar cluster, where similarity is the ratio of
-# intra-cluster distances to inter-cluster distances.
-# Overall, it summarizes how well clusters are farther apart and less
-# dispersed. Lower values indicates a better separation, ``0`` being the lowest
-# score possible.
+# The Davies-Bouldin score\ :footcite:p:`Davies-Bouldin` is defined as the
+# average similarity measure of each cluster with its most similar cluster,
+# where similarity is the ratio of intra-cluster distances to inter-cluster
+# distances. Overall, it summarizes how well clusters are farther apart and
+# less dispersed. Lower values indicates a better separation, ``0`` being the
+# lowest score possible.
 
 plt.figure()
 plt.scatter(cluster_numbers, scores["davies_bouldin"])
@@ -169,10 +167,10 @@ plt.show()
 #%%
 # Conclusion
 # ----------
-# As can be seen, there is no global consensus on which ``n_cluster`` value to
-# choose. The silhoutette score seems to be in favor of
-# ``n_clusters=3``, Calinski Harabasz score ``n_clusters=4``,
-# Dunns score ``n_clusters=8`` and Davies Bouldin score ``n_clusters=3 or 4``.
+# There is no global consensus on which ``n_cluster`` value to
+# choose. The Silhoutette score seems to be in favor of
+# ``n_clusters=3``, Calinski-Harabasz score ``n_clusters=4``,
+# Dunn score ``n_clusters=8`` and Davies-Bouldin score ``n_clusters=3 or 4``.
 # Each of these scores provides similar but different information about the
 # quality of the clustering.
 #

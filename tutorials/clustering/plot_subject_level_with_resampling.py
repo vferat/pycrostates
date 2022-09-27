@@ -22,7 +22,7 @@ the clustering results.
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
 #
-#     Note that an environment created via the `MNE installers`_. includes
+#     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
 
 from mne.io import read_raw_eeglab

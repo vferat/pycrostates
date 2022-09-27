@@ -22,15 +22,16 @@ by computing group-level topographies based on individual clusters.
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
 #
-#     Note that an environment created via the `MNE installers`_. includes
+#     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
 
 from mne.io import read_raw_eeglab
 
 from pycrostates.cluster import ModKMeans
 from pycrostates.datasets import lemon
-from pycrostates.preprocessing import extract_gfp_peaks
 from pycrostates.io import ChData
+from pycrostates.preprocessing import extract_gfp_peaks
+
 
 condition = "EO"
 subject_ids = ["010020", "010021", "010022", "010023", "010024"]

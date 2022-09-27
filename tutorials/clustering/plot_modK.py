@@ -3,7 +3,8 @@ The ModKMeans object
 ====================
 
 This tutorial introduces the main clustering object
-:class:`pycrostates.cluster.ModKMeans` structure in detail.
+:class:`pycrostates.cluster.ModKMeans` structure in detail. The Modified
+K-means algorithm is based on :footcite:t:`Marqui1995`.
 """
 
 #%%
@@ -22,7 +23,7 @@ This tutorial introduces the main clustering object
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
 #
-#     Note that an environment created via the `MNE installers`_. includes
+#     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
 
 from mne.io import read_raw_eeglab
@@ -39,10 +40,10 @@ raw.pick('eeg')  # select EEG channels
 raw.set_eeg_reference('average')  # Apply a common average reference
 
 #%%
-# The modified K-means can be instantiated with the number of
-# :term:`cluster centers` ``n_clusters`` to fit. By default, the modified
-# K-means will only work with EEG data, but other channel types can be selected
-# with the ``picks`` argument.
+# The modified K-means\ :footcite:p:`Marqui1995` can be instantiated with the
+# number of :term:`cluster centers` ``n_clusters`` to fit. By default, the
+# modified K-means will only work with EEG data, but other channel types can be
+# selected with the ``picks`` argument.
 #
 # .. note::
 #
@@ -102,8 +103,9 @@ ModK.invert_polarity([False, False, True, True, False])
 ModK.plot()
 
 #%%
-# Finally, the modified K-means can be used to predict the microstates
-# segmentation using the :meth:`pycrostates.cluster.ModKMeans.predict` method.
+# Finally, the modified K-means\ :footcite:p:`Marqui1995` can be used to
+# predict the microstates segmentation using the
+# :meth:`pycrostates.cluster.ModKMeans.predict` method.
 # By default, segments annotated as bad will not be labeled, but this behavior
 # can be changed with the ``reject_by_annotation`` argument. Smoothing can be
 # performed on the output sequence by setting the ``factor`` argument ``> 0``
@@ -118,3 +120,8 @@ segmentation = ModK.predict(raw, reject_by_annotation=True, factor=10,
                             half_window_size=10, min_segment_length=5,
                             reject_edges=True)
 segmentation.plot(tmin=1, tmax=5)
+
+#%%
+# References
+# ----------
+# .. footbibliography::

@@ -1,9 +1,9 @@
 """
-Group level analysis from individual gfp peaks
+Group level analysis from individual GFP peaks
 ==============================================
 
 In this tutorial, we will learn how to conduct group level analysis
-by computing group level topographies based on individual :term:GFP peaks.
+by computing group level topographies based on individual :term:`GFP` peaks.
 """
 
 #%%
@@ -22,22 +22,23 @@ by computing group level topographies based on individual :term:GFP peaks.
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
 #
-#     Note that an environment created via the `MNE installers`_. includes
+#     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
 
 from mne.io import read_raw_eeglab
 
 from pycrostates.cluster import ModKMeans
 from pycrostates.datasets import lemon
-from pycrostates.preprocessing import extract_gfp_peaks, resample
 from pycrostates.io import ChData
+from pycrostates.preprocessing import extract_gfp_peaks, resample
+
 
 condition = "EO"
 subject_ids = ["010020", "010021", "010022", "010023", "010024"]
 
 #%%
 # In this example, we first extract individual
-# :term:GFP peaks. Then we concatenate them into
+# :term:`GFP` peaks. Then we concatenate them into
 # a single dataset in order to submit it to
 # clustering (group level analysis).
 
