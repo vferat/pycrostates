@@ -14,3 +14,27 @@ Glossary
         Arithmetic mean of all the points belonging to the cluster. In the
         context of microstate analysis, it corresponds to the microstates
         topographies.
+
+    inter-cluster distance
+        Distance between two datapoints belonging to two different clusters.
+        Depending on the metric used, it can be computed in different ways, for example
+        as the average distance between all datapoint belonging to different clusters,
+        the distance between two cluster centers, the minimal distance between two
+        datapoints belonging to different cluster ect..
+
+        .. figure:: ../../_static/img/inter_cluster_distance.png
+            :width: 600
+            :alt: Inter cluster distance illustration.
+  
+
+    intra-cluster distance
+        Distance between two datapoint belonging to same cluster. Depending on
+        the metric used, it can be computed in different ways, for example
+        as the average distance between all datapoint belonging to same cluster,
+        the average distance between all datapoint at the cluster center or
+        the maximal distance between two datapoints belonging to the same
+        cluster, ect..
+
+        .. figure:: ../../_static/img/intra_cluster_distance.png
+            :width: 600
+            :alt: Intra cluster distance illustration.
