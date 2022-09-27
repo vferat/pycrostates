@@ -7,9 +7,7 @@ by computing group-level topographies based on individual clusters.
 """
 
 #%%
-# .. Links
-#
-# .. _`mne installers`: https://mne.tools/stable/install/installers.html
+# .. include:: ../../../../links.inc
 
 #%%
 # .. note::

@@ -9,9 +9,7 @@ in our model, and more particularly the number of :term:`cluster centers`.
 """
 
 #%%
-# .. Links
-#
-# .. _`mne installers`: https://mne.tools/stable/install/installers.html
+# .. include:: ../../../../links.inc
 
 # %%
 # Pycrostates implements several metrics to evaluate the quality of

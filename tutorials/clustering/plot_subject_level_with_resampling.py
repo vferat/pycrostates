@@ -7,9 +7,7 @@ to compute individual microstate topographies and study the stability of
 the clustering results.
 """
 #%%
-# .. Links
-#
-# .. _`mne installers`: https://mne.tools/stable/install/installers.html
+# .. include:: ../../../../links.inc
 
 #%%
 # .. note::

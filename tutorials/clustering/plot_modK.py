@@ -8,9 +8,7 @@ K-means algorithm is based on :footcite:t:`Marqui1995`.
 """
 
 #%%
-# .. Links
-#
-# .. _`mne installers`: https://mne.tools/stable/install/installers.html
+# .. include:: ../../../../links.inc
 
 # %%
 # .. note::
