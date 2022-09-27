@@ -57,7 +57,7 @@ set_log_level("ERROR")  # reduce verbosity
 
 raw_fname = lemon.data_path(subject_id="010017", condition="EO")
 raw = read_raw_eeglab(raw_fname, preload=True)
-raw.crop(0, 30)
+raw.crop(0, 180)
 raw.pick("eeg")
 raw.set_eeg_reference("average")
 
@@ -110,7 +110,8 @@ raw.set_eeg_reference("average")
 # algorithm.
 # For this example, we start by computing each of the score on the clustering
 # results of a :class:`~pycrostates.cluster.ModKMeans` fitted for different
-# ``n_clusters`` ranging from 2 to 8.
+# ``n_clusters`` ranging from 2 to 8. To speed-up the fitting while preserving
+# most of the information, only the :term:`GFP` peaks are used.
 
 from pycrostates.metrics import (
     silhouette_score,
@@ -118,6 +119,8 @@ from pycrostates.metrics import (
     dunn_score,
     davies_bouldin_score,
 )
+from pycrostates.preprocessing import extract_gfp_peaks
+
 
 cluster_numbers = range(2, 9)
 scores = {
@@ -126,10 +129,11 @@ scores = {
     "Dunn": np.zeros(len(cluster_numbers)),
     "Davies-Bouldin": np.zeros(len(cluster_numbers)),
 }
+gfp_peaks = extract_gfp_peaks(raw)
 for k, n_clusters in enumerate(cluster_numbers):
     # fit K-means algorithm with a set number of cluster centers
     ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
-    ModK.fit(raw, n_jobs=2, verbose="WARNING")
+    ModK.fit(gfp_peaks, n_jobs=2, verbose="WARNING")
 
     # compute scores
     scores["Silhouette"][k] = silhouette_score(ModK)
@@ -215,18 +219,27 @@ plt.show()
 # There is no global consensus on which ``n_cluster`` value to
 # choose. The Silhoutette score seems to be in favor of
 # ``n_clusters=3``, Calinski-Harabasz score ``n_clusters=4``,
-# Dunn score ``n_clusters=8`` and Davies-Bouldin score ``n_clusters=3 or 4``.
+# Dunn score ``n_clusters=5`` and Davies-Bouldin score ``n_clusters=2 or 5``.
 # Each of these scores provides similar but different information about the
 # quality of the clustering.
 #
 # Note that for microstate analysis the choice of the number of
-# :term:`cluster centers` is also
-# a trade off between the quality of the clustering,
-# interpretations that can be made of it,
-# and the variance expressed by the current clustering.
-# There is not ideal solution and it is up to the person who conducts the
+# :term:`cluster centers` is also a trade off between the quality of the
+# clustering, interpretations that can be made of it, and the variance
+# expressed by the current clustering.
+# There isn't an ideal solution and it is up to the person who conducts the
 # analysis to evaluate the most judicious choice, by exploring for example
 # several clustering solutions.
+
+#%%
+# Microstates fitted for n=5
+# --------------------------
+# In this case, ``n_clusters=5`` seems like a reasonable choice. This number of
+# clusters yields the following maps:
+
+ModK = ModKMeans(n_clusters=5, random_state=42)
+ModK.fit(gfp_peaks, n_jobs=2, verbose="WARNING")
+ModK.plot()
 
 #%%
 # References
