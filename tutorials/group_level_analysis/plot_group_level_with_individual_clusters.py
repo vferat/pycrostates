@@ -25,6 +25,9 @@ by computing group-level topographies based on individual clusters.
 #     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
 
+# sphinx_gallery_thumbnail_number = 2
+
+import numpy as np
 from mne.io import read_raw_eeglab
 
 from pycrostates.cluster import ModKMeans
@@ -37,43 +40,37 @@ condition = "EO"
 subject_ids = ["010020", "010021", "010022", "010023", "010024"]
 
 #%%
-# In this example, we first compute individual
-# topographies from GFP peaks (subject level analysis).
-# Then we concatenate individual topographies into
-# a single dataset and submit it for a second round of
-# clustering (group level analysis).
-
-import numpy as np
-
-n_jobs = 2
+# In this example, we start with a subject level analysis by computing
+# individual topographies from :term:`GFP` peaks. Then, the individual
+# topographies are concatenated and used in the group level analysis to fit a
+# second clustering algorithm.
 
 individual_cluster_centers = list()
 for subject_id in subject_ids:
-    # Load Data
-    ModK = ModKMeans(n_clusters=5, random_state=42)
+    # load Data
     raw_fname = lemon.data_path(subject_id=subject_id, condition=condition)
     raw = read_raw_eeglab(raw_fname, preload=True)
     raw = lemon.standardize(raw)
     raw.pick("eeg")
-    # For sake of time, we only use 30s of recording.
-    raw.crop(0, 30)
+    raw.crop(0, 30)  # crop the dataset to speed up computation
     raw.set_eeg_reference("average")
-    # Extract Gfp peaks
+    # extract GFP peaks
     gfp_peaks = extract_gfp_peaks(raw)
-    # Subject level clustering
-    ModK.fit(gfp_peaks, n_jobs=n_jobs)
-    individual_cluster_centers.append(ModK.cluster_centers_.T)
+    # subject level clustering
+    ModK = ModKMeans(n_clusters=5, random_state=42)
+    ModK.fit(gfp_peaks, n_jobs=2)
+    individual_cluster_centers.append(ModK.cluster_centers_)
 
-group_cluster_centers = np.hstack(individual_cluster_centers)
+group_cluster_centers = np.vstack(individual_cluster_centers).T
 group_cluster_centers = ChData(group_cluster_centers, ModK.info)
 
-# Group level clustering
+# group level clustering
 ModK = ModKMeans(n_clusters=5, random_state=42)
-ModK.fit(group_cluster_centers, n_jobs=n_jobs)
+ModK.fit(group_cluster_centers, n_jobs=2)
 ModK.plot()
 
 #%%
-# We can reorganize our clustering results to our needs.
+# The :term:`cluster centers` can be re-organize to our needs.
 
 ModK.reorder_clusters(order=[4, 2, 0, 1, 3])
 ModK.rename_clusters(new_names=["MS1", "MS2", "MS3", "MS4", "MS5"])
