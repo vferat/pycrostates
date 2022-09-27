@@ -6,6 +6,11 @@ This example demonstrates how to extract global field power (gfp) peaks from an 
 """
 
 #%%
+# .. Links
+#
+# .. _`mne installers`: https://mne.tools/stable/install/installers.html
+
+#%%
 # .. note::
 #
 #     The lemon datasets used in this tutorial is composed of EEGLAB files. To
@@ -16,7 +21,7 @@ This example demonstrates how to extract global field power (gfp) peaks from an 
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
 #
-#     Note that an environment created via the MNE installers includes
+#     Note that an environment created via the `MNE installers`_. includes
 #     ``pymatreader`` by default.
 
 import mne

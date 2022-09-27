@@ -1,6 +1,6 @@
 """
-Evaluating clustering results
-=============================
+Evaluating clustering fits
+==========================
 
 Since microstate analysis is based on an empirical model, it is impossible to
 know the ground truth label of each sample. It is therefore necessary to rely
@@ -8,14 +8,23 @@ on reliable metrics in order to evaluate the relevance of the parameters used
 in our model, and more particularly the number of :term:`cluster centers`.
 """
 
+#%%
+# .. Links
+#
+# .. _`mne installers`: https://mne.tools/stable/install/installers.html
+
 # %%
 # Pycrostates implements several metrics to evaluate the quality of
 # clustering solutions without knowing the ground truth:
 #
-# * The Silhouette score :func:`~pycrostates.metrics.silhouette_score` (higher the better)
-# * The Calinski-Harabasz score :func:`~pycrostates.metrics.calinski_harabasz_score` (higher the better)
-# * The Dunn score :func:`~pycrostates.metrics.dunn_score` (higher the better)
-# * The Davies-Bouldin score func:`~pycrostates.metrics.davies_bouldin_score` (lower the better)
+# * Silhouette score\ :footcite:p:`Silhouettes`
+#   :func:`~pycrostates.metrics.silhouette_score` (higher the better)
+# * Calinski-Harabasz score\ :footcite:p:`Calinski-Harabasz`
+#   :func:`~pycrostates.metrics.calinski_harabasz_score` (higher the better)
+# * Dunn score\ :footcite:p:`Dunn`
+#   :func:`~pycrostates.metrics.dunn_score` (higher the better)
+# * Davies-Bouldin score\ :footcite:p:`Davies-Bouldin`:
+#   func:`~pycrostates.metrics.davies_bouldin_score` (lower the better)
 #
 # Those metrics can directly be applied to a fitted clustering algorithm
 # such as the :py:class:`~pycrostates.cluster.ModKMeans`.
@@ -30,7 +39,7 @@ in our model, and more particularly the number of :term:`cluster centers`.
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
 #
-#     Note that an environment created via the MNE installers includes
+#     Note that an environment created via the `MNE installers`_. includes
 #     ``pymatreader`` by default.
 
 import matplotlib.pyplot as plt
@@ -43,7 +52,6 @@ from pycrostates.datasets import lemon
 raw_fname = lemon.data_path(subject_id="010017", condition="EO")
 raw = read_raw_eeglab(raw_fname, preload=True)
 raw.crop(0, 30)
-
 raw.pick("eeg")
 raw.set_eeg_reference("average")
 
@@ -177,3 +185,8 @@ plt.show()
 # and why it is up to the person who conducts the analysis
 # to evaluate the most judicious choice,
 # by exploring for example several clustering solutions.
+
+#%%
+# References
+# ----------
+# .. footbibliography::

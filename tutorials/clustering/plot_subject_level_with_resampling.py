@@ -6,6 +6,10 @@ This tutorial introduces how to use :class:`pycrostates.preprocessing.resample`
 to compute individual microstate topographies and study the stability of
 the clustering results.
 """
+#%%
+# .. Links
+#
+# .. _`mne installers`: https://mne.tools/stable/install/installers.html
 
 #%%
 # .. note::
@@ -18,7 +22,7 @@ the clustering results.
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
 #
-#     Note that an environment created via the MNE installers includes
+#     Note that an environment created via the `MNE installers`_. includes
 #     ``pymatreader`` by default.
 
 from mne.io import read_raw_eeglab

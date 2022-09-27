@@ -7,6 +7,11 @@ This tutorial introduces the main clustering object
 """
 
 #%%
+# .. Links
+#
+# .. _`mne installers`: https://mne.tools/stable/install/installers.html
+
+# %%
 # .. note::
 #
 #     The lemon datasets used in this tutorial is composed of EEGLAB files. To
@@ -17,7 +22,7 @@ This tutorial introduces the main clustering object
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
 #
-#     Note that an environment created via the MNE installers includes
+#     Note that an environment created via the `MNE installers`_. includes
 #     ``pymatreader`` by default.
 
 from mne.io import read_raw_eeglab
@@ -26,12 +31,12 @@ from pycrostates.cluster import ModKMeans
 from pycrostates.datasets import lemon
 
 
+# load sample dataset
 raw_fname = lemon.data_path(subject_id='010017', condition='EC')
 raw = read_raw_eeglab(raw_fname, preload=True)
-raw.crop(0, 10)
-
-raw.pick('eeg')
-raw.set_eeg_reference('average')
+raw.crop(0, 10)  # crop the dataset to speed up computation
+raw.pick('eeg')  # select EEG channels
+raw.set_eeg_reference('average')  # Apply a common average reference
 
 #%%
 # The modified K-means can be instantiated with the number of
@@ -49,9 +54,11 @@ n_clusters = 5
 ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
 
 #%%
-# Most methods need the modified K-means to be fitted. A clustering algorithm
-# can be fitted with either a :class:`~mne.io.Raw`, :class:`~mne.epochs.Epochs`
-# of :class:`~pycrostates.io.ChData` object.
+# After creating a :class:`~pycrostates.cluster.ModKMeans`, the next step is to
+# fit the model. In other words, fitting a clustering algorithm will determine
+# the microstate maps, also called :term:`cluster centers`. A clustering
+# algorithm can be fitted with :class:`~mne.io.Raw`,
+# :class:`~mne.epochs.Epochs` or :class:`~pycrostates.io.ChData` objects.
 #
 # .. note::
 #
