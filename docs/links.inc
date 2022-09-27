@@ -14,6 +14,7 @@
 .. _project pypi: https://pypi.org/project/pycrostates/
 .. _project conda: https://anaconda.org/conda-forge/pycrostates
 .. _project github: https://github.com/vferat/pycrostates
+.. _project issues: https://github.com/vferat/pycrostates/issues
 
 
 .. mne

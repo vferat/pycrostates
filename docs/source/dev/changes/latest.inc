@@ -22,7 +22,7 @@ Current (0.2.0.dev)
 
 Enhancements
 ~~~~~~~~~~~~
-- Improve metrics tutorial. (:pr:`81` by `Victor Férat`_)
+- Improve tutorials and documentation. (:pr:`81` by `Victor Férat`_)
 
 Bugs
 ~~~~
