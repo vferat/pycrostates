@@ -42,35 +42,36 @@ raw.set_eeg_reference('average')
 # (:term:`GFP`) are known to represent the portions of EEG data
 # with highest signal-to-noise ratio\ :footcite:p:`KOENIG20161104`.
 # We can use the :func:`~pycrostates.preprocessing.extract_gfp_peaks`
-# function to extract samples with highest Global Field Power.
-# The ``min_peak_distance`` argument allow to select the minimum number of
-# sample between 2 selected peaks.
+# function to extract samples with the highest Global Field Power.
+# The minimum distance between consecutive peaks can be defined with the
+# ``min_peak_distance`` argument.
 
 from pycrostates.preprocessing import extract_gfp_peaks
 gfp_data = extract_gfp_peaks(raw, min_peak_distance=3)
 gfp_data
 
 #%%
-# This function can also be used on a :class:`~mne.Epochs` object.
+# :term:`GFP` peaks can also be extracted from a :class:`~mne.Epochs` object.
 
 epochs = mne.make_fixed_length_epochs(raw, duration=2, preload=True)
 gfp_data = extract_gfp_peaks(epochs, min_peak_distance=3)
 gfp_data
 
 #%%
-# gfp_data can the be used for otherp reprocessing steps such as :func:`~pycrostates.preprocessing.resample`
+# The extracted :term:`GFP` peaks can be used in other preprocessing steps,
+# such as a resampling using :func:`~pycrostates.preprocessing.resample`:
 
 from pycrostates.preprocessing import resample
-# extract 1 resample of  100 random high gfp samples.
+# extract 1 resample of 100 random high GFP samples
 resample = resample(gfp_data, n_resamples=1, n_samples=100)
 resample[0]
 
 #%%
-# Or to directly fit a clustering algorithm
+# Or they can be used to fit a clustering algorithm on the portion of EEG data
+# with the highest signal-to-noise ratio.
 
 from pycrostates.cluster import ModKMeans
-n_clusters = 5
-ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
+ModK = ModKMeans(n_clusters=5, random_state=42)
 ModK.fit(gfp_data, n_jobs=5)
 ModK.plot()
 
