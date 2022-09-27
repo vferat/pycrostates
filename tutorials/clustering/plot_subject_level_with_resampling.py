@@ -39,19 +39,21 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# Resampling can be useful to study the stability and reliability of clustering results.
+# Resampling is a technic which consist of selecting a subset of 
+# dataset several times. This method can be useful to study the
+# stability and reliability of clustering results.
 # In this example, we will split our data in ``n_resamples`` resamples each containing
 # ``n_samples`` randomly selected from the original recording.
 #
 # .. note::
 #
 #      This method can also be used on GFP peaks only !
-#      """
-#      gfp_peaks = pycrostates.preprocessing.extract_gfp_peaks(raw)
-#      resamples = resample(
-#      raw, n_resamples=10, n_samples=1000, random_state=42
-#      )
-#      """
+#      ..  code-block:: python
+#          gfp_peaks = pycrostates.preprocessing.extract_gfp_peaks(raw)
+#          resamples = resample(
+#          raw, n_resamples=10, n_samples=1000, random_state=42
+#          )
+# 
 from pycrostates.preprocessing import resample
 
 resamples = resample(
@@ -64,17 +66,22 @@ resample_results = []
 for resample in resamples:
     ModK = ModKMeans(n_clusters=5, random_state=42)
     ModK.fit(resample, n_jobs=2)
-    ModK.plot()
+    fig = ModK.plot(show=False)
+    fig.suptitle(f'GEV: {ModK.GEV_:.2f}', fontsize=20)
     resample_results.append(ModK.cluster_centers_)
 
-
 #%%
-# As we can see, each resampling solution explain about 70% of the resample.
+# As we can see, each resampling clustering solution explains
+# about 70% of its GEV.
 # However, topographies can vary a lot from one solution to another.
 # The sparsity of results reveals how data sampling may influence
-# the results of microstates analysis.
-# To tackle this issue, one solution could be to compute a second round
-# of clustering on the concatenated resample solutions.
+# the results of microstates analysis. Sampling issue are inherent
+# to EEG recording (i.e recording have limited duration and are
+# done at a certain time of a day, in certain conditions..)
+# To tackle this issue, an increase the stability of the clustering,
+# one could compute a second round of clustering on the concatenated
+# resample solutions.
+
 import numpy as np
 from pycrostates.io import ChData
 
@@ -85,6 +92,7 @@ ModK = ModKMeans(n_clusters=5, random_state=42)
 ModK.fit(all_resampling_results, n_jobs=2)
 ModK.plot()
 
+#%%
 # .. note::
-#      This method can also be used for group level analysis by mixing individual resampling results
+#      This method can also be applied for group level analysis by mixing individual resampling results
 #      together.
