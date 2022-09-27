@@ -94,7 +94,7 @@ for subject_id in subject_ids:
     
 #%%
 # From this point on, we can start to visualize our results
-# and do your statistical analysis. For exemple we can
+# and do your statistical analysis. For example we can
 # plot the :term:`GEV` of microstate class.
 
 import matplotlib.pyplot as plt

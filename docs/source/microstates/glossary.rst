@@ -25,9 +25,9 @@ Glossary
     inter-cluster distance
         Distance between two datapoints belonging to two different clusters.
         Depending on the metric used, it can be computed in different ways, for example
-        as the average distance between all datapoint belonging to different clusters,
-        the distance between two cluster centers, the minimal distance between two
-        datapoints belonging to different cluster ect..
+        (but no limited to) as the average distance between all datapoint belonging to 
+        different clusters, the distance between two cluster centers, the minimal distance
+        between two datapoints belonging to different cluster.
 
         .. figure:: ../../_static/img/inter_cluster_distance.png
             :width: 600
@@ -36,11 +36,11 @@ Glossary
 
     intra-cluster distance
         Distance between two datapoint belonging to same cluster. Depending on
-        the metric used, it can be computed in different ways, for example
-        as the average distance between all datapoint belonging to same cluster,
-        the average distance between all datapoint at the cluster center or
-        the maximal distance between two datapoints belonging to the same
-        cluster, ect..
+        the metric used, it can be computed in different ways, for example 
+        (but no limited to) as the average distance between all datapoint
+        belonging to same cluster, the average distance between all datapoint
+        at the cluster center or the maximal distance between two datapoints
+        belonging to the same cluster.
 
         .. figure:: ../../_static/img/intra_cluster_distance.png
             :width: 600
