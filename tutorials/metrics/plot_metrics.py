@@ -65,7 +65,7 @@ raw.set_eeg_reference("average")
 # Silhouette score
 # ----------------
 # The Silhouette score\ :footcite:p:`Silhouettes` focuses on 2 metrics: the
-# intra-cluster distance and the inter-cluster distance. It summarizes how well
+# :term:`intra-cluster distance` and the :term:`inter-cluster distance`. It summarizes how well
 # clusters are dense and well separated.
 #
 # The silhouette score is bounded between ``-1`` (low cluster separation)
@@ -86,7 +86,7 @@ raw.set_eeg_reference("average")
 # ----------
 #
 # The Dunn score\ :footcite:p:`Dunn` is defined as a ratio of the smallest
-# inter-cluster distance to the largest intra-cluster distance. Overall, it
+# :term:`inter-cluster distance` to the largest :term:`intra-cluster distance`. Overall, it
 # summarizes how well clusters are farther apart and less dispersed. Higher
 # values indicates a better separation.
 
@@ -95,10 +95,10 @@ raw.set_eeg_reference("average")
 # --------------------
 # The Davies-Bouldin score\ :footcite:p:`Davies-Bouldin` is defined as the
 # average similarity measure of each cluster with its most similar cluster,
-# where similarity is the ratio of intra-cluster distances to inter-cluster
-# distances. Overall, it summarizes how well clusters are farther apart and
-# less dispersed. Lower values indicates a better separation, ``0`` being the
-# lowest score possible.
+# where similarity is the ratio of :term:`intra-cluster distance` to 
+# :term:`inter-cluster distance`. Overall, it summarizes how well clusters
+# are farther apart and less dispersed. Lower values indicates a better
+# separation, ``0`` being the lowest score possible.
 
 # %%
 # Compute scores
@@ -177,12 +177,13 @@ plt.show()
 # general rule is the higher the better. Thus, the Davies-Bouldin scores will
 # be inverted.
 
+# invert davies-bouldin scores
+scores["Davies-Bouldin"] = 1 / (1 + scores["Davies-Bouldin"])
+
 # normalize scores using sklearn
 from sklearn.preprocessing import normalize
 scores = {score: normalize(value[:, np.newaxis], axis=0).ravel()
           for score, value in scores.items()}
-# invert davies-bouldin scores
-scores["Davies-Bouldin"] = 1 - scores["Davies-Bouldin"]
 
 # set width of a bar and define colors
 barWidth = 0.2
@@ -239,7 +240,11 @@ plt.show()
 
 ModK = ModKMeans(n_clusters=5, random_state=42)
 ModK.fit(gfp_peaks, n_jobs=2, verbose="WARNING")
+
+ModK.reorder_clusters(order=[4,1,3,0,2])
+ModK.rename_clusters(new_names=['A', 'B', 'C', 'D', 'E'])
 ModK.plot()
+
 
 #%%
 # References
