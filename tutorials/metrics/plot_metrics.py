@@ -86,8 +86,8 @@ for n_clusters in cluster_numbers:
     scores["davies_bouldin"].append(davies_bouldin_score(ModK))
 
 #%%
-# The Silhouette score
-# --------------------
+# Silhouette score
+# ----------------
 # The Silhouette score\ :footcite:p:`Silhouettes` focuses on 2 metrics: the
 # intra-cluster distance and the inter-cluster distance. It summarizes how well
 # clusters are dense and well separated.
@@ -109,8 +109,8 @@ plt.show()
 # give score in the same order of magnitude.
 
 # %%
-# The Calinski-Harabasz score
-# ---------------------------
+# Calinski-Harabasz score
+# -----------------------
 # The Calinski-Harabasz score\ :footcite:p:`Calinski-Harabasz` is the ratio of
 # the sum of inter-clusters dispersion and of intra-cluster dispersion for all
 # clusters (where the dispersion is defined as the sum of correlations
@@ -129,8 +129,8 @@ plt.show()
 # a better cluster separation and higher cluster density.
 
 #%%
-# The Dunn score
-# --------------
+# Dunn score
+# ----------
 #
 # The Dunn score\ :footcite:p:`Dunn` is defined as a ratio of the smallest
 # inter-cluster distance to the largest intra-cluster distance. Overall, it
@@ -149,8 +149,8 @@ plt.show()
 # a better cluster separation.
 
 #%%
-# The Davies-Bouldin score
-# ------------------------
+# Davies-Bouldin score
+# --------------------
 # The Davies-Bouldin score\ :footcite:p:`Davies-Bouldin` is defined as the
 # average similarity measure of each cluster with its most similar cluster,
 # where similarity is the ratio of intra-cluster distances to inter-cluster
