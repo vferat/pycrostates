@@ -7,9 +7,9 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/029e425f90614943b0a944e03922b637)](https://www.codacy.com/gh/vferat/pycrostates/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vferat/pycrostates&amp;utm_campaign=Badge_Grade)
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_white.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_black.png">
-  <img alt="Pycrostate logo" src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/Pycrostates_logo_black.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/logos/Pycrostates_logo_white.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/logos/Pycrostates_logo_black.png">
+  <img alt="Pycrostate logo" src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/logos/Pycrostates_logo_black.png">
 </picture>
 
 # Pycrostates
@@ -78,9 +78,9 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 <p float="left">
     <a href="https://www.unige.ch/medecine/neuf/en/researc/grecherche/christoph-michel/">
-        <img src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/FBMLAB_logo.png" width="200" />
+        <img src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/logos/FBMLAB_logo.png" width="200" />
     </a>
     <a href="https://www.unige.ch/en/university/presentation/">
-        <img src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/img/UNIGE_logo.png" width="300" />
+        <img src="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/logos/UNIGE_logo.png" width="300" />
     </a>
 </p>

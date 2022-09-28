@@ -11,12 +11,12 @@ Glossary
         data with highest signal-to-noise ratio (:cite:t:`KOENIG20161104`).
 
     GEV
-        Global explained variance
+        Global explained variance.
         Total explained variance expressed by a given state.
-        Conputed as sum of the explained variance 
+        It is computed as the sum of the explained variance
         multiplied by the :term:`GFP` of each sample
         assigned to a given state.
-    
+
     cluster centers
         Arithmetic mean of all the points belonging to the cluster. In the
         context of microstate analysis, it corresponds to the microstates
@@ -25,18 +25,17 @@ Glossary
     inter-cluster distance
         Distance between two datapoints belonging to two different clusters.
         Depending on the metric used, it can be computed in different ways, for example
-        (but no limited to) as the average distance between all datapoint belonging to 
+        (but no limited to) as the average distance between all datapoint belonging to
         different clusters, the distance between two cluster centers, the minimal distance
         between two datapoints belonging to different cluster.
 
         .. figure:: ../../_static/img/inter_cluster_distance.png
             :width: 600
-            :alt: Inter cluster distance illustration.
-  
+            :alt: Inter-cluster distance illustration.
 
     intra-cluster distance
         Distance between two datapoint belonging to same cluster. Depending on
-        the metric used, it can be computed in different ways, for example 
+        the metric used, it can be computed in different ways, for example
         (but no limited to) as the average distance between all datapoint
         belonging to same cluster, the average distance between all datapoint
         at the cluster center or the maximal distance between two datapoints
@@ -44,4 +43,4 @@ Glossary
 
         .. figure:: ../../_static/img/intra_cluster_distance.png
             :width: 600
-            :alt: Intra cluster distance illustration.
+            :alt: Intra-cluster distance illustration.
