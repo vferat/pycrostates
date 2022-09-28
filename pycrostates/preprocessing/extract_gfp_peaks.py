@@ -71,7 +71,10 @@ def extract_gfp_peaks(
 
     Notes
     -----
-    The
+    The :term:`Global Field Power` (:term:`GFP`) peaks are extracted with
+    :func:`scipy.signal.find_peaks`. Only the ``distance`` argument is
+    filled with the value provided in ``min_peak_distance``. The other
+    arguments are set to their default values.
     """
     from ..io import ChData
 
