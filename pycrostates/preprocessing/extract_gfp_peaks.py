@@ -31,10 +31,10 @@ def extract_gfp_peaks(
     reject_by_annotation: bool = True,
     verbose=None,
 ) -> CHData:
-    """:term:`GFP` peaks extraction.
+    """:term:`Global Field Power` (:term:`GFP`) peaks extraction.
 
-    Extract :term:`global field power` (GFP) peaks from :class:`~mne.Epochs` or
-    :class:`~mne.io.Raw`.
+    Extract :term:`Global Field Power` (:term:`GFP`) peaks from
+    :class:`~mne.Epochs` or :class:`~mne.io.Raw`.
 
     Parameters
     ----------
@@ -68,6 +68,10 @@ def extract_gfp_peaks(
     -------
     ch_data : ChData
         Samples at global field power peaks.
+
+    Notes
+    -----
+    The
     """
     from ..io import ChData
 

@@ -40,9 +40,9 @@ subject_ids = ["010020", "010021", "010022", "010023", "010024"]
 
 #%%
 # In this example, we start with a subject level analysis by computing
-# individual topographies from :term:`GFP` peaks. Then, the individual
-# topographies are concatenated and used in the group level analysis to fit a
-# second clustering algorithm.
+# individual topographies from :term:`Global Field Power` (:term:`GFP`) peaks.
+# Then, the individual topographies are concatenated and used in the group
+# level analysis to fit a second clustering algorithm.
 
 individual_cluster_centers = list()
 for subject_id in subject_ids:

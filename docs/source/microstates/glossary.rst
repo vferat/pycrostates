@@ -19,8 +19,8 @@ Glossary
         Global explained variance.
         Total explained variance expressed by a given state.
         It is computed as the sum of the explained variance
-        multiplied by the :term:`GFP` of each sample
-        assigned to a given state.
+        multiplied by the :term:`Global Field Power` (:term:`GFP`) of each
+        sample assigned to a given state.
 
     cluster centers
         Arithmetic mean of all the points belonging to the cluster. In the

@@ -137,7 +137,8 @@ raw.set_eeg_reference("average")
 # For this example, we start by computing each of the score on the clustering
 # results of a :class:`~pycrostates.cluster.ModKMeans` fitted for different
 # ``n_clusters`` ranging from 2 to 8. To speed-up the fitting while preserving
-# most of the information, only the :term:`GFP` peaks are used.
+# most of the information, only the :term:`Global Field Power` (:term:`GFP`)
+# peaks are used.
 
 from pycrostates.metrics import (
     silhouette_score,
