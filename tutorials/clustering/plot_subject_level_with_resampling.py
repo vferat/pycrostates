@@ -32,7 +32,6 @@ from pycrostates.datasets import lemon
 raw_fname = lemon.data_path(subject_id='010017', condition='EC')
 raw = read_raw_eeglab(raw_fname, preload=True)
 raw.crop(0, 30)
-
 raw.pick('eeg')
 raw.set_eeg_reference('average')
 
@@ -60,7 +59,8 @@ resamples = resample(
     raw, n_resamples=10, n_samples=1000, random_state=42
 )
 
-#%% We can compute the :term:`cluster centers` on each of the resample:
+#%%
+# We can compute the :term:`cluster centers` on each of the resample.
 
 resample_results = []
 for resamp in resamples:

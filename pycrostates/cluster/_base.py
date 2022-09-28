@@ -509,6 +509,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             if invert[k]:
                 self._cluster_centers_[k] = -cluster
 
+    @fill_doc
     def plot(
         self, axes: Optional[Axes] = None, *, block: bool = False, **kwargs
     ):
@@ -517,11 +518,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         Parameters
         ----------
-        axes : Axes | None
-            Either none to create a new figure or axes (or an array of axes)
-            on which the topographic map should be plotted.
-        block : bool
-            Whether to halt program execution until the figure is closed.
+        %(axes_topo)s
+        %(block)s
         **kwargs
             Additional keyword arguments are passed to
             :func:`mne.viz.plot_topomap`.
