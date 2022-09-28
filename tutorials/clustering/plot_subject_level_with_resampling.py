@@ -37,21 +37,23 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# Resampling is a technique which consist of selecting a subset of 
+# Resampling is a technique which consist of selecting a subset of
 # dataset several times. This method can be useful to study the
 # stability and reliability of clustering results.
-# In this example, we will split our data in ``n_resamples`` resamples each containing
-# ``n_samples`` randomly selected from the original recording.
+# In this example, we will split our data in ``n_resamples`` resamples each
+# containing ``n_samples`` randomly selected from the original recording.
 #
 # .. note::
 #
-#      This method can also be used on GFP peaks only !
-#      ..  code-block:: python
+#     This method can also be used on GFP peaks only!
+#
+#     ..  code-block:: python
+#
 #          gfp_peaks = pycrostates.preprocessing.extract_gfp_peaks(raw)
 #          resamples = resample(
-#          raw, n_resamples=10, n_samples=1000, random_state=42
+#              raw, n_resamples=10, n_samples=1000, random_state=42
 #          )
-# 
+#
 from pycrostates.preprocessing import resample
 
 resamples = resample(
@@ -61,9 +63,9 @@ resamples = resample(
 #%% We can compute the :term:`cluster centers` on each of the resample:
 
 resample_results = []
-for resample in resamples:
+for resamp in resamples:
     ModK = ModKMeans(n_clusters=5, random_state=42)
-    ModK.fit(resample, n_jobs=2)
+    ModK.fit(resamp, n_jobs=2)
     fig = ModK.plot(show=False)
     fig.suptitle(f'GEV: {ModK.GEV_:.2f}', fontsize=20)
     resample_results.append(ModK.cluster_centers_)
@@ -92,5 +94,6 @@ ModK.plot()
 
 #%%
 # .. note::
-#      This method can also be applied for group level analysis by mixing individual resampling results
-#      together.
+#
+#     This method can also be applied for group level analysis by mixing
+#     individual resampling results together.

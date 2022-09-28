@@ -60,11 +60,35 @@ raw.pick("eeg")
 raw.set_eeg_reference("average")
 
 #%%
+# Intra/Inter cluster distances
+# -----------------------------
+# Clustering scores often rely on :term:`inter-cluster distance` and
+# :term:`intra-cluster distance`. Those concepts can be expanded to define the
+# density of a cluster, or the dispersion of a cluster.
+#
+# The :term:`inter-cluster distance` represents the distance between two
+# datapoints belonging to two different clusters.
+#
+# .. figure:: ../../../../_static/img/inter_cluster_distance.png
+#     :width: 600
+#     :alt: Inter-cluster distance illustration.
+#
+# The :term:`intra-cluster distance` represents the distance between two
+# datapoints belonging to the same cluster.
+#
+# .. figure:: ../../../../_static/img/intra_cluster_distance.png
+#     :width: 600
+#     :alt: Inter-cluster distance illustration.
+#
+# Depending on the score used, those distances can be computed in different
+# ways.
+
+#%%
 # Silhouette score
 # ----------------
 # The Silhouette score\ :footcite:p:`Silhouettes` focuses on 2 metrics: the
-# :term:`intra-cluster distance` and the :term:`inter-cluster distance`. It summarizes how well
-# clusters are dense and well separated.
+# :term:`intra-cluster distance` and the :term:`inter-cluster distance`. It
+# summarizes how well clusters are dense and well separated.
 #
 # The silhouette score is bounded between ``-1`` (low cluster separation)
 # to ``1`` (high cluster separation).
@@ -84,16 +108,16 @@ raw.set_eeg_reference("average")
 # ----------
 #
 # The Dunn score\ :footcite:p:`Dunn` is defined as a ratio of the smallest
-# :term:`inter-cluster distance` to the largest :term:`intra-cluster distance`. Overall, it
-# summarizes how well clusters are farther apart and less dispersed. Higher
-# values indicates a better separation.
+# :term:`inter-cluster distance` to the largest :term:`intra-cluster distance`.
+# Overall, it summarizes how well clusters are farther apart and less
+# dispersed. Higher values indicates a better separation.
 
 #%%
 # Davies-Bouldin score
 # --------------------
 # The Davies-Bouldin score\ :footcite:p:`Davies-Bouldin` is defined as the
 # average similarity measure of each cluster with its most similar cluster,
-# where similarity is the ratio of :term:`intra-cluster distance` to 
+# where similarity is the ratio of :term:`intra-cluster distance` to
 # :term:`inter-cluster distance`. Overall, it summarizes how well clusters
 # are farther apart and less dispersed. Lower values indicates a better
 # separation, ``0`` being the lowest score possible.
