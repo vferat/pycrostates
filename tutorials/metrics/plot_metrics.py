@@ -69,16 +69,20 @@ raw.set_eeg_reference("average")
 # The :term:`inter-cluster distance` represents the distance between two
 # datapoints belonging to two different clusters.
 #
-# .. figure:: ../../../../_static/img/inter_cluster_distance.png
-#     :width: 600
-#     :alt: Inter-cluster distance illustration.
+# .. figure:: ../../../../_static/img/inter_cluster_distance_lm.png
+#     :class: only-light
+#
+# .. figure:: ../../../../_static/img/inter_cluster_distance_dm.png
+#     :class: only-dark
 #
 # The :term:`intra-cluster distance` represents the distance between two
 # datapoints belonging to the same cluster.
 #
-# .. figure:: ../../../../_static/img/intra_cluster_distance.png
-#     :width: 600
-#     :alt: Inter-cluster distance illustration.
+# .. figure:: ../../../../_static/img/intra_cluster_distance_lm.png
+#     :class: only-light
+#
+# .. figure:: ../../../../_static/img/intra_cluster_distance_dm.png
+#     :class: only-dark
 #
 # Depending on the score used, those distances can be computed in different
 # ways.
