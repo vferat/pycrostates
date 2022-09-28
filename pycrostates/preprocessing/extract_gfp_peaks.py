@@ -25,7 +25,7 @@ def extract_gfp_peaks(
     inst: Union[BaseRaw, BaseEpochs],
     picks: Picks = "eeg",
     return_all: bool = False,
-    min_peak_distance: int = 2,
+    min_peak_distance: int = 1,
     tmin: Optional[float] = None,
     tmax: Optional[float] = None,
     reject_by_annotation: bool = True,
@@ -58,7 +58,7 @@ def extract_gfp_peaks(
     min_peak_distance : int
         Required minimal horizontal distance (``≥ 1`) in samples between
         neighboring peaks. Smaller peaks are removed first until the condition
-        is fulfilled for all remaining peaks. Default to ``2``.
+        is fulfilled for all remaining peaks. Default to ``1``.
     %(tmin_raw)s
     %(tmax_raw)s
     %(reject_by_annotation_raw)s

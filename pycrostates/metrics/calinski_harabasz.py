@@ -12,11 +12,12 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def calinski_harabasz_score(cluster):  # higher the better
-    """Compute the Calinski and Harabasz score.
+    r"""Compute the Calinski-Harabasz score.
 
-    This function is a wrapper around
-    :func:`sklearn.metrics.calinski_harabasz_score` that applies directly to a
-    fitted :ref:`Clustering` instance.
+    This function computes the Calinski-Harabasz
+    score\ :footcite:p:`Calinski-Harabasz` with
+    :func:`sklearn.metrics.calinski_harabasz_score` from a fitted
+    :ref:`Clustering` instance.
 
     Parameters
     ----------
@@ -25,7 +26,7 @@ def calinski_harabasz_score(cluster):  # higher the better
     Returns
     -------
     score : float
-        The resulting Calinski and Harabasz score.
+        The resulting Calinski-Harabasz score.
 
     Notes
     -----
@@ -34,10 +35,7 @@ def calinski_harabasz_score(cluster):  # higher the better
 
     References
     ----------
-    .. [1] `T. Calinski and J. Harabasz (1974).
-       "A dendrite method for cluster analysis".
-       Communications in Statistics.
-       <https://doi.org/10.1080/03610927408827101>`_
+    .. footbibliography::
     """
     _check_type(cluster, (_BaseCluster,), item_name="cluster")
     cluster._check_fit()

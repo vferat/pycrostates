@@ -1,22 +1,26 @@
 """
-Global field power peaks extraction
-===================================
+Global Field Power peaks
+========================
 
-This example demonstrates how to extract global field power (gfp) peaks for an eeg recording.
+This example demonstrates how to extract Global Field Power (:term:`GFP`) peaks
+from an EEG recording.
 """
+
+#%%
+# .. include:: ../../../../links.inc
 
 #%%
 # .. note::
 #
-#     The lemon datasets is composed of EEGLAB files. To use the MNE reader
-#     :func:`mne.io.read_raw_eeglab`, the ``pymatreader`` optional dependency
-#     is required. Use the following installation method appropriate for your
-#     environment:
+#     The lemon datasets used in this tutorial is composed of EEGLAB files. To
+#     use the MNE reader :func:`mne.io.read_raw_eeglab`, the ``pymatreader``
+#     optional dependency is required. Use the following installation method
+#     appropriate for your environment:
 #
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
 #
-#     Note that an environment created via the MNE installers includes
+#     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
 
 import mne
@@ -31,34 +35,45 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# We can then use the :func:`~pycrostates.preprocessing.extract_gfp_peaks`
-# function to extract samples with highest global field power.
-# The min_peak_distance allow to select the minimum number of sample between 2
-# selected peaks.
+# Global Field Power (:term:`GFP`) is computed as the standard deviation of the
+# sensors at a given timepoint. Local maxima of the Global Field Power
+# (:term:`GFP`) are known to represent the portions of EEG data
+# with highest signal-to-noise ratio\ :footcite:p:`KOENIG20161104`.
+# We can use the :func:`~pycrostates.preprocessing.extract_gfp_peaks`
+# function to extract samples with the highest Global Field Power.
+# The minimum distance between consecutive peaks can be defined with the
+# ``min_peak_distance`` argument.
 
 from pycrostates.preprocessing import extract_gfp_peaks
 gfp_data = extract_gfp_peaks(raw, min_peak_distance=3)
 gfp_data
 
 #%%
-# This function can also be used on :class:`~mne.Epochs`
+# :term:`GFP` peaks can also be extracted from an :class:`~mne.Epochs` object.
 
 epochs = mne.make_fixed_length_epochs(raw, duration=2, preload=True)
 gfp_data = extract_gfp_peaks(epochs, min_peak_distance=3)
 gfp_data
 
 #%%
-# gfp_data can the be used for otherp reprocessing steps such as :func:`~pycrostates.preprocessing.resample`
+# The extracted :term:`GFP` peaks can be used in other preprocessing steps,
+# such as a resampling using :func:`~pycrostates.preprocessing.resample`:
 
 from pycrostates.preprocessing import resample
-resample = resample(gfp_data, n_resamples=1, n_samples=100) #extract 1 resample of  100 random high gfp samples.
+# extract 1 resample of 100 random high GFP samples
+resample = resample(gfp_data, n_resamples=1, n_samples=100)
 resample[0]
 
 #%%
-# Or to directly fit a clustering algorithm
+# Or they can be used to fit a clustering algorithm on the portion of EEG data
+# with the highest signal-to-noise ratio.
 
 from pycrostates.cluster import ModKMeans
-n_clusters = 5
-ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
-ModK.fit(gfp_data, n_jobs=5)
+ModK = ModKMeans(n_clusters=5, random_state=42)
+ModK.fit(gfp_data, n_jobs=5, verbose="WARNING")
 ModK.plot()
+
+#%%
+# References
+# ----------
+# .. footbibliography::

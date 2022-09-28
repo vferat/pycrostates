@@ -17,8 +17,9 @@ Dependencies
 
 We require that you use Python ``3.7`` or higher.
 
-pycrostates works best with the latest stable release of MNE-Python. To ensure
-MNE-Python is up-to-date, see `MNE installation instructions <mne install_>`_.
+``pycrostates`` works best with the latest stable release of MNE-Python. To
+ensure MNE-Python is up-to-date, see
+`MNE installation instructions <mne install_>`_.
 
 .. tab-set::
 

@@ -22,6 +22,7 @@ Current (0.2.0.dev)
 
 Enhancements
 ~~~~~~~~~~~~
+- Improve tutorials and documentation. (:pr:`81` by `Victor Férat`_)
 
 Bugs
 ~~~~
@@ -29,5 +30,6 @@ Bugs
 
 API changes
 ~~~~~~~~~~~
+- Change default parameter ``min_peak_distance`` in :func:`pycrostates.preprocessing.extract_gfp_peaks` to 1. (:pr:`81` by `Victor Férat`_)
 - Change ``picks`` parameter in :meth:`pycrostates.cluster.ModKMeans.fit` (``pycrostates.cluster._BaseCluster.fit``) and :meth:`pycrostates.cluster.ModKMeans.predict` (``pycrostates.cluster._BaseCluster.predict``) (:pr:`66` by `Mathieu Scheltienne`_ and `Victor Férat`_)
 - Change ``picks`` parameter in :func:`pycrostates.preprocessing.extract_gfp_peaks` to force only one datatype in picks. Also add ``return_all`` parameter (:pr:`73` by `Mathieu Scheltienne`_ and `Victor Férat`_)
