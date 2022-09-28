@@ -30,9 +30,12 @@ Glossary
         :term:`cluster centers`, the minimal distance between two datapoints
         belonging to different cluster.
 
-        .. figure:: ../../_static/img/inter_cluster_distance.png
-            :width: 600
-            :alt: Inter-cluster distance illustration.
+        .. image:: ../../_static/img/inter_cluster_distance_dm.png
+            :class: only-dark
+
+        .. image:: ../../_static/img/inter_cluster_distance_lm.png
+            :class: only-light
+
 
     intra-cluster distance
         Distance between two datapoint belonging to the same cluster. Depending
@@ -42,6 +45,8 @@ Glossary
         datapoint at the cluster center or the maximal distance between two
         datapoints belonging to the same cluster.
 
-        .. figure:: ../../_static/img/intra_cluster_distance.png
-            :width: 600
-            :alt: Intra-cluster distance illustration.
+        .. image:: ../../_static/img/intra_cluster_distance_dm.png
+            :class: only-dark
+
+        .. image:: ../../_static/img/intra_cluster_distance_lm.png
+            :class: only-light
