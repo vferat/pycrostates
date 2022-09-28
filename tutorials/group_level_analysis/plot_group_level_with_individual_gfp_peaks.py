@@ -23,6 +23,7 @@ by computing group level topographies based on individual :term:`GFP` peaks.
 #     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
 
+import matplotlib.pyplot as plt
 import numpy as np
 from mne.io import read_raw_eeglab
 
@@ -91,17 +92,20 @@ for subject_id in subject_ids:
     d = segmentation.compute_parameters()
     d["subject_id"] = subject_id
     ms_data.append(d)
-    
+
 #%%
-# From this point on, we can start to visualize our results
-# and do your statistical analysis. For example we can
-# plot the :term:`GEV` of microstate class.
+# From this point on, we can visualize our results and do a statistical
+# analysis. For example we can plot the :term:`GEV` of each microstate class.
 
-import matplotlib.pyplot as plt
+data = [
+    [d['A_gev'], d['B_gev'], d['C_gev'], d['D_gev'], d['F_gev']]
+    for d in ms_data
+]
 
-data = np.array([[d['A_gev'], d['B_gev'], d['C_gev'], d['D_gev'], d['F_gev']] for d in ms_data])
-
-fig, ax = plt.subplots()
-ax.set_title('Global Explained Variance (%)')
-ax.violinplot(data)
-ax.set_xticklabels([""] + ModK.cluster_names)
+plt.violinplot(np.array(data))
+plt.title("Global Explained Variance (%)")
+plt.xticks(
+    ticks=range(1, len(ModK.cluster_names) + 1),
+    labels=ModK.cluster_names,
+)
+plt.show()
