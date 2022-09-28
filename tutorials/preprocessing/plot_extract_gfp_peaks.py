@@ -2,8 +2,8 @@
 Global Field Power peaks
 ========================
 
-This example demonstrates how to extract Global Field Power (:term:`GFP`) peaks
-from an EEG recording.
+This example demonstrates how to extract
+:term:`Global Field Power` (:term:`GFP`) peaks from an EEG recording.
 """
 
 #%%
@@ -35,10 +35,10 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# Global Field Power (:term:`GFP`) is computed as the standard deviation of the
-# sensors at a given timepoint. Local maxima of the Global Field Power
-# (:term:`GFP`) are known to represent the portions of EEG data
-# with highest signal-to-noise ratio\ :footcite:p:`KOENIG20161104`.
+# :term:`Global Field Power` (:term:`GFP`) is computed as the standard
+# deviation of the sensors at a given timepoint. Local maxima of the
+# :term:`Global Field Power` (:term:`GFP`) are known to represent the portions
+# of EEG data with highest signal-to-noise ratio\ :footcite:p:`KOENIG20161104`.
 # We can use the :func:`~pycrostates.preprocessing.extract_gfp_peaks`
 # function to extract samples with the highest Global Field Power.
 # The minimum distance between consecutive peaks can be defined with the
