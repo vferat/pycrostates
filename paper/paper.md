@@ -98,7 +98,7 @@ segmentation features such as smoothing and small segment rejection which are
 especially useful for handling low signal to noise datapoints occurring during
 microstate polarity inversions.
 
-Pycrostates API can replicate most of the analyses proposed in the literature
+Pycrostates API supports most of the analyses proposed in the literature
 [@MICHEL2018577] and in standard but non-python packages such as
 Cartool [@brunet_spatiotemporal_nodate] or MATLAB microstates EEGLab toolboxes.
 Pycrostates is built with a modular and scalable design, following modern
