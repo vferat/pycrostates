@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'pycrostates'
-version = '0.2.0.dev'
+version = '0.2.0'
 description = 'A simple open source Python package for EEG microstate segmentation.'
 readme = 'README.md'
 license = {file = 'LICENSE'}
