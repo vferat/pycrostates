@@ -1,15 +1,11 @@
 .. _changes_0_2_0:
 
-Version 0.2.0 (2022.9.30)
--------------------------
+Version 0.2.0 (2022.09.30)
+--------------------------
 
 Enhancements
 ~~~~~~~~~~~~
 - Improve tutorials and documentation. (:pr:`81` by `Victor Férat`_)
-
-Bugs
-~~~~
-
 
 API changes
 ~~~~~~~~~~~
