@@ -15,7 +15,9 @@
 
    Also add a corresponding entry for yourself in docs/dev/changes/names.inc
 
-.. _current:
+.. include:: ./names.inc
+
+.. _latest:
 
 Current 0.3.0.dev
 -----------------
@@ -30,3 +32,4 @@ Bugs
 
 API changes
 ~~~~~~~~~~~
+
