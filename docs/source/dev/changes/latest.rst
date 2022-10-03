@@ -24,7 +24,7 @@ Current 0.3.0.dev
 
 Enhancements
 ~~~~~~~~~~~~
-
+- Improve changelog. (:pr:`86` by `Victor Férat`_)
 
 Bugs
 ~~~~
