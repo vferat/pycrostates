@@ -1,5 +1,5 @@
-IO
-==
+File I/O
+========
 
 .. currentmodule:: pycrostates.io
 

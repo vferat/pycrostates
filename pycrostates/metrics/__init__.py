@@ -1,4 +1,6 @@
-"""Metric module for evaluating clusters."""
+"""This module contains function to evaluate fitted clusters. All metrics will
+require a fitted cluster as input. See :mod:`pycrostates.cluster` for available
+clustering algorithms."""
 
 from .calinski_harabasz import calinski_harabasz_score
 from .davies_bouldin import davies_bouldin_score

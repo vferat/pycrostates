@@ -1,4 +1,4 @@
-"""IO module for reading and writing data."""
+"""File I/O module for reading and writing data."""
 
 from .ch_data import ChData
 from .meas_info import ChInfo
