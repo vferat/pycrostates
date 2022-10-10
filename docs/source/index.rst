@@ -1,8 +1,5 @@
 .. include:: ../links.inc
 
-Pycrostates
-===========
-
 .. image:: ../_static/logos/Pycrostates_logo_white.png
     :class: only-dark
 
