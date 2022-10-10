@@ -32,7 +32,7 @@ Methods
         `MNE standalone installers <mne installers_>`_.
 
         The installers create a conda environment with the entire MNE-ecosystem
-        setup, and more! This installation method is recommanded for beginners.
+        setup, and more! This installation method is recommended for beginners.
 
     .. tab-item:: Pypi
 
