@@ -1,5 +1,12 @@
 .. include:: ../links.inc
 
+.. raw:: html
+
+    <style type="text/css">h1 {display:none;}</style>
+
+Pycrostates Homepage
+====================
+
 .. image:: ../_static/logos/Pycrostates_logo_white.png
     :class: only-dark
 
