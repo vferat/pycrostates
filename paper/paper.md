@@ -82,7 +82,7 @@ or Andreas Trier Poulsen's MATLAB microstates EEGLab toolbox
 language ecosystem has expanded considerably, especially in scientific fields.
 MNE-Python [@gramfort_meg_2013] stands out for the analysis of
 human neurophysiological data. Current Python implementations of microstate
-analysis include the python 2 library from Frederic von Wegner
+analysis include the Python 2 library from Frederic von Wegner
 [@von_wegner_information-theoretical_2018], Neurokit [@Makowski2021neurokit],
 Keypy [@patricia_milz_2016_48830] (no longer maintained) and the
 MNE-microstates package from Marijn van Vliet.
@@ -99,17 +99,17 @@ especially useful for handling low signal to noise datapoints occurring during
 microstate polarity inversions.
 
 Pycrostates API supports most of the analyses proposed in the literature
-[@MICHEL2018577] and in standard but non-python packages such as
+[@MICHEL2018577] and in standard but non-Python packages such as
 Cartool [@brunet_spatiotemporal_nodate] or MATLAB microstates EEGLab toolboxes.
 Pycrostates is built with a modular and scalable design, following modern
 development methods and standards to facilitate its maintenance and evolution
-over time. It offers a solid basis to the open-source community to use
+over time. It offers a solid basis to the open source community to use
 microstate methodology and to make it evolve. Finally, new users will benefit
 from the exhaustive documentation and tutorials describing microstate analysis.
 
-With this contribution, the developer team is excited to provide the state of
-the art in microstates analysis and is looking forward to welcoming new
-contributors and users from the broader MNE, neuroscience, and
+With this contribution, the developer team is excited to provide the
+state-of-the-art in microstates analysis and is looking forward to welcoming
+new contributors and users from the broader MNE, neuroscience, and
 electrophysiology communities.
 
 # Acknowledgements
