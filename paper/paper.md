@@ -107,9 +107,9 @@ over time. It offers a solid basis to the open source community to use
 microstate methodology and to make it evolve. Finally, new users will benefit
 from the exhaustive documentation and tutorials describing microstate analysis.
 
-With this contribution, the developer team is excited to provide the state of
-the art in microstates analysis and is looking forward to welcoming new
-contributors and users from the broader MNE, neuroscience, and
+With this contribution, the developer team is excited to provide the
+state-of-the-art in microstates analysis and is looking forward to welcoming
+new contributors and users from the broader MNE, neuroscience, and
 electrophysiology communities.
 
 # Acknowledgements
