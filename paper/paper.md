@@ -103,7 +103,7 @@ Pycrostates API supports most of the analyses proposed in the literature
 Cartool [@brunet_spatiotemporal_nodate] or MATLAB microstates EEGLab toolboxes.
 Pycrostates is built with a modular and scalable design, following modern
 development methods and standards to facilitate its maintenance and evolution
-over time. It offers a solid basis to the open-source community to use
+over time. It offers a solid basis to the open source community to use
 microstate methodology and to make it evolve. Finally, new users will benefit
 from the exhaustive documentation and tutorials describing microstate analysis.
 
