@@ -33,7 +33,7 @@ Installation instructions can be found [here](https://pycrostates.readthedocs.io
 ## Citing
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.04564/status.svg)](https://doi.org/10.21105/joss.04564)
 
-
+The associated paper can be retrieved here: https://joss.theoj.org/papers/10.21105/joss.04564
 To cite specific version numbers of the software, you can use the DOIs provided
 by [Zenodo](https://zenodo.org/record/7129852).
 
