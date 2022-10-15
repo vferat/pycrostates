@@ -68,6 +68,7 @@ docs = [
     'sphinx-issues',
 ]
 style = [
+    'bibclean',
     'black',
     'codespell',
     'isort',
@@ -128,7 +129,7 @@ extend_skip_glob = [
     'setup.py',
     'docs/*',
     'tutorials/*',
-    'pycrostates/html_templates/repr/*'
+    'pycrostates/html_templates/repr/*',
 ]
 
 [tool.pydocstyle]
