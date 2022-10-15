@@ -5,6 +5,7 @@
 [![Build Status](https://dev.azure.com/vferat/pycrostates/_apis/build/status/vferat.pycrostates?branchName=main)](https://dev.azure.com/vferat/pycrostates/_build/latest?definitionId=1&branchName=main)
 [![codecov](https://codecov.io/gh/vferat/pycrostates/branch/master/graph/badge.svg?token=47COGGCGX8)](https://codecov.io/gh/vferat/pycrostates)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/029e425f90614943b0a944e03922b637)](https://www.codacy.com/gh/vferat/pycrostates/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vferat/pycrostates&amp;utm_campaign=Badge_Grade)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.04564/status.svg)](https://doi.org/10.21105/joss.04564)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/vferat/pycrostates/main/docs/_static/logos/Pycrostates_logo_white.png">
@@ -30,11 +31,11 @@ The documentation including tutorials and example can be found [here](https://py
 Installation instructions can be found [here](https://pycrostates.readthedocs.io/en/latest/install.html).
 
 ## Citing
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6915329.svg)](https://doi.org/10.5281/zenodo.6915329)
-[![status](https://joss.theoj.org/papers/be7e10c061e28f5694cb7366aef445a3/status.svg)](https://joss.theoj.org/papers/be7e10c061e28f5694cb7366aef445a3)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.04564/status.svg)](https://doi.org/10.21105/joss.04564)
 
-To cite specific version numbers of the software, you can use the DOIs provided by [Zenodo](https://doi.org/10.5281/zenodo.6915329).
-The canonical journal article reference is currently under review at the [JOSS](https://joss.theoj.org/papers/be7e10c061e28f5694cb7366aef445a3) journal and can't be cited yet.
+The associated paper can be retrieved here: https://joss.theoj.org/papers/10.21105/joss.04564
+To cite specific version numbers of the software, you can use the DOIs provided
+by [Zenodo](https://zenodo.org/record/7129852).
 
 ## Contributing
 
