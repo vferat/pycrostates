@@ -34,7 +34,7 @@ from numpy.typing import NDArray
 
 from .. import __version__
 from .._typing import CHInfo
-from ..cluster import ModKMeans
+from ..cluster import ModKMeans, AAHCluster
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
@@ -110,7 +110,7 @@ def _write_cluster(
     if isinstance(chinfo, Info):
         chinfo = ChInfo(chinfo)  # convert to ChInfo if a MNE Info is provided
     _check_type(algorithm, (str,), "algorithm")
-    _check_value(algorithm, ("ModKMeans",), "algorithm")
+    _check_value(algorithm, ("ModKMeans", "AAHCluster"), "algorithm")
     _check_type(cluster_names, (list,), "cluster_names")
     if len(cluster_names) != cluster_centers_.shape[0]:
         raise ValueError(
@@ -178,6 +178,10 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
             "parameters": ["n_init", "max_iter", "tol"],
             "variables": ["GEV_"],
         },
+        "AAHCluster": {
+            "parameters": ["ignore_polarity", "normalize_input", "tol"],
+            "variables": ["GEV_"],
+        },
     }
 
     # retrieve list of expected kwargs for this algorithm
@@ -202,13 +206,23 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
             continue
 
         # ModKMeans
-        if key == "n_init":
-            fit_parameters["n_init"] = ModKMeans._check_n_init(value)
-        elif key == "max_iter":
-            fit_parameters["max_iter"] = ModKMeans._check_max_iter(value)
-        elif key == "tol":
-            fit_parameters["tol"] = ModKMeans._check_tol(value)
-        elif key == "GEV_":
+        if algorithm == "ModKMeans":
+            if key == "n_init":
+                fit_parameters["n_init"] = ModKMeans._check_n_init(value)
+            elif key == "max_iter":
+                fit_parameters["max_iter"] = ModKMeans._check_max_iter(value)
+            elif key == "tol":
+                fit_parameters["tol"] = ModKMeans._check_tol(value)
+        elif algorithm == "AAHCluster":
+            if key == "ignore_polarity":
+                fit_parameters["ignore_polarity"] = \
+                    AAHCluster._check_ignore_polarity(value)
+            elif key == "normalize_input":
+                fit_parameters["normalize_input"] = \
+                    AAHCluster._check_normalize_input(value)
+            elif key == "tol":
+                fit_parameters["tol"] = AAHCluster._check_tol(value)
+        if key == "GEV_":
             _check_type(value, ("numeric",), "GEV_")
             if value < 0 or 1 < value:
                 raise ValueError(
@@ -310,7 +324,10 @@ def _read_cluster(fname: Union[str, Path]):
     )
 
     # reconstruct cluster instance
-    function = {"ModKMeans": _create_ModKMeans}
+    function = {
+        "ModKMeans": _create_ModKMeans,
+        "AAHCluster": _create_AAHCluster
+    }
 
     return (
         function[algorithm](
@@ -334,6 +351,10 @@ def _check_fit_parameters_and_variables(
     valids = {
         "ModKMeans": {
             "parameters": ["n_init", "max_iter", "tol"],
+            "variables": ["GEV_"],
+        },
+        "AAHCluster": {
+            "parameters": ["ignore_polarity", "normalize_input", "tol"],
             "variables": ["GEV_"],
         },
     }
@@ -378,6 +399,32 @@ def _create_ModKMeans(
     cluster._fitted = True
     return cluster
 
+
+def _create_AAHCluster(
+    cluster_centers_: NDArray[float],
+    info: CHInfo,
+    cluster_names: List[str],
+    fitted_data: NDArray[float],
+    labels_: NDArray[int],
+    ignore_polarity: bool,
+    normalize_input: bool,
+    tol: Union[int, float],
+    GEV_: float,
+):
+
+    print(normalize_input, ignore_polarity)
+    """Create a AAHCluster object."""
+    cluster = AAHCluster(
+        cluster_centers_.shape[0], ignore_polarity, normalize_input, tol
+    )
+    cluster._cluster_centers_ = cluster_centers_
+    cluster._info = info
+    cluster._cluster_names = cluster_names
+    cluster._fitted_data = fitted_data
+    cluster._labels_ = labels_
+    cluster._GEV_ = GEV_
+    cluster._fitted = True
+    return cluster
 
 # ----------------------------------------------------------------------------
 def _write_meas_info(fid, info: CHInfo):
@@ -560,6 +607,8 @@ def _serialize(dict_: dict, outer_sep: str = ";", inner_sep: str = ":"):
     for key, value in dict_.items():
         if callable(value):
             value = value.__name__
+        elif isinstance(value, bool):
+            pass
         elif isinstance(value, Integral):
             value = int(value)
         elif isinstance(value, dict):

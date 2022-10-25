@@ -67,6 +67,7 @@ _types = {
     "path-like": (str, Path, os.PathLike),
     "int": (_IntLike(),),
     "callable": (_Callable(),),
+    "bool": (bool,),
 }
 
 

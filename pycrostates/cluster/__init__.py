@@ -15,5 +15,6 @@ same channels) using the ``predict`` method. This method will return either a
 to segment."""
 
 from .kmeans import ModKMeans  # noqa: F401
+from .aahc import AAHCluster
 
-__all__ = ("ModKMeans",)
+__all__ = ("ModKMeans", "AAHCluster")
