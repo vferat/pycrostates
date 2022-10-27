@@ -283,3 +283,76 @@ def test_invalid_segmentation(Segmentation, inst, bad_inst, caplog):
             dict(test=101),
         )
     assert "key 'test' in predict_parameters" in caplog.text
+
+
+@pytest.mark.parametrize(
+    "labels, ignore_self, T",
+    [
+        # Raw
+        (
+            np.array([-1, 0, 1, 2, 3, 4, -1]),
+            True,
+            np.array(
+                [
+                    [0, 1, 0, 0, 0],
+                    [0, 0, 1, 0, 0],
+                    [0, 0, 0, 1, 0],
+                    [0, 0, 0, 0, 1],
+                    [0, 0, 0, 0, 0],
+                ]
+            ),
+        ),
+        (
+            np.array([-1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 4, -1, -1]),
+            True,
+            np.array(
+                [
+                    [0, 1, 0, 0, 0],
+                    [0, 0, 1, 0, 0],
+                    [0, 0, 0, 1, 0],
+                    [0, 0, 0, 0, 1],
+                    [0, 0, 0, 0, 0],
+                ]
+            ),
+        ),
+        (
+            np.array([-1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 4, -1, -1]),
+            False,
+            np.array(
+                [
+                    [0.5, 0.5, 0, 0, 0],
+                    [0, 0.5, 0.5, 0, 0],
+                    [0, 0, 0.5, 0.5, 0],
+                    [0, 0, 0, 0.5, 0.5],
+                    [0, 0, 0, 0, 1],
+                ]
+            ),
+        ),
+        # Epochs
+        (
+            np.array([[-1, 0], [1, 2], [3, 4], [-1, -1]]),
+            True,
+            np.array(
+                [
+                    [0, 1, 0, 0, 0],
+                    [0, 0, 1, 0, 0],
+                    [0, 0, 0, 1, 0],
+                    [0, 0, 0, 0, 1],
+                    [0, 0, 0, 0, 0],
+                ]
+            ),
+        ),
+    ],
+)
+def test_compute_transition_probabilities(labels, ignore_self, T):
+    n_clusters = (
+        (len(np.unique(labels)) - 1)
+        if np.any(labels == -1)
+        else len(np.unique(labels))
+    )
+    t = RawSegmentation._compute_transition_probabilities(
+        labels, n_clusters=n_clusters, ignore_self=ignore_self
+    )
+    assert isinstance(T, np.ndarray)
+    assert t.shape == (n_clusters, n_clusters)
+    assert np.allclose(t, T)
