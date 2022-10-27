@@ -136,6 +136,14 @@ class _BaseSegmentation(ABC):
             * dist_durs : Distribution of durations.
                    Duration of each segments assigned to a given state.
                    Each value is expressed in seconds (s).
+                   
+        Warnings
+        --------
+        When working with `~mne.Epochs`, this method will put together
+        segments of all epochs. This could lead to wrong interpretation
+        especially on state durations. To avoid this behaviour,
+        make sure to set the ``reject_edges`` parameter to ``True``
+        when predicting the segmentation.
         """
         return _BaseSegmentation._compute_microstate_parameters(
             self._labels.copy(),
