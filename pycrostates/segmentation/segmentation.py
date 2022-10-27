@@ -136,7 +136,7 @@ class _BaseSegmentation(ABC):
             * dist_durs : Distribution of durations.
                    Duration of each segments assigned to a given state.
                    Each value is expressed in seconds (s).
-                   
+
         Warnings
         --------
         When working with `~mne.Epochs`, this method will put together
@@ -183,13 +183,23 @@ class _BaseSegmentation(ABC):
         To avoid this behaviour, make sure to set the ``reject_edges``
         parameter to ``True`` when predicting the segmentation.
         """
-        labels = self._labels
+        n_clusters = len(self._cluster_centers_)
+        T = _BaseSegmentation._compute_transition_probabilities(
+            self._labels, n_clusters=n_clusters, ignore_self=ignore_self
+        )
+        return T
+
+    @staticmethod
+    def _compute_transition_probabilities(
+        labels, n_clusters, ignore_self=True
+    ):
+        """Compute transitions probabilities of microstate transtions."""
         # reshape if epochs
         labels = labels.reshape(-1)
         # ignore transition to itself (i.e. 1 -> 1)
         if ignore_self:
             labels = [s for s, _ in itertools.groupby(labels)]
-        states = np.arange(-1, len(self.cluster_centers_))
+        states = np.arange(-1, n_clusters)
         n = len(states)
         T = np.zeros(shape=(n, n))
         # number of transitions
