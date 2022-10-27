@@ -356,3 +356,13 @@ def test_compute_transition_probabilities(labels, ignore_self, T):
     assert isinstance(T, np.ndarray)
     assert t.shape == (n_clusters, n_clusters)
     assert np.allclose(t, T)
+
+def test_compute_transition_probabilities_Raw():
+    segmentation = ModK_raw.predict(raw)
+    segmentation.compute_transition_probabilities()
+    segmentation.compute_transition_probabilities(ignore_self=False)
+    
+def test_compute_transition_probabilities_Epochs():
+    segmentation = ModK_epochs.predict(epochs)
+    segmentation.compute_transition_probabilities()
+    segmentation.compute_transition_probabilities(ignore_self=False)
