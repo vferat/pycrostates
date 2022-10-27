@@ -136,7 +136,7 @@ class _BaseSegmentation(ABC):
             * dist_durs : Distribution of durations.
                    Duration of each segments assigned to a given state.
                    Each value is expressed in seconds (s).
-
+                   
         Warnings
         --------
         When working with `~mne.Epochs`, this method will put together
@@ -297,18 +297,14 @@ class _BaseSegmentation(ABC):
 
         gfp = np.std(data, axis=0)
         if norm_gfp:
-            # ignore unlabeled segments
-            arg_where = np.argwhere(labels != 0)
-            gfp_ = gfp[arg_where]
-            # normalize
-            gfp /= np.linalg.norm(gfp_)
+            gfp /= np.linalg.norm(gfp)
 
         segments = [(s, list(group)) for s, group in itertools.groupby(labels)]
 
         d = {}
         for s, state in enumerate(maps):
             state_name = maps_names[s]
-            arg_where = np.argwhere(labels == s + 1)
+            arg_where = np.argwhere(labels == s)
             if len(arg_where) != 0:
                 labeled_tp = data.T[arg_where][:, 0, :].T
                 labeled_gfp = gfp[arg_where][:, 0]
@@ -323,11 +319,11 @@ class _BaseSegmentation(ABC):
                     [len(group) for s_, group in segments if s_ == s]
                 )
                 occurrences = (
-                    len(s_segments) / len(np.where(labels != 0)[0]) * sfreq
+                    len(s_segments) / len(np.where(labels != -1)[0]) * sfreq
                 )
                 d[f"{state_name}_occurrences"] = occurrences
 
-                timecov = np.sum(s_segments) / len(np.where(labels != 0)[0])
+                timecov = np.sum(s_segments) / len(np.where(labels != -1)[0])
                 d[f"{state_name}_timecov"] = timecov
 
                 dist_durs = s_segments / sfreq
@@ -350,7 +346,7 @@ class _BaseSegmentation(ABC):
                     d[f"{state_name}_dist_gev"] = np.array([])
                     d[f"{state_name}_dist_durs"] = np.array([])
 
-        d["unlabeled"] = len(np.argwhere(labels == 0)) / len(gfp)
+        d["unlabeled"] = len(np.argwhere(labels == -1)) / len(gfp)
         return d
 
     # --------------------------------------------------------------------
