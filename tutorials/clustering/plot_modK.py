@@ -118,7 +118,38 @@ segmentation = ModK.predict(raw, reject_by_annotation=True, factor=10,
                             half_window_size=10, min_segment_length=5,
                             reject_edges=True)
 segmentation.plot(tmin=1, tmax=5)
+#%%
+# `~pycrostates.segmentation.RawSegmentation` and
+# `~pycrostates.segmentation.EpochsSegmentation`
+# are placeholders for microstate segmentations.
+# Labels of each datapoints are stored in the ``_labels`` attribute
 
+segmentation._labels
+
+#%%
+# Microstate parameters can be extract form segmentations using the
+# `~pycrostates.segmentation.RawSegmentation.compute_parameters` methods
+
+parameters = segmentation.compute_parameters()
+parameters
+#%%
+# and probabilities of microstate transitions can be obtained using the 
+# `~pycrostates.segmentation.RawSegmentation.compute_transition_probabilities`
+# method
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+T = segmentation.compute_transition_probabilities()
+
+ax = sns.heatmap(T,
+                 annot=True,
+                 cmap='Blues',
+                 xticklabels=segmentation.cluster_names,
+                 yticklabels=segmentation.cluster_names)
+ax.set_ylabel('From')
+ax.set_xlabel('To')
+
+plt.show()
 #%%
 # References
 # ----------
