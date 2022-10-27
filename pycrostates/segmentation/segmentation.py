@@ -188,7 +188,7 @@ class _BaseSegmentation(ABC):
         labels = labels.reshape(-1)
         # ignore transition to itself (i.e. 1 -> 1)
         if ignore_self:
-            labels = [s for s, group in itertools.groupby(labels)]
+            labels = [s for s, _ in itertools.groupby(labels)]
         states = np.arrange(0, len(self.cluster_centers_) + 1)
         n = len(states)
         T = np.zeros(shape=(n, n))
@@ -297,7 +297,11 @@ class _BaseSegmentation(ABC):
 
         gfp = np.std(data, axis=0)
         if norm_gfp:
-            gfp /= np.linalg.norm(gfp)
+            # ignore unlabeled segments
+            arg_where = np.argwhere(labels != -1)
+            gfp_ = gfp[arg_where]
+            # normalize
+            gfp /= np.linalg.norm(gfp_)
 
         segments = [(s, list(group)) for s, group in itertools.groupby(labels)]
 
