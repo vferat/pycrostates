@@ -147,6 +147,55 @@ class _BaseSegmentation(ABC):
             return_dist=return_dist,
         )
 
+    def compute_transition_probabilities(self, ignore_self=True):
+        """Compute transitions probabilities of microstate transtions.
+
+        Parameters
+        ----------
+        ignore_self : bool
+            If True, ignore transition from one state to itself.
+            This is equivalent to set the duration of all states to 1 sample.
+
+        Returns
+        -------
+        T : `~numpy.array` shape (``n_cluster``, ``n_cluster``)
+            Array of transition probability values from one label to another.
+            First axis indicates state "from".
+            Second axis indicates state "to".
+            Unlabeled segments are ignored, and probabilities are normalized
+            (i.e. the sum of probabilities along the first axis is always
+            equal to 1, except in the case it never appears. In this case,
+            all probabilities "from" this state are null).
+
+        Warnings
+        --------
+        When working with `~mne.Epochs`, this method will take into account
+        transitions that occur between epochs. This could lead to wrong
+        interpretation when working with discontinuous data.
+        To avoid this behaviour, make sure to set the ``reject_edges``
+        parameter to ``True`` when predicting the segmentation.
+        """
+        labels = self._labels
+        # reshape if epochs
+        labels = labels.reshape(-1)
+        # ignore transition to itself (i.e. 1 -> 1)
+        if ignore_self:
+            labels = [s for s, group in itertools.groupby(labels)]
+        states = np.arrange(0, len(self.cluster_centers_) + 1)
+        n = len(states)
+        T = np.zeros(shape=(n, n))
+        # number of transitions
+        for (i, j) in zip(labels, labels[1:]):
+            T[i][j] += 1
+        # ignore unlabeled
+        T = T[1:, 1:]
+        # transform to probability
+        for row in T:
+            s = sum(row)
+            if s > 0:
+                row[:] = [f / s for f in row]
+        return T
+
     @fill_doc
     def plot_cluster_centers(
         self, axes: Optional[Axes] = None, *, block: bool = False
