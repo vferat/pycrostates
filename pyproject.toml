@@ -66,6 +66,7 @@ docs = [
     'sphinx-design',
     'sphinx_gallery',
     'sphinx-issues',
+    'seaborn',
 ]
 style = [
     'black',
