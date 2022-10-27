@@ -189,14 +189,14 @@ class _BaseSegmentation(ABC):
         # ignore transition to itself (i.e. 1 -> 1)
         if ignore_self:
             labels = [s for s, _ in itertools.groupby(labels)]
-        states = np.arrange(0, len(self.cluster_centers_) + 1)
+        states = np.arange(-1, len(self.cluster_centers_))
         n = len(states)
         T = np.zeros(shape=(n, n))
         # number of transitions
         for (i, j) in zip(labels, labels[1:]):
             T[i][j] += 1
         # ignore unlabeled
-        T = T[1:, 1:]
+        T = T[:-1, :-1]
         # transform to probability
         for row in T:
             s = sum(row)
