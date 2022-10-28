@@ -244,6 +244,8 @@ class AAHCluster(_BaseCluster):
             to_remove = np.argmin(GEV)
             orphans = assignment == to_remove
 
+            old_cluster = cluster[:, to_remove].copy()
+
             cluster = np.delete(cluster, to_remove, axis=1)
             GEV = np.delete(GEV, to_remove, axis=0)
             assignment[assignment > to_remove] = (
@@ -260,8 +262,16 @@ class AAHCluster(_BaseCluster):
             for c in cluster_to_update:
                 members = assignment == c
                 if ignore_polarity:
+
+                    old_weight = len(new_assignment == c) / members.sum()
+
+                    sgn = np.sign(old_cluster @ cluster[:, c])
+
+                    v0 = old_weight * sgn * old_cluster + \
+                        (1. - old_weight) * cluster[:, c]
+
                     v, _ = AAHCluster._first_principal_component(
-                        data[:, members], tol, cluster[:, c]
+                        data[:, members], tol, v0
                     )
                     cluster[:, c] = v
                 else:
