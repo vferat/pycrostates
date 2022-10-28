@@ -13,3 +13,4 @@ Cluster
    :toctree: generated/
 
    ModKMeans
+   AAHCluster

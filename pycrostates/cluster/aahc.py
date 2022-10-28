@@ -21,7 +21,6 @@ from ._base import _BaseCluster
 try:
     from numba import njit
 except ImportError:
-
     def njit(cache=False):
         def decorator(func):
             @func_wraps(func)
@@ -33,6 +32,7 @@ except ImportError:
         return decorator
 
 
+@fill_doc
 class AAHCluster(_BaseCluster):
     r"""Atomize and Agglomerate Hierarchical Clustering (AAHC) algorithm.
 
@@ -41,7 +41,6 @@ class AAHCluster(_BaseCluster):
     Parameters
     ----------
     %(n_clusters)s
-
     ignore_polarity : bool
         If true, polarity is ignored when computing distances.
     normalize_input : bool
@@ -81,7 +80,7 @@ class AAHCluster(_BaseCluster):
     def _repr_html_(self, caption=None):
         from ..html_templates import repr_templates_env
 
-        template = repr_templates_env.get_template("ModKMeans.html.jinja")
+        template = repr_templates_env.get_template("AAHCluster.html.jinja")
         if self.fitted:
             n_samples = self._fitted_data.shape[-1]
             ch_types, ch_counts = np.unique(
@@ -262,7 +261,7 @@ class AAHCluster(_BaseCluster):
                 members = assignment == c
                 if ignore_polarity:
                     v, _ = AAHCluster._first_principal_component(
-                        data[:, members], tol
+                        data[:, members], tol, cluster[:, c]
                     )
                     cluster[:, c] = v
                 else:
@@ -279,16 +278,45 @@ class AAHCluster(_BaseCluster):
     @staticmethod
     @njit(cache=True)
     def _first_principal_component(
-        X: NDArray[float], tol: float, max_iter: int = 100
+        X: NDArray[float],
+        tol: float,
+        v0: Optional[NDArray[float]] = None,
+        max_iter: int = 100,
     ) -> Tuple[NDArray[float], float]:
         """Compute first principal component.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            Input data matrix with dimensions (channels x observations)
+        tol : float
+            Tolerance for convergence.
+        v0 : numpy.ndarray or None (default)
+            Initial estimate of the principal vector with dimensions
+            (channels, )
+            If None, a random initialization is used
+        max_iter : int
+            Maximum number of iterations to estiamte the first principal
+            component.
+
+        Returns
+        -------
+
+        tuple(v, eig)
+
+        v : numpy.ndarray
+            estimated principal component vector
+        eig : float
+            eigenvalue of the covariance matrix of X (channels x channels)
 
         See :footcite:t:`Roweis1997` for additional information.
         """
 
-        v = np.random.rand(X.shape[0])
-        # v = np.ones((X.shape[0],))
-        # v[::2] = -1
+        if v0 is None:  # use a random choice
+            v = np.random.rand(X.shape[0])
+        else:
+            v = v0.flatten()
+            assert v.shape[0] == X.shape[0]
         v /= np.linalg.norm(v)
 
         for _ in range(max_iter):
@@ -300,8 +328,6 @@ class AAHCluster(_BaseCluster):
             if np.linalg.norm(eig * v - s) / s_norm < tol:
                 break
             v = s / s_norm
-        # else:
-        #     logger.warn("First PC estimation: max iteration reached!")
         return v, eig
 
     # --------------------------------------------------------------------
