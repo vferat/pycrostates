@@ -305,7 +305,7 @@ class AAHCluster(_BaseCluster):
             Initial estimate of the principal vector with dimensions
             (channels,). If None, a random initialization is used.
         max_iter : int
-            Maximum number of iterations to estiamte the first principal
+            Maximum number of iterations to estimate the first principal
             component.
 
         Returns
