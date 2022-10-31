@@ -310,13 +310,10 @@ class AAHCluster(_BaseCluster):
 
         Returns
         -------
-
-        tuple(v, eig)
-
         v : numpy.ndarray
-            estimated principal component vector
+            Estimated principal component vector.
         eig : float
-            eigenvalue of the covariance matrix of X (channels x channels)
+            Eigenvalue of the covariance matrix of X (channels x channels)
 
         See :footcite:t:`Roweis1997` for additional information.
         """
