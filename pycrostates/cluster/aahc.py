@@ -303,8 +303,7 @@ class AAHCluster(_BaseCluster):
             Tolerance for convergence.
         v0 : numpy.ndarray or None (default)
             Initial estimate of the principal vector with dimensions
-            (channels, )
-            If None, a random initialization is used
+            (channels,). If None, a random initialization is used.
         max_iter : int
             Maximum number of iterations to estiamte the first principal
             component.
