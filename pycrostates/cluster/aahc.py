@@ -21,6 +21,7 @@ from ._base import _BaseCluster
 try:
     from numba import njit
 except ImportError:
+
     def njit(cache=False):
         def decorator(func):
             @func_wraps(func)
@@ -45,9 +46,6 @@ class AAHCluster(_BaseCluster):
         If true, polarity is ignored when computing distances.
     normalize_input : bool
         If set, the input data is normalized along the channel dimension.
-    tol : float
-        Relative tolerance with regards estimate residual noise in the cluster
-        centers of two consecutive iterations to declare convergence.
 
     References
     ----------
@@ -59,7 +57,6 @@ class AAHCluster(_BaseCluster):
         n_clusters: int,
         ignore_polarity: bool = True,
         normalize_input: bool = False,
-        tol: float = 1e-6,
     ):
         super().__init__()
 
@@ -72,7 +69,6 @@ class AAHCluster(_BaseCluster):
         self._normalize_input = AAHCluster._check_ignore_polarity(
             normalize_input
         )
-        self._tol = AAHCluster._check_tol(tol)
 
         # fit variables
         self._GEV_ = None
@@ -116,7 +112,6 @@ class AAHCluster(_BaseCluster):
             attributes = (
                 "_ignore_polarity",
                 "_normalize_input",
-                "_tol",
                 "_GEV_",
             )
             for attribute in attributes:
@@ -168,7 +163,6 @@ class AAHCluster(_BaseCluster):
             self._n_clusters,
             self._ignore_polarity,
             self._normalize_input,
-            self._tol,
         )
 
         if gev is not None:
@@ -196,7 +190,6 @@ class AAHCluster(_BaseCluster):
             self._labels_,
             ignore_polarity=self._ignore_polarity,
             normalize_input=self._normalize_input,
-            tol=self._tol,
             GEV_=self._GEV_,
         )
 
@@ -207,12 +200,11 @@ class AAHCluster(_BaseCluster):
         n_clusters: int,
         ignore_polarity: bool,
         normalize_input: bool,
-        tol: Union[int, float],
     ) -> Tuple[float, NDArray[float], NDArray[int]]:
         """Run the AAHC algorithm."""
         gfp_sum_sq = np.sum(data**2)
         maps, segmentation = AAHCluster._compute_maps(
-            data, n_clusters, ignore_polarity, normalize_input, tol
+            data, n_clusters, ignore_polarity, normalize_input
         )
         map_corr = _corr_vectors(data, maps[segmentation].T)
         gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
@@ -224,7 +216,6 @@ class AAHCluster(_BaseCluster):
         n_clusters: int,
         ignore_polarity: bool,
         normalize_input: bool,
-        tol: Union[int, float],
     ) -> Tuple[NDArray[float], NDArray[int]]:
         """Compute microstates maps."""
         n_chan, n_frame = data.shape
@@ -267,15 +258,24 @@ class AAHCluster(_BaseCluster):
 
                     sgn = np.sign(old_cluster @ cluster[:, c])
 
-                    v0 = old_weight * sgn * old_cluster + \
-                        (1. - old_weight) * cluster[:, c]
-
-                    v, _ = AAHCluster._first_principal_component(
-                        data[:, members], tol, v0
+                    v0 = (
+                        old_weight * sgn * old_cluster
+                        + (1.0 - old_weight) * cluster[:, c]
                     )
+
+                    v, _, converged = AAHCluster._first_principal_component(
+                        data[:, members], v0, max_iter=n_chan
+                    )
+                    if not converged:
+                        # fall back to covariance estimation
+                        # and eigenvalue computation
+                        Cxx = data[:, members] @ data[:, members].T
+                        _, V = np.linalg.eigh(Cxx)
+                        v = V[:, -1]
+
                     cluster[:, c] = v
                 else:
-                    cluster[:, c] = np.mean(data[:, members], axis=0)
+                    cluster[:, c] = np.mean(data[:, members], axis=1)
                     cluster[:, c] /= np.linalg.norm(
                         cluster[:, c], axis=0, keepdims=True
                     )
@@ -289,22 +289,22 @@ class AAHCluster(_BaseCluster):
     @njit(cache=True)
     def _first_principal_component(
         X: NDArray[float],
-        tol: float,
-        v0: Optional[NDArray[float]] = None,
+        v0: NDArray[float],
+        tol: float = 1e-6,
         max_iter: int = 100,
-    ) -> Tuple[NDArray[float], float]:
+    ) -> Tuple[NDArray[float], float, bool]:
         """Compute first principal component.
 
         Parameters
         ----------
         X : numpy.ndarray
             Input data matrix with dimensions (channels x observations)
-        tol : float
-            Tolerance for convergence.
-        v0 : numpy.ndarray or None (default)
+        v0 : numpy.ndarray
             Initial estimate of the principal vector with dimensions
-            (channels,). If None, a random initialization is used.
-        max_iter : int
+            (channels,).
+        tol : float (1e-6 by default)
+            Tolerance for convergence.
+        max_iter : int (100 by default)
             Maximum number of iterations to estimate the first principal
             component.
 
@@ -314,17 +314,17 @@ class AAHCluster(_BaseCluster):
             Estimated principal component vector.
         eig : float
             Eigenvalue of the covariance matrix of X (channels x channels)
+        converged : bool
+            False, if `max_iter` were reached.
 
         See :footcite:t:`Roweis1997` for additional information.
         """
 
-        if v0 is None:  # use a random choice
-            v = np.random.rand(X.shape[0])
-        else:
-            v = v0.flatten()
-            assert v.shape[0] == X.shape[0]
+        v = v0.flatten()
+        assert v.shape[0] == X.shape[0]
         v /= np.linalg.norm(v)
 
+        converged = False
         for _ in range(max_iter):
             s = np.sum((np.expand_dims(v, 0) @ X) * X, axis=1)
 
@@ -332,9 +332,10 @@ class AAHCluster(_BaseCluster):
             s_norm = np.linalg.norm(s)
 
             if np.linalg.norm(eig * v - s) / s_norm < tol:
+                converged = True
                 break
             v = s / s_norm
-        return v, eig
+        return v, eig, converged
 
     # --------------------------------------------------------------------
 
@@ -353,14 +354,6 @@ class AAHCluster(_BaseCluster):
         :type: `bool`
         """
         return self._normalize_input
-
-    @property
-    def tol(self) -> Union[int, float]:
-        """Relative tolerance to reach convergence.
-
-        :type: `float`
-        """
-        return self._tol
 
     @property
     def GEV_(self) -> float:
@@ -383,22 +376,11 @@ class AAHCluster(_BaseCluster):
     @staticmethod
     def _check_ignore_polarity(ignore_polarity: bool) -> bool:
         """Check that ignore_polarity is a boolean."""
-        _check_type(ignore_polarity, ("bool",), item_name="ignore_polarity")
+        _check_type(ignore_polarity, (bool,), item_name="ignore_polarity")
         return ignore_polarity
 
     @staticmethod
     def _check_normalize_input(normalize_input: bool) -> bool:
         """Check that normalize_input is a boolean."""
-        _check_type(normalize_input, ("bool",), item_name="normalize_input")
+        _check_type(normalize_input, (bool,), item_name="normalize_input")
         return normalize_input
-
-    @staticmethod
-    def _check_tol(tol: Union[int, float]) -> Union[int, float]:
-        """Check that tol is a positive number."""
-        _check_type(tol, ("numeric",), item_name="tol")
-        if tol <= 0:
-            raise ValueError(
-                "The tolerance must be a positive number. "
-                f"Provided: '{tol}'."
-            )
-        return tol

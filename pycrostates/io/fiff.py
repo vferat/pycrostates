@@ -34,7 +34,7 @@ from numpy.typing import NDArray
 
 from .. import __version__
 from .._typing import CHInfo
-from ..cluster import ModKMeans, AAHCluster
+from ..cluster import AAHCluster, ModKMeans
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
@@ -179,7 +179,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
             "variables": ["GEV_"],
         },
         "AAHCluster": {
-            "parameters": ["ignore_polarity", "normalize_input", "tol"],
+            "parameters": ["ignore_polarity", "normalize_input"],
             "variables": ["GEV_"],
         },
     }
@@ -215,11 +215,13 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
                 fit_parameters["tol"] = ModKMeans._check_tol(value)
         elif algorithm == "AAHCluster":
             if key == "ignore_polarity":
-                fit_parameters["ignore_polarity"] = \
-                    AAHCluster._check_ignore_polarity(value)
+                fit_parameters[
+                    "ignore_polarity"
+                ] = AAHCluster._check_ignore_polarity(value)
             elif key == "normalize_input":
-                fit_parameters["normalize_input"] = \
-                    AAHCluster._check_normalize_input(value)
+                fit_parameters[
+                    "normalize_input"
+                ] = AAHCluster._check_normalize_input(value)
             elif key == "tol":
                 fit_parameters["tol"] = AAHCluster._check_tol(value)
         if key == "GEV_":
@@ -326,7 +328,7 @@ def _read_cluster(fname: Union[str, Path]):
     # reconstruct cluster instance
     function = {
         "ModKMeans": _create_ModKMeans,
-        "AAHCluster": _create_AAHCluster
+        "AAHCluster": _create_AAHCluster,
     }
 
     return (
@@ -408,14 +410,12 @@ def _create_AAHCluster(
     labels_: NDArray[int],
     ignore_polarity: bool,
     normalize_input: bool,
-    tol: Union[int, float],
     GEV_: float,
 ):
 
-    print(normalize_input, ignore_polarity)
     """Create a AAHCluster object."""
     cluster = AAHCluster(
-        cluster_centers_.shape[0], ignore_polarity, normalize_input, tol
+        cluster_centers_.shape[0], ignore_polarity, normalize_input
     )
     cluster._cluster_centers_ = cluster_centers_
     cluster._info = info
@@ -425,6 +425,7 @@ def _create_AAHCluster(
     cluster._GEV_ = GEV_
     cluster._fitted = True
     return cluster
+
 
 # ----------------------------------------------------------------------------
 def _write_meas_info(fid, info: CHInfo):
