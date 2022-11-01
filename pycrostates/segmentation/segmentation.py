@@ -117,7 +117,8 @@ class _BaseSegmentation(ABC):
                    The proportion of time during which a given state is
                    active. This metric is expressed as a ratio.
             * meandurs : Mean duration
-                   Mean temporal duration of segments assigned to a given state.
+                   Mean temporal duration of segments assigned
+                   to a given state.
                    This metric is expressed in seconds (s).
             * occurrences : occurrences
                    Mean number of segment assigned to a given state per
@@ -155,11 +156,24 @@ class _BaseSegmentation(ABC):
             return_dist=return_dist,
         )
 
-    def compute_transition_probabilities(self, ignore_self=True):
+    def compute_transition_probabilities(
+        self, stat="probability", ignore_self=True
+    ):
         """Compute transitions probabilities of microstate transtions.
 
         Parameters
         ----------
+        stat : str
+            Aggregate statistic to compute each transition. Can be:
+
+            * ``count``: show the number of observations of each transition.
+
+            * ``probability`` or ``proportion``: normalize such probabilities
+                along the first axis is always equal to 1.
+
+            * ``percent``: normalize such probabilities along the first axis
+                is always equal to 100.
+
         ignore_self : bool
             If True, ignore transition from one state to itself.
             This is equivalent to set the duration of all states to 1 sample.
@@ -170,10 +184,6 @@ class _BaseSegmentation(ABC):
             Array of transition probability values from one label to another.
             First axis indicates state "from".
             Second axis indicates state "to".
-            Unlabeled segments are ignored, and probabilities are normalized
-            (i.e. the sum of probabilities along the first axis is always
-            equal to 1, except in the case it never appears. In this case,
-            all probabilities "from" this state are null).
 
         Warnings
         --------
@@ -183,15 +193,24 @@ class _BaseSegmentation(ABC):
         To avoid this behaviour, make sure to set the ``reject_edges``
         parameter to ``True`` when predicting the segmentation.
         """
+        if stat not in ["count", "probability", "proportion", "percent"]:
+            raise ValueError(
+                f"Argument 'stat' should be either 'count',"
+                f"'probability', 'proportion' or 'percent'"
+                f"but {stat} was provided."
+            )
         n_clusters = len(self._cluster_centers_)
         T = _BaseSegmentation._compute_transition_probabilities(
-            self._labels, n_clusters=n_clusters, ignore_self=ignore_self
+            self._labels,
+            n_clusters=n_clusters,
+            stat=stat,
+            ignore_self=ignore_self,
         )
         return T
 
     @staticmethod
     def _compute_transition_probabilities(
-        labels, n_clusters, ignore_self=True
+        labels, n_clusters, ignore_self=True, stat="probability"
     ):
         """Compute transitions probabilities of microstate transtions."""
         # reshape if epochs
@@ -207,12 +226,19 @@ class _BaseSegmentation(ABC):
             T[i][j] += 1
         # ignore unlabeled
         T = T[:-1, :-1]
+
+        if stat == "count":
+            return T
+
         # transform to probability
         for row in T:
             s = sum(row)
             if s > 0:
                 row[:] = [f / s for f in row]
-        return T
+        if stat == "probability" or stat == "proportion":
+            return T
+        if stat == "percent":
+            return T * 100
 
     @fill_doc
     def plot_cluster_centers(
