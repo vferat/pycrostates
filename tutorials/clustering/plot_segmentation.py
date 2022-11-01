@@ -35,7 +35,7 @@ ModK.rename_clusters(new_names=['A', 'B', 'C', 'D', 'F'])
 ModK.plot()
 
 #%%
-# Once a set a cluster centers has been computed, we can use it to
+# Once a set a cluster centers has been computed, we can use it  to
 # predict the microstate segmentation using the :meth:`pycrostates.cluster.ModKMeans.predict`
 # method. This method returns either a `~pycrostates.segmentation.RawSegmentation` or
 # `~pycrostates.segmentation.EpochsSegmentation` depending on the input instance.
@@ -47,7 +47,7 @@ segmentation = ModK.predict(raw, reject_by_annotation=True, factor=10,
 # The ``factor`` and ``half_window_size`` allows control of the smoothing algorithm introduced
 # by Pascual Marqui \ :footcite:p:`Marqui1995`. This algorithm allows to correct wrong label assignment
 # which occur during periods of low signal to noise ratio. For each timepoint,
-# this algorithm takes into account the label of the neighbouring segments in order to favor assignements that increase
+# this algorithm takes into account the label of the neighbouring segments in order to favor assignments that increase
 # label continuity
 # (i.e. long segments). The ``factor`` parameter controls the strength of the influence of the neighboring segments
 # while the ``half_window_size`` parameter controls how far (in time) neighbours should have influence.
@@ -78,7 +78,7 @@ parameters
 #%%
 # This method returns a `dict` which keys corresponds to each
 # combinaison of ``cluster_center_name`` and parameter name.
-# For exemple, ``gev`` is the total explained variance expressed by a given state.
+# For example, ``gev`` is the total explained variance expressed by a given state.
 # It is computed as the sum of global explained variance values of each time point assigned
 # to a given state.
 import matplotlib.pyplot as plt
@@ -156,7 +156,7 @@ parameters = segmentation.compute_parameters(return_dist=True)
 parameters
 
 #%%
-# For exemple, distribution of segment durations can be plotted using ``seaborn``:
+# For example, distribution of segment durations can be plotted using ``seaborn``:
 sns.displot(parameters['C_dist_durs'], stat='probability', bins=30)
 
 #%%
@@ -168,18 +168,18 @@ mean = np.mean(parameters['C_dist_durs'])
 print(f'Microstate C segment has a median duration of {median:.2f}s and mean duration of {mean:.2f}s')
 
 #%%
-# Finaly, one can analyze microstates transitions using the
+# Finally, one can analyze microstates transitions using the
 # :meth:`~pycrostates.segmentation.RawSegmentation.compute_transition_probabilities` method.
 
 T = segmentation.compute_transition_probabilities()
 
 #%%
 # This method returns a `numpy.array` of shape (``n_clusters``, ``n_clusters``) containing the
-# value corresponding to the choosen statistic: ``count`` will return the number of transitions observed,
+# value corresponding to the chosen statistic: ``count`` will return the number of transitions observed,
 # ``probability`` and ``proportion`` will both return the normalize transition probability and
 # ``percent`` will return the probability as percentage ( ``probability`` * 100).
 # The rows of T correspond to the "from" state while the columns indicate the "to" state,
-# so that T[1,2] encode for the transition from the 2nd state to the 3rd(B -> C in this exemple).
+# so that T[1,2] encode for the transition from the 2nd state to the 3rd(B -> C in this example).
 #
 # .. note::
 #
