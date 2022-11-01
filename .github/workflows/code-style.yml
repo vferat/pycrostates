@@ -45,3 +45,5 @@ jobs:
           skip: ./.git,./build,./.github,*.bib
       - name: Run pydocstyle
         run: pydocstyle .
+      - name: Run bibclean
+        run: bibclean-check docs/references.bib
