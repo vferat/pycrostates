@@ -65,7 +65,7 @@ segmentation._labels
 #%%
 # The :meth:`pycrostates.cluster.ModKMeans.plot` method can be used
 # to visualize the segmentation:
-
+# sphinx_gallery_thumbnail_number = 2
 segmentation.plot(tmin=1, tmax=5)
 
 #%%
