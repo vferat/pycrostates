@@ -159,7 +159,7 @@ class _BaseSegmentation(ABC):
     def compute_transition_probabilities(
         self, stat="probability", ignore_self=True
     ):
-        """Compute transitions probabilities of microstate transtions.
+        """Compute transition probabilities of microstate transitions.
 
         Parameters
         ----------
@@ -212,7 +212,7 @@ class _BaseSegmentation(ABC):
     def _compute_transition_probabilities(
         labels, n_clusters, ignore_self=True, stat="probability"
     ):
-        """Compute transitions probabilities of microstate transtions."""
+        """Compute transition probabilities of microstate transitions."""
         # reshape if epochs
         labels = labels.reshape(-1)
         # ignore transition to itself (i.e. 1 -> 1)
