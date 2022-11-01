@@ -115,7 +115,7 @@ class _BaseSegmentation(ABC):
                    time point assigned to a given state.
             * timecov : Time coverage
                    The proportion of time during which a given state is
-                   active. This metric is expressed in percentage (%%).
+                   active. This metric is expressed as a ratio.
             * meandurs : Mean duration
                    Mean temporal duration segments assigned to a given state.
                    This metric is expressed in seconds (s).
