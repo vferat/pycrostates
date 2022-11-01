@@ -81,7 +81,7 @@ class ModKMeans(_BaseCluster):
                 f"{ch_count} {ch_type.upper()}"
                 for ch_type, ch_count in zip(ch_types, ch_counts)
             ]
-            GEV = int(self._GEV_ * 100)
+            GEV = f"{self._GEV_ * 100:.2f}"
         else:
             n_samples = None
             ch_repr = None
