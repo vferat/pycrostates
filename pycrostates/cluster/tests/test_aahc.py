@@ -139,6 +139,31 @@ def test_ignore_polarity_false():
     assert len(set(dists.argmin(axis=0))) == 2 * sim_n_ms
 
 
+def test_normalize_input_true():
+    obj = AAHCluster(
+        n_clusters=sim_n_ms, ignore_polarity=True, normalize_input=True
+    )
+    obj.fit(raw_sim)
+
+    # extract cluster centers
+    A_hat = obj._cluster_centers_
+
+    # compute Euclidean distances (using the sign that minimizes the distance)
+    sgn = np.sign(A @ A_hat.T)
+    dists = np.linalg.norm(
+        (A_hat[None, ...] - A[:, None] * sgn[..., None]), axis=2
+    )
+    # compute tolerance (2 times the expected noise level)
+    tol = (
+        2 * sim_sigma / np.sqrt(sim_n_frames / sim_n_ms) * np.sqrt(sim_n_chans)
+    )
+    # check if there is a cluster center whose distance
+    # is within the tolerance
+    assert (dists.min(axis=0) < tol).all()
+    # ensure that all cluster centers were identified
+    assert len(set(dists.argmin(axis=0))) == sim_n_ms
+
+
 # pylint: disable=protected-access
 def _check_fitted(aahCluster):
     """
@@ -583,6 +608,20 @@ def test_invalid_arguments():
         aahCluster_ = AAHCluster(n_clusters=0)
     with pytest.raises(ValueError, match="The number of clusters must be a"):
         aahCluster_ = AAHCluster(n_clusters=-101)
+
+    # ignore_polarity
+    with pytest.raises(
+        TypeError, match="'ignore_polarity' must be an instance of bool"
+    ):
+        aahCluster_ = AAHCluster(n_clusters=n_clusters, ignore_polarity="asdf")
+        aahCluster_ = AAHCluster(n_clusters=n_clusters, ignore_polarity=None)
+
+    # normalize_input
+    with pytest.raises(
+        TypeError, match="'normalize_input' must be an instance of bool"
+    ):
+        aahCluster_ = AAHCluster(n_clusters=n_clusters, normalize_input="asdf")
+        aahCluster_ = AAHCluster(n_clusters=n_clusters, normalize_input=None)
 
     aahCluster_ = AAHCluster(
         n_clusters=n_clusters,

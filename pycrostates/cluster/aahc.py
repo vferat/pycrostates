@@ -66,7 +66,7 @@ class AAHCluster(_BaseCluster):
         self._ignore_polarity = AAHCluster._check_ignore_polarity(
             ignore_polarity
         )
-        self._normalize_input = AAHCluster._check_ignore_polarity(
+        self._normalize_input = AAHCluster._check_normalize_input(
             normalize_input
         )
 
