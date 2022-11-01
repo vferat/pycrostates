@@ -47,11 +47,11 @@ ch_data = ChData(raw_eeg.get_data(), raw_eeg.info)
 # Fit one for general purposes
 n_clusters = 4
 
-aahCluster = AAHCluster(
+aah_cluster = AAHCluster(
     n_clusters=n_clusters, ignore_polarity=True, normalize_input=False
 )
 
-aahCluster.fit(ch_data)
+aah_cluster.fit(ch_data)
 
 # simulated data
 
@@ -68,7 +68,7 @@ sources = np.array(
     dtype=np.double,
 )
 sim_n_ms = sources.shape[0]
-sim_n_frames = 1000  # number of samples to generate
+sim_n_frames = 250  # number of samples to generate
 sim_n_chans = pos.shape[0]  # number of channels
 # compute forward model
 A = np.sum(
@@ -97,7 +97,7 @@ def test_ignore_polarity_true():
     obj.fit(raw_sim)
 
     # extract cluster centers
-    A_hat = obj._cluster_centers_
+    A_hat = obj.cluster_centers_
 
     # compute Euclidean distances (using the sign that minimizes the distance)
     sgn = np.sign(A @ A_hat.T)
@@ -120,7 +120,7 @@ def test_ignore_polarity_false():
     obj.fit(raw_sim)
 
     # extract cluster centers
-    A_hat = obj._cluster_centers_
+    A_hat = obj.cluster_centers_
     # create extended targets (pos. and neg. polarity)
     A_ = np.concatenate((A, -A), axis=0)
     # compute Euclidean distances
@@ -146,7 +146,7 @@ def test_normalize_input_true():
     obj.fit(raw_sim)
 
     # extract cluster centers
-    A_hat = obj._cluster_centers_
+    A_hat = obj.cluster_centers_
 
     # compute Euclidean distances (using the sign that minimizes the distance)
     sgn = np.sign(A @ A_hat.T)
@@ -165,32 +165,32 @@ def test_normalize_input_true():
 
 
 # pylint: disable=protected-access
-def _check_fitted(aahCluster):
+def _check_fitted(aah_cluster):
     """
-    Checks that the aahCluster is fitted.
+    Checks that the aah_cluster is fitted.
     """
-    assert aahCluster.fitted
-    assert aahCluster.n_clusters == n_clusters
-    assert len(aahCluster._cluster_names) == n_clusters
-    assert len(aahCluster._cluster_centers_) == n_clusters
-    assert aahCluster._fitted_data is not None
-    assert aahCluster._info is not None
-    assert aahCluster.GEV_ is not None
-    assert aahCluster._labels_ is not None
+    assert aah_cluster.fitted
+    assert aah_cluster.n_clusters == n_clusters
+    assert len(aah_cluster._cluster_names) == n_clusters
+    assert len(aah_cluster._cluster_centers_) == n_clusters
+    assert aah_cluster._fitted_data is not None
+    assert aah_cluster._info is not None
+    assert aah_cluster.GEV_ is not None
+    assert aah_cluster._labels_ is not None
 
 
-def _check_unfitted(aahCluster):
+def _check_unfitted(aah_cluster):
     """
-    Checks that the aahCluster is not fitted.
+    Checks that the aah_cluster is not fitted.
     """
-    assert not aahCluster.fitted
-    assert aahCluster.n_clusters == n_clusters
-    assert len(aahCluster._cluster_names) == n_clusters
-    assert aahCluster._cluster_centers_ is None
-    assert aahCluster._fitted_data is None
-    assert aahCluster._info is None
-    assert aahCluster.GEV_ is None
-    assert aahCluster._labels_ is None
+    assert not aah_cluster.fitted
+    assert aah_cluster.n_clusters == n_clusters
+    assert len(aah_cluster._cluster_names) == n_clusters
+    assert aah_cluster._cluster_centers_ is None
+    assert aah_cluster._fitted_data is None
+    assert aah_cluster._info is None
+    assert aah_cluster.GEV_ is None
+    assert aah_cluster._labels_ is None
 
 
 def _check_fitted_data_raw(
@@ -289,8 +289,8 @@ def test_aahClusterMeans():
 
     # Test representation
     expected = f"<AAHCluster | fitted on n = {n_clusters} cluster centers>"
-    assert expected == aahCluster1.__repr__()
-    assert "<AAHCluster | not fitted>" == aahCluster2.__repr__()
+    assert expected == repr(aahCluster1)
+    assert "<AAHCluster | not fitted>" == repr(aahCluster2)
 
     # Test HTML representation
     html = aahCluster1._repr_html_()
@@ -311,7 +311,7 @@ def test_aahClusterMeans():
 def test_invert_polarity():
     """Test invert polarity method."""
     # list/tuple
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
     cluster_centers_ = deepcopy(aahCluster_._cluster_centers_)
     aahCluster_.invert_polarity([True, False, True, False])
     assert np.isclose(
@@ -328,7 +328,7 @@ def test_invert_polarity():
     ).all()
 
     # bool
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
     cluster_centers_ = deepcopy(aahCluster_._cluster_centers_)
     aahCluster_.invert_polarity(True)
     assert np.isclose(
@@ -345,7 +345,7 @@ def test_invert_polarity():
     ).all()
 
     # np.array
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
     cluster_centers_ = deepcopy(aahCluster_._cluster_centers_)
     aahCluster_.invert_polarity(np.array([True, False, True, False]))
     assert np.isclose(
@@ -383,9 +383,9 @@ def test_rename(caplog):
     alphabet = ["A", "B", "C", "D"]
 
     # Test mapping
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
     mapping = {
-        old: alphabet[k] for k, old in enumerate(aahCluster._cluster_names)
+        old: alphabet[k] for k, old in enumerate(aah_cluster._cluster_names)
     }
     for key, value in mapping.items():
         assert isinstance(key, str)
@@ -393,26 +393,26 @@ def test_rename(caplog):
         assert key != value
     aahCluster_.rename_clusters(mapping=mapping)
     assert aahCluster_._cluster_names == alphabet
-    assert aahCluster_._cluster_names != aahCluster._cluster_names
+    assert aahCluster_._cluster_names != aah_cluster._cluster_names
 
     # Test new_names
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
     aahCluster_.rename_clusters(new_names=alphabet)
     assert aahCluster_._cluster_names == alphabet
-    assert aahCluster_._cluster_names != aahCluster._cluster_names
+    assert aahCluster_._cluster_names != aah_cluster._cluster_names
 
     # Test invalid arguments
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
     with pytest.raises(TypeError, match="'mapping' must be an instance of "):
         aahCluster_.rename_clusters(mapping=101)
     with pytest.raises(ValueError, match="Invalid value for the 'old name'"):
         mapping = {
             old + "101": alphabet[k]
-            for k, old in enumerate(aahCluster._cluster_names)
+            for k, old in enumerate(aah_cluster._cluster_names)
         }
         aahCluster_.rename_clusters(mapping=mapping)
     with pytest.raises(TypeError, match="'new name' must be an instance of "):
-        mapping = {old: k for k, old in enumerate(aahCluster._cluster_names)}
+        mapping = {old: k for k, old in enumerate(aah_cluster._cluster_names)}
         aahCluster_.rename_clusters(mapping=mapping)
     with pytest.raises(
         ValueError, match="Argument 'new_names' should contain"
@@ -426,17 +426,19 @@ def test_rename(caplog):
         ValueError, match="Only one of 'mapping' or 'new_names'"
     ):
         mapping = {
-            old: alphabet[k] for k, old in enumerate(aahCluster._cluster_names)
+            old: alphabet[k]
+            for k, old in enumerate(aah_cluster._cluster_names)
         }
         aahCluster_.rename_clusters(mapping=mapping, new_names=alphabet)
 
     # Test unfitted
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
     aahCluster_.fitted = False
     _check_unfitted(aahCluster_)
     with pytest.raises(RuntimeError, match="must be fitted before"):
         mapping = {
-            old: alphabet[k] for k, old in enumerate(aahCluster._cluster_names)
+            old: alphabet[k]
+            for k, old in enumerate(aah_cluster._cluster_names)
         }
         aahCluster_.rename_clusters(mapping=mapping)
     with pytest.raises(RuntimeError, match="must be fitted before"):
@@ -446,42 +448,44 @@ def test_rename(caplog):
 def test_reorder(caplog):
     """Test reordering of clusters."""
     # Test mapping
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
     aahCluster_.reorder_clusters(mapping={0: 1})
     assert np.isclose(
-        aahCluster._cluster_centers_[0, :], aahCluster_._cluster_centers_[1, :]
+        aah_cluster._cluster_centers_[0, :],
+        aahCluster_._cluster_centers_[1, :],
     ).all()
     assert np.isclose(
-        aahCluster._cluster_centers_[1, :], aahCluster_._cluster_centers_[0, :]
+        aah_cluster._cluster_centers_[1, :],
+        aahCluster_._cluster_centers_[0, :],
     ).all()
-    assert aahCluster._cluster_names[0] == aahCluster_._cluster_names[1]
-    assert aahCluster._cluster_names[0] == aahCluster_._cluster_names[1]
+    assert aah_cluster._cluster_names[0] == aahCluster_._cluster_names[1]
+    assert aah_cluster._cluster_names[0] == aahCluster_._cluster_names[1]
 
     # Test order
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
     aahCluster_.reorder_clusters(order=[1, 0, 2, 3])
     assert np.isclose(
-        aahCluster._cluster_centers_[0], aahCluster_._cluster_centers_[1]
+        aah_cluster._cluster_centers_[0], aahCluster_._cluster_centers_[1]
     ).all()
     assert np.isclose(
-        aahCluster._cluster_centers_[1], aahCluster_._cluster_centers_[0]
+        aah_cluster._cluster_centers_[1], aahCluster_._cluster_centers_[0]
     ).all()
-    assert aahCluster._cluster_names[0] == aahCluster_._cluster_names[1]
-    assert aahCluster._cluster_names[0] == aahCluster_._cluster_names[1]
+    assert aah_cluster._cluster_names[0] == aahCluster_._cluster_names[1]
+    assert aah_cluster._cluster_names[0] == aahCluster_._cluster_names[1]
 
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
     aahCluster_.reorder_clusters(order=np.array([1, 0, 2, 3]))
     assert np.isclose(
-        aahCluster._cluster_centers_[0], aahCluster_._cluster_centers_[1]
+        aah_cluster._cluster_centers_[0], aahCluster_._cluster_centers_[1]
     ).all()
     assert np.isclose(
-        aahCluster._cluster_centers_[1], aahCluster_._cluster_centers_[0]
+        aah_cluster._cluster_centers_[1], aahCluster_._cluster_centers_[0]
     ).all()
-    assert aahCluster._cluster_names[0] == aahCluster_._cluster_names[1]
-    assert aahCluster._cluster_names[0] == aahCluster_._cluster_names[1]
+    assert aah_cluster._cluster_names[0] == aahCluster_._cluster_names[1]
+    assert aah_cluster._cluster_names[0] == aahCluster_._cluster_names[1]
 
     # test ._labels_ reordering
-    y = aahCluster._labels_[:20]
+    y = aah_cluster._labels_[:20]
     y[y == 0] = -1
     y[y == 1] = 0
     y[y == -1] = 1
@@ -489,7 +493,7 @@ def test_reorder(caplog):
     assert np.all(x == y)
 
     # Test invalid arguments
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
     with pytest.raises(TypeError, match="'mapping' must be an instance of "):
         aahCluster_.reorder_clusters(mapping=101)
     with pytest.raises(
@@ -531,7 +535,7 @@ def test_reorder(caplog):
         aahCluster_.reorder_clusters(mapping={0: 1}, order=[1, 0, 2, 3])
 
     # Test unfitted
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
     aahCluster_.fitted = False
     _check_unfitted(aahCluster_)
     with pytest.raises(RuntimeError, match="must be fitted before"):
@@ -564,17 +568,17 @@ def test_properties(caplog):
     caplog.clear()
 
     # Fitted
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
 
-    aahCluster_.cluster_centers_
+    assert aahCluster_.cluster_centers_ is not None
     assert "Clustering algorithm has not been fitted." not in caplog.text
     caplog.clear()
 
-    aahCluster_.info
+    assert aahCluster_.info is not None
     assert "Clustering algorithm has not been fitted." not in caplog.text
     caplog.clear()
 
-    aahCluster_.fitted_data
+    assert aahCluster_.fitted_data is not None
     assert "Clustering algorithm has not been fitted." not in caplog.text
     caplog.clear()
 
@@ -591,7 +595,7 @@ def test_properties(caplog):
     log = "'fitted' can not be set to 'True' directly. Please use the .fit()"
     assert log in caplog.text
     caplog.clear()
-    aahCluster_ = aahCluster.copy()
+    aahCluster_ = aah_cluster.copy()
     aahCluster_.fitted = True
     log = "'fitted' can not be set to 'True' directly. The clustering"
     assert log in caplog.text
@@ -879,13 +883,13 @@ def test_refit():
 def test_predict_default(caplog):
     """Test predict method default behaviors."""
     # raw, no smoothing, no_edge
-    segmentation = aahCluster.predict(raw_eeg, factor=0, reject_edges=False)
+    segmentation = aah_cluster.predict(raw_eeg, factor=0, reject_edges=False)
     assert isinstance(segmentation, RawSegmentation)
     assert "Segmenting data without smoothing" in caplog.text
     caplog.clear()
 
     # raw, no smoothing, with edge rejection
-    segmentation = aahCluster.predict(raw_eeg, factor=0, reject_edges=True)
+    segmentation = aah_cluster.predict(raw_eeg, factor=0, reject_edges=True)
     assert isinstance(segmentation, RawSegmentation)
     assert segmentation._labels[0] == -1
     assert segmentation._labels[-1] == -1
@@ -893,7 +897,7 @@ def test_predict_default(caplog):
     caplog.clear()
 
     # raw, with smoothing
-    segmentation = aahCluster.predict(raw_eeg, factor=3, reject_edges=True)
+    segmentation = aah_cluster.predict(raw_eeg, factor=3, reject_edges=True)
     assert isinstance(segmentation, RawSegmentation)
     assert segmentation._labels[0] == -1
     assert segmentation._labels[-1] == -1
@@ -901,7 +905,7 @@ def test_predict_default(caplog):
     caplog.clear()
 
     # raw with min_segment_length
-    segmentation = aahCluster.predict(
+    segmentation = aah_cluster.predict(
         raw_eeg, factor=0, reject_edges=False, min_segment_length=5
     )
     assert isinstance(segmentation, RawSegmentation)
@@ -913,13 +917,15 @@ def test_predict_default(caplog):
     caplog.clear()
 
     # epochs, no smoothing, no_edge
-    segmentation = aahCluster.predict(epochs_eeg, factor=0, reject_edges=False)
+    segmentation = aah_cluster.predict(
+        epochs_eeg, factor=0, reject_edges=False
+    )
     assert isinstance(segmentation, EpochsSegmentation)
     assert "Segmenting data without smoothing" in caplog.text
     caplog.clear()
 
     # epochs, no smoothing, with edge rejection
-    segmentation = aahCluster.predict(epochs_eeg, factor=0, reject_edges=True)
+    segmentation = aah_cluster.predict(epochs_eeg, factor=0, reject_edges=True)
     assert isinstance(segmentation, EpochsSegmentation)
     for epoch_labels in segmentation._labels:
         assert epoch_labels[0] == -1
@@ -928,7 +934,7 @@ def test_predict_default(caplog):
     caplog.clear()
 
     # epochs, with smoothing
-    segmentation = aahCluster.predict(epochs_eeg, factor=3, reject_edges=True)
+    segmentation = aah_cluster.predict(epochs_eeg, factor=3, reject_edges=True)
     assert isinstance(segmentation, EpochsSegmentation)
     for epoch_labels in segmentation._labels:
         assert epoch_labels[0] == -1
@@ -937,7 +943,7 @@ def test_predict_default(caplog):
     caplog.clear()
 
     # epochs with min_segment_length
-    segmentation = aahCluster.predict(
+    segmentation = aah_cluster.predict(
         epochs_eeg, factor=0, reject_edges=False, min_segment_length=5
     )
     assert isinstance(segmentation, EpochsSegmentation)
@@ -953,16 +959,16 @@ def test_predict_default(caplog):
     bad_annot = Annotations([1], [2], "bad")
     raw_ = raw_eeg.copy()
     raw_.set_annotations(bad_annot)
-    segmentation_rej_True = aahCluster.predict(
+    segmentation_rej_True = aah_cluster.predict(
         raw_, factor=0, reject_edges=True, reject_by_annotation=True
     )
-    segmentation_rej_False = aahCluster.predict(
+    segmentation_rej_False = aah_cluster.predict(
         raw_, factor=0, reject_edges=True, reject_by_annotation=False
     )
-    segmentation_rej_None = aahCluster.predict(
+    segmentation_rej_None = aah_cluster.predict(
         raw_, factor=0, reject_edges=True, reject_by_annotation=None
     )
-    segmentation_no_annot = aahCluster.predict(
+    segmentation_no_annot = aah_cluster.predict(
         raw_eeg, factor=0, reject_edges=True, reject_by_annotation="omit"
     )
     assert not np.isclose(
@@ -976,13 +982,13 @@ def test_predict_default(caplog):
     ).all()
 
     # test different half_window_size
-    segmentation1 = aahCluster.predict(
+    segmentation1 = aah_cluster.predict(
         raw_eeg, factor=3, reject_edges=False, half_window_size=3
     )
-    segmentation2 = aahCluster.predict(
+    segmentation2 = aah_cluster.predict(
         raw_eeg, factor=3, reject_edges=False, half_window_size=60
     )
-    segmentation3 = aahCluster.predict(
+    segmentation3 = aah_cluster.predict(
         raw_eeg, factor=0, reject_edges=False, half_window_size=3
     )
     assert not np.isclose(segmentation1._labels, segmentation2._labels).all()
@@ -1047,7 +1053,7 @@ def test_picks_fit_predict(caplog):
     assert "Fp2 which was not used during fitting" not in caplog.text
 
     # predict with a channel used for fitting that is now missing
-    # fails, because aahCluster.info includes Fp1 which is bad
+    # fails, because aah_cluster.info includes Fp1 which is bad
     # in prediction instance
     raw_predict.info["bads"] = ["Fp1"]
     with pytest.raises(ValueError, match="Fp1 is required to predict"):
@@ -1093,7 +1099,7 @@ def test_picks_fit_predict(caplog):
     caplog.clear()
 
     # try with a missing channel from the prediction instance
-    # fails, because Fp1 is used in aahCluster.info
+    # fails, because Fp1 is used in aah_cluster.info
     raw_predict.drop_channels(["Fp1"])
     with pytest.raises(
         ValueError, match="Fp1 was used during fitting but is missing"
@@ -1166,35 +1172,35 @@ def test_picks_fit_predict(caplog):
 def test_predict_invalid_arguments():
     """Test invalid arguments passed to predict."""
     with pytest.raises(TypeError, match="'inst' must be an instance of "):
-        aahCluster.predict(epochs_eeg.average())
+        aah_cluster.predict(epochs_eeg.average())
     with pytest.raises(TypeError, match="'factor' must be an instance of "):
-        aahCluster.predict(raw_eeg, factor="0")
+        aah_cluster.predict(raw_eeg, factor="0")
     with pytest.raises(
         TypeError, match="'reject_edges' must be an instance of "
     ):
-        aahCluster.predict(raw_eeg, reject_edges=1)
+        aah_cluster.predict(raw_eeg, reject_edges=1)
     with pytest.raises(
         TypeError, match="'half_window_size' must be an instance of "
     ):
-        aahCluster.predict(raw_eeg, half_window_size="1")
+        aah_cluster.predict(raw_eeg, half_window_size="1")
     with pytest.raises(
         TypeError, match="'min_segment_length' must be an instance of "
     ):
-        aahCluster.predict(raw_eeg, min_segment_length="0")
+        aah_cluster.predict(raw_eeg, min_segment_length="0")
     with pytest.raises(
         TypeError, match="'reject_by_annotation' must be an instance of "
     ):
-        aahCluster.predict(raw_eeg, reject_by_annotation=1)
+        aah_cluster.predict(raw_eeg, reject_by_annotation=1)
     with pytest.raises(ValueError, match="'reject_by_annotation' can be"):
-        aahCluster.predict(raw_eeg, reject_by_annotation="101")
+        aah_cluster.predict(raw_eeg, reject_by_annotation="101")
 
 
 def test_contains_mixin():
     """Test contains mixin class."""
-    assert "eeg" in aahCluster
-    assert aahCluster.compensation_grade is None
+    assert "eeg" in aah_cluster
+    assert aah_cluster.compensation_grade is None
     assert (
-        aahCluster.get_channel_types() == ["eeg"] * aahCluster._info["nchan"]
+        aah_cluster.get_channel_types() == ["eeg"] * aah_cluster._info["nchan"]
     )
 
     # test raise with non-fitted instance
@@ -1206,7 +1212,7 @@ def test_contains_mixin():
     with pytest.raises(
         ValueError, match="Instance 'AAHCluster' attribute 'info' is None."
     ):
-        "eeg" in aahCluster_
+        assert "eeg" in aahCluster_
     with pytest.raises(
         ValueError, match="Instance 'AAHCluster' attribute 'info' is None."
     ):
@@ -1214,13 +1220,13 @@ def test_contains_mixin():
     with pytest.raises(
         ValueError, match="Instance 'AAHCluster' attribute 'info' is None."
     ):
-        aahCluster_.compensation_grade
+        _ = aahCluster_.compensation_grade
 
 
 def test_montage_mixin():
     """Test montage mixin class."""
-    aahCluster_ = aahCluster.copy()
-    montage = aahCluster.get_montage()
+    aahCluster_ = aah_cluster.copy()
+    montage = aah_cluster.get_montage()
     assert isinstance(montage, DigMontage)
     assert montage.dig[-1]["r"][0] != 0
     montage.dig[-1]["r"][0] = 0
@@ -1249,11 +1255,11 @@ def test_save(tmp_path, caplog):
     """Test .save() method."""
     # writing to .fif
     fname1 = tmp_path / "cluster.fif"
-    aahCluster.save(fname1)
+    aah_cluster.save(fname1)
 
     # writing to .gz (compression)
     fname2 = tmp_path / "cluster.fif.gz"
-    aahCluster.save(fname2)
+    aah_cluster.save(fname2)
 
     # re-load
     caplog.clear()
@@ -1265,12 +1271,12 @@ def test_save(tmp_path, caplog):
     assert __version__ not in caplog.text
 
     # compare
-    assert aahCluster == aahCluster1
-    assert aahCluster == aahCluster2
+    assert aah_cluster == aahCluster1
+    assert aah_cluster == aahCluster2
     assert aahCluster1 == aahCluster2  # sanity-check
 
     # test prediction
-    segmentation = aahCluster.predict(raw_eeg, picks="eeg")
+    segmentation = aah_cluster.predict(raw_eeg, picks="eeg")
     segmentation1 = aahCluster1.predict(raw_eeg, picks="eeg")
     segmentation2 = aahCluster2.predict(raw_eeg, picks="eeg")
 
@@ -1281,20 +1287,20 @@ def test_save(tmp_path, caplog):
 
 def test_comparison(caplog):
     """Test == and != methods."""
-    aahCluster1 = aahCluster.copy()
-    aahCluster2 = aahCluster.copy()
+    aahCluster1 = aah_cluster.copy()
+    aahCluster2 = aah_cluster.copy()
     assert aahCluster1 == aahCluster2
 
     # with different aahClustermeans variables
     aahCluster1.fitted = False
     assert aahCluster1 != aahCluster2
-    aahCluster1 = aahCluster.copy()
+    aahCluster1 = aah_cluster.copy()
     aahCluster1._ignore_polarity = False
     assert aahCluster1 != aahCluster2
-    aahCluster1 = aahCluster.copy()
+    aahCluster1 = aah_cluster.copy()
     aahCluster1._normalize_input = True
     assert aahCluster1 != aahCluster2
-    aahCluster1 = aahCluster.copy()
+    aahCluster1 = aah_cluster.copy()
     aahCluster1._GEV_ = 0.101
     assert aahCluster1 != aahCluster2
 
@@ -1302,13 +1308,13 @@ def test_comparison(caplog):
     assert aahCluster1 != 101
 
     # with different base variables
-    aahCluster1 = aahCluster.copy()
-    aahCluster2 = aahCluster.copy()
+    aahCluster1 = aah_cluster.copy()
+    aahCluster2 = aah_cluster.copy()
     assert aahCluster1 == aahCluster2
-    aahCluster1 = aahCluster.copy()
+    aahCluster1 = aah_cluster.copy()
     aahCluster1._n_clusters = 101
     assert aahCluster1 != aahCluster2
-    aahCluster1 = aahCluster.copy()
+    aahCluster1 = aah_cluster.copy()
     aahCluster1._info = ChInfo(
         ch_names=[
             str(k) for k in range(aahCluster1._cluster_centers_.shape[1])
@@ -1316,16 +1322,16 @@ def test_comparison(caplog):
         ch_types=["eeg"] * aahCluster1._cluster_centers_.shape[1],
     )
     assert aahCluster1 != aahCluster2
-    aahCluster1 = aahCluster.copy()
+    aahCluster1 = aah_cluster.copy()
     aahCluster1._labels_ = aahCluster1._labels_[::-1]
     assert aahCluster1 != aahCluster2
-    aahCluster1 = aahCluster.copy()
+    aahCluster1 = aah_cluster.copy()
     aahCluster1._fitted_data = aahCluster1._fitted_data[:, ::-1]
     assert aahCluster1 != aahCluster2
 
     # different cluster names
-    aahCluster1 = aahCluster.copy()
-    aahCluster2 = aahCluster.copy()
+    aahCluster1 = aah_cluster.copy()
+    aahCluster2 = aah_cluster.copy()
     caplog.clear()
     assert aahCluster1 == aahCluster2
     assert "Cluster names differ between both clustering" not in caplog.text

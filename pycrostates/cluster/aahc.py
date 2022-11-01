@@ -1,5 +1,4 @@
-"""Class and functions to use Atomize and Agglomerate Hierarchical Clustering
-   (AAHC)."""
+"""Atomize and Agglomerate Hierarchical Clustering (AAHC)."""
 
 from functools import wraps as func_wraps
 from pathlib import Path
@@ -22,7 +21,9 @@ try:
     from numba import njit
 except ImportError:
 
-    def njit(cache=False):
+    def njit(cache=False):  # pylint: disable=unused-argument
+        """Define dummy decorator for numba."""
+
         def decorator(func):
             @func_wraps(func)
             def wrapper(*args, **kwargs):
@@ -74,7 +75,10 @@ class AAHCluster(_BaseCluster):
         self._GEV_ = None
 
     def _repr_html_(self, caption=None):
+        # pylint: disable=import-outside-toplevel
         from ..html_templates import repr_templates_env
+
+        # pylint: enable=import-outside-toplevel
 
         template = repr_templates_env.get_template("AAHCluster.html.jinja")
         if self.fitted:
@@ -139,7 +143,7 @@ class AAHCluster(_BaseCluster):
 
     @copy_doc(_BaseCluster.fit)
     @fill_doc
-    def fit(
+    def fit(  # pylint: disable=arguments-differ
         self,
         inst: Union[BaseRaw, BaseEpochs],
         picks: Picks = "eeg",
@@ -178,7 +182,10 @@ class AAHCluster(_BaseCluster):
         super().save(fname)
         # TODO: to be replaced by a general writer than infers the writer from
         # the file extension.
-        from ..io.fiff import _write_cluster  # pylint: disable=C0415
+        # pylint: disable=import-outside-toplevel
+        from ..io.fiff import _write_cluster
+
+        # pylint: enable=import-outside-toplevel
 
         _write_cluster(
             fname,
@@ -210,6 +217,7 @@ class AAHCluster(_BaseCluster):
         gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
         return gev, maps, segmentation
 
+    # pylint: disable=too-many-locals
     @staticmethod
     def _compute_maps(
         data: NDArray[float],
@@ -285,6 +293,8 @@ class AAHCluster(_BaseCluster):
                 GEV[c] = np.sum(new_fit)
         return cluster.T, assignment
 
+    # pylint: enable=too-many-locals
+
     @staticmethod
     @njit(cache=True)
     def _first_principal_component(
@@ -319,7 +329,6 @@ class AAHCluster(_BaseCluster):
 
         See :footcite:t:`Roweis1997` for additional information.
         """
-
         v = v0.flatten()
         assert v.shape[0] == X.shape[0]
         v /= np.linalg.norm(v)

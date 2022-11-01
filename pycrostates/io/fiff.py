@@ -222,8 +222,6 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
                 fit_parameters[
                     "normalize_input"
                 ] = AAHCluster._check_normalize_input(value)
-            elif key == "tol":
-                fit_parameters["tol"] = AAHCluster._check_tol(value)
         if key == "GEV_":
             _check_type(value, ("numeric",), "GEV_")
             if value < 0 or 1 < value:
@@ -356,7 +354,7 @@ def _check_fit_parameters_and_variables(
             "variables": ["GEV_"],
         },
         "AAHCluster": {
-            "parameters": ["ignore_polarity", "normalize_input", "tol"],
+            "parameters": ["ignore_polarity", "normalize_input"],
             "variables": ["GEV_"],
         },
     }
@@ -412,7 +410,6 @@ def _create_AAHCluster(
     normalize_input: bool,
     GEV_: float,
 ):
-
     """Create a AAHCluster object."""
     cluster = AAHCluster(
         cluster_centers_.shape[0], ignore_polarity, normalize_input
