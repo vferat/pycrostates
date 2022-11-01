@@ -117,7 +117,7 @@ class _BaseSegmentation(ABC):
                    The proportion of time during which a given state is
                    active. This metric is expressed as a ratio.
             * meandurs : Mean duration
-                   Mean temporal duration segments assigned to a given state.
+                   Mean temporal duration of segments assigned to a given state.
                    This metric is expressed in seconds (s).
             * occurrences : occurrences
                    Mean number of segment assigned to a given state per
