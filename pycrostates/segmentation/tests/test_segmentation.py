@@ -373,11 +373,11 @@ def test_compute_transition_probabilities_Epochs():
 def test_compute_transition_probabilities_stat():
     segmentation = ModK_raw.predict(raw)
     with pytest.raises(ValueError, match="Argument 'stat' should be either"):
-        segmentation.compute_transition_probabilities(stat='wrong')
-    T = segmentation.compute_transition_probabilities(stat='count')
-    T = segmentation.compute_transition_probabilities(stat='probability')
+        segmentation.compute_transition_probabilities(stat="wrong")
+    T = segmentation.compute_transition_probabilities(stat="count")
+    T = segmentation.compute_transition_probabilities(stat="probability")
     assert np.allclose(np.sum(T, axis=1), 1)
-    T = segmentation.compute_transition_probabilities(stat='proportion')
+    T = segmentation.compute_transition_probabilities(stat="proportion")
     assert np.allclose(np.sum(T, axis=1), 1)
-    T = segmentation.compute_transition_probabilities(stat='percent')
+    T = segmentation.compute_transition_probabilities(stat="percent")
     assert np.allclose(np.sum(T, axis=1), 100)
