@@ -25,16 +25,16 @@ def extract_gfp_peaks(
     inst: Union[BaseRaw, BaseEpochs],
     picks: Picks = "eeg",
     return_all: bool = False,
-    min_peak_distance: int = 2,
+    min_peak_distance: int = 1,
     tmin: Optional[float] = None,
     tmax: Optional[float] = None,
     reject_by_annotation: bool = True,
     verbose=None,
 ) -> CHData:
-    """:term:`GFP` peaks extraction.
+    """:term:`Global Field Power` (:term:`GFP`) peaks extraction.
 
-    Extract :term:`global field power` (GFP) peaks from :class:`~mne.Epochs` or
-    :class:`~mne.io.Raw`.
+    Extract :term:`Global Field Power` (:term:`GFP`) peaks from
+    :class:`~mne.Epochs` or :class:`~mne.io.Raw`.
 
     Parameters
     ----------
@@ -58,7 +58,7 @@ def extract_gfp_peaks(
     min_peak_distance : int
         Required minimal horizontal distance (``≥ 1`) in samples between
         neighboring peaks. Smaller peaks are removed first until the condition
-        is fulfilled for all remaining peaks. Default to ``2``.
+        is fulfilled for all remaining peaks. Default to ``1``.
     %(tmin_raw)s
     %(tmax_raw)s
     %(reject_by_annotation_raw)s
@@ -68,6 +68,13 @@ def extract_gfp_peaks(
     -------
     ch_data : ChData
         Samples at global field power peaks.
+
+    Notes
+    -----
+    The :term:`Global Field Power` (:term:`GFP`) peaks are extracted with
+    :func:`scipy.signal.find_peaks`. Only the ``distance`` argument is
+    filled with the value provided in ``min_peak_distance``. The other
+    arguments are set to their default values.
     """
     from ..io import ChData
 

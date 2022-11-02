@@ -200,8 +200,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         ----------
         inst : Raw | Epochs | ChData
             MNE `~mne.io.Raw`, `~mne.Epochs` or `~pycrostates.io.ChData` object
-            containing data to transform to cluster-distance space (absolute
-            spatial correlation).
+            from which to extract :term:`cluster centers`.
         picks : str | list | slice | None
             Channels to include. Note that all channels selected must have the
             same type. Slices and lists of integers will be interpreted as
@@ -461,7 +460,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             NDArray[bool],
         ],
     ) -> None:
-        """Invert map polarities for visualisation purposes.
+        """Invert map polarities.
 
         Parameters
         ----------
@@ -473,6 +472,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         Notes
         -----
         Operates in-place.
+
+        Inverting polarities has no effect on the other steps
+        of the analysis as polarity is ignored in the current methodology.
+        This function is only used for tuning visualization
+        (i.e. for visual inspection and/or to generate figure for an article).
         """
         self._check_fit()
 
@@ -505,17 +509,20 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             if invert[k]:
                 self._cluster_centers_[k] = -cluster
 
-    def plot(self, axes: Optional[Axes] = None, *, block: bool = False):
+    @fill_doc
+    def plot(
+        self, axes: Optional[Axes] = None, *, block: bool = False, **kwargs
+    ):
         """
         Plot cluster centers as topographic maps.
 
         Parameters
         ----------
-        axes : Axes | None
-            Either none to create a new figure or axes (or an array of axes)
-            on which the topographic map should be plotted.
-        block : bool
-            Whether to halt program execution until the figure is closed.
+        %(axes_topo)s
+        %(block)s
+        **kwargs
+            Additional keyword arguments are passed to
+            :func:`mne.viz.plot_topomap`.
 
         Returns
         -------
@@ -531,6 +538,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             self._cluster_names,
             axes,
             block=block,
+            **kwargs,
         )
 
     @abstractmethod
@@ -552,7 +560,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         inst: Union[BaseRaw, BaseEpochs],
         picks: Picks = None,
         factor: int = 0,
-        half_window_size: int = 3,
+        half_window_size: int = 1,
         tol: Union[int, float] = 10e-6,
         min_segment_length: int = 0,
         reject_edges: bool = True,
@@ -560,7 +568,10 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         *,
         verbose: Optional[str] = None,
     ):
-        """Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
+        r"""Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
+
+        Segment instance into microstate sequence using the segmentation
+        smoothing algorithm\ :footcite:p:`Marqui1995`.
 
         Parameters
         ----------
@@ -579,10 +590,12 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             names or indices are explicitly provided.
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing.
+            Default to 0.
         half_window_size : int
             Number of samples used for the half window size while smoothing
-            labels. Has no ffect if ``factor=0``. The half window size is
-            defined as ``window_size = 2 * half_window_size + 1``.
+            labels. The half window size is defined as
+            ``window_size = 2 * half_window_size + 1``. It has no effect if
+            ``factor=0`` (default). Default to 1.
         tol : float
             Convergence tolerance.
         min_segment_length : int
@@ -601,6 +614,10 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             labeled according to cluster centers number: ``0`` for the first
             center, ``1`` for the second, etc..
             ``-1`` is used for unlabeled time points.
+
+        References
+        ----------
+        .. footbibliography::
         """
         # TODO: reject_by_annotation_raw doc probably doesn't match the correct
         # argument types.
@@ -810,24 +827,21 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         if reject_by_annotation:
             # retrieve onsets/ends for BAD annotations
-            onsets, ends = _annotations_starts_stops(raw, ["BAD"])
-            onsets = onsets.tolist() + [data.shape[-1] - 1]
-            ends = [0] + ends.tolist()
-
+            onsets, ends = _annotations_starts_stops(raw, ["BAD"], invert=True)
             segmentation = np.full(data.shape[-1], -1)
 
             for onset, end in zip(onsets, ends):
                 # small segments can't be smoothed
-                if factor != 0 and onset - end < 2 * half_window_size + 1:
+                if factor != 0 and end - onset < 2 * half_window_size + 1:
                     continue
 
-                data_ = data[:, end:onset]
+                data_ = data[:, onset:end]
                 segment = _BaseCluster._segment(
                     data_, cluster_centers_, factor, tol, half_window_size
                 )
                 if reject_edges:
                     segment = _BaseCluster._reject_edge_segments(segment)
-                segmentation[end:onset] = segment
+                segmentation[onset:end] = segment
 
         else:
             segmentation = _BaseCluster._segment(

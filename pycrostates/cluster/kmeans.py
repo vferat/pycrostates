@@ -22,7 +22,7 @@ from ._base import _BaseCluster
 class ModKMeans(_BaseCluster):
     r"""Modified K-Means clustering algorithm.
 
-    See :footcite:t:`391164` for additional information.
+    See :footcite:t:`Marqui1995` for additional information.
 
     Parameters
     ----------

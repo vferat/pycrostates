@@ -1,59 +1,59 @@
 """
-Group level analysis from individual gfp peaks
+Group level analysis from individual GFP peaks
 ==============================================
 
 In this tutorial, we will learn how to conduct group level analysis
-by computing group level topographies based on individual gfp peaks.
+by computing group level topographies based on individual
+:term:`Global Field Power` (:term:`GFP`) peaks.
 """
+
+#%%
+# .. include:: ../../../../links.inc
 
 #%%
 # .. note::
 #
-#     The lemon datasets is composed of EEGLAB files. To use the MNE reader
-#     :func:`mne.io.read_raw_eeglab`, the ``pymatreader`` optional dependency
-#     is required. Use the following installation method appropriate for your
-#     environment:
+#     The lemon datasets used in this tutorial is composed of EEGLAB files. To
+#     use the MNE reader :func:`mne.io.read_raw_eeglab`, the ``pymatreader``
+#     optional dependency is required. Use the following installation method
+#     appropriate for your environment:
 #
 #     - ``pip install pymatreader``
 #     - ``conda install -c conda-forge pymatreader``
 #
-#     Note that an environment created via the MNE installers includes
+#     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
 
+import matplotlib.pyplot as plt
+import numpy as np
 from mne.io import read_raw_eeglab
 
 from pycrostates.cluster import ModKMeans
 from pycrostates.datasets import lemon
-from pycrostates.preprocessing import extract_gfp_peaks, resample
 from pycrostates.io import ChData
+from pycrostates.preprocessing import extract_gfp_peaks, resample
+
 
 condition = "EO"
 subject_ids = ["010020", "010021", "010022", "010023", "010024"]
 
 #%%
-# In this example, we first extract individual
-# GFP peaks. Then we concatenate them into
-# a single dataset in order to submit it to
-# clustering (group level analysis).
-
-import numpy as np
-
-ModK = ModKMeans(n_clusters=5, random_state=42)
-n_jobs = 2
+# In this example, we start by extracting the individual :term:`GFP` peaks and
+# concatenating them into a single dataset. The totality of :term:`GFP` peaks
+# is used in the group level analysis to fit a clustering algorithm.
 
 individual_gfp_peaks = list()
 for subject_id in subject_ids:
-    # Load Data
+    # load Data
     raw_fname = lemon.data_path(subject_id=subject_id, condition=condition)
     raw = read_raw_eeglab(raw_fname, preload=True)
     raw = lemon.standardize(raw)
     raw.pick("eeg")
-    # For sake of time, we only use 30s of recording.
-    raw.crop(0, 30)
+    raw.crop(0, 30)  # crop the dataset to speed up computation
     raw.set_eeg_reference("average")
-    # Extract GFP peaks
+    # extract GFP peaks
     gfp_peaks = extract_gfp_peaks(raw)
-    # Equalize peak number across subjects
+    # equalize peak number across subjects by resampling
     gfp_peaks = resample(
         gfp_peaks, n_resamples=1, n_samples=880, random_state=42
     )[0]
@@ -61,23 +61,24 @@ for subject_id in subject_ids:
 
 individual_gfp_peaks = np.hstack(individual_gfp_peaks)
 individual_gfp_peaks = ChData(individual_gfp_peaks, raw.info)
-# Group level clustering
-ModK.fit(individual_gfp_peaks, n_jobs=n_jobs)
+
+# group level clustering
+ModK = ModKMeans(n_clusters=5, random_state=42)
+ModK.fit(individual_gfp_peaks, n_jobs=2)
 ModK.plot()
 
 #%%
-# We can reorganize our clustering results to our needs.
+# The :term:`cluster centers` can be re-organize to our needs.
 
 ModK.reorder_clusters(order=[0, 2, 4, 3, 1])
 ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
 ModK.plot()
 
 #%%
-# We can now backfit the group level maps
-# to each individual recording and extract
-# microstate parameters.
-
-import pandas as pd
+# We can now use this fitted clustering algorithm to predict the segmentation
+# on each individual. This is also referred to as backfitting the group level
+# maps to each individual recording. Finally, we can extract microstate
+# parameters from the backfitted segmentations.
 
 ms_data = list()
 for subject_id in subject_ids:
@@ -93,5 +94,19 @@ for subject_id in subject_ids:
     d["subject_id"] = subject_id
     ms_data.append(d)
 
-ms_data = pd.DataFrame(ms_data)
-ms_data
+#%%
+# From this point on, we can visualize our results and do a statistical
+# analysis. For example we can plot the :term:`GEV` of each microstate class.
+
+data = [
+    [d['A_gev'], d['B_gev'], d['C_gev'], d['D_gev'], d['F_gev']]
+    for d in ms_data
+]
+
+plt.violinplot(np.array(data))
+plt.title("Global Explained Variance (%)")
+plt.xticks(
+    ticks=range(1, len(ModK.cluster_names) + 1),
+    labels=ModK.cluster_names,
+)
+plt.show()

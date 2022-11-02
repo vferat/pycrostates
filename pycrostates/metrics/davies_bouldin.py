@@ -12,12 +12,12 @@ from ..utils._docs import fill_doc
 
 @fill_doc
 def davies_bouldin_score(cluster):  # lower the better
-    """Compute the Davies-Bouldin score.
+    r"""Compute the Davies-Bouldin score.
 
-    This function is a wrapper around
-    :func:`sklearn.metrics.davies_bouldin_score` that applies directly to a
-    fitted :ref:`Clustering` instance. It uses the absolute spatial correlation
-    for distance computations.
+    This function computes the Davies-Bouldin
+    score\ :footcite:p:`Davies-Bouldin` with
+    :func:`sklearn.metrics.davies_bouldin_score` from a fitted
+    :ref:`Clustering` instance.
 
     Parameters
     ----------
@@ -37,11 +37,7 @@ def davies_bouldin_score(cluster):  # lower the better
 
     References
     ----------
-    .. [1] `Davies, David L.; Bouldin, Donald W (1979).
-       "A Cluster Separation Measure"
-       IEEE Transactions on Pattern Analysis and Machine Intelligence.
-       PAMI-1 (2): 224-227.
-       <https://doi.org/10.1109/TPAMI.1979.4766909>`_
+    .. footbibliography::
     """
     _check_type(cluster, (_BaseCluster,), item_name="cluster")
     cluster._check_fit()

@@ -2,9 +2,8 @@
 
 .. _api_reference:
 
-====================
-Python API Reference
-====================
+API Reference
+=============
 
 This is the reference for classes (``CamelCase`` names) and functions
 (``underscore_case`` names) of pycrostates.
@@ -12,12 +11,6 @@ This is the reference for classes (``CamelCase`` names) and functions
 .. contents::
    :local:
    :depth: 2
-
-
-.. automodule:: pycrostates
-   :no-members:
-   :no-inherited-members:
-
 
 .. toctree::
     :maxdepth: 2
