@@ -133,7 +133,7 @@ ax.set_xlabel('Microstates')
 ax.set_ylabel('Mean duration (s)')
 
 #%%
-# ``occurrences`` indicates the nean number of segment assigned to a given state
+# ``occurrences`` indicates the mean number of segments assigned to a given state
 # per second. This metrics is expressed in segment per second ( . / s).
 x = ModK.cluster_names
 y = [parameters['A_occurrences'],
