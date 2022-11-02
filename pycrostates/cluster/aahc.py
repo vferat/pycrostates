@@ -141,9 +141,10 @@ class AAHCluster(_BaseCluster):
         # sanity-check
         assert self.GEV_ is not None
 
+    # pylint: disable=arguments-differ
     @copy_doc(_BaseCluster.fit)
     @fill_doc
-    def fit(  # pylint: disable=arguments-differ
+    def fit(
         self,
         inst: Union[BaseRaw, BaseEpochs],
         picks: Picks = "eeg",
@@ -176,6 +177,7 @@ class AAHCluster(_BaseCluster):
         self._cluster_centers_ = maps
         self._labels_ = segmentation
         self._fitted = True
+    # pylint: enable=arguments-differ
 
     @copy_doc(_BaseCluster.save)
     def save(self, fname: Union[str, Path]):

@@ -879,7 +879,7 @@ def test_refit():
     assert eeg_ch_names == aahCluster_.info["ch_names"]
     assert np.allclose(eeg_cluster_centers, aahCluster_.cluster_centers_)
 
-
+# pylint: disable=too-many-statements
 def test_predict_default(caplog):
     """Test predict method default behaviors."""
     # raw, no smoothing, no_edge
@@ -994,8 +994,9 @@ def test_predict_default(caplog):
     assert not np.isclose(segmentation1._labels, segmentation2._labels).all()
     assert not np.isclose(segmentation1._labels, segmentation3._labels).all()
     assert not np.isclose(segmentation2._labels, segmentation3._labels).all()
+# pylint: enable=too-many-statements
 
-
+# pylint: disable=too-many-statements
 def test_picks_fit_predict(caplog):
     """Test fitting and prediction with different picks."""
     raw = raw_meg.copy().pick_types(meg=True, eeg=True, eog=True)
@@ -1167,6 +1168,7 @@ def test_picks_fit_predict(caplog):
     assert predict_warning in caplog.text
     assert "Fp1 is set as bad in the instance but was selected" in caplog.text
     caplog.clear()
+# pylint: enable=too-many-statements
 
 
 def test_predict_invalid_arguments():

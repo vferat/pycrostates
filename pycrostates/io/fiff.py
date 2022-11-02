@@ -206,6 +206,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
             continue
 
         # ModKMeans
+        # pylint: disable=protected-access
         if algorithm == "ModKMeans":
             if key == "n_init":
                 fit_parameters["n_init"] = ModKMeans._check_n_init(value)
@@ -222,6 +223,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
                 fit_parameters[
                     "normalize_input"
                 ] = AAHCluster._check_normalize_input(value)
+        # pylint: enable=protected-access
         if key == "GEV_":
             _check_type(value, ("numeric",), "GEV_")
             if value < 0 or 1 < value:
