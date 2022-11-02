@@ -167,13 +167,10 @@ class _BaseSegmentation(ABC):
             Aggregate statistic to compute each transition. Can be:
 
             * ``count``: show the number of observations of each transition.
-
             * ``probability`` or ``proportion``: normalize such probabilities
                 along the first axis is always equal to 1.
-
             * ``percent``: normalize such probabilities along the first axis
                 is always equal to 100.
-
         ignore_self : bool
             If True, ignore transition from one state to itself.
             This is equivalent to set the duration of all states to 1 sample.
