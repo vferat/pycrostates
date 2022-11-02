@@ -182,7 +182,7 @@ T = segmentation.compute_transition_probabilities()
 # .. note::
 #
 #     Transition ``from`` and ``to``  unlabeled segments are ignored and not taken into
-#     during normalization.
+#     account during normalization.
 
 
 import matplotlib.pyplot as plt
