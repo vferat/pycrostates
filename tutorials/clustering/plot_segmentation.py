@@ -172,7 +172,7 @@ print(f'Microstate C segment has a median duration of {median:.2f}s and mean dur
 T = segmentation.compute_transition_probabilities()
 
 #%%
-# This method returns a `numpy.array` of shape (``n_clusters``, ``n_clusters``) containing the
+# This method returns a `numpy.array` of shape ``(n_clusters, n_clusters)`` containing the
 # value corresponding to the chosen statistic: ``count`` will return the number of transitions observed,
 # ``probability`` and ``proportion`` will both return the normalize transition probability and
 # ``percent`` will return the probability as percentage ( ``probability`` * 100).
