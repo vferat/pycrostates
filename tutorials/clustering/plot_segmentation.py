@@ -2,8 +2,7 @@
 Microstate Segmentation
 =======================
 
-This tutorial introduces the concept while working with microstate
-segmentations.
+This tutorial introduces the concept of segmentation.
 """
 
 #%%
