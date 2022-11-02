@@ -11,8 +11,7 @@ This tutorial introduces the concept of segmentation.
 #%%
 # Here we fit a modified K-means with a sample dataset.
 # For more details about the fitting procedure,
-# please refer to :ref:`this <fit>`
-# tutorial.
+# please refer to :ref:`this tutorial <fit>`.
 
 from mne.io import read_raw_eeglab
 
