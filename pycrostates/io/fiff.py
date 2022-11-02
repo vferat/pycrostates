@@ -414,7 +414,12 @@ def _create_AAHCluster(
 ):
     """Create a AAHCluster object."""
     cluster = AAHCluster(
-        cluster_centers_.shape[0], ignore_polarity, normalize_input
+        cluster_centers_.shape[0],
+        # TODO : ignor_polarity=True for now.
+        # After _BaseCluster and Metric support ignore_polarity
+        # make the parameter an argument
+        # ignore_polarity,
+        normalize_input,
     )
     cluster._cluster_centers_ = cluster_centers_
     cluster._info = info

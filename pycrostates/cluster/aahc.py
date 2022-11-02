@@ -43,8 +43,6 @@ class AAHCluster(_BaseCluster):
     Parameters
     ----------
     %(n_clusters)s
-    ignore_polarity : bool
-        If true, polarity is ignored when computing distances.
     normalize_input : bool
         If set, the input data is normalized along the channel dimension.
 
@@ -56,7 +54,6 @@ class AAHCluster(_BaseCluster):
     def __init__(
         self,
         n_clusters: int,
-        ignore_polarity: bool = True,
         normalize_input: bool = False,
     ):
         super().__init__()
@@ -64,9 +61,11 @@ class AAHCluster(_BaseCluster):
         self._n_clusters = _BaseCluster._check_n_clusters(n_clusters)
         self._cluster_names = [str(k) for k in range(self.n_clusters)]
 
-        self._ignore_polarity = AAHCluster._check_ignore_polarity(
-            ignore_polarity
-        )
+        # TODO : ignor_polarity=True for now.
+        # After _BaseCluster and Metric support ignore_polarity
+        # make the parameter an argument
+        # https://github.com/vferat/pycrostates/pull/93#issue-1431122168
+        self._ignore_polarity = True
         self._normalize_input = AAHCluster._check_normalize_input(
             normalize_input
         )
@@ -177,6 +176,7 @@ class AAHCluster(_BaseCluster):
         self._cluster_centers_ = maps
         self._labels_ = segmentation
         self._fitted = True
+
     # pylint: enable=arguments-differ
 
     @copy_doc(_BaseCluster.save)

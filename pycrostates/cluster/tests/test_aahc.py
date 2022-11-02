@@ -47,9 +47,7 @@ ch_data = ChData(raw_eeg.get_data(), raw_eeg.info)
 # Fit one for general purposes
 n_clusters = 4
 
-aah_cluster = AAHCluster(
-    n_clusters=n_clusters, ignore_polarity=True, normalize_input=False
-)
+aah_cluster = AAHCluster(n_clusters=n_clusters, normalize_input=False)
 
 aah_cluster.fit(ch_data)
 
@@ -92,8 +90,9 @@ raw_sim = RawArray(X, raw_eeg.info, copy="info")
 raw_sim.info["bads"] = []
 
 
-def test_ignore_polarity_true():
-    obj = AAHCluster(n_clusters=sim_n_ms, ignore_polarity=True)
+def test_default_algorithm():
+    obj = AAHCluster(n_clusters=sim_n_ms)
+    assert obj.ignore_polarity is True
     obj.fit(raw_sim)
 
     # extract cluster centers
@@ -116,7 +115,8 @@ def test_ignore_polarity_true():
 
 
 def test_ignore_polarity_false():
-    obj = AAHCluster(n_clusters=sim_n_ms * 2, ignore_polarity=False)
+    obj = AAHCluster(n_clusters=sim_n_ms * 2)
+    obj._ignore_polarity = False  # pylint: disable=protected-access
     obj.fit(raw_sim)
 
     # extract cluster centers
@@ -141,8 +141,11 @@ def test_ignore_polarity_false():
 
 def test_normalize_input_true():
     obj = AAHCluster(
-        n_clusters=sim_n_ms, ignore_polarity=True, normalize_input=True
+        n_clusters=sim_n_ms,
+        # ignore_polarity=True,
+        normalize_input=True,
     )
+    assert obj.ignore_polarity is True
     obj.fit(raw_sim)
 
     # extract cluster centers
@@ -223,12 +226,12 @@ def test_aahClusterMeans():
     """Test K-Means default functionalities."""
     aahCluster1 = AAHCluster(
         n_clusters=n_clusters,
-        ignore_polarity=True,
+        # ignore_polarity=True,
         normalize_input=False,
     )
 
     # Test properties
-    assert aahCluster1.ignore_polarity is True
+    # assert aahCluster1.ignore_polarity is True
     assert aahCluster1.normalize_input is False
     _check_unfitted(aahCluster1)
 
@@ -551,7 +554,7 @@ def test_properties(caplog):
     # Unfitted
     aahCluster_ = AAHCluster(
         n_clusters=n_clusters,
-        ignore_polarity=True,
+        # ignore_polarity=True,
         normalize_input=False,
     )
 
@@ -585,7 +588,7 @@ def test_properties(caplog):
     # Test fitted property
     aahCluster_ = AAHCluster(
         n_clusters=n_clusters,
-        ignore_polarity=True,
+        # ignore_polarity=True,
         normalize_input=False,
     )
     with pytest.raises(TypeError, match="'fitted' must be an instance of"):
@@ -613,12 +616,18 @@ def test_invalid_arguments():
     with pytest.raises(ValueError, match="The number of clusters must be a"):
         aahCluster_ = AAHCluster(n_clusters=-101)
 
-    # ignore_polarity
-    with pytest.raises(
-        TypeError, match="'ignore_polarity' must be an instance of bool"
-    ):
-        aahCluster_ = AAHCluster(n_clusters=n_clusters, ignore_polarity="asdf")
-        aahCluster_ = AAHCluster(n_clusters=n_clusters, ignore_polarity=None)
+    # # ignore_polarity
+    # with pytest.raises(
+    #     TypeError, match="'ignore_polarity' must be an instance of bool"
+    # ):
+    #     aahCluster_ = AAHCluster(
+    #         n_clusters=n_clusters,
+    #         ignore_polarity="asdf"
+    #     )
+    #     aahCluster_ = AAHCluster(
+    #         n_clusters=n_clusters,
+    #         ignore_polarity=None
+    #     )
 
     # normalize_input
     with pytest.raises(
@@ -629,7 +638,7 @@ def test_invalid_arguments():
 
     aahCluster_ = AAHCluster(
         n_clusters=n_clusters,
-        ignore_polarity=True,
+        # ignore_polarity=True,
         normalize_input=False,
     )
     # inst
@@ -674,7 +683,7 @@ def test_fit_data_shapes():
     """Test different tmin/tmax, rejection with fit."""
     aahCluster_ = AAHCluster(
         n_clusters=n_clusters,
-        ignore_polarity=True,
+        # ignore_polarity=True,
         normalize_input=False,
     )
 
@@ -851,7 +860,7 @@ def test_refit():
     raw = raw_meg.copy().pick_types(meg=True, eeg=True, eog=True)
     aahCluster_ = AAHCluster(
         n_clusters=n_clusters,
-        ignore_polarity=True,
+        # ignore_polarity=True,
         normalize_input=False,
     )
     aahCluster_.fit(raw, picks="eeg")
@@ -868,7 +877,7 @@ def test_refit():
     raw = raw_meg.copy().pick_types(meg=True, eeg=True, eog=True)
     aahCluster_ = AAHCluster(
         n_clusters=n_clusters,
-        ignore_polarity=True,
+        # ignore_polarity=True,
         normalize_input=False,
     )
     aahCluster_.fit(raw, picks="eeg")  # works
@@ -878,6 +887,7 @@ def test_refit():
         aahCluster_.fit(raw, picks="mag")  # works
     assert eeg_ch_names == aahCluster_.info["ch_names"]
     assert np.allclose(eeg_cluster_centers, aahCluster_.cluster_centers_)
+
 
 # pylint: disable=too-many-statements
 def test_predict_default(caplog):
@@ -994,7 +1004,10 @@ def test_predict_default(caplog):
     assert not np.isclose(segmentation1._labels, segmentation2._labels).all()
     assert not np.isclose(segmentation1._labels, segmentation3._labels).all()
     assert not np.isclose(segmentation2._labels, segmentation3._labels).all()
+
+
 # pylint: enable=too-many-statements
+
 
 # pylint: disable=too-many-statements
 def test_picks_fit_predict(caplog):
@@ -1002,7 +1015,7 @@ def test_picks_fit_predict(caplog):
     raw = raw_meg.copy().pick_types(meg=True, eeg=True, eog=True)
     aahCluster_ = AAHCluster(
         n_clusters=n_clusters,
-        ignore_polarity=True,
+        # ignore_polarity=True,
         normalize_input=False,
     )
 
@@ -1168,6 +1181,8 @@ def test_picks_fit_predict(caplog):
     assert predict_warning in caplog.text
     assert "Fp1 is set as bad in the instance but was selected" in caplog.text
     caplog.clear()
+
+
 # pylint: enable=too-many-statements
 
 
@@ -1208,7 +1223,7 @@ def test_contains_mixin():
     # test raise with non-fitted instance
     aahCluster_ = AAHCluster(
         n_clusters=n_clusters,
-        ignore_polarity=True,
+        # ignore_polarity=True,
         normalize_input=False,
     )
     with pytest.raises(
@@ -1239,7 +1254,7 @@ def test_montage_mixin():
     # test raise with non-fitted instance
     aahCluster_ = AAHCluster(
         n_clusters=n_clusters,
-        ignore_polarity=True,
+        # ignore_polarity=True,
         normalize_input=False,
     )
     with pytest.raises(
