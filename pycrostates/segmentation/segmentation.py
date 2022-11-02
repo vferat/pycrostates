@@ -177,7 +177,7 @@ class _BaseSegmentation(ABC):
 
         Returns
         -------
-        T : `~numpy.array` shape (``n_cluster``, ``n_cluster``)
+        T : array of shape (``n_cluster``, ``n_cluster``)
             Array of transition probability values from one label to another.
             First axis indicates state "from".
             Second axis indicates state "to".
