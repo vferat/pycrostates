@@ -245,6 +245,7 @@ sphinx_gallery_conf = {
         [
             "../../tutorials/preprocessing",
             "../../tutorials/clustering",
+            "../../tutorials/segmentation",
             "../../tutorials/group_level_analysis",
             "../../tutorials/metrics",
         ]
