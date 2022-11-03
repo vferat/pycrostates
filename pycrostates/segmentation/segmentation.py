@@ -11,7 +11,7 @@ from mne.io import BaseRaw
 from numpy.typing import NDArray
 
 from ..utils import _corr_vectors
-from ..utils._checks import _check_type
+from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 from ..viz import (
@@ -190,12 +190,7 @@ class _BaseSegmentation(ABC):
         To avoid this behaviour, make sure to set the ``reject_edges``
         parameter to ``True`` when predicting the segmentation.
         """
-        if stat not in ["count", "probability", "proportion", "percent"]:
-            raise ValueError(
-                f"Argument 'stat' should be either 'count',"
-                f"'probability', 'proportion' or 'percent'"
-                f"but {stat} was provided."
-            )
+        _check_value(stat, ("count", "probability", "proportion", "percent", "stat"))
         n_clusters = len(self._cluster_centers_)
         T = _BaseSegmentation._compute_transition_probabilities(
             self._labels,
@@ -217,6 +212,13 @@ class _BaseSegmentation(ABC):
             labels = [s for s, _ in itertools.groupby(labels)]
         states = np.arange(-1, n_clusters)
         n = len(states)
+        
+        # Expected probability:
+        Te = np.zeros(shape=(n, n))
+        n_segments = len(labels)
+        label_count = [np.sum(np.where(labels == i)) for i in states]
+        
+        
         T = np.zeros(shape=(n, n))
         # number of transitions
         for (i, j) in zip(labels, labels[1:]):
@@ -236,7 +238,8 @@ class _BaseSegmentation(ABC):
             return T
         if stat == "percent":
             return T * 100
-
+        
+        
     @fill_doc
     def plot_cluster_centers(
         self, axes: Optional[Axes] = None, *, block: bool = False
