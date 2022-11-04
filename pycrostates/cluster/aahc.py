@@ -107,7 +107,6 @@ class AAHCluster(_BaseCluster):
 
     @copy_doc(_BaseCluster.__eq__)
     def __eq__(self, other: Any) -> bool:
-        """Equality == method."""
         if isinstance(other, AAHCluster):
             if not super().__eq__(other):
                 return False
@@ -131,7 +130,6 @@ class AAHCluster(_BaseCluster):
 
     @copy_doc(_BaseCluster.__ne__)
     def __ne__(self, other: Any) -> bool:
-        """Different != method."""
         return not self.__eq__(other)
 
     @copy_doc(_BaseCluster._check_fit)
