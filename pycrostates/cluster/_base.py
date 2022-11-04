@@ -17,7 +17,6 @@ from .._typing import CHData, Picks
 from ..segmentation import EpochsSegmentation, RawSegmentation
 from ..utils import _corr_vectors
 from ..utils._checks import (
-    _check_n_jobs,
     _check_picks_uniqueness,
     _check_reject_by_annotation,
     _check_tmin_tmax,
@@ -193,7 +192,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,
         reject_by_annotation: bool = True,
-        n_jobs: int = 1,
         *,
         verbose: Optional[str] = None,
     ) -> NDArray[float]:
@@ -216,7 +214,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         %(tmin_raw)s
         %(tmax_raw)s
         %(reject_by_annotation_raw)s
-        %(n_jobs)s
         %(verbose)s
         """
         from ..io import ChData, ChInfo
@@ -224,7 +221,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         _set_verbose(verbose)
 
         self._check_unfitted()
-        n_jobs = _check_n_jobs(n_jobs)
         _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
         if isinstance(inst, (BaseRaw, BaseEpochs)):
             tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)

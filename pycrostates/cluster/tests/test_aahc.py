@@ -235,7 +235,7 @@ def test_aahClusterMeans():
     assert aahCluster1._cluster_names == ["0", "1", "2", "3"]
 
     # Test fit on RAW
-    aahCluster1.fit(raw_eeg, n_jobs=1)
+    aahCluster1.fit(raw_eeg)
     _check_fitted(aahCluster1)
     assert aahCluster1._cluster_centers_.shape == (
         n_clusters,
@@ -247,7 +247,7 @@ def test_aahClusterMeans():
     _check_unfitted(aahCluster1)
 
     # Test fit on Epochs
-    aahCluster1.fit(epochs_eeg, n_jobs=1)
+    aahCluster1.fit(epochs_eeg)
     _check_fitted(aahCluster1)
     assert aahCluster1._cluster_centers_.shape == (
         n_clusters,
@@ -256,7 +256,7 @@ def test_aahClusterMeans():
 
     # Test fit on ChData
     aahCluster1.fitted = False
-    aahCluster1.fit(ch_data, n_jobs=1)
+    aahCluster1.fit(ch_data)
     _check_fitted(aahCluster1)
     assert aahCluster1._cluster_centers_.shape == (
         n_clusters,
@@ -678,7 +678,6 @@ def test_fit_data_shapes():
     _check_unfitted(aahCluster_)
     aahCluster_.fit(
         raw_eeg,
-        n_jobs=1,
         picks="eeg",
         tmin=5,
         tmax=None,
@@ -694,7 +693,6 @@ def test_fit_data_shapes():
     _check_unfitted(aahCluster_)
     aahCluster_.fit(
         epochs_eeg,
-        n_jobs=1,
         picks="eeg",
         tmin=0.2,
         tmax=None,
@@ -709,7 +707,6 @@ def test_fit_data_shapes():
     _check_unfitted(aahCluster_)
     aahCluster_.fit(
         raw_eeg,
-        n_jobs=1,
         picks="eeg",
         tmin=None,
         tmax=5,
@@ -725,7 +722,6 @@ def test_fit_data_shapes():
     _check_unfitted(aahCluster_)
     aahCluster_.fit(
         epochs_eeg,
-        n_jobs=1,
         picks="eeg",
         tmin=None,
         tmax=0.3,
@@ -740,7 +736,6 @@ def test_fit_data_shapes():
     _check_unfitted(aahCluster_)
     aahCluster_.fit(
         raw_eeg,
-        n_jobs=1,
         picks="eeg",
         tmin=2,
         tmax=8,
@@ -754,7 +749,6 @@ def test_fit_data_shapes():
     _check_unfitted(aahCluster_)
     aahCluster_.fit(
         epochs_eeg,
-        n_jobs=1,
         picks="eeg",
         tmin=0.1,
         tmax=0.4,
@@ -775,11 +769,11 @@ def test_fit_data_shapes():
     _check_unfitted(aahCluster_)
 
     aahCluster_no_reject = aahCluster_.copy()
-    aahCluster_no_reject.fit(raw_, n_jobs=1, reject_by_annotation=False)
+    aahCluster_no_reject.fit(raw_, reject_by_annotation=False)
     aahCluster_reject_True = aahCluster_.copy()
-    aahCluster_reject_True.fit(raw_, n_jobs=1, reject_by_annotation=True)
+    aahCluster_reject_True.fit(raw_, reject_by_annotation=True)
     aahCluster_reject_omit = aahCluster_.copy()
-    aahCluster_reject_omit.fit(raw_, n_jobs=1, reject_by_annotation="omit")
+    aahCluster_reject_omit.fit(raw_, reject_by_annotation="omit")
 
     # Compare 'omit' and True
     assert np.isclose(
@@ -821,11 +815,11 @@ def test_fit_data_shapes():
     # Check with reject with tmin/tmax
     aahCluster_rej_0_5 = aahCluster_.copy()
     aahCluster_rej_0_5.fit(
-        raw_, n_jobs=1, tmin=0, tmax=5, reject_by_annotation=True
+        raw_, tmin=0, tmax=5, reject_by_annotation=True
     )
     aahCluster_rej_5_end = aahCluster_.copy()
     aahCluster_rej_5_end.fit(
-        raw_, n_jobs=1, tmin=5, tmax=None, reject_by_annotation=True
+        raw_, tmin=5, tmax=None, reject_by_annotation=True
     )
     _check_fitted(aahCluster_rej_0_5)
     _check_fitted(aahCluster_rej_5_end)

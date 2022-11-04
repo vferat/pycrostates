@@ -146,7 +146,6 @@ class AAHCluster(_BaseCluster):
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,
         reject_by_annotation: bool = True,
-        n_jobs: int = 1,
         *,
         verbose: Optional[str] = None,
     ) -> None:
@@ -156,7 +155,6 @@ class AAHCluster(_BaseCluster):
             tmin=tmin,
             tmax=tmax,
             reject_by_annotation=reject_by_annotation,
-            n_jobs=n_jobs,
             verbose=verbose,
         )
 
