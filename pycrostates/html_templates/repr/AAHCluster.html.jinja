@@ -1,0 +1,29 @@
+
+<table class="table table-hover table-striped table-sm table-responsive small">
+    <tr>
+        <th>Method</th>
+        <td>{{ name }}</td>
+    </tr>
+    <tr>
+        <th>Fit</th>
+        <td>{% if fitted %}fitted to {{ n_samples }} samples{% else %}not fitted{% endif %}</td>
+    </tr>
+    {% if fitted %}
+    <tr>
+        <th>Cluster centers</th>
+        <td>{{ n_clusters }}</td>
+    </tr>
+    <tr>
+        <th>GEV</th>
+        <td>{{ GEV }} %</td>
+    </tr>
+    <tr>
+        <th>Cluster centers names</th>
+        <td>{{ cluster_names|join(', ') }}</td>
+    </tr>
+    <tr>
+        <th>Channels</th>
+        <td>{{ ch_repr|join(', ') }}</td>
+    </tr>
+    {% endif %}
+</table>
