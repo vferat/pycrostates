@@ -814,9 +814,7 @@ def test_fit_data_shapes():
 
     # Check with reject with tmin/tmax
     aahCluster_rej_0_5 = aahCluster_.copy()
-    aahCluster_rej_0_5.fit(
-        raw_, tmin=0, tmax=5, reject_by_annotation=True
-    )
+    aahCluster_rej_0_5.fit(raw_, tmin=0, tmax=5, reject_by_annotation=True)
     aahCluster_rej_5_end = aahCluster_.copy()
     aahCluster_rej_5_end.fit(
         raw_, tmin=5, tmax=None, reject_by_annotation=True

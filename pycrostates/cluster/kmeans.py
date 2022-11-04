@@ -12,7 +12,7 @@ from numpy.typing import NDArray
 
 from .._typing import Picks, RANDomState
 from ..utils import _corr_vectors
-from ..utils._checks import _check_random_state, _check_type, _check_n_jobs
+from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
 from ._base import _BaseCluster
