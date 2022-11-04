@@ -156,9 +156,7 @@ class _BaseSegmentation(ABC):
             return_dist=return_dist,
         )
 
-    def compute_transition_probabilities(
-        self, stat="probability", ignore_self=True
-    ):
+    def get_transition_matrix(self, stat="probability", ignore_self=True):
         """Compute transition probabilities of microstate transitions.
 
         Parameters
@@ -190,9 +188,18 @@ class _BaseSegmentation(ABC):
         To avoid this behaviour, make sure to set the ``reject_edges``
         parameter to ``True`` when predicting the segmentation.
         """
-        _check_value(stat, ("count", "probability", "proportion", "percent", "stat"))
+        _check_value(
+            stat,
+            (
+                "count",
+                "probability",
+                "proportion",
+                "percent",
+            ),
+            "stat",
+        )
         n_clusters = len(self._cluster_centers_)
-        T = _BaseSegmentation._compute_transition_probabilities(
+        T = _BaseSegmentation._get_transition_matrix(
             self._labels,
             n_clusters=n_clusters,
             stat=stat,
@@ -201,10 +208,10 @@ class _BaseSegmentation(ABC):
         return T
 
     @staticmethod
-    def _compute_transition_probabilities(
+    def _get_transition_matrix(
         labels, n_clusters, ignore_self=True, stat="probability"
     ):
-        """Compute transition probabilities of microstate transitions."""
+        """Compute observed transition."""
         # reshape if epochs
         labels = labels.reshape(-1)
         # ignore transition to itself (i.e. 1 -> 1)
@@ -212,13 +219,7 @@ class _BaseSegmentation(ABC):
             labels = [s for s, _ in itertools.groupby(labels)]
         states = np.arange(-1, n_clusters)
         n = len(states)
-        
-        # Expected probability:
-        Te = np.zeros(shape=(n, n))
-        n_segments = len(labels)
-        label_count = [np.sum(np.where(labels == i)) for i in states]
-        
-        
+
         T = np.zeros(shape=(n, n))
         # number of transitions
         for (i, j) in zip(labels, labels[1:]):
@@ -238,8 +239,102 @@ class _BaseSegmentation(ABC):
             return T
         if stat == "percent":
             return T * 100
-        
-        
+
+    def get_expected_transition_matrix(
+        self, stat="probability", ignore_self=True
+    ):
+        """Compute transition probabilities of microstate transitions.
+
+        Parameters
+        ----------
+        stat : str
+            Aggregate statistic to compute each transition. Can be:
+            - ``probability`` or ``proportion``: normalize such probabilities
+                along the first axis is always equal to 1.
+            - ``percent``: normalize such probabilities along the first axis
+                is always equal to 100.
+        ignore_self : bool
+            If True, ignore transition from one state to itself.
+            This is equivalent to set the duration of all states to 1 sample.
+
+        Returns
+        -------
+        T : array of shape (``n_cluster``, ``n_cluster``)
+            Array of transition probability values from one label to another.
+            First axis indicates state "from".
+            Second axis indicates state "to".
+
+        Warnings
+        --------
+        When working with `~mne.Epochs`, this method will take into account
+        transitions that occur between epochs. This could lead to wrong
+        interpretation when working with discontinuous data.
+        To avoid this behaviour, make sure to set the ``reject_edges``
+        parameter to ``True`` when predicting the segmentation.
+        """
+        _check_value(
+            stat,
+            (
+                "probability",
+                "proportion",
+                "percent",
+            ),
+            "stat",
+        )
+        n_clusters = len(self._cluster_centers_)
+        T = _BaseSegmentation._get_expected_transition_matrix(
+            self._labels,
+            n_clusters=n_clusters,
+            stat=stat,
+            ignore_self=ignore_self,
+        )
+        return T
+
+    @staticmethod
+    def _get_expected_transition_matrix(
+        labels, n_clusters, ignore_self=True, stat="probability"
+    ):
+        """Compute theorical transition matrix.
+
+        Compute theorical transition matrix
+        taking into account time coverage.
+        """
+        # reshape if epochs
+        labels = labels.reshape(-1)
+        states = np.arange(-1, n_clusters)
+        n = len(states)
+        states = np.arange(-1, n_clusters)
+        n = len(states)
+        # Expected probability:
+        Te = np.zeros(shape=(n, n))
+        for state_from in states:
+            n_from = np.sum(labels == state_from)  # no state_from in labels
+            for state_to in states:
+                n_to = np.sum(labels == state_to)
+                if n_from != 0:
+                    if state_from != state_to:
+                        Te[state_from, state_to] = n_to
+                    else:
+                        Te[state_from, state_to] = n_to - 1
+                else:
+                    Te[state_from, state_to] = 0
+
+        # ignore unlabeled
+        Te = Te[:-1, :-1]
+        if ignore_self:
+            np.fill_diagonal(Te, 0)
+        # ignore self
+        for row in Te:
+            s = sum(row)
+            if s > 0:
+                row[:] = [f / s for f in row]
+
+        if stat == "probability" or stat == "proportion":
+            return Te
+        if stat == "percent":
+            return Te * 100
+        return Te
+
     @fill_doc
     def plot_cluster_centers(
         self, axes: Optional[Axes] = None, *, block: bool = False

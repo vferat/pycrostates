@@ -166,10 +166,10 @@ mean = np.mean(parameters['C_dist_durs'])
 print(f'Microstate C segment has a median duration of {median:.2f}s and mean duration of {mean:.2f}s')
 
 #%%
-# Finally, one can analyze microstates transitions using the
+# Finally, get the observed transition probabilities using the
 # :meth:`~pycrostates.segmentation.RawSegmentation.compute_transition_probabilities` method.
 
-T = segmentation.compute_transition_probabilities()
+T = segmentation.get_transition_matrix()
 
 #%%
 # This method returns a `numpy.array` of shape ``(n_clusters, n_clusters)`` containing the
@@ -199,6 +199,41 @@ ax.set_xlabel('To')
 
 plt.show()
 
+#%%
+# It is however important to take into account the time coverage of each microstate in order to analyze this matrix.
+# Indeed, the more a state is present, the more there is a chance that a transition towards this state is observed
+# without reflecting any particular dynamics in state transitions.
+# Pycrostates offers the possibility to generate a theoretical transition matrix based on segments counts of each state 
+# present in the segmentation but ignoring the temporal dynamics of segmentation (random order).
+Te = segmentation.get_expected_transition_matrix()
+ax = sns.heatmap(Te,
+                 annot=True,
+                 cmap='Blues',
+                 xticklabels=segmentation.cluster_names,
+                 yticklabels=segmentation.cluster_names)
+ax.set_ylabel('From')
+ax.set_xlabel('To')
+
+plt.show()
+
+#%%
+# The difference between the observed transition probability matrix ``T``
+# and the theoretical transition probability matrix ``Te``
+# reveals particular dynamic present in the segmentation.
+# Here we observe that the transition from state B to state C appears
+# in much larger proportion than expected while the transition from 
+# state B to state C is much less observed than in theory.
+ax = sns.heatmap(T - Te,
+                 annot=True,
+                 cmap='RdBu_r',
+                 vmin=-0.15,
+                 vmax=0.15,
+                 xticklabels=segmentation.cluster_names,
+                 yticklabels=segmentation.cluster_names)
+ax.set_ylabel('From')
+ax.set_xlabel('To')
+
+plt.show()
 #%%
 # References
 # ----------
