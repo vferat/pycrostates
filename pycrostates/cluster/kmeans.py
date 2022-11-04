@@ -12,9 +12,9 @@ from numpy.typing import NDArray
 
 from .._typing import Picks, RANDomState
 from ..utils import _corr_vectors
-from ..utils._checks import _check_random_state, _check_type
+from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc
-from ..utils._logs import _set_verbose, logger
+from ..utils._logs import logger
 from ._base import _BaseCluster
 
 
@@ -81,7 +81,7 @@ class ModKMeans(_BaseCluster):
                 f"{ch_count} {ch_type.upper()}"
                 for ch_type, ch_count in zip(ch_types, ch_counts)
             ]
-            GEV = int(self._GEV_ * 100)
+            GEV = f"{self._GEV_ * 100:.2f}"
         else:
             n_samples = None
             ch_repr = None
@@ -100,7 +100,6 @@ class ModKMeans(_BaseCluster):
 
     @copy_doc(_BaseCluster.__eq__)
     def __eq__(self, other: Any) -> bool:
-        """Equality == method."""
         if isinstance(other, ModKMeans):
             if not super().__eq__(other):
                 return False
@@ -127,7 +126,6 @@ class ModKMeans(_BaseCluster):
 
     @copy_doc(_BaseCluster.__ne__)
     def __ne__(self, other: Any) -> bool:
-        """Different != method."""
         return not self.__eq__(other)
 
     @copy_doc(_BaseCluster._check_fit)
@@ -136,7 +134,6 @@ class ModKMeans(_BaseCluster):
         # sanity-check
         assert self.GEV_ is not None
 
-    @copy_doc(_BaseCluster.fit)
     @fill_doc
     def fit(
         self,
@@ -149,12 +146,36 @@ class ModKMeans(_BaseCluster):
         *,
         verbose: Optional[str] = None,
     ) -> None:
-        """
+        """Compute cluster centers.
+
+        Parameters
+        ----------
+        inst : Raw | Epochs | ChData
+            MNE `~mne.io.Raw`, `~mne.Epochs` or `~pycrostates.io.ChData` object
+            from which to extract :term:`cluster centers`.
+        picks : str | list | slice | None
+            Channels to include. Note that all channels selected must have the
+            same type. Slices and lists of integers will be interpreted as
+            channel indices. In lists, channel name strings (e.g.
+            ``['Fp1', 'Fp2']``) will pick the given channels. Can also be the
+            string values “all” to pick all channels, or “data” to pick data
+            channels. ``"eeg"`` (default) will pick all eeg channels.
+            Note that channels in ``info['bads']`` will be included if their
+            names or indices are explicitly provided.
+        %(tmin_raw)s
+        %(tmax_raw)s
+        %(reject_by_annotation_raw)s
+        %(n_jobs)s
         %(verbose)s
         """
-        _set_verbose(verbose)  # TODO: decorator nesting is failing
+        n_jobs = _check_n_jobs(n_jobs)
         data = super().fit(
-            inst, picks, tmin, tmax, reject_by_annotation, n_jobs
+            inst,
+            picks=picks,
+            tmin=tmin,
+            tmax=tmax,
+            reject_by_annotation=reject_by_annotation,
+            verbose=verbose,
         )
 
         inits = self._random_state.randint(
