@@ -169,9 +169,7 @@ def test_normalize_input_true():
 
 # pylint: disable=protected-access
 def _check_fitted(aah_cluster):
-    """
-    Checks that the aah_cluster is fitted.
-    """
+    """Check that the aah_cluster is fitted."""
     assert aah_cluster.fitted
     assert aah_cluster.n_clusters == n_clusters
     assert len(aah_cluster._cluster_names) == n_clusters
