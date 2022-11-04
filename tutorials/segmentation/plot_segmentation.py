@@ -167,16 +167,16 @@ print(f'Microstate C segment has a median duration of {median:.2f}s and mean dur
 
 #%%
 # Finally, get the observed transition probabilities using the
-# :meth:`~pycrostates.segmentation.RawSegmentation.get_transition_probabilities` method.
+# :meth:`~pycrostates.segmentation.RawSegmentation.get_transition_matrix` method.
 
 T_observed = segmentation.get_transition_matrix()
 
 #%%
 # This method returns a `numpy.array` of shape ``(n_clusters, n_clusters)`` containing the
 # value corresponding to the chosen statistic:
-#  - ``count`` will return the number of transitions observed.
-#  - ``probability`` and ``proportion`` will both return the normalize transition probability.
-#  - ``percent`` will return the probability as percentage ( ``probability`` * 100).
+#     - ``count`` will return the number of transitions observed.
+#     - ``probability`` and ``proportion`` will both return the normalize transition probability.
+#     - ``percent`` will return the probability as percentage ( ``probability`` * 100).
 #
 # The rows of T correspond to the "from" state while the columns indicate the "to" state,
 # so that T[1,2] encodes the transition from the 2nd state to the 3rd state (B -> C in this example).
@@ -204,7 +204,7 @@ plt.show()
 # Indeed, the more a state is present, the more there is a chance that a transition towards this state is observed
 # without reflecting any particular dynamics in state transitions.
 # Pycrostates offers the possibility to generate a theoretical transition matrix thanks to the 
-# :meth:`~pycrostates.segmentation.RawSegmentation.get_expected_transition_probabilities` method.
+# :meth:`~pycrostates.segmentation.RawSegmentation.get_expected_transition_matrix` method.
 # This transition matrix is based on segments counts of each state 
 # present in the segmentation but ignores the temporal dynamics of segmentation (random transition order).
 T_expected = segmentation.get_expected_transition_matrix()
