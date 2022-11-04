@@ -134,7 +134,7 @@ class ModKMeans(_BaseCluster):
         # sanity-check
         assert self.GEV_ is not None
 
-    @copy_doc(_BaseCluster.fit)
+    @fill_doc
     def fit(
         self,
         inst: Union[BaseRaw, BaseEpochs],
@@ -146,8 +146,27 @@ class ModKMeans(_BaseCluster):
         *,
         verbose: Optional[str] = None,
     ) -> None:
-        """
+        """Compute cluster centers.
+
+        Parameters
+        ----------
+        inst : Raw | Epochs | ChData
+            MNE `~mne.io.Raw`, `~mne.Epochs` or `~pycrostates.io.ChData` object
+            from which to extract :term:`cluster centers`.
+        picks : str | list | slice | None
+            Channels to include. Note that all channels selected must have the
+            same type. Slices and lists of integers will be interpreted as
+            channel indices. In lists, channel name strings (e.g.
+            ``['Fp1', 'Fp2']``) will pick the given channels. Can also be the
+            string values “all” to pick all channels, or “data” to pick data
+            channels. ``"eeg"`` (default) will pick all eeg channels.
+            Note that channels in ``info['bads']`` will be included if their
+            names or indices are explicitly provided.
+        %(tmin_raw)s
+        %(tmax_raw)s
+        %(reject_by_annotation_raw)s
         %(n_jobs)s
+        %(verbose)s
         """
         n_jobs = _check_n_jobs(n_jobs)
         data = super().fit(
