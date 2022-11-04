@@ -183,9 +183,7 @@ def _check_fitted(aah_cluster):
 
 
 def _check_unfitted(aah_cluster):
-    """
-    Checks that the aah_cluster is not fitted.
-    """
+    """Check that the aah_cluster is not fitted."""
     assert not aah_cluster.fitted
     assert aah_cluster.n_clusters == n_clusters
     assert len(aah_cluster._cluster_names) == n_clusters
