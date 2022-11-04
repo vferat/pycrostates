@@ -386,7 +386,7 @@ def test_get_transition_matrix_stat():
 
 
 def test_get_expected_transition_matrix():
-    # Use boostrap method to check results
+    # Use bootstrap method to check results
     labels = np.random.randint(-1, 4, 500)
     n_clusters = 4
     Ts = list()

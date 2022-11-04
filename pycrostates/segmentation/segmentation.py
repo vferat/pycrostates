@@ -294,9 +294,9 @@ class _BaseSegmentation(ABC):
     def _get_expected_transition_matrix(
         labels, n_clusters, ignore_self=True, stat="probability"
     ):
-        """Compute theorical transition matrix.
+        """Compute theoretical transition matrix.
 
-        Compute theorical transition matrix
+        Compute theoretical transition matrix
         taking into account time coverage.
         """
         # reshape if epochs
@@ -306,34 +306,34 @@ class _BaseSegmentation(ABC):
         states = np.arange(-1, n_clusters)
         n = len(states)
         # Expected probability:
-        Te = np.zeros(shape=(n, n))
+        T_expected = np.zeros(shape=(n, n))
         for state_from in states:
             n_from = np.sum(labels == state_from)  # no state_from in labels
             for state_to in states:
                 n_to = np.sum(labels == state_to)
                 if n_from != 0:
                     if state_from != state_to:
-                        Te[state_from, state_to] = n_to
+                        T_expected[state_from, state_to] = n_to
                     else:
-                        Te[state_from, state_to] = n_to - 1
+                        T_expected[state_from, state_to] = n_to - 1
                 else:
-                    Te[state_from, state_to] = 0
+                    T_expected[state_from, state_to] = 0
 
         # ignore unlabeled
-        Te = Te[:-1, :-1]
+        T_expected = T_expected[:-1, :-1]
         if ignore_self:
-            np.fill_diagonal(Te, 0)
+            np.fill_diagonal(T_expected, 0)
         # ignore self
-        for row in Te:
+        for row in T_expected:
             s = sum(row)
             if s > 0:
                 row[:] = [f / s for f in row]
 
         if stat == "probability" or stat == "proportion":
-            return Te
+            return T_expected
         if stat == "percent":
-            return Te * 100
-        return Te
+            return T_expected * 100
+        return T_expected
 
     @fill_doc
     def plot_cluster_centers(

@@ -169,7 +169,7 @@ print(f'Microstate C segment has a median duration of {median:.2f}s and mean dur
 # Finally, get the observed transition probabilities using the
 # :meth:`~pycrostates.segmentation.RawSegmentation.get_transition_probabilities` method.
 
-T = segmentation.get_transition_matrix()
+T_observed = segmentation.get_transition_matrix()
 
 #%%
 # This method returns a `numpy.array` of shape ``(n_clusters, n_clusters)`` containing the
@@ -189,7 +189,7 @@ T = segmentation.get_transition_matrix()
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-ax = sns.heatmap(T,
+ax = sns.heatmap(T_observed,
                  annot=True,
                  cmap='Blues',
                  xticklabels=segmentation.cluster_names,
@@ -207,8 +207,8 @@ plt.show()
 # :meth:`~pycrostates.segmentation.RawSegmentation.get_expected_transition_probabilities` method.
 # This transition matrix is based on segments counts of each state 
 # present in the segmentation but ignores the temporal dynamics of segmentation (random transition order).
-Te = segmentation.get_expected_transition_matrix()
-ax = sns.heatmap(Te,
+T_expected = segmentation.get_expected_transition_matrix()
+ax = sns.heatmap(T_expected,
                  annot=True,
                  cmap='Blues',
                  xticklabels=segmentation.cluster_names,
@@ -219,13 +219,13 @@ ax.set_xlabel('To')
 plt.show()
 
 #%%
-# The difference between the observed transition probability matrix ``T``
-# and the theoretical transition probability matrix ``Te``
+# The difference between the observed transition probability matrix ``T_observed``
+# and the theoretical transition probability matrix ``T_expected``
 # reveals particular dynamic present in the segmentation.
 # Here we observe that the transition from state B to state C appears
 # in much larger proportion than expected while the transition from 
 # state B to state C is much less observed than expected.
-ax = sns.heatmap(T - Te,
+ax = sns.heatmap(T_observed - T_expected,
                  annot=True,
                  cmap='RdBu_r',
                  vmin=-0.15,
