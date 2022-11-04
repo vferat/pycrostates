@@ -223,7 +223,7 @@ def _check_fitted_data_epochs(fitted_data, epochs, picks, tmin, tmax):
 
 
 def test_aahClusterMeans():
-    """Test K-Means default functionalities."""
+    """Test AAHC default functionalities."""
     aahCluster1 = AAHCluster(
         n_clusters=n_clusters,
         # ignore_polarity=True,
