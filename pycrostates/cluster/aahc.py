@@ -13,7 +13,7 @@ from .._typing import Picks
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import copy_doc, fill_doc
-from ..utils._logs import _set_verbose, logger
+from ..utils._logs import logger
 from ._base import _BaseCluster
 
 # if we have numba, use its jit interface
@@ -140,9 +140,7 @@ class AAHCluster(_BaseCluster):
         # sanity-check
         assert self.GEV_ is not None
 
-    # pylint: disable=arguments-differ
     @copy_doc(_BaseCluster.fit)
-    @fill_doc
     def fit(
         self,
         inst: Union[BaseRaw, BaseEpochs],
@@ -154,12 +152,14 @@ class AAHCluster(_BaseCluster):
         *,
         verbose: Optional[str] = None,
     ) -> None:
-        """
-        %(verbose)s
-        """
-        _set_verbose(verbose)  # TODO: decorator nesting is failing
         data = super().fit(
-            inst, picks, tmin, tmax, reject_by_annotation, n_jobs
+            inst,
+            picks=picks,
+            tmin=tmin,
+            tmax=tmax,
+            reject_by_annotation=reject_by_annotation,
+            n_jobs=n_jobs,
+            verbose=verbose,
         )
 
         gev, maps, segmentation = AAHCluster._aahc(
@@ -176,8 +176,6 @@ class AAHCluster(_BaseCluster):
         self._cluster_centers_ = maps
         self._labels_ = segmentation
         self._fitted = True
-
-    # pylint: enable=arguments-differ
 
     @copy_doc(_BaseCluster.save)
     def save(self, fname: Union[str, Path]):
@@ -240,7 +238,10 @@ class AAHCluster(_BaseCluster):
 
         assignment = np.arange(n_frame)
 
+        n_steps = n_frame - n_clusters
         while cluster.shape[1] > n_clusters:
+
+            step = n_frame - cluster.shape[1]
 
             to_remove = np.argmin(GEV)
             orphans = assignment == to_remove
@@ -268,22 +269,40 @@ class AAHCluster(_BaseCluster):
 
                     sgn = np.sign(old_cluster @ cluster[:, c])
 
-                    v0 = (
+                    first_pc_init = (
                         old_weight * sgn * old_cluster
                         + (1.0 - old_weight) * cluster[:, c]
                     )
 
-                    v, _, converged = AAHCluster._first_principal_component(
-                        data[:, members], v0, max_iter=n_chan
+                    (
+                        first_pc,
+                        _,
+                        converged,
+                    ) = AAHCluster._first_principal_component(
+                        data[:, members], first_pc_init, max_iter=n_chan
                     )
-                    if not converged:
+                    if converged:
+                        logger.debug(
+                            "AAHC %d/%d: " "power iterations converged.",
+                            step,
+                            n_steps,
+                        )
+                    else:
+                        logger.debug(
+                            "AAHC %d/%d "
+                            "power iteration did not converge. "
+                            "Computing fallback solution.",
+                            step,
+                            n_steps,
+                        )
                         # fall back to covariance estimation
                         # and eigenvalue computation
-                        Cxx = data[:, members] @ data[:, members].T
-                        _, V = np.linalg.eigh(Cxx)
-                        v = V[:, -1]
+                        data_cov = data[:, members] @ data[:, members].T
+                        _, evecs = np.linalg.eigh(data_cov)
+                        # eigenvector at largest eigenvalue
+                        first_pc = evecs[:, -1]
 
-                    cluster[:, c] = v
+                    cluster[:, c] = first_pc
                 else:
                     cluster[:, c] = np.mean(data[:, members], axis=1)
                     cluster[:, c] /= np.linalg.norm(
@@ -349,14 +368,6 @@ class AAHCluster(_BaseCluster):
         return v, eig, converged
 
     # --------------------------------------------------------------------
-
-    @property
-    def ignore_polarity(self) -> bool:
-        """If true, polarity is ignored when computing distances.
-
-        :type: `bool`
-        """
-        return self._ignore_polarity
 
     @property
     def normalize_input(self) -> bool:

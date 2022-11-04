@@ -408,7 +408,7 @@ def _create_AAHCluster(
     cluster_names: List[str],
     fitted_data: NDArray[float],
     labels_: NDArray[int],
-    ignore_polarity: bool,
+    ignore_polarity: bool,  # pylint: disable=unused-argument
     normalize_input: bool,
     GEV_: float,
 ):

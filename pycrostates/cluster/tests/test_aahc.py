@@ -92,7 +92,7 @@ raw_sim.info["bads"] = []
 
 def test_default_algorithm():
     obj = AAHCluster(n_clusters=sim_n_ms)
-    assert obj.ignore_polarity is True
+    assert obj._ignore_polarity is True  # pylint: disable=protected-access
     obj.fit(raw_sim)
 
     # extract cluster centers
@@ -145,7 +145,7 @@ def test_normalize_input_true():
         # ignore_polarity=True,
         normalize_input=True,
     )
-    assert obj.ignore_polarity is True
+    assert obj._ignore_polarity is True  # pylint: disable=protected-access
     obj.fit(raw_sim)
 
     # extract cluster centers

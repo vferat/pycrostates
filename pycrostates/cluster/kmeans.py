@@ -14,7 +14,7 @@ from .._typing import Picks, RANDomState
 from ..utils import _corr_vectors
 from ..utils._checks import _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc
-from ..utils._logs import _set_verbose, logger
+from ..utils._logs import logger
 from ._base import _BaseCluster
 
 
@@ -137,7 +137,6 @@ class ModKMeans(_BaseCluster):
         assert self.GEV_ is not None
 
     @copy_doc(_BaseCluster.fit)
-    @fill_doc
     def fit(
         self,
         inst: Union[BaseRaw, BaseEpochs],
@@ -149,12 +148,14 @@ class ModKMeans(_BaseCluster):
         *,
         verbose: Optional[str] = None,
     ) -> None:
-        """
-        %(verbose)s
-        """
-        _set_verbose(verbose)  # TODO: decorator nesting is failing
         data = super().fit(
-            inst, picks, tmin, tmax, reject_by_annotation, n_jobs
+            inst,
+            picks=picks,
+            tmin=tmin,
+            tmax=tmax,
+            reject_by_annotation=reject_by_annotation,
+            n_jobs=n_jobs,
+            verbose=verbose,
         )
 
         inits = self._random_state.randint(

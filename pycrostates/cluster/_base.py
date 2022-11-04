@@ -25,7 +25,8 @@ from ..utils._checks import (
     _check_value,
 )
 from ..utils._docs import fill_doc
-from ..utils._logs import logger, verbose
+from ..utils._logs import _set_verbose, logger
+from ..utils._logs import verbose as verbose_decorator
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 from ..viz import plot_cluster_centers
 
@@ -193,6 +194,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         tmax: Optional[Union[int, float]] = None,
         reject_by_annotation: bool = True,
         n_jobs: int = 1,
+        *,
+        verbose: Optional[str] = None,
     ) -> NDArray[float]:
         """Compute cluster centers.
 
@@ -214,8 +217,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         %(tmax_raw)s
         %(reject_by_annotation_raw)s
         %(n_jobs)s
+        %(verbose)s
         """
         from ..io import ChData, ChInfo
+
+        _set_verbose(verbose)
 
         self._check_unfitted()
         n_jobs = _check_n_jobs(n_jobs)
@@ -554,7 +560,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self._check_fit()
         _check_type(fname, ("path-like",), "fname")
 
-    @verbose
+    @verbose_decorator
     def predict(
         self,
         inst: Union[BaseRaw, BaseEpochs],
