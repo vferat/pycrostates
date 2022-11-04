@@ -612,24 +612,14 @@ def test_invalid_arguments():
     with pytest.raises(ValueError, match="The number of clusters must be a"):
         aahCluster_ = AAHCluster(n_clusters=-101)
 
-    # # ignore_polarity
-    # with pytest.raises(
-    #     TypeError, match="'ignore_polarity' must be an instance of bool"
-    # ):
-    #     aahCluster_ = AAHCluster(
-    #         n_clusters=n_clusters,
-    #         ignore_polarity="asdf"
-    #     )
-    #     aahCluster_ = AAHCluster(
-    #         n_clusters=n_clusters,
-    #         ignore_polarity=None
-    #     )
-
     # normalize_input
     with pytest.raises(
         TypeError, match="'normalize_input' must be an instance of bool"
     ):
         aahCluster_ = AAHCluster(n_clusters=n_clusters, normalize_input="asdf")
+    with pytest.raises(
+        TypeError, match="'normalize_input' must be an instance of bool"
+    ):
         aahCluster_ = AAHCluster(n_clusters=n_clusters, normalize_input=None)
 
     aahCluster_ = AAHCluster(
