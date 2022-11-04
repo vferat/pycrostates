@@ -392,7 +392,7 @@ def test_get_expected_transition_matrix():
     Ts = list()
     for k in range(10000):
         labels_ = labels.copy()
-        np.random.shuffle(l)
+        np.random.shuffle(labels_)
         T = RawSegmentation._get_transition_matrix(
             labels_, n_clusters, ignore_self=True, stat="probability"
         )
@@ -409,7 +409,7 @@ def test_get_expected_transition_matrix():
     Ts = list()
     for k in range(10000):
         labels_ = labels.copy()
-        np.random.shuffle(l)
+        np.random.shuffle(labels_)
         T = RawSegmentation._get_transition_matrix(
             labels_, n_clusters, ignore_self=True, stat="probability"
         )
