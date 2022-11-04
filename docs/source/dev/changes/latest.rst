@@ -24,9 +24,9 @@ Current 0.3.0.dev
 
 Enhancements
 ~~~~~~~~~~~~
-- Add ``Microstate Segmentation`` tutorial. (:pr:`91` by `Victor Férat`_)
-- Add :meth:`pycrostates.segmentation.RawSegmentation.compute_transition_probabilities`. (:pr:`91` by `Victor Férat`_)
 - Improve changelog. (:pr:`86` by `Victor Férat`_)
+- Add ``Microstate Segmentation`` tutorial. (:pr:`91` by `Victor Férat`_)
+- Add :meth:`pycrostates.segmentation.RawSegmentation.get_transition_matrix` and :meth:`pycrostates.segmentation.RawSegmentation.get_expected_transition_matrix`. (:pr:`91` by `Victor Férat`_)
 
 Bugs
 ~~~~
