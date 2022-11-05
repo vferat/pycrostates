@@ -251,7 +251,7 @@ class _BaseSegmentation(ABC):
         ----------
         stat : str
             Aggregate statistic to compute each transition. Can be:
-            
+
             * ``probability`` or ``proportion``: normalize such probabilities
                 along the first axis is always equal to 1.
             * ``percent``: normalize such probabilities along the first axis
