@@ -157,16 +157,20 @@ class _BaseSegmentation(ABC):
         )
 
     def get_transition_matrix(self, stat="probability", ignore_self=True):
-        """Compute transition probabilities of microstate transitions.
+        """Get the observed transition matrix.
+
+        Count the number of transitions from one state to another
+        and aggregate the result as statistic.
+        Transition "from" and "to" unlabeled segments (-1) are ignored.
 
         Parameters
         ----------
         stat : str
-            Aggregate statistic to compute each transition. Can be:
+            Aggregate statistic to compute transitions. Can be:
 
             * ``count``: show the number of observations of each transition.
-            * ``probability`` or ``proportion``: normalize such probabilities
-                along the first axis is always equal to 1.
+            * ``probability`` or ``proportion``: normalize count such
+                probabilities along the first axis is always equal to 1.
             * ``percent``: normalize such probabilities along the first axis
                 is always equal to 100.
 
@@ -188,7 +192,6 @@ class _BaseSegmentation(ABC):
         interpretation when working with discontinuous data.
         To avoid this behaviour, make sure to set the ``reject_edges``
         parameter to ``True`` when predicting the segmentation.
-
         """
         _check_value(
             stat,
@@ -245,12 +248,21 @@ class _BaseSegmentation(ABC):
     def get_expected_transition_matrix(
         self, stat="probability", ignore_self=True
     ):
-        """Compute transition probabilities of microstate transitions.
+        """Get expected transition matrix.
+
+        Compute the theoretical transition matrix as if time
+        course was ignored, but microstate proportions kept
+        (i.e. shuffled segmentation).
+        This matrix can be used to quantify/correct the effect of
+        microstate time coverage on the observed transition
+        matrix obtained with
+        :meth:`~pycrostates.segmentation.RawSegmentation.get_expected_transition_matrix`.
+        Transition "from" and "to" unlabeled segments (-1) are ignored.
 
         Parameters
         ----------
         stat : str
-            Aggregate statistic to compute each transition. Can be:
+            Aggregate statistic to compute transitions. Can be:
 
             * ``probability`` or ``proportion``: normalize such probabilities
                 along the first axis is always equal to 1.
@@ -267,14 +279,6 @@ class _BaseSegmentation(ABC):
             Array of transition probability values from one label to another.
             First axis indicates state "from".
             Second axis indicates state "to".
-
-        Warnings
-        --------
-        When working with `~mne.Epochs`, this method will take into account
-        transitions that occur between epochs. This could lead to wrong
-        interpretation when working with discontinuous data.
-        To avoid this behaviour, make sure to set the ``reject_edges``
-        parameter to ``True`` when predicting the segmentation.
         """
         _check_value(
             stat,
