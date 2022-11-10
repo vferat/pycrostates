@@ -27,7 +27,7 @@ Enhancements
 - Improve changelog. (:pr:`86` by `Victor Férat`_)
 - Support for AAHC clustering (:pr:`92` by `Reinmar Kobler`_)
 - Add ``Microstate Segmentation`` tutorial. (:pr:`91` by `Victor Férat`_)
-- Add :meth:`pycrostates.segmentation.RawSegmentation.get_transition_matrix` and :meth:`pycrostates.segmentation.RawSegmentation.get_expected_transition_matrix`. (:pr:`91` by `Victor Férat`_)
+- Add :meth:`pycrostates.segmentation.RawSegmentation.compute_transition_matrix` and :meth:`pycrostates.segmentation.RawSegmentation.compute_expected_transition_matrix`. (:pr:`91` by `Victor Férat`_)
 
 Bugs
 ~~~~
