@@ -168,10 +168,10 @@ class _BaseSegmentation(ABC):
         stat : str
             Aggregate statistic to compute transitions. Can be:
 
-            * ``count``: show the number of observations of each transition.
-            * ``probability`` or ``proportion``: normalize count such
+            * ``count`` : show the number of observations of each transition.
+            * ``probability`` or ``proportion`` : normalize count such
                 probabilities along the first axis is always equal to 1.
-            * ``percent``: normalize such probabilities along the first axis
+            * ``percent`` : normalize such probabilities along the first axis
                 is always equal to 100.
 
         ignore_self : bool
@@ -264,9 +264,9 @@ class _BaseSegmentation(ABC):
         stat : str
             Aggregate statistic to compute transitions. Can be:
 
-            * ``probability`` or ``proportion``: normalize such probabilities
+            * ``probability`` or ``proportion`` : normalize such probabilities
                 along the first axis is always equal to 1.
-            * ``percent``: normalize such probabilities along the first axis
+            * ``percent`` : normalize such probabilities along the first axis
                 is always equal to 100.
 
         ignore_self : bool
