@@ -344,13 +344,13 @@ def test_invalid_segmentation(Segmentation, inst, bad_inst, caplog):
         ),
     ],
 )
-def test_get_transition_matrix(labels, ignore_self, T):
+def test_compute_transition_matrix(labels, ignore_self, T):
     n_clusters = (
         (len(np.unique(labels)) - 1)
         if np.any(labels == -1)
         else len(np.unique(labels))
     )
-    t = RawSegmentation._get_transition_matrix(
+    t = RawSegmentation._compute_transition_matrix(
         labels, n_clusters=n_clusters, ignore_self=ignore_self
     )
     assert isinstance(T, np.ndarray)
@@ -358,34 +358,34 @@ def test_get_transition_matrix(labels, ignore_self, T):
     assert np.allclose(t, T)
 
 
-def test_get_transition_matrix_Raw():
+def test_compute_transition_matrix_Raw():
     segmentation = ModK_raw.predict(raw)
-    segmentation.get_transition_matrix()
-    segmentation.get_transition_matrix(ignore_self=False)
+    segmentation.compute_transition_matrix()
+    segmentation.compute_transition_matrix(ignore_self=False)
 
 
-def test_get_transition_matrix_Epochs():
+def test_compute_transition_matrix_Epochs():
     segmentation = ModK_epochs.predict(epochs)
-    segmentation.get_transition_matrix()
-    segmentation.get_transition_matrix(ignore_self=False)
+    segmentation.compute_transition_matrix()
+    segmentation.compute_transition_matrix(ignore_self=False)
 
 
-def test_get_transition_matrix_stat():
+def test_compute_transition_matrix_stat():
     segmentation = ModK_raw.predict(raw)
     with pytest.raises(
         ValueError, match="Invalid value for the 'stat' parameter"
     ):
-        segmentation.get_transition_matrix(stat="wrong")
-    T = segmentation.get_transition_matrix(stat="count")
-    T = segmentation.get_transition_matrix(stat="probability")
+        segmentation.compute_transition_matrix(stat="wrong")
+    T = segmentation.compute_transition_matrix(stat="count")
+    T = segmentation.compute_transition_matrix(stat="probability")
     assert np.allclose(np.sum(T, axis=1), 1)
-    T = segmentation.get_transition_matrix(stat="proportion")
+    T = segmentation.compute_transition_matrix(stat="proportion")
     assert np.allclose(np.sum(T, axis=1), 1)
-    T = segmentation.get_transition_matrix(stat="percent")
+    T = segmentation.compute_transition_matrix(stat="percent")
     assert np.allclose(np.sum(T, axis=1), 100)
 
 
-def test_get_expected_transition_matrix():
+def test_compute_expected_transition_matrix():
     # Use bootstrap method to check results
     labels = np.random.randint(-1, 4, 500)
     n_clusters = 4
@@ -393,12 +393,12 @@ def test_get_expected_transition_matrix():
     for k in range(10000):
         labels_ = labels.copy()
         np.random.shuffle(labels_)
-        T = RawSegmentation._get_transition_matrix(
+        T = RawSegmentation._compute_transition_matrix(
             labels_, n_clusters, ignore_self=True, stat="probability"
         )
         Ts.append(T)
     boostrap_T = np.array(Ts).mean(axis=0)
-    expected_T = RawSegmentation._get_expected_transition_matrix(
+    expected_T = RawSegmentation._compute_expected_transition_matrix(
         labels, n_clusters, ignore_self=True, stat="probability"
     )
     assert np.allclose(boostrap_T, expected_T, atol=1e-2)
@@ -410,38 +410,38 @@ def test_get_expected_transition_matrix():
     for k in range(10000):
         labels_ = labels.copy()
         np.random.shuffle(labels_)
-        T = RawSegmentation._get_transition_matrix(
+        T = RawSegmentation._compute_transition_matrix(
             labels_, n_clusters, ignore_self=True, stat="probability"
         )
         Ts.append(T)
     boostrap_T = np.array(Ts).mean(axis=0)
-    expected_T = RawSegmentation._get_expected_transition_matrix(
+    expected_T = RawSegmentation._compute_expected_transition_matrix(
         labels, n_clusters, ignore_self=True, stat="probability"
     )
     assert np.allclose(boostrap_T, expected_T, atol=1e-2)
 
 
-def test_get_expected_transition_matrix_Raw():
+def test_compute_expected_transition_matrix_Raw():
     segmentation = ModK_raw.predict(raw)
-    segmentation.get_expected_transition_matrix()
-    segmentation.get_expected_transition_matrix(ignore_self=False)
+    segmentation.compute_expected_transition_matrix()
+    segmentation.compute_expected_transition_matrix(ignore_self=False)
 
 
-def test_get_expected_transition_matrix_Epochs():
+def test_compute_expected_transition_matrix_Epochs():
     segmentation = ModK_epochs.predict(epochs)
-    segmentation.get_expected_transition_matrix()
-    segmentation.get_expected_transition_matrix(ignore_self=False)
+    segmentation.compute_expected_transition_matrix()
+    segmentation.compute_expected_transition_matrix(ignore_self=False)
 
 
-def test_get_expected_transition_matrix_stat():
+def test_compute_expected_transition_matrix_stat():
     segmentation = ModK_raw.predict(raw)
     with pytest.raises(
         ValueError, match="Invalid value for the 'stat' parameter"
     ):
-        segmentation.get_expected_transition_matrix(stat="wrong")
-    T = segmentation.get_expected_transition_matrix(stat="probability")
+        segmentation.compute_expected_transition_matrix(stat="wrong")
+    T = segmentation.compute_expected_transition_matrix(stat="probability")
     assert np.allclose(np.sum(T, axis=1), 1)
-    T = segmentation.get_expected_transition_matrix(stat="proportion")
+    T = segmentation.compute_expected_transition_matrix(stat="proportion")
     assert np.allclose(np.sum(T, axis=1), 1)
-    T = segmentation.get_expected_transition_matrix(stat="percent")
+    T = segmentation.compute_expected_transition_matrix(stat="percent")
     assert np.allclose(np.sum(T, axis=1), 100)
