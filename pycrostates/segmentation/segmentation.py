@@ -156,8 +156,8 @@ class _BaseSegmentation(ABC):
             return_dist=return_dist,
         )
 
-    def get_transition_matrix(self, stat="probability", ignore_self=True):
-        """Get the observed transition matrix.
+    def compute_transition_matrix(self, stat="probability", ignore_self=True):
+        """Compute the observed transition matrix.
 
         Count the number of transitions from one state to another
         and aggregate the result as statistic.
@@ -169,10 +169,8 @@ class _BaseSegmentation(ABC):
             Aggregate statistic to compute transitions. Can be:
 
             * ``count`` : show the number of observations of each transition.
-            * ``probability`` or ``proportion`` : normalize count such
-                probabilities along the first axis is always equal to 1.
-            * ``percent`` : normalize such probabilities along the first axis
-                is always equal to 100.
+            * ``probability`` or ``proportion`` : normalize count such probabilities along the first axis is always equal to 1.
+            * ``percent`` : normalize such probabilities along the first axis is always equal to 100.
 
         ignore_self : bool
             If True, ignore transition from one state to itself.
@@ -192,7 +190,7 @@ class _BaseSegmentation(ABC):
         interpretation when working with discontinuous data.
         To avoid this behaviour, make sure to set the ``reject_edges``
         parameter to ``True`` when predicting the segmentation.
-        """
+        """  # noqa: E501
         _check_value(
             stat,
             (
@@ -204,7 +202,7 @@ class _BaseSegmentation(ABC):
             "stat",
         )
         n_clusters = len(self._cluster_centers_)
-        T = _BaseSegmentation._get_transition_matrix(
+        T = _BaseSegmentation._compute_transition_matrix(
             self._labels,
             n_clusters=n_clusters,
             stat=stat,
@@ -213,7 +211,7 @@ class _BaseSegmentation(ABC):
         return T
 
     @staticmethod
-    def _get_transition_matrix(
+    def _compute_transition_matrix(
         labels, n_clusters, ignore_self=True, stat="probability"
     ):
         """Compute observed transition."""
@@ -245,10 +243,10 @@ class _BaseSegmentation(ABC):
         if stat == "percent":
             return T * 100
 
-    def get_expected_transition_matrix(
+    def compute_expected_transition_matrix(
         self, stat="probability", ignore_self=True
     ):
-        """Get expected transition matrix.
+        """Compute the expected transition matrix.
 
         Compute the theoretical transition matrix as if time
         course was ignored, but microstate proportions kept
@@ -256,7 +254,7 @@ class _BaseSegmentation(ABC):
         This matrix can be used to quantify/correct the effect of
         microstate time coverage on the observed transition
         matrix obtained with
-        :meth:`~pycrostates.segmentation.RawSegmentation.get_expected_transition_matrix`.
+        :meth:`~pycrostates.segmentation.RawSegmentation.compute_expected_transition_matrix`.
         Transition "from" and "to" unlabeled segments (-1) are ignored.
 
         Parameters
@@ -279,7 +277,7 @@ class _BaseSegmentation(ABC):
             Array of transition probability values from one label to another.
             First axis indicates state "from".
             Second axis indicates state "to".
-        """
+        """  # noqa: E501
         _check_value(
             stat,
             (
@@ -290,7 +288,7 @@ class _BaseSegmentation(ABC):
             "stat",
         )
         n_clusters = len(self._cluster_centers_)
-        T = _BaseSegmentation._get_expected_transition_matrix(
+        T = _BaseSegmentation._compute_expected_transition_matrix(
             self._labels,
             n_clusters=n_clusters,
             stat=stat,
@@ -299,7 +297,7 @@ class _BaseSegmentation(ABC):
         return T
 
     @staticmethod
-    def _get_expected_transition_matrix(
+    def _compute_expected_transition_matrix(
         labels, n_clusters, ignore_self=True, stat="probability"
     ):
         """Compute theoretical transition matrix.

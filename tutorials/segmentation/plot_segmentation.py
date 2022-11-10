@@ -167,9 +167,9 @@ print(f'Microstate C segment has a median duration of {median:.2f}s and mean dur
 
 #%%
 # Finally, one can get the observed transition probabilities using the
-# :meth:`~pycrostates.segmentation.RawSegmentation.get_transition_matrix` method.
+# :meth:`~pycrostates.segmentation.RawSegmentation.compute_transition_matrix` method.
 
-T_observed = segmentation.get_transition_matrix()
+T_observed = segmentation.compute_transition_matrix()
 
 #%%
 # This method returns a `numpy.array` of shape ``(n_clusters, n_clusters)`` containing the
@@ -205,10 +205,10 @@ plt.show()
 # Indeed, the more a state is present, the more there is a chance that a transition towards this state is observed
 # without reflecting any particular dynamics in state transitions.
 # Pycrostates offers the possibility to generate a theoretical transition matrix thanks to the 
-# :meth:`~pycrostates.segmentation.RawSegmentation.get_expected_transition_matrix` method.
+# :meth:`~pycrostates.segmentation.RawSegmentation.compute_expected_transition_matrix` method.
 # This transition matrix is based on segments counts of each state 
 # present in the segmentation but ignores the temporal dynamics of segmentation (random transition order).
-T_expected = segmentation.get_expected_transition_matrix()
+T_expected = segmentation.compute_expected_transition_matrix()
 ax = sns.heatmap(T_expected,
                  annot=True,
                  cmap='Blues',
