@@ -166,7 +166,7 @@ mean = np.mean(parameters['C_dist_durs'])
 print(f'Microstate C segment has a median duration of {median:.2f}s and mean duration of {mean:.2f}s')
 
 #%%
-# Finally, get the observed transition probabilities using the
+# Finally, one can get the observed transition probabilities using the
 # :meth:`~pycrostates.segmentation.RawSegmentation.get_transition_matrix` method.
 
 T_observed = segmentation.get_transition_matrix()
@@ -174,6 +174,7 @@ T_observed = segmentation.get_transition_matrix()
 #%%
 # This method returns a `numpy.array` of shape ``(n_clusters, n_clusters)`` containing the
 # value corresponding to the chosen statistic:
+#
 # - ``count`` will return the number of transitions observed.
 # - ``probability`` and ``proportion`` will both return the normalize transition probability.
 # - ``percent`` will return the probability as percentage ( ``probability`` * 100).
