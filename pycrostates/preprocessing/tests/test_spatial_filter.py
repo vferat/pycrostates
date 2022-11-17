@@ -1,11 +1,6 @@
-import itertools
-
 import mne
-import numpy as np
 import pytest
-from mne import BaseEpochs
 from mne.datasets import testing
-from mne.io.pick import _picks_to_idx
 
 from pycrostates.io import ChData
 from pycrostates.preprocessing import apply_spatial_filter
@@ -22,3 +17,9 @@ def test_test_spatial_filter(inst):
     """Test apply_spatial_filter."""
     new_inst = apply_spatial_filter(inst, "eeg")
     assert isinstance(new_inst, type(inst))
+
+
+def test_test_spatial_filter_njobs():
+    """Test apply_spatial_filter."""
+    new_inst = apply_spatial_filter(raw, "eeg", n_jobs=2)
+    assert isinstance(new_inst, type(raw))

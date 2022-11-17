@@ -2,28 +2,29 @@ from typing import List, Optional, Union
 
 import mne
 import numpy as np
-from mne import BaseEpochs, pick_info
+from mne import BaseEpochs
 from mne.channels.interpolation import _make_interpolation_matrix
 from mne.io import BaseRaw
-from mne.io.pick import _picks_by_type, _picks_to_idx
+from mne.io.pick import _picks_to_idx
 from mne.parallel import parallel_func
 from mne.utils.check import _check_preload
 
-from .._typing import CHData, Picks, RANDomState
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
-
+@fill_doc
+@verbose
 def apply_spatial_filter(
     inst: Union[BaseRaw, BaseEpochs],
     ch_type: str = "eeg",
     exclude_bads: bool = True,
     n_jobs: int = 1,
-):  # TODO: add verbose
+    verbose = None
+):
     # Checks
     _check_type(inst, (BaseRaw, BaseEpochs))
-    _check_value(ch_type, ("mag", "grad", "eeg"), item_name="ch_type")
+    _check_value(ch_type, ("eeg"), item_name="ch_type")
     n_jobs = _check_n_jobs(n_jobs)
     # check preload for Raw
     _check_preload(inst, "Apply spatial filter")
