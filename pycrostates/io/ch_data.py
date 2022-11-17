@@ -48,8 +48,6 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
             )
         self._data = data
         self._info = info if isinstance(info, ChInfo) else ChInfo(info)
-        # Preload
-        self.preload = True
 
     def __repr__(self) -> str:  # noqa: D401
         """String representation."""
@@ -153,3 +151,8 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
     def ch_names(self):
         """Channel names."""
         return self.info["ch_names"]
+
+    @property
+    def preload(self):
+        """Preload required by some MNE functions."""
+        return True
