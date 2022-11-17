@@ -2,19 +2,18 @@
 
 from mne.io.meas_info import ContainsMixin as MNEContainsMixin
 from mne.io.meas_info import MontageMixin as MNEMontageMixin
-from mne.channels.channels import SetChannelsMixin as MNESetChannelsMixin
-from mne.channels.channels import UpdateChannelsMixin as MNEUpdateChannelsMixin
+
 from ._docs import copy_doc
 
 
-    
-class ChannelsMixin(MNESetChannelsMixin, MNEUpdateChannelsMixin):
+class ChannelsMixin:
     """Channels Mixin for futur implementation."""
 
     # TODO: Maybe some part are salvageable from mne.channels.channels:
     # - UpdateChannelsMixin
     # - SetChannelsMixin
     pass
+
 
 @copy_doc(MNEContainsMixin)
 class ContainsMixin(MNEContainsMixin):

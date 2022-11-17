@@ -152,5 +152,4 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
     @property
     def ch_names(self):
         """Channel names."""
-        return self.info['ch_names']
-
+        return self.info["ch_names"]

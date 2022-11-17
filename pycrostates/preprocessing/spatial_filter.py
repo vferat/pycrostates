@@ -5,9 +5,10 @@ import numpy as np
 from mne import BaseEpochs, pick_info
 from mne.channels.interpolation import _make_interpolation_matrix
 from mne.io import BaseRaw
-from mne.io.pick import _picks_to_idx, _picks_by_type
+from mne.io.pick import _picks_by_type, _picks_to_idx
 from mne.parallel import parallel_func
 from mne.utils.check import _check_preload
+
 from .._typing import CHData, Picks, RANDomState
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
 from ..utils._docs import fill_doc
@@ -15,22 +16,21 @@ from ..utils._logs import logger, verbose
 
 
 def apply_spatial_filter(
-    inst: Union[BaseRaw, BaseEpochs, CHData],
+    inst: Union[BaseRaw, BaseEpochs],
     ch_type: str = "eeg",
     exclude_bads: bool = True,
     n_jobs: int = 1,
-): # TODO: add verbose
-    from ..io import ChData
+):  # TODO: add verbose
     # Checks
-    _check_type(inst, (BaseRaw, BaseEpochs, ChData))
-    _check_value(ch_type, ('mag', 'grad', 'eeg'), item_name="ch_type")
+    _check_type(inst, (BaseRaw, BaseEpochs))
+    _check_value(ch_type, ("mag", "grad", "eeg"), item_name="ch_type")
     n_jobs = _check_n_jobs(n_jobs)
     # check preload for Raw
-    _check_preload(inst, 'Apply spatial filter')
+    _check_preload(inst, "Apply spatial filter")
     # remove bad channels
     # TODO: better handling of picks and bad_channels
     if exclude_bads:
-        inst = inst.copy().drop_channels(inst.info['bads'])
+        inst = inst.copy().drop_channels(inst.info["bads"])
     # Extract adjacency matrix
     adjacency_matrix, ch_names = mne.channels.find_ch_adjacency(
         inst.info, ch_type
@@ -65,8 +65,10 @@ def apply_spatial_filter(
 
     data = np.array(spatial_filtered_data)
     if isinstance(inst, BaseEpochs):
-        data = data.reshape((inst._data.shape[0], len(picks),inst._data.shape[-1]))
-        inst._data[:,picks,:] = data
+        data = data.reshape(
+            (inst._data.shape[0], len(picks), inst._data.shape[-1])
+        )
+        inst._data[:, picks, :] = data
     else:
         inst._data[picks] = data
 
