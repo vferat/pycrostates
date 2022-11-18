@@ -5,7 +5,7 @@ import numpy as np
 from mne import BaseEpochs
 from mne.channels.interpolation import _make_interpolation_matrix
 from mne.io import BaseRaw
-from mne.io.pick import _picks_to_idx
+from mne.io.pick import _picks_to_idx, _picks_by_type
 from mne.parallel import parallel_func
 from mne.utils.check import _check_preload
 
@@ -22,6 +22,7 @@ def apply_spatial_filter(
     n_jobs: int = 1,
     verbose = None
 ):
+    """ Operates in place."""
     # Checks
     _check_type(inst, (BaseRaw, BaseEpochs))
     _check_value(ch_type, ("eeg"), item_name="ch_type")
@@ -29,17 +30,21 @@ def apply_spatial_filter(
     # check preload for Raw
     _check_preload(inst, "Apply spatial filter")
     # remove bad channels
-    # TODO: better handling of picks and bad_channels
-    if exclude_bads:
-        inst = inst.copy().drop_channels(inst.info["bads"])
     # Extract adjacency matrix
     adjacency_matrix, ch_names = mne.channels.find_ch_adjacency(
         inst.info, ch_type
     )
     adjacency_matrix = adjacency_matrix.todense()
     adjacency_matrix = np.array(adjacency_matrix)
+    if exclude_bads:
+        for c, chan in enumerate(ch_names):
+            if chan in inst.info["bads"]:
+                adjacency_matrix[c, :] = 0 # do not change bads
+                adjacency_matrix[:, c] = 0 # don't use bads to interpolate
+                print(adjacency_matrix)
     # retrieve picks based on adjacency matrix
-    picks = _picks_to_idx(inst.info, ch_names, exclude=[])
+    picks = dict(_picks_by_type(inst.info, exclude=[]))[ch_type]
+    assert ch_names == inst.ch_names
     # retrieve channel positions
     pos = inst._get_channel_positions(picks)
     interpolate_matrix = _make_interpolation_matrix(pos, pos)
@@ -67,8 +72,7 @@ def apply_spatial_filter(
     data = np.array(spatial_filtered_data)
     if isinstance(inst, BaseEpochs):
         data = data.reshape(
-            (inst._data.shape[0], len(picks), inst._data.shape[-1])
-        )
+            (len(picks), inst._data.shape[0], inst._data.shape[-1])).swapaxes(0,1)
         inst._data[:, picks, :] = data
     else:
         inst._data[picks] = data
@@ -79,6 +83,10 @@ def apply_spatial_filter(
 def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix):
     neighbors_data = data[adjacency_vector == 1, :]
     neighbor_indices = np.argwhere(adjacency_vector == 1)
+    # too much bads /edge 
+    if len(neighbor_indices) <= 3:
+        print(index)
+        return(data[index])
     # neighbor_matrix shape (n_neighbor, n_samples)
     neighbor_matrix = np.array(
         [neighbor_indices.flatten().tolist()] * data.shape[-1]
@@ -98,9 +106,6 @@ def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix):
     channel_data = data[index]
     for i, keep_ind in enumerate(keep_indices):
         weights = interpolate_matrix[keep_ind, index]
-        if len(weights) == 0:
-            # Not enough neighbors or all values are max/min
-            continue
         # normalize weights
         weights = weights / np.linalg.norm(weights)
         # average
