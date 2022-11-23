@@ -10,7 +10,6 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 from numpy.typing import NDArray
 
-from ._base import _BaseSegmentation
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
@@ -20,6 +19,7 @@ from ..viz import (
     plot_epoch_segmentation,
     plot_raw_segmentation,
 )
+from ._base import _BaseSegmentation
 
 
 @fill_doc

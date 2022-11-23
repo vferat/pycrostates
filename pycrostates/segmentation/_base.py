@@ -11,10 +11,14 @@ from mne.io import BaseRaw
 from numpy.typing import NDArray
 
 from ..utils import _corr_vectors
-from ..utils._checks import _check_type, _check_value
+from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
+from .transitions import (
+    _compute_expected_transition_matrix,
+    _compute_transition_matrix,
+)
 
 
 @fill_doc
@@ -256,53 +260,13 @@ class _BaseSegmentation(ABC):
         interpretation when working with discontinuous data.
         To avoid this behaviour, make sure to set the ``reject_edges``
         parameter to ``True`` when predicting the segmentation.
-        """  # noqa: E501
-        _check_value(
-            stat,
-            (
-                "count",
-                "probability",
-                "proportion",
-                "percent",
-            ),
-            "stat",
-        )
-        n_clusters = len(self._cluster_centers_)
-        T = _BaseSegmentation._compute_transition_matrix(
+        """
+        return _compute_transition_matrix(
             self._labels,
-            n_clusters=n_clusters,
-            stat=stat,
-            ignore_self=ignore_self,
+            self._cluster_centers_.shape[0],
+            stat,
+            ignore_self,
         )
-        return T
-
-    @staticmethod
-    def _compute_transition_matrix(
-        labels, n_clusters, ignore_self=True, stat="probability"
-    ):
-        """Compute observed transition."""
-        # reshape if epochs
-        labels = labels.reshape(-1)
-        # ignore transition to itself (i.e. 1 -> 1)
-        if ignore_self:
-            labels = [s for s, _ in itertools.groupby(labels)]
-
-        T = np.zeros(shape=(n_clusters, n_clusters))
-        # number of transitions
-        for i, j in zip(labels, labels[1:]):
-            if i == -1 or j == -1:
-                continue  # ignore unlabeled
-            T[i, j] += 1
-
-        # transform to probability
-        if stat != "count":
-            with np.errstate(divide="ignore", invalid="ignore"):
-                T = T / T.sum(axis=1, keepdims=True)
-                np.nan_to_num(T, nan=0, posinf=0, copy=False)
-            if stat == "percent":
-                T = T * 100
-
-        return T
 
     def compute_expected_transition_matrix(
         self, stat="probability", ignore_self=True
@@ -337,61 +301,12 @@ class _BaseSegmentation(ABC):
             First axis indicates state ``"from"``. Second axis indicates state
             ``"to"``.
         """  # noqa: E501
-        _check_value(
-            stat,
-            (
-                "probability",
-                "proportion",
-                "percent",
-            ),
-            "stat",
-        )
-        n_clusters = len(self._cluster_centers_)
-        T = _BaseSegmentation._compute_expected_transition_matrix(
+        return _compute_expected_transition_matrix(
             self._labels,
-            n_clusters=n_clusters,
+            n_clusters=self._cluster_centers_.shape[0],
             stat=stat,
             ignore_self=ignore_self,
         )
-        return T
-
-    @staticmethod
-    def _compute_expected_transition_matrix(
-        labels, n_clusters, ignore_self=True, stat="probability"
-    ):
-        """Compute theoretical transition matrix.
-
-        The theoretical transition matrix takes into account the time coverage.
-        """
-        # reshape if epochs
-        labels = labels.reshape(-1)
-        states = np.arange(-1, n_clusters)
-        # Expected probability:
-        T_expected = np.zeros(shape=(states.size, states.size))
-        for state_from in states:
-            n_from = np.sum(labels == state_from)  # no state_from in labels
-            for state_to in states:
-                n_to = np.sum(labels == state_to)
-                if n_from != 0:
-                    if state_from != state_to:
-                        T_expected[state_from, state_to] = n_to
-                    else:
-                        T_expected[state_from, state_to] = n_to - 1
-                else:
-                    T_expected[state_from, state_to] = 0
-
-        # ignore unlabeled
-        T_expected = T_expected[:-1, :-1]
-        if ignore_self:
-            np.fill_diagonal(T_expected, 0)
-        # transform to probability
-        with np.errstate(divide="ignore", invalid="ignore"):
-            T_expected = T_expected / T_expected.sum(axis=1, keepdims=True)
-            np.nan_to_num(T_expected, nan=0, posinf=0, copy=False)
-        if stat == "percent":
-            T_expected = T_expected * 100
-
-        return T_expected
 
     @fill_doc
     def plot_cluster_centers(
