@@ -389,8 +389,8 @@ def test_compute_expected_transition_matrix():
     # Use bootstrap method to check results
     labels = np.random.randint(-1, 4, 500)
     n_clusters = 4
-    Ts = list()
-    for k in range(10000):
+    Ts = []
+    for _ in range(10000):
         labels_ = labels.copy()
         np.random.shuffle(labels_)
         T = RawSegmentation._compute_transition_matrix(
@@ -406,8 +406,8 @@ def test_compute_expected_transition_matrix():
     # Case where 1 state is missing
     labels = np.random.randint(-1, 3, 500)
     n_clusters = 4
-    Ts = list()
-    for k in range(10000):
+    Ts = []
+    for _ in range(10000):
         labels_ = labels.copy()
         np.random.shuffle(labels_)
         T = RawSegmentation._compute_transition_matrix(
