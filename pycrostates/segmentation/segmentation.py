@@ -102,41 +102,30 @@ class _BaseSegmentation(ABC):
         -------
         dict : dict
             Dictionaries containing microstate parameters as key/value pairs.
-            Keys are named as follow: ``'{microstate name}_{parameter}'``.
+            Keys are named as follow: ``'{microstate name}_{parameter name}'``.
 
             Available parameters are listed below:
 
-            * mean_corr : Mean correlation
-                  Mean correlation value of each time point assigned to a
-                  given state.
-            * gev : Global explained variance
-                   Total explained variance expressed by a given state.
-                   It is the sum of global explained variance values of each
-                   time point assigned to a given state.
-            * timecov : Time coverage
-                   The proportion of time during which a given state is
-                   active. This metric is expressed as a ratio.
-            * meandurs : Mean duration
-                   Mean temporal duration of segments assigned
-                   to a given state.
-                   This metric is expressed in seconds (s).
-            * occurrences : occurrences
-                   Mean number of segment assigned to a given state per
-                   second. This metrics is expressed in segment per second
-                   ( . / s).
-
-            If return_dist is set to ``True``, also return the following
-            distributions:
-
-            * dist_corr : Distribution of correlations
-                   Correlation values of each time point assigned to a given
-                   state.
-            * dist_gev : Distribution of global explained variances
-                   Global explained variance values of each time point
-                   assigned to a given state.
-            * dist_durs : Distribution of durations.
-                   Duration of each segments assigned to a given state.
-                   Each value is expressed in seconds (s).
+            * ``mean_corr``: Mean correlation value fo each time point assigned
+              to a given state.
+            * ``gev``: Global explained variance expressed by a given state.
+              It is the sum of global explained variance values of each
+              time point assigned to a given state.
+            * ``timecov``: Time coverage, the proportion of time during which
+              a given state is active. This metric is expressed as a ratio.
+            * ``meandurs``: Mean durations of segments assigned to a given
+              state. This metric is expressed in seconds (s).
+            * ``occurrences``: Occurrences per second, the mean number of
+              segment assigned to a given state per second. This metrics is
+              expressed in segment per second.
+            * ``dist_corr`` (req. ``return_dist=True``): Distribution of
+              correlations values of each time point assigned to a given state.
+            * ``dist_gev`` (req. ``return_dist=True``): Distribution of global
+              explained variances values of each time point assigned to a given
+              state.
+            * ``dist_durs`` (req. ``return_dist=True``): Distribution of
+              durations of each segments assigned to a given state. Each value
+              is expressed in seconds (s).
 
         Warnings
         --------
@@ -144,7 +133,7 @@ class _BaseSegmentation(ABC):
         segments of all epochs. This could lead to wrong interpretation
         especially on state durations. To avoid this behaviour,
         make sure to set the ``reject_edges`` parameter to ``True``
-        when predicting the segmentation.
+        when creating the segmentation.
         """
         return _BaseSegmentation._compute_microstate_parameters(
             self._labels.copy(),
@@ -161,30 +150,29 @@ class _BaseSegmentation(ABC):
 
         Count the number of transitions from one state to another
         and aggregate the result as statistic.
-        Transition "from" and "to" unlabeled segments (-1) are ignored.
+        Transition "from" and "to" unlabeled segments ``-1`` are ignored.
 
         Parameters
         ----------
         stat : str
             Aggregate statistic to compute transitions. Can be:
 
-            * ``count`` :
-                    show the number of observations of each transition.
-            * ``probability`` or ``proportion`` :
-                    normalize count such probabilities along the first axis is always equal to 1.
-            * ``percent`` :
-                    normalize such probabilities along the first axis is always equal to 100.
-
+            * ``count``: show the number of observations of each transition.
+            * ``probability`` or ``proportion``: normalize count such as the
+              probabilities along the first axis is always equal to ``1``.
+            * ``percent``: normalize count such as the
+              probabilities along the first axis is always equal to ``100``.
         ignore_self : bool
-            If True, ignore transition from one state to itself.
-            This is equivalent to set the duration of all states to 1 sample.
+            If True, ignores the transition from one state to itself.
+            This is equivalent to setting the duration of all states to 1
+            sample.
 
         Returns
         -------
-        T : array of shape (``n_cluster``, ``n_cluster``)
+        T : array of shape ``(n_cluster, n_cluster)``
             Array of transition probability values from one label to another.
-            First axis indicates state "from".
-            Second axis indicates state "to".
+            First axis indicates state ``"from"``. Second axis indicates state
+            ``"to"``.
 
         Warnings
         --------
@@ -251,35 +239,33 @@ class _BaseSegmentation(ABC):
     ):
         """Compute the expected transition matrix.
 
-        Compute the theoretical transition matrix as if time
-        course was ignored, but microstate proportions kept
-        (i.e. shuffled segmentation).
-        This matrix can be used to quantify/correct the effect of
-        microstate time coverage on the observed transition
-        matrix obtained with
-        :meth:`~pycrostates.segmentation.RawSegmentation.compute_expected_transition_matrix`.
-        Transition "from" and "to" unlabeled segments (-1) are ignored.
+        Compute the theoretical transition matrix as if time course was
+        ignored, but microstate proportions kept (i.e. shuffled segmentation).
+        This matrix can be used to quantify/correct the effect of microstate
+        time coverage on the observed transition matrix obtained with
+        the method ``compute_expected_transition_matrix``.
+        Transition "from" and "to" unlabeled segments ``-1`` are ignored.
 
         Parameters
         ----------
         stat : str
             Aggregate statistic to compute transitions. Can be:
 
-            * ``probability`` or ``proportion`` :
-                    normalize such probabilities along the first axis is always equal to 1.
-            * ``percent`` :
-                    normalize such probabilities along the first axis is always equal to 100.
-
+            * ``probability`` or ``proportion``: normalize count such as the
+              probabilities along the first axis is always equal to ``1``.
+            * ``percent``: normalize count such as the
+              probabilities along the first axis is always equal to ``100``.
         ignore_self : bool
-            If True, ignore transition from one state to itself.
-            This is equivalent to set the duration of all states to 1 sample.
+            If True, ignores the transition from one state to itself.
+            This is equivalent to setting the duration of all states to 1
+            sample.
 
         Returns
         -------
-        T : array of shape (``n_cluster``, ``n_cluster``)
+        T : array of shape ``(n_cluster, n_cluster)``
             Array of transition probability values from one label to another.
-            First axis indicates state "from".
-            Second axis indicates state "to".
+            First axis indicates state ``"from"``. Second axis indicates state
+            ``"to"``.
         """  # noqa: E501
         _check_value(
             stat,
@@ -305,8 +291,7 @@ class _BaseSegmentation(ABC):
     ):
         """Compute theoretical transition matrix.
 
-        Compute theoretical transition matrix
-        taking into account time coverage.
+        The theoretical transition matrix takes into account the time coverage.
         """
         # reshape if epochs
         labels = labels.reshape(-1)
@@ -346,7 +331,10 @@ class _BaseSegmentation(ABC):
 
     @fill_doc
     def plot_cluster_centers(
-        self, axes: Optional[Axes] = None, *, block: bool = False
+        self,
+        axes: Optional[Union[Axes, NDArray[Axes]]],
+        *,
+        block: bool = False,
     ):
         """Plot cluster centers as topographic maps.
 

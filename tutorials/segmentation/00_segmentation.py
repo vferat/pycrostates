@@ -174,7 +174,7 @@ ax.set_ylabel("Mean duration (s)")
 
 #%%
 # Occurrence per second
-# ~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~
 #
 # ``occurrences`` indicates the mean number of segments assigned to a given
 # state per second. This metrics is expressed in segment per second.
