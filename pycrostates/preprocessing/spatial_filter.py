@@ -23,7 +23,56 @@ def apply_spatial_filter(
     n_jobs: int = 1,
     verbose=None,
 ):
-    """Operates in place."""
+    r"""Apply spatial filter.
+
+    Adapted from \ :footcite:p:`michel2019eeg`.
+    Apply an instantaneous filter which interpolates channels
+    with local neigbhors while removing outliers.
+    The current implementation proceeds as follows:
+
+    * An interpolation matrix is computed using
+      ``mne.channels.interpolation._make_interpolation_matrix``.
+    * An ajdacency matrix is computed using
+      `mne.channels.find_ch_adjacency`.
+    * If ``exclude_bads`` is st to ``True``,
+      bad channels are removed from the ajdacency matrix.
+    * For each timepoint and each channel,
+      a reduced adjacency matrix is build by removing neigbhors
+      with lowest and highest value.
+    * For each timepoint and each channel,
+      a reduced interpolation matrix is build by extracting neigbhor
+      weights based on the reduced adjacency matrix.
+    * Reduced interpolation matrices are normalized.
+    * Channel's timepoints are interpolated
+      using their reduced interpolation matrix.
+
+    Parameters
+    ----------
+    inst : Raw | Epochs
+        Instance to spatial filter.
+    ch_type : str
+        The channel type on which to apply spatial filter.
+        Currently only supports ``'eeg'``.
+        Default to 'eeg'.
+    exclude_bads : bool
+        If set to ``True`` bad channels will be removed
+        from the adjacency matrix and therefore no be used
+        to interpolate neighbors. In addition, bad channels
+        will not be filtered.
+        If set to ``False``, proceed as if all channels were good.
+        Default to ``True``.
+    %(n_jobs)s
+    %(verbose)s
+
+    Returns
+    -------
+    inst : Raw | Epochs
+        The modified instance.
+
+    References
+    ----------
+    .. footbibliography::
+    """
     # Checks
     _check_type(inst, (BaseRaw, BaseEpochs))
     _check_value(ch_type, ("eeg"), item_name="ch_type")
