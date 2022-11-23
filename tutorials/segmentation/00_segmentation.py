@@ -42,6 +42,7 @@ This tutorial introduces the concept of segmentation.
 
 import numpy as np
 import seaborn as sns
+from matplotlib import pyplot as plt
 from mne.io import read_raw_eeglab
 
 from pycrostates.cluster import ModKMeans
@@ -101,6 +102,7 @@ segmentation.labels
 # :meth:`~pycrostates.segmentation.RawSegmentation.plot`.
 
 segmentation.plot(tmin=1, tmax=5)
+plt.show()
 
 #%%
 # Microstates parameters
@@ -129,6 +131,7 @@ y = [parameters[elt + "_gev"] for elt in x]
 ax = sns.barplot(x=x, y=y)
 ax.set_xlabel("Microstates")
 ax.set_ylabel("Global explained Variance (ratio)")
+plt.show()
 
 #%%
 # Mean correlation
@@ -143,6 +146,7 @@ y = [parameters[elt + "_mean_corr"] for elt in x]
 ax = sns.barplot(x=x, y=y)
 ax.set_xlabel("Microstates")
 ax.set_ylabel("Mean correlation")
+plt.show()
 
 #%%
 # Time coverage
@@ -157,6 +161,7 @@ y = [parameters[elt + "_timecov"] for elt in x]
 ax = sns.barplot(x=x, y=y)
 ax.set_xlabel("Microstates")
 ax.set_ylabel("Time Coverage (ratio)")
+plt.show()
 
 #%%
 # Mean durations
@@ -171,6 +176,7 @@ y = [parameters[elt + "_meandurs"] for elt in x]
 ax = sns.barplot(x=x, y=y)
 ax.set_xlabel("Microstates")
 ax.set_ylabel("Mean duration (s)")
+plt.show()
 
 #%%
 # Occurrence per second
@@ -185,6 +191,7 @@ y = [parameters[elt + "_occurrences"] for elt in x]
 ax = sns.barplot(x=x, y=y)
 ax.set_xlabel("Microstates")
 ax.set_ylabel('Occurrences (segment/s)')
+plt.show()
 
 #%%
 # Distributions
@@ -200,6 +207,7 @@ parameters
 # For example, the distribution of ``C`` segment durations can be plotted.
 
 sns.displot(parameters['C_dist_durs'], stat='probability', bins=30)
+plt.show()
 
 #%%
 # Or it can be used to compute other custom metrics from the segmentation. For
@@ -249,6 +257,7 @@ ax = sns.heatmap(
 )
 ax.set_ylabel("From")
 ax.set_xlabel("To")
+plt.show()
 
 #%%
 # It is however important to take into account the time coverage of each
@@ -273,6 +282,7 @@ ax = sns.heatmap(
 )
 ax.set_ylabel("From")
 ax.set_xlabel("To")
+plt.show()
 
 #%%
 # The difference between the observed transition probability matrix
@@ -293,6 +303,7 @@ ax = sns.heatmap(
 )
 ax.set_ylabel("From")
 ax.set_xlabel("To")
+plt.show()
 
 #%%
 # References
