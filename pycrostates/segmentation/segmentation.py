@@ -135,15 +135,94 @@ class _BaseSegmentation(ABC):
         make sure to set the ``reject_edges`` parameter to ``True``
         when creating the segmentation.
         """
-        return _BaseSegmentation._compute_microstate_parameters(
-            self._labels.copy(),
-            self._inst.get_data(),
-            self._cluster_centers_,
-            self._cluster_names,
-            self._inst.info["sfreq"],
-            norm_gfp=norm_gfp,
-            return_dist=return_dist,
-        )
+        _check_type(norm_gfp, (bool,), "norm_gfp")
+        _check_type(return_dist, (bool,), "return_dist")
+
+        # retrieve sampling frequency for convenience
+        sfreq = self._inst.info["sfreq"]
+
+        # don't copy the data/labels array, get_data, swapaxes, reshape are
+        # returning a new view of the array, which is fine since we do not
+        # modify it.
+        labels = self._labels  # same pointer, no memory overhead.
+        if isinstance(self._inst, BaseRaw):
+            data = self._inst.get_data()
+            # sanity-checks
+            assert labels.ndim == 1
+            assert data.ndim == 2
+            assert labels.size == data.shape[1]
+        elif isinstance(self._inst, BaseEpochs):
+            data = self._inst.get_data()
+            # sanity-checks
+            assert labels.ndim == 2
+            assert data.ndim == 3
+            assert labels.size == data.shape[0] * data.shape[2]
+            # create a 2D view of the data array
+            data = np.swapaxes(data, 0, 1)
+            data = data.reshape(data.shape[0], -1)
+            # create a 1D view of the labels array
+            labels = labels.reshape(-1)
+
+        gfp = np.std(data, axis=0)
+        if norm_gfp:
+            labeled = np.argwhere(labels != -1)  # ignore unlabeled segments
+            gfp /= np.linalg.norm(gfp[labeled])  # normalize
+
+        segments = [(s, list(group)) for s, group in itertools.groupby(labels)]
+
+        params = dict()
+        for s, state in enumerate(self._cluster_centers_):
+            state_name = self._cluster_names[s]
+            arg_where = np.argwhere(labels == s)
+            if len(arg_where) != 0:
+                labeled_tp = data.T[arg_where][:, 0, :].T
+                labeled_gfp = gfp[arg_where][:, 0]
+                state_array = np.array([state] * len(arg_where)).transpose()
+
+                dist_corr = _corr_vectors(state_array, labeled_tp)
+                params[f"{state_name}_mean_corr"] = np.mean(np.abs(dist_corr))
+                dist_gev = (labeled_gfp * dist_corr) ** 2 / np.sum(gfp**2)
+                params[f"{state_name}_gev"] = np.sum(dist_gev)
+
+                s_segments = np.array(
+                    [len(group) for s_, group in segments if s_ == s]
+                )
+                occurrences = (
+                    len(s_segments) / len(np.where(labels != -1)[0]) * sfreq
+                )
+                params[f"{state_name}_occurrences"] = occurrences
+
+                timecov = np.sum(s_segments) / len(np.where(labels != -1)[0])
+                params[f"{state_name}_timecov"] = timecov
+
+                dist_durs = s_segments / sfreq
+                params[f"{state_name}_meandurs"] = np.mean(dist_durs)
+
+                if return_dist:
+                    params[f"{state_name}_dist_corr"] = dist_corr
+                    params[f"{state_name}_dist_gev"] = dist_gev
+                    params[f"{state_name}_dist_durs"] = dist_durs
+
+            else:
+                params[f"{state_name}_mean_corr"] = 0.0
+                params[f"{state_name}_gev"] = 0.0
+                params[f"{state_name}_timecov"] = 0.0
+                params[f"{state_name}_meandurs"] = 0.0
+                params[f"{state_name}_occurrences"] = 0.0
+
+                if return_dist:
+                    params[f"{state_name}_dist_corr"] = np.array(
+                        [], dtype=float
+                    )
+                    params[f"{state_name}_dist_gev"] = np.array(
+                        [], dtype=float
+                    )
+                    params[f"{state_name}_dist_durs"] = np.array(
+                        [], dtype=float
+                    )
+
+        params["unlabeled"] = len(np.argwhere(labels == -1)) / len(gfp)
+        return params
 
     def compute_transition_matrix(self, stat="probability", ignore_self=True):
         """Compute the observed transition matrix.
@@ -388,86 +467,6 @@ class _BaseSegmentation(ABC):
                     "the default set of keys supported by pycrostates."
                 )
         return predict_parameters
-
-    @staticmethod
-    def _compute_microstate_parameters(
-        labels: NDArray[int],
-        data: NDArray[float],
-        maps: NDArray[float],
-        maps_names: List[str],
-        sfreq: Union[int, float],
-        norm_gfp: bool = True,
-        return_dist: bool = False,
-    ):
-        """Compute microstate parameters."""
-        assert (data.ndim == 3 and labels.ndim == 2) or (
-            data.ndim == 2 and labels.ndim == 1
-        )
-        if data.ndim == 3:  # epochs
-            data = np.swapaxes(data, 0, 1)
-            data = data.reshape(data.shape[0], -1)
-            labels = labels.reshape(-1)
-
-        _check_type(norm_gfp, (bool,), "norm_gfp")
-        _check_type(return_dist, (bool,), "return_dist")
-
-        gfp = np.std(data, axis=0)
-        if norm_gfp:
-            # ignore unlabeled segments
-            arg_where = np.argwhere(labels != -1)
-            gfp_ = gfp[arg_where]
-            # normalize
-            gfp /= np.linalg.norm(gfp_)
-
-        segments = [(s, list(group)) for s, group in itertools.groupby(labels)]
-
-        d = {}
-        for s, state in enumerate(maps):
-            state_name = maps_names[s]
-            arg_where = np.argwhere(labels == s)
-            if len(arg_where) != 0:
-                labeled_tp = data.T[arg_where][:, 0, :].T
-                labeled_gfp = gfp[arg_where][:, 0]
-                state_array = np.array([state] * len(arg_where)).transpose()
-
-                dist_corr = _corr_vectors(state_array, labeled_tp)
-                d[f"{state_name}_mean_corr"] = np.mean(np.abs(dist_corr))
-                dist_gev = (labeled_gfp * dist_corr) ** 2 / np.sum(gfp**2)
-                d[f"{state_name}_gev"] = np.sum(dist_gev)
-
-                s_segments = np.array(
-                    [len(group) for s_, group in segments if s_ == s]
-                )
-                occurrences = (
-                    len(s_segments) / len(np.where(labels != -1)[0]) * sfreq
-                )
-                d[f"{state_name}_occurrences"] = occurrences
-
-                timecov = np.sum(s_segments) / len(np.where(labels != -1)[0])
-                d[f"{state_name}_timecov"] = timecov
-
-                dist_durs = s_segments / sfreq
-                d[f"{state_name}_meandurs"] = np.mean(dist_durs)
-
-                if return_dist:
-                    d[f"{state_name}_dist_corr"] = dist_corr
-                    d[f"{state_name}_dist_gev"] = dist_gev
-                    d[f"{state_name}_dist_durs"] = dist_durs
-
-            else:
-                d[f"{state_name}_mean_corr"] = 0
-                d[f"{state_name}_gev"] = 0
-                d[f"{state_name}_timecov"] = 0
-                d[f"{state_name}_meandurs"] = 0
-                d[f"{state_name}_occurrences"] = 0
-
-                if return_dist:
-                    d[f"{state_name}_dist_corr"] = np.array([])
-                    d[f"{state_name}_dist_gev"] = np.array([])
-                    d[f"{state_name}_dist_durs"] = np.array([])
-
-        d["unlabeled"] = len(np.argwhere(labels == -1)) / len(gfp)
-        return d
 
     # --------------------------------------------------------------------
     @property
