@@ -11,7 +11,7 @@ from ..utils._docs import fill_doc
 def compute_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
-    stat: str = " probability",
+    stat: str = "probability",
     ignore_self: bool = True,
 ) -> NDArray[float]:
     """Compute the observed transition matrix.
@@ -43,7 +43,7 @@ def compute_transition_matrix(
 def _compute_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
-    stat: str = " probability",
+    stat: str = "probability",
     ignore_self: bool = True,
 ) -> NDArray[float]:
     """Compute observed transition."""
@@ -81,7 +81,7 @@ def _compute_transition_matrix(
 def compute_expected_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
-    stat: str = " probability",
+    stat: str = "probability",
     ignore_self: bool = True,
 ) -> NDArray[float]:
     """Compute the expected transition matrix.
@@ -116,7 +116,7 @@ def compute_expected_transition_matrix(
 def _compute_expected_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
-    stat: str = " probability",
+    stat: str = "probability",
     ignore_self: bool = True,
 ) -> NDArray[float]:
     """Compute theoretical transition matrix.
