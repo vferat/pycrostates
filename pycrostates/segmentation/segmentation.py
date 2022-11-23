@@ -325,8 +325,7 @@ class _BaseSegmentation(ABC):
     @fill_doc
     def plot_cluster_centers(
         self,
-        axes: Optional[Union[Axes, NDArray[Axes]]],
-        *,
+        axes: Optional[Union[Axes, NDArray[Axes]]] = None,
         block: bool = False,
     ):
         """Plot cluster centers as topographic maps.
