@@ -106,8 +106,8 @@ class _BaseSegmentation(ABC):
 
             Available parameters are listed below:
 
-            * ``mean_corr``: Mean correlation value fo each time point assigned
-              to a given state.
+            * ``mean_corr``: Mean correlation value for each time point
+              assigned to a given state.
             * ``gev``: Global explained variance expressed by a given state.
               It is the sum of global explained variance values of each
               time point assigned to a given state.
