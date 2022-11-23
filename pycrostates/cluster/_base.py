@@ -513,7 +513,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @fill_doc
     def plot(
-        self, axes: Optional[Axes] = None, *, block: bool = False, **kwargs
+        self,
+        axes: Optional[Union[Axes, NDArray[Axes]]] = None,
+        *,
+        block: bool = False,
+        **kwargs,
     ):
         """
         Plot cluster centers as topographic maps.
