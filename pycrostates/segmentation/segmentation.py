@@ -316,10 +316,8 @@ class _BaseSegmentation(ABC):
             if s > 0:
                 row[:] = [f / s for f in row]
 
-        if stat == "probability" or stat == "proportion":
-            return T_expected
         if stat == "percent":
-            return T_expected * 100
+            T_expected = T_expected * 100
         return T_expected
 
     @fill_doc
