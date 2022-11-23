@@ -211,28 +211,21 @@ class _BaseSegmentation(ABC):
         # ignore transition to itself (i.e. 1 -> 1)
         if ignore_self:
             labels = [s for s, _ in itertools.groupby(labels)]
-        states = np.arange(-1, n_clusters)
-        n = len(states)
 
-        T = np.zeros(shape=(n, n))
+        T = np.zeros(shape=(n_clusters, n_clusters))
         # number of transitions
-        for (i, j) in zip(labels, labels[1:]):
-            T[i][j] += 1
-        # ignore unlabeled
-        T = T[:-1, :-1]
-
-        if stat == "count":
-            return T
+        for i, j in zip(labels, labels[1:]):
+            if i == -1 or j == -1:
+                continue  # ignore unlabeled
+            T[i, j] += 1
 
         # transform to probability
-        for row in T:
-            s = sum(row)
-            if s > 0:
-                row[:] = [f / s for f in row]
-        if stat == "probability" or stat == "proportion":
-            return T
-        if stat == "percent":
-            return T * 100
+        if stat != "count":
+            T = T / T.sum(axis=1, keepdims=True)
+            if stat == "percent":
+                T = T * 100
+
+        return T
 
     def compute_expected_transition_matrix(
         self, stat="probability", ignore_self=True
@@ -295,8 +288,6 @@ class _BaseSegmentation(ABC):
         """
         # reshape if epochs
         labels = labels.reshape(-1)
-        states = np.arange(-1, n_clusters)
-        n = len(states)
         states = np.arange(-1, n_clusters)
         n = len(states)
         # Expected probability:
