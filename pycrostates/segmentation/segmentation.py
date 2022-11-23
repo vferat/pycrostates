@@ -221,9 +221,9 @@ class _BaseSegmentation(ABC):
 
         # transform to probability
         if stat != "count":
-            with np.errstate(divide="ignore"):
+            with np.errstate(divide="ignore", invalid="ignore"):
                 T = T / T.sum(axis=1, keepdims=True)
-                np.nan_to_num(T, posinf=0, copy=False)
+                np.nan_to_num(T, nan=0, posinf=0, copy=False)
             if stat == "percent":
                 T = T * 100
 
