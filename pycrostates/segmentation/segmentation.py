@@ -1,24 +1,14 @@
 """Segmentation module for segmented data."""
 
-import itertools
-from abc import ABC, abstractmethod
-from typing import List, Optional, Union
+from typing import Optional, Union
 
-import numpy as np
 from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
-from numpy.typing import NDArray
 
-from ..utils import _corr_vectors
-from ..utils._checks import _check_type, _check_value
+from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
-from ..utils._logs import logger
-from ..viz import (
-    plot_cluster_centers,
-    plot_epoch_segmentation,
-    plot_raw_segmentation,
-)
+from ..viz import plot_epoch_segmentation, plot_raw_segmentation
 from ._base import _BaseSegmentation
 
 
