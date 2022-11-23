@@ -350,9 +350,9 @@ def test_invalid_segmentation(Segmentation, inst, bad_inst, caplog):
 )
 def test_compute_transition_matrix(labels, ignore_self, T):
     n_clusters = (
-        (len(np.unique(labels)) - 1)
+        np.unique(labels).size - 1
         if np.any(labels == -1)
-        else len(np.unique(labels))
+        else np.unique(labels).size
     )
     t = _compute_transition_matrix(
         labels, n_clusters=n_clusters, ignore_self=ignore_self
