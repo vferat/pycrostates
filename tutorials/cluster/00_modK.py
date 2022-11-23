@@ -8,7 +8,6 @@ K-means algorithm is based on :footcite:t:`Marqui1995`.
 """
 
 #%%
-# .. _fit:
 # .. include:: ../../../../links.inc
 
 # %%

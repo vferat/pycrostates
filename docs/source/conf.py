@@ -245,7 +245,7 @@ sphinx_gallery_conf = {
     "subsection_order": ExplicitOrder(
         [
             "../../tutorials/preprocessing",
-            "../../tutorials/clustering",
+            "../../tutorials/cluster",
             "../../tutorials/segmentation",
             "../../tutorials/group_level_analysis",
             "../../tutorials/metrics",

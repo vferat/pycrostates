@@ -9,27 +9,26 @@ This tutorial introduces the concept of segmentation.
 # .. include:: ../../../../links.inc
 
 #%%
-# Here we fit a modified K-means with a sample dataset.
-# For more details about the fitting procedure,
-# please refer to :ref:`this tutorial <fit>`.
+# Here we fit a modified K-means (:class:`~pycrostates.cluster.ModKMeans` with
+# a sample dataset. For more details about the fitting procedure, please refer
+# to :ref:`this tutorial
+# <sphx_glr_generated_auto_tutorials_cluster_00_modK.py>`.
 
 from mne.io import read_raw_eeglab
 
 from pycrostates.cluster import ModKMeans
 from pycrostates.datasets import lemon
 
-raw_fname = lemon.data_path(subject_id='010017', condition='EC')
-raw = read_raw_eeglab(raw_fname, preload=True)
+raw_fname = lemon.data_path(subject_id="010017", condition="EC")
+raw = read_raw_eeglab(raw_fname, preload=False)
 raw.crop(0, 60)  # crop the dataset to speed up computation
-raw.pick('eeg')  # select EEG channels
-raw.set_eeg_reference('average')  # Apply a common average reference
+raw.load_data()
+raw.set_eeg_reference("average")  # Apply a common average reference
 
-n_clusters = 5
-ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
-
-ModK.fit(raw, n_jobs=5)
+ModK = ModKMeans(n_clusters=5, random_state=42)
+ModK.fit(raw, n_jobs=2)
 ModK.reorder_clusters(order=[4, 1, 3, 2, 0])
-ModK.rename_clusters(new_names=['A', 'B', 'C', 'D', 'F'])
+ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
 ModK.plot()
 
 #%%
@@ -67,7 +66,7 @@ segmentation._labels
 segmentation.plot(tmin=1, tmax=5)
 
 #%%
-# Parameters usually studied in microstate analysis can be computed using the 
+# Parameters usually studied in microstate analysis can be computed using the
 # :meth:`~pycrostates.segmentation.RawSegmentation.compute_parameters` method.
 
 parameters = segmentation.compute_parameters()
@@ -204,9 +203,9 @@ plt.show()
 # It is however important to take into account the time coverage of each microstate in order to analyze this matrix.
 # Indeed, the more a state is present, the more there is a chance that a transition towards this state is observed
 # without reflecting any particular dynamics in state transitions.
-# Pycrostates offers the possibility to generate a theoretical transition matrix thanks to the 
+# Pycrostates offers the possibility to generate a theoretical transition matrix thanks to the
 # :meth:`~pycrostates.segmentation.RawSegmentation.compute_expected_transition_matrix` method.
-# This transition matrix is based on segments counts of each state 
+# This transition matrix is based on segments counts of each state
 # present in the segmentation but ignores the temporal dynamics of segmentation (random transition order).
 T_expected = segmentation.compute_expected_transition_matrix()
 ax = sns.heatmap(T_expected,
@@ -224,7 +223,7 @@ plt.show()
 # and the theoretical transition probability matrix ``T_expected``
 # reveals particular dynamic present in the segmentation.
 # Here we observe that the transition from state B to state C appears
-# in much larger proportion than expected while the transition from 
+# in much larger proportion than expected while the transition from
 # state B to state C is much less observed than expected.
 ax = sns.heatmap(T_observed - T_expected,
                  annot=True,
