@@ -310,14 +310,13 @@ class _BaseSegmentation(ABC):
         T_expected = T_expected[:-1, :-1]
         if ignore_self:
             np.fill_diagonal(T_expected, 0)
-        # ignore self
-        for row in T_expected:
-            s = sum(row)
-            if s > 0:
-                row[:] = [f / s for f in row]
-
+        # transform to probability
+        with np.errstate(divide="ignore", invalid="ignore"):
+            T_expected = T_expected / T_expected.sum(axis=1, keepdims=True)
+            np.nan_to_num(T_expected, nan=0, posinf=0, copy=False)
         if stat == "percent":
             T_expected = T_expected * 100
+
         return T_expected
 
     @fill_doc
