@@ -291,9 +291,8 @@ class _BaseSegmentation(ABC):
         # reshape if epochs
         labels = labels.reshape(-1)
         states = np.arange(-1, n_clusters)
-        n = len(states)
         # Expected probability:
-        T_expected = np.zeros(shape=(n, n))
+        T_expected = np.zeros(shape=(states.size, states.size))
         for state_from in states:
             n_from = np.sum(labels == state_from)  # no state_from in labels
             for state_to in states:
