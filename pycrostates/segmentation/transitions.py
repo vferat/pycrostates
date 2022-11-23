@@ -4,14 +4,33 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..utils._checks import _check_type, _check_value
+from ..utils._docs import fill_doc
 
 
+@fill_doc
 def compute_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = " probability",
     ignore_self: bool = True,
 ) -> NDArray[float]:
+    """Compute the observed transition matrix.
+
+    Count the number of transitions from one state to another and aggregate the
+    result as statistic. Transitions "from" and "to" unlabeled segments ``-1``
+    are ignored.
+
+    Parameters
+    ----------
+    %(labels_transition)s
+    %(n_clusters)s
+    %(stat_transition)s
+    %(ignore_self)s
+
+    Returns
+    -------
+    %(transition_matrix)s
+    """
     # TODO: Error checking on labels/n_clusters
     return _compute_transition_matrix(
         labels,
@@ -58,12 +77,33 @@ def _compute_transition_matrix(
     return T
 
 
+@fill_doc
 def compute_expected_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = " probability",
     ignore_self: bool = True,
 ) -> NDArray[float]:
+    """Compute the expected transition matrix.
+
+    Compute the theoretical transition matrix as if time course was
+    ignored, but microstate proportions was kept (i.e. shuffled segmentation).
+    This matrix can be used to quantify/correct the effect of microstate
+    time coverage on the observed transition matrix obtained with the
+    :func:`pycrostates.segmentation.compute_transition_matrix`.
+    Transition "from" and "to" unlabeled segments ``-1`` are ignored.
+
+    Parameters
+    ----------
+    %(labels_transition)s
+    %(n_clusters)s
+    %(stat_expected_transitions)s
+    %(ignore_self)s
+
+    Returns
+    -------
+    %(transition_matrix)s
+    """
     # TODO: Error checking on labels/n_clusters
     return _compute_expected_transition_matrix(
         labels,

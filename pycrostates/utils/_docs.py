@@ -38,7 +38,7 @@ docdict[
     "n_clusters"
 ] = """
 n_clusters : int
-    The number of clusters, i.e. the number of microstates, to look for.
+    The number of clusters, i.e. the number of microstates.
 """
 docdict[
     "cluster_centers"
@@ -77,12 +77,17 @@ cluster_centers : array (n_clusters, n_channels)
 docdict[
     "labels_raw"
 ] = """
-labels : array (n_samples, )
+labels : array of shape ``(n_samples, )``
     Microstates labels attributed to each sample, i.e. the segmentation."""
 docdict[
     "labels_epo"
 ] = """
-labels : array (n_epochs, n_samples)
+labels : array of shape ``(n_epochs, n_samples)``
+    Microstates labels attributed to each sample, i.e. the segmentation."""
+docdict[
+    "labels_transition"
+] = """
+labels : array of shape ``(n_samples, )`` or ``(n_epochs, n_samples)``
     Microstates labels attributed to each sample, i.e. the segmentation."""
 # TODO: predict_parameters docstring is missing.
 docdict[
@@ -90,6 +95,40 @@ docdict[
 ] = """
 predict_parameters : dict | None
     The prediction parameters."""
+docdict[
+    "stat_transition"
+] = """
+stat : str
+    Aggregate statistic to compute transitions. Can be:
+
+    * ``count``: show the number of observations of each transition.
+    * ``probability`` or ``proportion``: normalize count such as the
+      probabilities along the first axis is always equal to ``1``.
+    * ``percent``: normalize count such as the
+      probabilities along the first axis is always equal to ``100``."""
+docdict[
+    "stat_expected_transitions"
+] = """
+stat : str
+    Aggregate statistic to compute transitions. Can be:
+
+    * ``probability`` or ``proportion``: normalize count such as the
+      probabilities along the first axis is always equal to ``1``.
+    * ``percent``: normalize count such as the
+      probabilities along the first axis is always equal to ``100``."""
+docdict[
+    "ignore_self"
+] = """
+ignore_self : bool
+    If True, ignores the transition from one state to itself.
+    This is equivalent to setting the duration of all states to 1 sample."""
+docdict[
+    "transition_matrix"
+] = """
+T : array of shape ``(n_cluster, n_cluster)``
+    Array of transition probability values from one label to another.
+    First axis indicates state ``"from"``. Second axis indicates state
+    ``"to"``."""
 
 # ------ Viz -------
 docdict[

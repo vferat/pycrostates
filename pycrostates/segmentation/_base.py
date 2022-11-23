@@ -233,25 +233,12 @@ class _BaseSegmentation(ABC):
 
         Parameters
         ----------
-        stat : str
-            Aggregate statistic to compute transitions. Can be:
-
-            * ``count``: show the number of observations of each transition.
-            * ``probability`` or ``proportion``: normalize count such as the
-              probabilities along the first axis is always equal to ``1``.
-            * ``percent``: normalize count such as the
-              probabilities along the first axis is always equal to ``100``.
-        ignore_self : bool
-            If True, ignores the transition from one state to itself.
-            This is equivalent to setting the duration of all states to 1
-            sample.
+        %(stat_transition)s
+        %(ignore_self)s
 
         Returns
         -------
-        T : array of shape ``(n_cluster, n_cluster)``
-            Array of transition probability values from one label to another.
-            First axis indicates state ``"from"``. Second axis indicates state
-            ``"to"``.
+        %(transition_matrix)s
 
         Warnings
         --------
@@ -268,6 +255,7 @@ class _BaseSegmentation(ABC):
             ignore_self,
         )
 
+    @fill_doc
     def compute_expected_transition_matrix(
         self, stat="probability", ignore_self=True
     ):
@@ -282,24 +270,12 @@ class _BaseSegmentation(ABC):
 
         Parameters
         ----------
-        stat : str
-            Aggregate statistic to compute transitions. Can be:
-
-            * ``probability`` or ``proportion``: normalize count such as the
-              probabilities along the first axis is always equal to ``1``.
-            * ``percent``: normalize count such as the
-              probabilities along the first axis is always equal to ``100``.
-        ignore_self : bool
-            If True, ignores the transition from one state to itself.
-            This is equivalent to setting the duration of all states to 1
-            sample.
+        %(stat_expected_transitions)s
+        %(ignore_self)s
 
         Returns
         -------
-        T : array of shape ``(n_cluster, n_cluster)``
-            Array of transition probability values from one label to another.
-            First axis indicates state ``"from"``. Second axis indicates state
-            ``"to"``.
+        %(transition_matrix)s
         """  # noqa: E501
         return _compute_expected_transition_matrix(
             self._labels,
