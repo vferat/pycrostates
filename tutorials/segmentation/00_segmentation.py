@@ -173,7 +173,7 @@ ax.set_xlabel("Microstates")
 ax.set_ylabel("Mean duration (s)")
 
 #%%
-# Occurence per second
+# Occurrence per second
 # ~~~~~~~~~~~~~~~~~~~~
 #
 # ``occurrences`` indicates the mean number of segments assigned to a given
