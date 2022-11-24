@@ -26,6 +26,7 @@ Enhancements
 ~~~~~~~~~~~~
 - Improve changelog. (:pr:`86` by `Victor Férat`_)
 - Support for AAHC clustering (:pr:`92` by `Reinmar Kobler`_)
+- Add :func:`pycrostates.preprocessing.apply_spatial_filter`. (:pr:`96` by `Victor Férat`_)
 
 Bugs
 ~~~~
