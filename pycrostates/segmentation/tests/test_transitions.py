@@ -1,9 +1,14 @@
+import re
+
 import numpy as np
 import pytest
 
 from pycrostates.segmentation.transitions import (
+    _check_labels_n_clusters,
     _compute_expected_transition_matrix,
     _compute_transition_matrix,
+    compute_expected_transition_matrix,
+    compute_transition_matrix,
 )
 
 
@@ -114,3 +119,34 @@ def test_compute_expected_transition_matrix():
         labels, n_clusters, ignore_self=True, stat="probability"
     )
     assert np.allclose(boostrap_T, expected_T, atol=1e-2)
+
+
+def test_check_labels_n_clusters():
+    """Test the static checker for the public entry-points."""
+    # valids
+    labels = np.random.randint(-1, 5, size=100)
+    _check_labels_n_clusters(labels, 5)
+    compute_transition_matrix(labels, 5)
+    compute_expected_transition_matrix(labels, 5)
+    labels = np.random.randint(0, 5, size=100)
+    _check_labels_n_clusters(labels, 5)
+    compute_transition_matrix(labels, 5)
+    compute_expected_transition_matrix(labels, 5)
+
+    # invalids
+    with pytest.raises(
+        ValueError, match="Negative integers except -1 are invalid."
+    ):
+        _check_labels_n_clusters(np.random.randint(-2, 5, size=100), 5)
+    with pytest.raises(
+        ValueError, match=re.escape("'[1, 2, 3, 4]' are invalid.")
+    ):
+        _check_labels_n_clusters(np.random.randint(1, 5, size=100), 4)
+    with pytest.raises(ValueError, match="'float64' is invalid."):
+        _check_labels_n_clusters(
+            np.random.randint(0, 5, size=100).astype(float), 5
+        )
+    with pytest.raises(
+        ValueError, match="invalid with 'n_clusters' set to '6'."
+    ):
+        _check_labels_n_clusters(np.random.randint(0, 5, size=100), 6)

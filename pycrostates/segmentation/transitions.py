@@ -182,13 +182,6 @@ def _check_labels_n_clusters(
             "representing unlabelled segments. Negative integers except -1 "
             "are invalid."
         )
-    # check for NaN
-    if np.any(np.isnan(labels)):
-        raise ValueError(
-            "The argument 'labels' must contain the labels of each timepoint "
-            "encoded as consecutive positive integers (0-indexed) with '-1' "
-            "representing unlabelled segments. 'np.nan' are invalid."
-        )
     # check for consecutiveness and 0-index
     states = sorted([elt for elt in np.unique(labels) if 0 <= elt])
     if (
