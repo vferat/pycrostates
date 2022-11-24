@@ -350,8 +350,9 @@ class _BaseSegmentation(ABC):
         for key in predict_parameters.keys():
             if key not in valid_keys:
                 logger.warning(
-                    f"The key '{key}' in predict_parameters is not part of "
-                    "the default set of keys supported by pycrostates."
+                    "The key '%s' in predict_parameters is not part of "
+                    "the default set of keys supported by pycrostates.",
+                    key,
                 )
         return predict_parameters
 
