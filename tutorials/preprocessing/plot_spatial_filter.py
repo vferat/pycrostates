@@ -21,6 +21,7 @@ This example demonstrates the effect of spatial filter on EEG data.
 #
 #     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
+import matplotlib.pyplot as plt 
 import mne
 from mne.io import read_raw_eeglab
 
@@ -39,7 +40,6 @@ raw.set_eeg_reference('average')
 # The goal of the preprocessing step is to reduced the effect of local transcient
 # artefacts that corrupts EEG channels.
 # The computation of this filter relies on the creation of an adjacency matrix:
-import matplotlib.pyplot as plt 
 from mne.channels import find_ch_adjacency
 from mne.viz import plot_ch_adjacency
 
@@ -47,7 +47,7 @@ adjacency, ch_names = find_ch_adjacency(info=raw.info, ch_type="eeg")
 plot_ch_adjacency(raw.info, adjacency, ch_names, kind='2d', edit=False)
 plt.show()
 #%%
-# :term:`GFP` peaks can also be extracted from an :class:`~mne.Epochs` object.
+# We can apply the spatial filter to a copy of the raw instance:
 from pycrostates.preprocessing import apply_spatial_filter
 raw_filter = raw.copy()
 apply_spatial_filter(raw_filter, n_jobs=-1)
