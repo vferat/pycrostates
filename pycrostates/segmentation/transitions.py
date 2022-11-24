@@ -31,7 +31,7 @@ def compute_transition_matrix(
     -------
     %(transition_matrix)s
     """
-    # TODO: Error checking on labels/n_clusters
+    _check_labels_n_clusters(labels, n_clusters)
     return _compute_transition_matrix(
         labels,
         n_clusters,
@@ -104,7 +104,7 @@ def compute_expected_transition_matrix(
     -------
     %(transition_matrix)s
     """
-    # TODO: Error checking on labels/n_clusters
+    _check_labels_n_clusters(labels, n_clusters)
     return _compute_expected_transition_matrix(
         labels,
         n_clusters,
@@ -156,3 +156,11 @@ def _compute_expected_transition_matrix(
         T_expected = T_expected * 100
 
     return T_expected
+
+
+def _check_labels_n_clusters(
+    labels: NDArray[int],
+    n_clusters: int,
+) -> None:
+    """Checker for labels and n_clusters."""
+    pass
