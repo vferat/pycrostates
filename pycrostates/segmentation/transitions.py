@@ -163,4 +163,48 @@ def _check_labels_n_clusters(
     n_clusters: int,
 ) -> None:
     """Checker for labels and n_clusters."""
-    pass
+    _check_type(labels, (np.ndarray,), "labels")
+    _check_type(n_clusters, ("int",), "n_clusters")
+
+    # only accept array of integers to simplify maintenance
+    if labels.dtype != "int":
+        raise ValueError(
+            "The argument 'labels' must contain the labels of each timepoint "
+            "encoded as consecutive positive integers (0-indexed). Make sure "
+            f"you are providing an integer array. '{labels.dtype}' is "
+            "invalid."
+        )
+    # check for negative integers except -1
+    if np.any(labels < -1):
+        raise ValueError(
+            "The argument 'labels' must contain the labels of each timepoint "
+            "encoded as consecutive positive integers (0-indexed) with '-1' "
+            "representing unlabelled segments. Negative integers except -1 "
+            "are invalid."
+        )
+    # check for NaN
+    if np.any(np.isnan(labels)):
+        raise ValueError(
+            "The argument 'labels' must contain the labels of each timepoint "
+            "encoded as consecutive positive integers (0-indexed) with '-1' "
+            "representing unlabelled segments. 'np.nan' are invalid."
+        )
+    # check for consecutiveness and 0-index
+    states = sorted([elt for elt in np.unique(labels) if 0 <= elt])
+    if (
+        states[0] != 0
+        or len(states) != np.arange(states[0], states[-1] + 1).size
+    ):
+        raise ValueError(
+            "The argument 'labels' must contain the labels of each timepoint "
+            "encoded as consecutive positive integers (0-indexed), with the "
+            f"first state encoded as '0'. '{states}' are invalid."
+        )
+    # check if the states match the number of clusters
+    if len(states) != n_clusters:
+        raise ValueError(
+            "The argument 'labels' must contain the labels of each timepoint "
+            "encoded as consecutive positive integers (0-indexed), with the "
+            f"first state encoded as '0'. '{states}' are invalid with "
+            f"'n_clusters' set to '{n_clusters}'."
+        )

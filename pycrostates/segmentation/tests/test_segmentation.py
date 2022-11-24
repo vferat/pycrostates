@@ -7,10 +7,6 @@ from mne.io import BaseRaw, read_raw_fif
 
 from pycrostates.cluster import ModKMeans
 from pycrostates.segmentation import EpochsSegmentation, RawSegmentation
-from pycrostates.segmentation.transitions import (
-    _compute_expected_transition_matrix,
-    _compute_transition_matrix,
-)
 from pycrostates.utils._logs import logger, set_log_level
 
 set_log_level("INFO")
