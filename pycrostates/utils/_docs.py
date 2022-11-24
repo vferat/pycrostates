@@ -77,7 +77,7 @@ cluster_centers : array (n_clusters, n_channels)
 docdict[
     "labels_raw"
 ] = """
-labels : array of shape ``(n_samples, )``
+labels : array of shape ``(n_samples,)``
     Microstates labels attributed to each sample, i.e. the segmentation."""
 docdict[
     "labels_epo"
@@ -87,7 +87,7 @@ labels : array of shape ``(n_epochs, n_samples)``
 docdict[
     "labels_transition"
 ] = """
-labels : array of shape ``(n_samples, )`` or ``(n_epochs, n_samples)``
+labels : array of shape ``(n_samples,)`` or ``(n_epochs, n_samples)``
     Microstates labels attributed to each sample, i.e. the segmentation."""
 # TODO: predict_parameters docstring is missing.
 docdict[
