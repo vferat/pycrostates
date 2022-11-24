@@ -134,6 +134,8 @@ def test_check_labels_n_clusters():
     compute_expected_transition_matrix(labels, 5)
 
     # invalids
+    with pytest.raises(ValueError, match="'-101' is invalid."):
+        _check_labels_n_clusters(np.random.randint(-1, 5, size=100), -101)
     with pytest.raises(
         ValueError, match="Negative integers except -1 are invalid."
     ):
@@ -147,6 +149,6 @@ def test_check_labels_n_clusters():
             np.random.randint(0, 5, size=100).astype(float), 5
         )
     with pytest.raises(
-        ValueError, match="invalid with 'n_clusters' set to '6'."
+        ValueError, match=re.escape("'[0, 1, 2, 3, 4, 5, 6, 7]' are invalid.")
     ):
-        _check_labels_n_clusters(np.random.randint(0, 5, size=100), 6)
+        _check_labels_n_clusters(np.random.randint(0, 8, size=100), 6)

@@ -165,6 +165,11 @@ def _check_labels_n_clusters(
     """Checker for labels and n_clusters."""
     _check_type(labels, (np.ndarray,), "labels")
     _check_type(n_clusters, ("int",), "n_clusters")
+    if n_clusters <= 0:
+        raise ValueError(
+            "The provided number of clusters 'n_clusters' must be a strictly "
+            f"positive integer. '{n_clusters}' is invalid."
+        )
 
     # only accept array of integers to simplify maintenance
     if labels.dtype != "int":
@@ -182,22 +187,11 @@ def _check_labels_n_clusters(
             "representing unlabelled segments. Negative integers except -1 "
             "are invalid."
         )
-    # check for consecutiveness and 0-index
+    # check that the labels are in the range of clusters
     states = sorted([elt for elt in np.unique(labels) if 0 <= elt])
-    if (
-        states[0] != 0
-        or len(states) != np.arange(states[0], states[-1] + 1).size
-    ):
+    if not np.all(np.isin(states, np.arange(n_clusters))):
         raise ValueError(
             "The argument 'labels' must contain the labels of each timepoint "
-            "encoded as consecutive positive integers (0-indexed), with the "
-            f"first state encoded as '0'. '{states}' are invalid."
-        )
-    # check if the states match the number of clusters
-    if len(states) != n_clusters:
-        raise ValueError(
-            "The argument 'labels' must contain the labels of each timepoint "
-            "encoded as consecutive positive integers (0-indexed), with the "
-            f"first state encoded as '0'. '{states}' are invalid with "
-            f"'n_clusters' set to '{n_clusters}'."
+            "encoded as consecutive positive integers (0-indexed), between 0 "
+            f"and 'n_clusters' ({n_clusters}. '{states}' are invalid."
         )
