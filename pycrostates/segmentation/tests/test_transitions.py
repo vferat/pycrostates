@@ -140,15 +140,11 @@ def test_check_labels_n_clusters():
         ValueError, match="Negative integers except -1 are invalid."
     ):
         _check_labels_n_clusters(np.random.randint(-2, 5, size=100), 5)
-    with pytest.raises(
-        ValueError, match=re.escape("'[4]' is invalid.")
-    ):
+    with pytest.raises(ValueError, match=re.escape("'[4]' is invalid.")):
         _check_labels_n_clusters(np.random.randint(1, 5, size=100), 4)
     with pytest.raises(ValueError, match="'float64' is invalid."):
         _check_labels_n_clusters(
             np.random.randint(0, 5, size=100).astype(float), 5
         )
-    with pytest.raises(
-        ValueError, match=re.escape("'[6 7]' are invalid")
-    ):
+    with pytest.raises(ValueError, match=re.escape("'[6 7]' are invalid")):
         _check_labels_n_clusters(np.random.randint(0, 8, size=100), 6)
