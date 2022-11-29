@@ -99,27 +99,3 @@ ModK.plot()
 
 ModK.invert_polarity([False, False, True, True, False])
 ModK.plot()
-
-#%%
-# Finally, the modified K-means\ :footcite:p:`Marqui1995` can be used to
-# predict the microstates segmentation using the
-# :meth:`pycrostates.cluster.ModKMeans.predict` method.
-# By default, segments annotated as bad will not be labeled, but this behavior
-# can be changed with the ``reject_by_annotation`` argument. Smoothing can be
-# performed on the output sequence by setting the ``factor`` argument ``> 0``
-# (no smoothing by default ``factor=0``) while the ``half_window_size``
-# parameter is used to specify the smoothing temporal span. Finally, the
-# ``reject_edges`` argument is used to prevent the assignment of the first and
-# last segment of each recording (or each epoch) as these can be incomplete. It
-# should have little impact for `~mne.io.Raw` objects, but can be important
-# when working with `~mne.Epochs`.
-
-segmentation = ModK.predict(raw, reject_by_annotation=True, factor=10,
-                            half_window_size=10, min_segment_length=5,
-                            reject_edges=True)
-segmentation.plot(tmin=1, tmax=5)
-
-#%%
-# References
-# ----------
-# .. footbibliography::
