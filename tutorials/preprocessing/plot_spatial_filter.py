@@ -35,10 +35,10 @@ raw.set_eeg_reference('average')
 
 #%%
 # Spatial filter was first introduced in \ :footcite:p:`michel2019eeg`
-# in the context of EEG source imaging. Since then, it as also been 
+# in the context of EEG source imaging. Since then, it has also been 
 # widly applied as a preprocessing step of EEG microstate analysis.
-# The goal of the preprocessing step is to reduced the effect of local transcient
-# artefacts that corrupts EEG channels.
+# The goal of the preprocessing step is to reduce the effect of local transient
+# artifacts that corrupt EEG channels.
 # The computation of this filter relies on the creation of an adjacency matrix:
 from mne.channels import find_ch_adjacency
 from mne.viz import plot_ch_adjacency

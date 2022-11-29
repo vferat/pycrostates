@@ -14,7 +14,6 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 
-@fill_doc
 @verbose
 def apply_spatial_filter(
     inst: Union[BaseRaw, BaseEpochs],
@@ -27,20 +26,20 @@ def apply_spatial_filter(
 
     Adapted from \ :footcite:p:`michel2019eeg`.
     Apply an instantaneous filter which interpolates channels
-    with local neigbhors while removing outliers.
+    with local neighbors while removing outliers.
     The current implementation proceeds as follows:
 
     * An interpolation matrix is computed using
       ``mne.channels.interpolation._make_interpolation_matrix``.
     * An ajdacency matrix is computed using
       `mne.channels.find_ch_adjacency`.
-    * If ``exclude_bads`` is st to ``True``,
+    * If ``exclude_bads`` is set to ``True``,
       bad channels are removed from the ajdacency matrix.
     * For each timepoint and each channel,
       a reduced adjacency matrix is build by removing neigbhors
       with lowest and highest value.
     * For each timepoint and each channel,
-      a reduced interpolation matrix is build by extracting neigbhor
+      a reduced interpolation matrix is built by extracting neighbor
       weights based on the reduced adjacency matrix.
     * Reduced interpolation matrices are normalized.
     * Channel's timepoints are interpolated
@@ -56,7 +55,7 @@ def apply_spatial_filter(
         Default to 'eeg'.
     exclude_bads : bool
         If set to ``True`` bad channels will be removed
-        from the adjacency matrix and therefore no be used
+        from the adjacency matrix and therefore not be used
         to interpolate neighbors. In addition, bad channels
         will not be filtered.
         If set to ``False``, proceed as if all channels were good.
@@ -75,7 +74,7 @@ def apply_spatial_filter(
     """
     # Checks
     _check_type(inst, (BaseRaw, BaseEpochs))
-    _check_value(ch_type, ("eeg"), item_name="ch_type")
+    _check_value(ch_type, ("eeg",), item_name="ch_type")
     n_jobs = _check_n_jobs(n_jobs)
     # check preload for Raw
     _check_preload(inst, "Apply spatial filter")
