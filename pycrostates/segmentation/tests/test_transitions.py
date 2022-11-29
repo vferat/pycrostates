@@ -141,7 +141,7 @@ def test_check_labels_n_clusters():
     ):
         _check_labels_n_clusters(np.random.randint(-2, 5, size=100), 5)
     with pytest.raises(
-        ValueError, match=re.escape("'[1, 2, 3, 4]' are invalid.")
+        ValueError, match=re.escape("'[4]' is invalid.")
     ):
         _check_labels_n_clusters(np.random.randint(1, 5, size=100), 4)
     with pytest.raises(ValueError, match="'float64' is invalid."):
@@ -149,6 +149,6 @@ def test_check_labels_n_clusters():
             np.random.randint(0, 5, size=100).astype(float), 5
         )
     with pytest.raises(
-        ValueError, match=re.escape("'[0, 1, 2, 3, 4, 5, 6, 7]' are invalid.")
+        ValueError, match=re.escape("'[6 7]' are invalid")
     ):
         _check_labels_n_clusters(np.random.randint(0, 8, size=100), 6)

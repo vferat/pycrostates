@@ -188,10 +188,13 @@ def _check_labels_n_clusters(
             "are invalid."
         )
     # check that the labels are in the range of clusters
-    states = sorted([elt for elt in np.unique(labels) if 0 <= elt])
-    if not np.all(np.isin(states, np.arange(n_clusters))):
+    states = sorted(elt for elt in np.unique(labels) if 0 <= elt)
+    isin = np.isin(states, np.arange(n_clusters))
+    if not np.all(isin):
+        states = np.array(states)[~isin]
         raise ValueError(
             "The argument 'labels' must contain the labels of each timepoint "
             "encoded as consecutive positive integers (0-indexed), between 0 "
-            f"and 'n_clusters' ({n_clusters}. '{states}' are invalid."
+            f"and 'n_clusters - 1' ({n_clusters - 1}). "
+            f"'{states}' {'is' if len(states) == 1 else 'are'} invalid."
         )
