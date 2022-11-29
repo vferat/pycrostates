@@ -19,7 +19,7 @@ def plot_cluster_centers(
     cluster_centers: NDArray[float],
     info: Union[Info, CHInfo],
     cluster_names: List[str] = None,
-    axes: Optional[Axes] = None,
+    axes: Optional[Union[Axes, NDArray[Axes]]] = None,
     *,
     block: bool = False,
     **kwargs,

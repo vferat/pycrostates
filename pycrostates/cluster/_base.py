@@ -513,7 +513,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @fill_doc
     def plot(
-        self, axes: Optional[Axes] = None, *, block: bool = False, **kwargs
+        self,
+        axes: Optional[Union[Axes, NDArray[Axes]]] = None,
+        *,
+        block: bool = False,
+        **kwargs,
     ):
         """
         Plot cluster centers as topographic maps.
@@ -766,7 +770,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         else:
             logger.info(
                 "Segmenting data with factor %s and effective smoothing "
-                "window size: %.4f (ms).",
+                "window size: %.4f (s).",
                 factor,
                 (2 * half_window_size + 1) / inst.info["sfreq"],
             )

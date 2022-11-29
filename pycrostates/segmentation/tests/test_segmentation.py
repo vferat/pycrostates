@@ -283,3 +283,66 @@ def test_invalid_segmentation(Segmentation, inst, bad_inst, caplog):
             dict(test=101),
         )
     assert "key 'test' in predict_parameters" in caplog.text
+
+
+def test_compute_transition_matrix_Raw():
+    segmentation = ModK_raw.predict(raw)
+    segmentation.compute_transition_matrix()
+    segmentation.compute_transition_matrix(ignore_self=False)
+
+
+def test_compute_transition_matrix_Epochs():
+    segmentation = ModK_epochs.predict(epochs)
+    segmentation.compute_transition_matrix()
+    segmentation.compute_transition_matrix(ignore_self=False)
+
+
+@pytest.mark.parametrize(
+    "ModK, inst", [(ModK_raw, raw), (ModK_epochs, epochs)]
+)
+def test_compute_transition_matrix_stat(ModK, inst):
+    segmentation = ModK.predict(inst)
+    with pytest.raises(
+        ValueError, match="Invalid value for the 'stat' parameter"
+    ):
+        segmentation.compute_transition_matrix(stat="wrong")
+    T = segmentation.compute_transition_matrix(stat="count")
+    T = segmentation.compute_transition_matrix(stat="probability")
+    assert np.allclose(np.sum(T, axis=1), 1)
+    T = segmentation.compute_transition_matrix(stat="proportion")
+    assert np.allclose(np.sum(T, axis=1), 1)
+    T = segmentation.compute_transition_matrix(stat="percent")
+    assert np.allclose(np.sum(T, axis=1), 100)
+
+
+def test_compute_expected_transition_matrix_Raw():
+    segmentation = ModK_raw.predict(raw)
+    segmentation.compute_expected_transition_matrix()
+    segmentation.compute_expected_transition_matrix(ignore_self=False)
+
+
+def test_compute_expected_transition_matrix_Epochs():
+    segmentation = ModK_epochs.predict(epochs)
+    segmentation.compute_expected_transition_matrix()
+    segmentation.compute_expected_transition_matrix(ignore_self=False)
+
+
+@pytest.mark.parametrize(
+    "ModK, inst", [(ModK_raw, raw), (ModK_epochs, epochs)]
+)
+def test_compute_expected_transition_matrix_stat(ModK, inst):
+    segmentation = ModK.predict(inst)
+    with pytest.raises(
+        ValueError, match="Invalid value for the 'stat' parameter"
+    ):
+        segmentation.compute_expected_transition_matrix(stat="wrong")
+    with pytest.raises(
+        ValueError, match="Invalid value for the 'stat' parameter"
+    ):
+        segmentation.compute_expected_transition_matrix(stat="count")
+    T = segmentation.compute_expected_transition_matrix(stat="probability")
+    assert np.allclose(np.sum(T, axis=1), 1)
+    T = segmentation.compute_expected_transition_matrix(stat="proportion")
+    assert np.allclose(np.sum(T, axis=1), 1)
+    T = segmentation.compute_expected_transition_matrix(stat="percent")
+    assert np.allclose(np.sum(T, axis=1), 100)
