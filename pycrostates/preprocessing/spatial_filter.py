@@ -3,24 +3,25 @@ from typing import Union
 import mne
 import numpy as np
 from mne import BaseEpochs
+from mne.bem import _check_origin
 from mne.channels.interpolation import _make_interpolation_matrix
 from mne.io import BaseRaw
 from mne.io.pick import _picks_by_type
 from mne.parallel import parallel_func
 from mne.utils.check import _check_preload
-from mne.bem import _check_origin
 
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 
+@fill_doc
 @verbose
 def apply_spatial_filter(
     inst: Union[BaseRaw, BaseEpochs],
     ch_type: str = "eeg",
     exclude_bads: bool = True,
-    origin = 'auto',
+    origin="auto",
     n_jobs: int = 1,
     verbose=None,
 ):
@@ -86,11 +87,12 @@ def apply_spatial_filter(
     _check_preload(inst, "Apply spatial filter")
     # check montage
     if inst.get_montage() is None:
-         raise ValueError(
-                    'No montage was set on your data, but spatial filter'
-                    'can only work if digitization points for the EEG '
-                    'channels are available. Consider calling set_montage() '
-                    'to apply a montage.')
+        raise ValueError(
+            "No montage was set on your data, but spatial filter"
+            "can only work if digitization points for the EEG "
+            "channels are available. Consider calling set_montage() "
+            "to apply a montage."
+        )
     # remove bad channels
     # Extract adjacency matrix
     adjacency_matrix, ch_names = mne.channels.find_ch_adjacency(
@@ -105,7 +107,7 @@ def apply_spatial_filter(
                 adjacency_matrix[:, c] = 0  # don't use bads to interpolate
     # retrieve picks based on adjacency matrix
     picks = dict(_picks_by_type(inst.info, exclude=[]))[ch_type]
-    info = mne.pick_info(picks)
+    info = mne.pick_info(inst.info, picks)
     assert ch_names == info.ch_names
     # retrieve channel positions
     pos = inst._get_channel_positions(picks)
@@ -113,9 +115,11 @@ def apply_spatial_filter(
     origin = _check_origin(origin, info)
     distance = np.linalg.norm(pos - origin, axis=-1)
     distance = np.mean(distance / np.mean(distance))
-    if np.abs(1. - distance) > 0.1:
-       logger.warn('Your spherical fit is poor, interpolation results are '
-             'likely to be inaccurate.')
+    if np.abs(1.0 - distance) > 0.1:
+        logger.warn(
+            "Your spherical fit is poor, interpolation results are "
+            "likely to be inaccurate."
+        )
     interpolate_matrix = _make_interpolation_matrix(pos, pos)
     # retrieve data
     data = inst.get_data(picks=picks)

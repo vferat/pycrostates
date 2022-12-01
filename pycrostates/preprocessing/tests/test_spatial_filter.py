@@ -1,20 +1,23 @@
 import mne
 import numpy as np
 from mne.datasets import testing
+from mne.io.pick import _picks_by_type
 
 from pycrostates.preprocessing import apply_spatial_filter
 
 dir_ = testing.data_path() / "MEG" / "sample"
 fname_raw_testing = dir_ / "sample_audvis_trunc_raw.fif"
-raw = mne.io.read_raw_fif(fname_raw_testing, preload=True)
-raw.info["bads"] = []
-# TODO: test with no EEG channels
+raw_all = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+raw_all.info["bads"] = []
+raw_all.crop(0, 10)
+
+raw = raw_all.copy()
 raw.pick("eeg")
-raw.crop(0, 10)
+
 epochs = mne.make_fixed_length_epochs(raw, duration=2, preload=True)
 
 
-def test_test_spatial_filter_raw():
+def test_spatial_filter_raw():
     """Test apply_spatial_filter."""
     inst = raw
     inst_bad = inst.copy()
@@ -40,7 +43,7 @@ def test_test_spatial_filter_raw():
     assert not np.all(new_inst._data == inst._data)
 
 
-def test_test_spatial_filter_epochs():
+def test_spatial_filter_epochs():
     """Test apply_spatial_filter."""
     inst = epochs
     inst_bad = inst.copy()
@@ -70,3 +73,19 @@ def test_spatial_filter_njobs():
     """Test apply_spatial_filter."""
     new_inst = apply_spatial_filter(raw, "eeg", n_jobs=2)
     assert isinstance(new_inst, type(raw))
+
+
+def test_spatial_filter_eeg_and_meg():
+    """Test apply_spatial_filter on raw with not only eeg channels."""
+    new_inst = apply_spatial_filter(raw_all.copy(), "eeg")
+    picks = dict(_picks_by_type(raw_all.info, exclude=[]))
+    picks_eeg = picks["eeg"]
+    picks_non_eeg = [
+        idx for idx in np.arange(len(raw_all.ch_names)) if idx not in picks_eeg
+    ]
+    assert not np.all(
+        new_inst._data[picks_eeg, :] == raw_all._data[picks_eeg, :]
+    )
+    assert np.all(
+        new_inst._data[picks_non_eeg, :] == raw_all._data[picks_non_eeg, :]
+    )
