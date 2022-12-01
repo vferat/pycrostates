@@ -12,3 +12,5 @@ Segmentation
 
    RawSegmentation
    EpochsSegmentation
+   compute_transition_matrix
+   compute_expected_transition_matrix

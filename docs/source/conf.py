@@ -230,11 +230,12 @@ bibtex_bibfiles = ["../references.bib"]
 sphinx_gallery_conf = {
     "backreferences_dir": "generated/backreferences",
     "doc_module": ("pycrostates",),
-    "examples_dirs": [str(Path(__file__).parent.parent.parent / "tutorials")],
+    "examples_dirs": ["../../tutorials"],
     "exclude_implicit_doc": {
         r"pycrostates.CHData",
         r"pycrostates.ChData.get_data",
     },
+    "filename_pattern": r"\d{2}_",
     "gallery_dirs": ["generated/auto_tutorials"],
     "line_numbers": False,  # messes with style
     "plot_gallery": True,
@@ -244,7 +245,8 @@ sphinx_gallery_conf = {
     "subsection_order": ExplicitOrder(
         [
             "../../tutorials/preprocessing",
-            "../../tutorials/clustering",
+            "../../tutorials/cluster",
+            "../../tutorials/segmentation",
             "../../tutorials/group_level_analysis",
             "../../tutorials/metrics",
         ]
