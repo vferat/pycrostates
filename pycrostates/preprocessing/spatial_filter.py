@@ -8,6 +8,7 @@ from mne.io import BaseRaw
 from mne.io.pick import _picks_by_type
 from mne.parallel import parallel_func
 from mne.utils.check import _check_preload
+from mne.bem import _check_origin
 
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
 from ..utils._docs import fill_doc
@@ -19,12 +20,13 @@ def apply_spatial_filter(
     inst: Union[BaseRaw, BaseEpochs],
     ch_type: str = "eeg",
     exclude_bads: bool = True,
+    origin = 'auto',
     n_jobs: int = 1,
     verbose=None,
 ):
     r"""Apply spatial filter.
 
-    Adapted from \ :footcite:p:`michel2019eeg`.
+    Adapted from \ :footcite:n:`michel2019eeg`.
     Apply an instantaneous filter which interpolates channels
     with local neighbors while removing outliers.
     The current implementation proceeds as follows:
@@ -60,6 +62,10 @@ def apply_spatial_filter(
         will not be filtered.
         If set to ``False``, proceed as if all channels were good.
         Default to ``True``.
+    origin : array-like, shape (3,) | str
+        Origin of the sphere in the head coordinate frame and in meters.
+        Can be ``'auto'`` (default), which means a head-digitization-based
+        origin fit.
     %(n_jobs)s
     %(verbose)s
 
@@ -78,6 +84,13 @@ def apply_spatial_filter(
     n_jobs = _check_n_jobs(n_jobs)
     # check preload for Raw
     _check_preload(inst, "Apply spatial filter")
+    # check montage
+    if inst.get_montage() is None:
+         raise ValueError(
+                    'No montage was set on your data, but spatial filter'
+                    'can only work if digitization points for the EEG '
+                    'channels are available. Consider calling set_montage() '
+                    'to apply a montage.')
     # remove bad channels
     # Extract adjacency matrix
     adjacency_matrix, ch_names = mne.channels.find_ch_adjacency(
@@ -90,13 +103,19 @@ def apply_spatial_filter(
             if chan in inst.info["bads"]:
                 adjacency_matrix[c, :] = 0  # do not change bads
                 adjacency_matrix[:, c] = 0  # don't use bads to interpolate
-                print(adjacency_matrix)
     # retrieve picks based on adjacency matrix
     picks = dict(_picks_by_type(inst.info, exclude=[]))[ch_type]
-    assert ch_names == inst.ch_names
+    info = mne.pick_info(picks)
+    assert ch_names == info.ch_names
     # retrieve channel positions
-    # TODO: warn if no sphere fit for eeg
     pos = inst._get_channel_positions(picks)
+    # test spherical fit
+    origin = _check_origin(origin, info)
+    distance = np.linalg.norm(pos - origin, axis=-1)
+    distance = np.mean(distance / np.mean(distance))
+    if np.abs(1. - distance) > 0.1:
+       logger.warn('Your spherical fit is poor, interpolation results are '
+             'likely to be inaccurate.')
     interpolate_matrix = _make_interpolation_matrix(pos, pos)
     # retrieve data
     data = inst.get_data(picks=picks)
