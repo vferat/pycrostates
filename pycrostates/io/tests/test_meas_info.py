@@ -394,7 +394,8 @@ def test_comparison(caplog):
     chinfo1 = ChInfo(raw.info)
     chinfo2 = ChInfo(raw.info)
     assert chinfo1 == chinfo2
-    chinfo1["projs"][0] = deepcopy(chinfo1["projs"][1])
+    with chinfo1._unlock():
+        chinfo1["projs"] = []
     if check_version("mne", "1.2"):
         assert chinfo1 != chinfo2
     else:
