@@ -219,7 +219,7 @@ def _plot_segmentation(
             "of clusters must be strictly positive."
         )
     _check_type(cluster_names, (None, list, tuple), "cluster_names")
-    _check_type(cmap, (None, str), "cmap")
+    _check_type(cmap, (None, str, colors.Colormap), "cmap")
     _check_type(axes, (None, Axes), "ax")
     _check_type(cbar_axes, (None, Axes), "cbar_ax")
 
@@ -255,7 +255,11 @@ def _plot_segmentation(
     state_labels = [-1] + list(range(n_clusters))
     cluster_names = ["unlabeled"] + cluster_names
     n_colors = n_clusters + 1
-    cmap = colormaps["viridis" if cmap is None else cmap].resampled(n_colors)
+    if cmap is None:
+        cmap = colormaps["viridis"]
+    elif isinstance(cmap, str):
+        cmap = colormaps[cmap]  # the cmap name is checked by matplotlib
+    cmap = cmap.resampled(n_colors)
 
     # plot
     axes.plot(times, gfp, **kwargs)
