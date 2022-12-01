@@ -134,8 +134,8 @@ T : array of shape ``(n_cluster, n_cluster)``
 docdict[
     "cmap"
 ] = """
-cmap : str | None
-    The name of a colormap known to Matplotlib."""
+cmap : str | colormap | None
+    The colormap to use. If None, ``viridis`` is used."""
 docdict[
     "block"
 ] = """

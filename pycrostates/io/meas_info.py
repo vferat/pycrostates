@@ -17,6 +17,7 @@ from mne.io.pick import get_channel_type_constants
 from mne.io.proj import Projection
 from mne.io.tag import _ch_coord_dict
 from mne.transforms import Transform
+from mne.utils import check_version
 
 from .._typing import CHInfo
 from ..utils._checks import _check_type, _IntLike
@@ -375,7 +376,15 @@ class ChInfo(CHInfo, Info):
                 if self[transform] != other[transform]:
                     return False
 
-            # TODO: compare compensation grades and projs
+            # compare projs, compatible with mne 1.2 and above
+            if len(self["projs"]) != len(other["projs"]):
+                return False
+            if check_version("mne", "1.2"):
+                for proj1, proj2 in zip(self["projs"], other["projs"]):
+                    if proj1 != proj2:
+                        return False
+
+            # TODO: compare compensation grades
 
             if self["bads"] != other["bads"]:
                 logger.warning("Both info do not have the same bad channels.")
