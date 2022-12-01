@@ -45,11 +45,6 @@ stages:
       MPLBACKEND: agg
     strategy:
       matrix:
-        linux 3.7:
-          VM_IMAGE: 'ubuntu-latest'
-          PYTHON_VERSION: '3.7'
-          MNE_DEV: false
-          CACHE_MNE_PATH: $(CACHE_PATH_MNE_LINUX)
         linux 3.8:
           VM_IMAGE: 'ubuntu-latest'
           PYTHON_VERSION: '3.8'
@@ -70,11 +65,6 @@ stages:
           PYTHON_VERSION: '3.10'
           MNE_DEV: true
           CACHE_MNE_PATH: $(CACHE_PATH_MNE_LINUX)
-        macOS 3.7:
-          VM_IMAGE: 'macOS-latest'
-          PYTHON_VERSION: '3.7'
-          MNE_DEV: false
-          CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
         macOS 3.8:
           VM_IMAGE: 'macOS-latest'
           PYTHON_VERSION: '3.8'
@@ -90,11 +80,6 @@ stages:
           PYTHON_VERSION: '3.10'
           MNE_DEV: false
           CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
-        windows 3.7:
-          VM_IMAGE: 'windows-latest'
-          PYTHON_VERSION: '3.7'
-          MNE_DEV: false
-          CACHE_MNE_PATH: $(CACHE_PATH_MNE_WINDOWS)
         windows 3.8:
           VM_IMAGE: 'windows-latest'
           PYTHON_VERSION: '3.8'

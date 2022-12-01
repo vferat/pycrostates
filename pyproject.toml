@@ -8,7 +8,7 @@ version = '0.3.0.dev'
 description = 'A simple open source Python package for EEG microstate segmentation.'
 readme = 'README.md'
 license = {file = 'LICENSE'}
-requires-python = '>=3.7'
+requires-python = '>=3.8'
 authors = [
     {name = 'Victor Férat', email = 'victor.ferat@unige.ch'},
 ]
@@ -48,7 +48,6 @@ dependencies = [
     'pooch',
     'decorator',
     'jinja2',
-    'importlib-metadata; python_version < "3.8"',
     'importlib-resources; python_version < "3.9"',
 ]
 
