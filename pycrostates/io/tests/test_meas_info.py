@@ -1,7 +1,6 @@
 """Test meas_info.py"""
 
 from collections import OrderedDict
-from copy import deepcopy
 
 import numpy as np
 import pytest
