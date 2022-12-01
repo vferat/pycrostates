@@ -186,6 +186,8 @@ class ChInfo(CHInfo, Info):
         "projs": "projs cannot be set directly. "
                  "Please use methods inst.add_proj() and inst.del_proj() "
                  "instead.",
+        "meas_date" : "measurement date cannot be set directly.",
+        "experimenter" : "experimenter cannot be set directly."
     }
     # fmt: on
 
@@ -236,6 +238,9 @@ class ChInfo(CHInfo, Info):
         self["dig"] = info.get("dig", None)
         self["comps"] = info.get("comps", [])
         self["projs"] = info.get("projs", [])
+
+        self["meas_date"] = info["meas_date"]
+        self["experimenter"] = info["experimenter"]
         self._update_redundant()
 
     def _init_from_channels(
@@ -320,6 +325,10 @@ class ChInfo(CHInfo, Info):
 
         # add empty projs
         self["projs"] = []
+
+        # meas_date
+        self["meas_date"] = None
+        self["experimenter"] = None
 
         self._unlocked = False
 

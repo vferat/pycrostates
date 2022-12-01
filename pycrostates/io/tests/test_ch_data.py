@@ -114,3 +114,25 @@ def test_ChData_invalid_arguments():
         ChData(data.reshape(6, 5, 400), ch_info)
     with pytest.raises(ValueError, match="'data' and 'info' do not have"):
         ChData(data, create_info(2, 400, "eeg"))
+
+def test_ChData_SetChannelsMixin():
+    ch_data = ChData(data, info.copy())
+    # set_eeg_reference
+    # ch_data.set_eeg_reference('average')
+    # _set_channel_positions
+    pos = np.random.randint(0, 10, (len(ch_data.ch_names),3))
+    ch_data._set_channel_positions(pos, ch_data.ch_names)
+    # _get_channel_positions
+    ch_data._get_channel_positions()
+    # set_channel_types
+    mapping = {ch_data.ch_names[0]: 'misc'}
+    ch_data.set_channel_types(mapping)
+    # rename_channels
+    mapping = {ch_data.ch_names[0]: 'test'}
+    ch_data.rename_channels(mapping)
+    # plot_sensors
+    ch_data.plot_sensors()
+    # anonymize
+    # ch_data.anonymize()
+    # set_meas_date
+    ch_data.set_meas_date(0)
