@@ -39,7 +39,7 @@ def apply_spatial_filter(
     * If ``exclude_bads`` is set to ``True``,
       bad channels are removed from the ajdacency matrix.
     * For each timepoint and each channel,
-      a reduced adjacency matrix is build by removing neigbhors
+      a reduced adjacency matrix is build by removing neighbors
       with lowest and highest value.
     * For each timepoint and each channel,
       a reduced interpolation matrix is built by extracting neighbor

@@ -53,7 +53,7 @@ raw_filter = raw.copy()
 apply_spatial_filter(raw_filter, n_jobs=-1)
 #%%
 # Let's have a look at the effect of the spatial filter.
-# First we can vizualise the effect on topographies:
+# First we can visualise the effect on topographies:
 import numpy as np
 
 n = 10
