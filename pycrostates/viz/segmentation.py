@@ -3,7 +3,7 @@
 from typing import List, Optional, Union
 
 import numpy as np
-from matplotlib import colors
+from matplotlib import colormaps, colors
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from mne import BaseEpochs
@@ -255,7 +255,7 @@ def _plot_segmentation(
     state_labels = [-1] + list(range(n_clusters))
     cluster_names = ["unlabeled"] + cluster_names
     n_colors = n_clusters + 1
-    cmap = plt.cm.get_cmap(cmap, n_colors)
+    cmap = colormaps["viridis" if cmap is None else cmap].resampled(n_colors)
 
     # plot
     axes.plot(times, gfp, **kwargs)
