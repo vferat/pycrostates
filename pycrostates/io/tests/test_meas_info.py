@@ -391,11 +391,10 @@ def test_comparison(caplog):
     assert chinfo1 != 101
 
     # with projs
-    info1 = ChInfo(raw.info)
-    info2 = ChInfo(raw.info)
+    chinfo1 = ChInfo(raw.info)
+    chinfo2 = ChInfo(raw.info)
     assert chinfo1 == chinfo2
     chinfo1["projs"][0] = deepcopy(chinfo1["projs"][1])
-
     if check_version("mne", "1.2"):
         assert chinfo1 != chinfo2
     else:
