@@ -43,7 +43,7 @@ dependencies = [
     'scipy',
     'mne>=1.0.0',
     'joblib',
-    'matplotlib>=3.6.0',
+    'matplotlib',
     'scikit-learn',
     'pooch',
     'decorator',
