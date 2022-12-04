@@ -34,7 +34,7 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# Spatial filter was first introduced in \ :footcite:n:`michel2019eeg`
+# Spatial filter was first introduced in \ :footcite:t:`michel2019eeg`
 # in the context of EEG source imaging. Since then, it has also been 
 # widly applied as a preprocessing step of EEG microstate analysis.
 # The goal of the preprocessing step is to reduce the effect of local transient

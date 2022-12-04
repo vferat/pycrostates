@@ -27,7 +27,7 @@ def apply_spatial_filter(
 ):
     r"""Apply spatial filter.
 
-    Adapted from \ :footcite:n:`michel2019eeg`.
+    Adapted from \ :footcite:t:`michel2019eeg`.
     Apply an instantaneous filter which interpolates channels
     with local neighbors while removing outliers.
     The current implementation proceeds as follows:
