@@ -298,7 +298,7 @@ def _compatibility_cmap(
     cmap: Optional[Union[str, colors.Colormap]],
     n_colors: int,
 ):
-    """Converts the 'cmap' argument to a colormap
+    """Convert the 'cmap' argument to a colormap.
 
     Matplotlib 3.6 introduced a deprecation of plt.cm.get_cmap().
     When support for the 3.6 version is dropped, this checker can be removed.
