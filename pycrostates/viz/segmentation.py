@@ -201,7 +201,7 @@ def _plot_segmentation(
     times: NDArray[float],
     n_clusters: int,
     cluster_names: List[str] = None,
-    cmap: Optional[str] = None,
+    cmap: Optional[Union[str, colors.Colormap]] = None,
     axes: Optional[Axes] = None,
     cbar_axes: Optional[Axes] = None,
     *,
@@ -256,21 +256,7 @@ def _plot_segmentation(
     state_labels = [-1] + list(range(n_clusters))
     cluster_names = ["unlabeled"] + cluster_names
     n_colors = n_clusters + 1
-    if check_version("matplotlib", "3.6"):
-        if cmap is None:
-            cmap = colormaps["viridis"]
-        elif isinstance(cmap, str):
-            cmap = colormaps[cmap]  # the cmap name is checked by matplotlib
-        cmap = cmap.resampled(n_colors)
-    else:
-        if isinstance(cmap, (str, type(None))):
-            cmap = plt.cm.get_cmap(cmap, n_colors)
-        else:
-            raise RuntimeError(
-                "User-defined colormaps are supported as of matplotlib 3.6 "
-                "and above. Please update matplotlib or provide a colormap "
-                "name as a string."
-            )
+    cmap = _compatibility_cmap(cmap, n_colors)
 
     # plot
     axes.plot(times, gfp, **kwargs)
@@ -306,3 +292,30 @@ def _plot_segmentation(
     colorbar.ax.set_yticklabels(cluster_names)
 
     return fig, axes, show
+
+
+def _compatibility_cmap(
+    cmap: Optional[Union[str, colors.Colormap]],
+    n_colors: int,
+):
+    """Converts the 'cmap' argument to a colormap
+
+    Matplotlib 3.6 introduced a deprecation of plt.cm.get_cmap().
+    When support for the 3.6 version is dropped, this checker can be removed.
+    """
+    if check_version("matplotlib", "3.6"):
+        if cmap is None:
+            cmap = colormaps["viridis"]
+        elif isinstance(cmap, str):
+            cmap = colormaps[cmap]  # the cmap name is checked by matplotlib
+        cmap = cmap.resampled(n_colors)
+    else:
+        if isinstance(cmap, (str, type(None))):
+            cmap = plt.cm.get_cmap(cmap, n_colors)
+        else:
+            raise RuntimeError(
+                "User-defined colormaps are supported as of matplotlib 3.6 "
+                "and above. Please update matplotlib or provide a colormap "
+                "name as a string."
+            )
+    return cmap
