@@ -10,7 +10,7 @@ from mne.parallel import parallel_func
 from numpy.random import Generator, RandomState
 from numpy.typing import NDArray
 
-from .._typing import Picks, RANDomState, CHData
+from .._typing import CHData, Picks, RANDomState
 from ..utils import _corr_vectors
 from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc

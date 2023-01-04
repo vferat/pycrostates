@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from mne import create_info
+from mne import create_info, pick_types
 
 from pycrostates.io import ChData, ChInfo
 
@@ -114,3 +114,14 @@ def test_ChData_invalid_arguments():
         ChData(data.reshape(6, 5, 400), ch_info)
     with pytest.raises(ValueError, match="'data' and 'info' do not have"):
         ChData(data, create_info(2, 400, "eeg"))
+
+
+def test_ChData_get_channel_positions():
+    """Test get for sensor positions."""
+    ch_data = ChData(data, ch_info_types.copy())
+    ch_data.set_montage('standard_1020')
+    picks = pick_types(ch_data.info, meg=False, eeg=True)
+    print(picks)
+    pos = np.array([ch["loc"][:3] for ch in ch_data.info["chs"]])[picks]
+    ch_data_pos = ch_data._get_channel_positions(picks=picks)
+    assert np.all(ch_data_pos == pos)

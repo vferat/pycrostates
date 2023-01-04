@@ -82,6 +82,7 @@ def apply_spatial_filter(
     """
     # Checks
     from ..io import ChData
+
     _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
     _check_value(ch_type, ("eeg",), item_name="ch_type")
     n_jobs = _check_n_jobs(n_jobs)
