@@ -73,7 +73,7 @@ def apply_spatial_filter(
 
     Returns
     -------
-    inst : Raw | Epochs
+    inst : Raw | Epochs| CHData 
         The modified instance.
 
     References

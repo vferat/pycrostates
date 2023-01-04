@@ -34,18 +34,18 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# Spatial filter was first introduced in \ :footcite:t:`michel2019eeg`
-# in the context of EEG source imaging. Since then, it has also been 
-# widely applied as a preprocessing step of EEG microstate analysis.
-# The goal of the preprocessing step is to reduce the effect of local transient
-# artifacts that corrupt EEG channels.
-# The computation of this filter relies on the creation of an adjacency matrix:
+# Spatial filters, which were first introduced in the context of EEG source imaging in\ :footcite:t:`michel2019eeg`,
+# have become a widely used preprocessing step in EEG microstate analysis.
+# These filters aim to reduce the impact of local transient artifacts on EEG channels."
+# Its computation of this filter relies on the creation of an adjacency matrix:
 from mne.channels import find_ch_adjacency
 from mne.viz import plot_ch_adjacency
 
 adjacency, ch_names = find_ch_adjacency(info=raw.info, ch_type="eeg")
 plot_ch_adjacency(raw.info, adjacency, ch_names, kind='2d', edit=False)
 plt.show()
+# In the context of EEG, an adjacency matrix may be used to represent the spatial relationships between different electrodes on the scalp.
+# In our case, it can be used to find all neighboring of a specific electrode, which will later be used for spatial filtering.
 #%%
 # We can apply the spatial filter to a copy of the raw instance:
 from pycrostates.preprocessing import apply_spatial_filter
@@ -58,13 +58,18 @@ import numpy as np
 
 n = 10
 random_sample = np.random.randint(0, raw.n_times, n)
-sphere = np.array([0,0,0,1])
+sphere = np.array([0,0,0,0.1])
 fig, axes = plt.subplots(nrows=2, ncols=n, figsize=(10,2))
 for s,sample in enumerate(random_sample):
     mne.viz.topomap._plot_topomap(raw.get_data()[:, sample], pos=raw.info, axes=axes[0, s], sphere=sphere, show=False)
     mne.viz.topomap._plot_topomap(raw_filter.get_data()[:, sample], pos=raw_filter.info, axes=axes[1, s], sphere=sphere, show=False)
 plt.show()
+
+# The aim such a filter is to remove the local maxima which makes the observed topographies smoother.
 #%%
+#  It is important to note that although small, spatial filter can have effects on other measures, such as PSD and channel time courses. 
+# Here is an example of its effect on the PSD of our recording, as well as on the correlation of the signal before and after applying the filter:
+
 # PSD
 fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(18,5), sharex=True, sharey=True)
 
