@@ -51,7 +51,7 @@ def apply_spatial_filter(
 
     Parameters
     ----------
-    inst : Raw | Epochs | CHData
+    inst : Raw | Epochs | ChData
         Instance to spatial filter.
     ch_type : str
         The channel type on which to apply spatial filter.
@@ -73,7 +73,7 @@ def apply_spatial_filter(
 
     Returns
     -------
-    inst : Raw | Epochs| CHData 
+    inst : Raw | Epochs| ChData
         The modified instance.
 
     References
