@@ -10,6 +10,7 @@ from mne.io.pick import _picks_by_type
 from mne.parallel import parallel_func
 from mne.utils.check import _check_preload
 
+from .._typing import CHData
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
@@ -18,7 +19,7 @@ from ..utils._logs import logger, verbose
 @fill_doc
 @verbose
 def apply_spatial_filter(
-    inst: Union[BaseRaw, BaseEpochs],
+    inst: Union[BaseRaw, BaseEpochs, CHData],
     ch_type: str = "eeg",
     exclude_bads: bool = True,
     origin="auto",
@@ -50,7 +51,7 @@ def apply_spatial_filter(
 
     Parameters
     ----------
-    inst : Raw | Epochs
+    inst : Raw | Epochs | CHData
         Instance to spatial filter.
     ch_type : str
         The channel type on which to apply spatial filter.
@@ -80,7 +81,8 @@ def apply_spatial_filter(
     .. footbibliography::
     """
     # Checks
-    _check_type(inst, (BaseRaw, BaseEpochs))
+    from ..io import ChData
+    _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
     _check_value(ch_type, ("eeg",), item_name="ch_type")
     n_jobs = _check_n_jobs(n_jobs)
     # check preload for Raw
@@ -90,7 +92,7 @@ def apply_spatial_filter(
         raise ValueError(
             "No montage was set on your data, but spatial filter"
             "can only work if digitization points for the EEG "
-            "channels are available. Consider calling set_montage() "
+            "channels are available. Consider calling inst.set_montage() "
             "to apply a montage."
         )
     # remove bad channels

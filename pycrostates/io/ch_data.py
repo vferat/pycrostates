@@ -138,6 +138,25 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         self._data = data
         return self
 
+    def _get_channel_positions(self, picks=None):
+        """Get channel locations from info.
+        Parameters
+        ----------
+        picks : str | list | slice | None
+            None gets good data indices.
+        Notes
+        -----
+        .. versionadded:: 0.9.0
+        """
+        picks = _picks_to_idx(self.info, picks)
+        chs = self.info['chs']
+        pos = np.array([chs[k]['loc'][:3] for k in picks])
+        n_zero = np.sum(np.sum(np.abs(pos), axis=1) == 0)
+        if n_zero > 1:  # XXX some systems have origin (0, 0, 0)
+            raise ValueError('Could not extract channel positions for '
+                             '{} channels'.format(n_zero))
+        return pos
+
     # --------------------------------------------------------------------
     @property
     def info(self) -> CHInfo:

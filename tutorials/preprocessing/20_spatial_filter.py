@@ -36,7 +36,7 @@ raw.set_eeg_reference('average')
 #%%
 # Spatial filter was first introduced in \ :footcite:t:`michel2019eeg`
 # in the context of EEG source imaging. Since then, it has also been 
-# widly applied as a preprocessing step of EEG microstate analysis.
+# widely applied as a preprocessing step of EEG microstate analysis.
 # The goal of the preprocessing step is to reduce the effect of local transient
 # artifacts that corrupt EEG channels.
 # The computation of this filter relies on the creation of an adjacency matrix:
@@ -53,7 +53,7 @@ raw_filter = raw.copy()
 apply_spatial_filter(raw_filter, n_jobs=-1)
 #%%
 # Let's have a look at the effect of the spatial filter.
-# First we can visualise the effect on topographies:
+# First we can visualize the effect on topographies:
 import numpy as np
 
 n = 10
