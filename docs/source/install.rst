@@ -3,7 +3,7 @@
 Install
 =======
 
-``pycrostates`` requires Python ``3.7`` or higher.
+``pycrostates`` requires Python ``3.8`` or higher.
 
 Dependencies
 ------------

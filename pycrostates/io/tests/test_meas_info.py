@@ -10,6 +10,7 @@ from mne.datasets import testing
 from mne.io import read_raw_fif
 from mne.io.constants import FIFF
 from mne.transforms import Transform
+from mne.utils import check_version
 
 from pycrostates.io import ChInfo
 from pycrostates.utils._logs import logger, set_log_level
@@ -103,7 +104,6 @@ def test_create_from_info():
 
     # test with a file with projs and coordinate transformation
     chinfo = ChInfo(info=raw.info)
-    assert chinfo["projs"] == raw.info["projs"]
     assert chinfo["ctf_head_t"] is None
     assert chinfo["dev_ctf_t"] is None
     assert chinfo["dev_head_t"] == raw.info["dev_head_t"]
@@ -388,3 +388,14 @@ def test_comparison(caplog):
 
     # with different object
     assert chinfo1 != 101
+
+    # with projs
+    chinfo1 = ChInfo(raw.info)
+    chinfo2 = ChInfo(raw.info)
+    assert chinfo1 == chinfo2
+    with chinfo1._unlock():
+        chinfo1["projs"] = []
+    if check_version("mne", "1.2"):
+        assert chinfo1 != chinfo2
+    else:
+        assert chinfo1 == chinfo2

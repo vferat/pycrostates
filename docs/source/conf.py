@@ -169,6 +169,7 @@ numpydoc_xref_aliases = {
     "EpochsSegmentation": "pycrostates.segmentation.EpochsSegmentation",
     # Matplotlib
     "Axes": "matplotlib.axes.Axes",
+    "colormap": ":doc:`colormap <matplotlib:tutorials/colors/colormaps>`",
     "Figure": "matplotlib.figure.Figure",
 }
 numpydoc_xref_ignore = {
