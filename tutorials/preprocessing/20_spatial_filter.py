@@ -34,29 +34,29 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# Spatial filters, which were first introduced in the context of EEG source imaging in\ :footcite:t:`michel2019eeg`,
-# have become a widely used preprocessing step in EEG microstate analysis.
-# These filters aim to reduce the impact of local transient artifacts on EEG channels."
-# Its computation of this filter relies on the creation of an adjacency matrix:
+# Spatial filter were first introduced in the context of EEG source imaging in\ :footcite:t:`michel2019eeg`,
+# These filters aim to reduce the impact of local transient artifacts on EEG channels.
+# The computation of such filter starts with the creation of an adjacency matrix:
 from mne.channels import find_ch_adjacency
 from mne.viz import plot_ch_adjacency
 
 adjacency, ch_names = find_ch_adjacency(info=raw.info, ch_type="eeg")
 plot_ch_adjacency(raw.info, adjacency, ch_names, kind='2d', edit=False)
 plt.show()
-# In the context of EEG, an adjacency matrix may be used to represent the spatial relationships between different electrodes on the scalp.
-# In our case, it can be used to find all neighboring of a specific electrode, which will later be used for spatial filtering.
+# In the context of EEG, an adjacency matrix indicate whether pairs of electrodes are adjacent (i.e neigbhours) or not in the graph.
+# The signal is then locally averaged by using the values of each channel and time point, as well as the values of its nearest neighbors.
+# The maximum and minimum values are removed from this calculation in order to improve the signal to noise ratio.
 #%%
 # We can apply the spatial filter to a copy of the raw instance:
 from pycrostates.preprocessing import apply_spatial_filter
 raw_filter = raw.copy()
 apply_spatial_filter(raw_filter, n_jobs=-1)
+
 #%%
-# Let's have a look at the effect of the spatial filter.
-# First we can visualize the effect on topographies:
+# To assess the impact of the spatial filter, we can display topographies from random points in the recording.
 import numpy as np
 
-n = 10
+n = 20
 random_sample = np.random.randint(0, raw.n_times, n)
 sphere = np.array([0,0,0,0.1])
 fig, axes = plt.subplots(nrows=2, ncols=n, figsize=(10,2))
@@ -65,27 +65,8 @@ for s,sample in enumerate(random_sample):
     mne.viz.topomap._plot_topomap(raw_filter.get_data()[:, sample], pos=raw_filter.info, axes=axes[1, s], sphere=sphere, show=False)
 plt.show()
 
-# The aim such a filter is to remove the local maxima which makes the observed topographies smoother.
-#%%
-#  It is important to note that although small, spatial filter can have effects on other measures, such as PSD and channel time courses. 
-# Here is an example of its effect on the PSD of our recording, as well as on the correlation of the signal before and after applying the filter:
-
-# PSD
-fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(18,5), sharex=True, sharey=True)
-
-raw.compute_psd(fmin=0, fmax=30).plot(axes=axes[0], show=False)
-axes[0].set_title("Filter Off")
-raw_filter.compute_psd(fmin=0, fmax=30).plot(axes=axes[1], show=False)
-axes[1].set_title("Filter On")
-plt.show()
-
-#%%
-# Correlations
-import seaborn as sns
-correlation_matrix = np.corrcoef(raw.get_data(), raw_filter.get_data())
-correlation_matrix = correlation_matrix[len(raw.info['ch_names']):, :len(raw.info['ch_names'])]
-sns.displot(np.diag(correlation_matrix))
-plt.show()
+# After applying the spatial filter, we observe smoother topographies.
+# These topographies, presenting less local artfeact, can be used as input for a clstering algortihm.
 
 #%%
 # References
