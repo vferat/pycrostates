@@ -140,13 +140,16 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
 
     def _get_channel_positions(self, picks=None):
         """Get channel locations from info.
+
         Parameters
         ----------
         picks : str | list | slice | None
             None gets good data indices.
-        Notes
-        -----
-        .. versionadded:: 0.9.0
+
+        Returns
+        -------
+        pos : array
+            Channel locations ``(n_channels, 3)``.
         """
         picks = _picks_to_idx(self.info, picks)
         chs = self.info["chs"]
