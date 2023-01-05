@@ -38,6 +38,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self._n_clusters = None
         self._cluster_names = None
         self._cluster_centers_ = None
+        self._ignore_polarity = None
 
         # fit variables
         self._info = None
