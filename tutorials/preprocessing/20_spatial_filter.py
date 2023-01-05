@@ -43,7 +43,7 @@ from mne.viz import plot_ch_adjacency
 adjacency, ch_names = find_ch_adjacency(info=raw.info, ch_type="eeg")
 plot_ch_adjacency(raw.info, adjacency, ch_names, kind='2d', edit=False)
 plt.show()
-# In the context of EEG, an adjacency matrix indicate whether pairs of electrodes are adjacent (i.e neigbhours) or not in the graph.
+# In the context of EEG, an adjacency matrix indicate whether pairs of electrodes are adjacent (i.e neighbours) or not in the graph.
 # The signal is then locally averaged by using the values of each channel and time point, as well as the values of its nearest neighbors.
 # The maximum and minimum values are removed from this calculation in order to improve the signal to noise ratio.
 #%%
@@ -66,7 +66,7 @@ for s,sample in enumerate(random_sample):
 plt.show()
 
 # After applying the spatial filter, we observe smoother topographies.
-# These topographies, presenting less local artfeact, can be used as input for a clstering algortihm.
+# These topographies, presenting less local artfeact, can be used as input for a clstering algorithm.
 
 #%%
 # References
