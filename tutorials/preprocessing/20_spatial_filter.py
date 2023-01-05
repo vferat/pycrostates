@@ -56,7 +56,7 @@ apply_spatial_filter(raw_filter, n_jobs=-1)
 # To assess the impact of the spatial filter, we can display topographies from random points in the recording.
 import numpy as np
 
-n = 20
+n = 10
 random_sample = np.random.randint(0, raw.n_times, n)
 sphere = np.array([0,0,0,0.1])
 fig, axes = plt.subplots(nrows=2, ncols=n, figsize=(10,2))
