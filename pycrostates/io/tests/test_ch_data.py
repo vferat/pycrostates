@@ -119,7 +119,7 @@ def test_ChData_invalid_arguments():
 def test_ChData_get_channel_positions():
     """Test get for sensor positions."""
     ch_data = ChData(data, ch_info_types.copy())
-    ch_data.set_montage('standard_1020')
+    ch_data.set_montage("standard_1020")
     picks = pick_types(ch_data.info, meg=False, eeg=True)
     print(picks)
     pos = np.array([ch["loc"][:3] for ch in ch_data.info["chs"]])[picks]
