@@ -8,9 +8,10 @@ from pycrostates.preprocessing import apply_spatial_filter
 
 dir_ = testing.data_path() / "MEG" / "sample"
 fname_raw_testing = dir_ / "sample_audvis_trunc_raw.fif"
-raw_all = mne.io.read_raw_fif(fname_raw_testing, preload=True)
+raw_all = mne.io.read_raw_fif(fname_raw_testing, preload=False)
 raw_all.info["bads"] = []
 raw_all.crop(0, 10)
+raw.load_data()
 # raw
 raw = raw_all.copy()
 raw.pick("eeg")

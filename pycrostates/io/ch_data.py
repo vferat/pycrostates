@@ -144,12 +144,12 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         Parameters
         ----------
         picks : str | list | slice | None
-            None gets good data indices.
+            None selects the good data channels.
 
         Returns
         -------
         pos : array
-            Channel locations ``(n_channels, 3)``.
+            Channel locations (n_channels, 3).
         """
         picks = _picks_to_idx(self.info, picks)
         chs = self.info["chs"]

@@ -26,7 +26,7 @@ def apply_spatial_filter(
     n_jobs: int = 1,
     verbose=None,
 ):
-    r"""Apply spatial filter.
+    r"""Apply a spatial filter.
 
     Adapted from \ :footcite:t:`michel2019eeg`.
     Apply an instantaneous filter which interpolates channels
@@ -52,19 +52,17 @@ def apply_spatial_filter(
     Parameters
     ----------
     inst : Raw | Epochs | ChData
-        Instance to spatial filter.
+        Instance to filter spatially.
     ch_type : str
         The channel type on which to apply spatial filter.
         Currently only supports ``'eeg'``.
-        Default to 'eeg'.
     exclude_bads : bool
-        If set to ``True`` bad channels will be removed
-        from the adjacency matrix and therefore not be used
+        If set to ``True``, bad channels will be removed
+        from the adjacency matrix and therefore not used
         to interpolate neighbors. In addition, bad channels
         will not be filtered.
         If set to ``False``, proceed as if all channels were good.
-        Default to ``True``.
-    origin : array-like, shape (3,) | str
+    origin : array of shape (3,) | str
         Origin of the sphere in the head coordinate frame and in meters.
         Can be ``'auto'`` (default), which means a head-digitization-based
         origin fit.
@@ -74,7 +72,11 @@ def apply_spatial_filter(
     Returns
     -------
     inst : Raw | Epochs| ChData
-        The modified instance.
+        The instance modified in place.
+        
+    Notes
+    -----
+    This function requires a full copy of the data in memory.
 
     References
     ----------
@@ -84,7 +86,9 @@ def apply_spatial_filter(
     from ..io import ChData
 
     _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
+    _check_type(ch_type, (str,), item_name="ch_type")
     _check_value(ch_type, ("eeg",), item_name="ch_type")
+    _check_type(exclude_bads, (bool,), item_name="exclude_bads")
     n_jobs = _check_n_jobs(n_jobs)
     # check preload for Raw
     _check_preload(inst, "Apply spatial filter")
@@ -96,7 +100,6 @@ def apply_spatial_filter(
             "channels are available. Consider calling inst.set_montage() "
             "to apply a montage."
         )
-    # remove bad channels
     # Extract adjacency matrix
     adjacency_matrix, ch_names = mne.channels.find_ch_adjacency(
         inst.info, ch_type
