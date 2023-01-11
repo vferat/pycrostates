@@ -1,14 +1,15 @@
 from typing import Union
 
-import mne
 import numpy as np
-from mne import BaseEpochs
+from mne import BaseEpochs, pick_info
 from mne.bem import _check_origin
+from mne.channels import find_ch_adjacency
 from mne.channels.interpolation import _make_interpolation_matrix
 from mne.io import BaseRaw
 from mne.io.pick import _picks_by_type
 from mne.parallel import parallel_func
 from mne.utils.check import _check_preload
+from numpy.typing import NDArray
 
 from .._typing import CHData
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
@@ -22,7 +23,7 @@ def apply_spatial_filter(
     inst: Union[BaseRaw, BaseEpochs, CHData],
     ch_type: str = "eeg",
     exclude_bads: bool = True,
-    origin="auto",
+    origin: Union[str, NDArray[float]] = "auto",
     n_jobs: int = 1,
     verbose=None,
 ):
@@ -73,7 +74,7 @@ def apply_spatial_filter(
     -------
     inst : Raw | Epochs| ChData
         The instance modified in place.
-        
+
     Notes
     -----
     This function requires a full copy of the data in memory.
@@ -102,9 +103,7 @@ def apply_spatial_filter(
             "to apply a montage."
         )
     # Extract adjacency matrix
-    adjacency_matrix, ch_names = mne.channels.find_ch_adjacency(
-        inst.info, ch_type
-    )
+    adjacency_matrix, ch_names = find_ch_adjacency(inst.info, ch_type)
     adjacency_matrix = adjacency_matrix.todense()
     adjacency_matrix = np.array(adjacency_matrix)
     if exclude_bads:
@@ -114,7 +113,7 @@ def apply_spatial_filter(
                 adjacency_matrix[:, c] = 0  # don't use bads to interpolate
     # retrieve picks based on adjacency matrix
     picks = dict(_picks_by_type(inst.info, exclude=[]))[ch_type]
-    info = mne.pick_info(inst.info, picks)
+    info = pick_info(inst.info, picks)
     assert ch_names == info.ch_names
     # retrieve channel positions
     pos = inst._get_channel_positions(picks)
