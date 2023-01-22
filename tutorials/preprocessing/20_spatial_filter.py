@@ -21,11 +21,16 @@ This example demonstrates the effect of spatial filter on EEG data.
 #
 #     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
-import matplotlib.pyplot as plt 
+
+import matplotlib.pyplot as plt
 import mne
+import numpy as np
 from mne.io import read_raw_eeglab
+from mne.channels import find_ch_adjacency
+from mne.viz import plot_ch_adjacency
 
 from pycrostates.datasets import lemon
+from pycrostates.preprocessing import apply_spatial_filter
 
 raw_fname = lemon.data_path(subject_id='010004', condition='EC')
 raw = read_raw_eeglab(raw_fname, preload=True)
@@ -34,39 +39,54 @@ raw.pick('eeg')
 raw.set_eeg_reference('average')
 
 #%%
-# Spatial filter were first introduced in the context of EEG source imaging in\ :footcite:t:`michel2019eeg`,
-# These filters aim to reduce the impact of local transient artifacts on EEG channels.
-# The computation of such filter starts with the creation of an adjacency matrix:
-from mne.channels import find_ch_adjacency
-from mne.viz import plot_ch_adjacency
+# Spatial filters were first introduced in the context of EEG source imaging
+# in\ :footcite:t:`michel2019eeg`, with the aim to reduce the impact of
+# local transient artifacts on EEG channels. The computation of a spatial
+# filter starts with the creation of an adjacency matrix, defining whether
+# pairs of electrodes are adjacent (neighbors).
+# An adjacency matrix can be represented as a graph where each node represents
+# a sensor and each edge links adjacent sensors.
 
 adjacency, ch_names = find_ch_adjacency(info=raw.info, ch_type="eeg")
-plot_ch_adjacency(raw.info, adjacency, ch_names, kind='2d', edit=False)
+plot_ch_adjacency(raw.info, adjacency, ch_names, kind="2d", edit=False)
 plt.show()
-# In the context of EEG, an adjacency matrix indicate whether pairs of electrodes are adjacent (i.e neighbours) or not in the graph.
-# The signal is then locally averaged by using the values of each channel and time point, as well as the values of its nearest neighbors.
-# The maximum and minimum values are removed from this calculation in order to improve the signal to noise ratio.
+
 #%%
-# We can apply the spatial filter to a copy of the raw instance:
-from pycrostates.preprocessing import apply_spatial_filter
+# The spatial filter averages the signal locally by using the samples of each
+# channel and its nearest neighbors. The maximum and minimum value of the
+# neighboring channels is removed to improve the signal to noise ratio.
+
 raw_filter = raw.copy()
 apply_spatial_filter(raw_filter, n_jobs=-1)
 
 #%%
-# To assess the impact of the spatial filter, we can display topographies from random points in the recording.
-import numpy as np
+# To assess the impact of the spatial filter, we can display topographies from
+# random points in the recording.
 
 n = 10
 random_sample = np.random.randint(0, raw.n_times, n)
 sphere = np.array([0,0,0,0.1])
 fig, axes = plt.subplots(nrows=2, ncols=n, figsize=(10,2))
-for s,sample in enumerate(random_sample):
-    mne.viz.topomap._plot_topomap(raw.get_data()[:, sample], pos=raw.info, axes=axes[0, s], sphere=sphere, show=False)
-    mne.viz.topomap._plot_topomap(raw_filter.get_data()[:, sample], pos=raw_filter.info, axes=axes[1, s], sphere=sphere, show=False)
+for s, sample in enumerate(random_sample):
+    mne.viz.topomap._plot_topomap(
+        raw.get_data()[:, sample],
+        pos=raw.info,
+        axes=axes[0, s],
+        sphere=sphere,
+        show=False,
+    )
+    mne.viz.topomap._plot_topomap(
+        raw_filter.get_data()[:, sample],
+        pos=raw_filter.info,
+        axes=axes[1, s],
+        sphere=sphere,
+        show=False,
+    )
 plt.show()
 
-# After applying the spatial filter, we observe smoother topographies.
-# These topographies, presenting less local artfeact, can be used as input for a clstering algorithm.
+# After applying the spatial filter, the topographies are smoother.
+# These topographies, presenting less local artifact, can be used as input for
+# a clustering algorithm.
 
 #%%
 # References
