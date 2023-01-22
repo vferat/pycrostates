@@ -41,13 +41,13 @@ def apply_spatial_filter(
     * If ``exclude_bads`` is set to ``True``,
       bad channels are removed from the ajdacency matrix.
     * For each timepoint and each channel,
-      a reduced adjacency matrix is build by removing neighbors
+      a reduced adjacency matrix is built by removing neighbors
       with lowest and highest value.
     * For each timepoint and each channel,
       a reduced interpolation matrix is built by extracting neighbor
       weights based on the reduced adjacency matrix.
-    * Reduced interpolation matrices are normalized.
-    * Channel's timepoints are interpolated
+    * The reduced interpolation matrices are normalized.
+    * The channel's timepoints are interpolated
       using their reduced interpolation matrix.
 
     Parameters
@@ -55,7 +55,7 @@ def apply_spatial_filter(
     inst : Raw | Epochs | ChData
         Instance to filter spatially.
     ch_type : str
-        The channel type on which to apply spatial filter.
+        The channel type on which to apply the spatial filter.
         Currently only supports ``'eeg'``.
     exclude_bads : bool
         If set to ``True``, bad channels will be removed
@@ -83,18 +83,13 @@ def apply_spatial_filter(
     ----------
     .. footbibliography::
     """
-    # Checks
-    from ..io import ChData
-
-    _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
+    _check_type(inst, (BaseRaw, BaseEpochs, CHData), item_name="inst")
     _check_type(ch_type, (str,), item_name="ch_type")
     _check_value(ch_type, ("eeg",), item_name="ch_type")
     _check_type(exclude_bads, (bool,), item_name="exclude_bads")
     origin = _check_origin(origin, inst.info)
     n_jobs = _check_n_jobs(n_jobs)
-    # check preload for Raw
     _check_preload(inst, "Apply spatial filter")
-    # check montage
     if inst.get_montage() is None:
         raise ValueError(
             "No montage was set on your data, but spatial filter"
@@ -102,7 +97,7 @@ def apply_spatial_filter(
             "channels are available. Consider calling inst.set_montage() "
             "to apply a montage."
         )
-    # Extract adjacency matrix
+    # extract adjacency matrix
     adjacency_matrix, ch_names = find_ch_adjacency(inst.info, ch_type)
     adjacency_matrix = adjacency_matrix.todense()
     adjacency_matrix = np.array(adjacency_matrix)
@@ -132,7 +127,7 @@ def apply_spatial_filter(
     data = inst.get_data(picks=picks)
     if isinstance(inst, BaseEpochs):
         data = np.hstack(data)
-    # Apply filter
+    # apply filter
     if n_jobs == 1:
         spatial_filtered_data = []
         for index, adjacency_vector in enumerate(adjacency_matrix):
