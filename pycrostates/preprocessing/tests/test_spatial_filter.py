@@ -1,5 +1,6 @@
 import mne
 import numpy as np
+from mne.channels import find_ch_adjacency
 from mne.datasets import testing
 from mne.io.pick import _picks_by_type
 
@@ -118,4 +119,12 @@ def test_spatial_filter_eeg_and_meg():
     )
     assert np.all(
         new_inst._data[picks_non_eeg, :] == raw_all._data[picks_non_eeg, :]
+    )
+
+
+def test_spatial_filter_custom_adjacency():
+    """TODO"""
+    adjacency_matrix, ch_names = find_ch_adjacency(raw_all.info, "eeg")
+    new_inst = apply_spatial_filter(
+        raw_all.copy(), "eeg", adjacency=adjacency_matrix
     )

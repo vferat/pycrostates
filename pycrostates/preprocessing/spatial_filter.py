@@ -10,6 +10,7 @@ from mne.io.pick import _picks_by_type
 from mne.parallel import parallel_func
 from mne.utils.check import _check_preload
 from numpy.typing import NDArray
+from scipy.sparse import csr_matrix
 
 from .._typing import CHData
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
@@ -24,6 +25,7 @@ def apply_spatial_filter(
     ch_type: str = "eeg",
     exclude_bads: bool = True,
     origin: Union[str, NDArray[float]] = "auto",
+    adjacency: Union[csr_matrix, str] = "auto",
     n_jobs: int = 1,
     verbose=None,
 ):
@@ -35,7 +37,7 @@ def apply_spatial_filter(
     The current implementation proceeds as follows:
 
     * An interpolation matrix is computed using
-      ``mne.channels.interpolation._make_interpolation_matrix``.
+      `mne.channels.interpolation._make_interpolation_matrix`.
     * An ajdacency matrix is computed using
       `mne.channels.find_ch_adjacency`.
     * If ``exclude_bads`` is set to ``True``,
@@ -67,6 +69,12 @@ def apply_spatial_filter(
         Origin of the sphere in the head coordinate frame and in meters.
         Can be ``'auto'`` (default), which means a head-digitization-based
         origin fit.
+    adjacency: scipy.sparse.csr_matrix, shape (n_channels, n_channels) | str
+        An adjacency matrix. Can be created using 
+        `mne.channels.find_ch_adjacency` and edited with
+        `mne.viz.plot_ch_adjacency`.
+        If ``'auto'`` (default), the matrix will be automaticaly using
+        `mne.channels.find_ch_adjacency` and other parameters.
     %(n_jobs)s
     %(verbose)s
 
@@ -96,19 +104,39 @@ def apply_spatial_filter(
             "channels are available. Consider calling inst.set_montage() "
             "to apply a montage."
         )
-    # extract adjacency matrix
-    adjacency_matrix, ch_names = find_ch_adjacency(inst.info, ch_type)
-    adjacency_matrix = adjacency_matrix.todense()
-    adjacency_matrix = np.array(adjacency_matrix)
+    # retrieve picks
+    picks = dict(_picks_by_type(inst.info, exclude=[]))[ch_type]
+    info = pick_info(inst.info, picks)
+    # adjacency matrix
+    _check_type(adjacency, (csr_matrix, str), "adjacency")
+    if isinstance(adjacency, str):
+        if adjacency != "auto":
+            raise (
+                ValueError(
+                    f"Adjaceny can be either a scipy.sparse.csr_matrix"
+                    f"or 'auto' but got '{adjacency}' instead"
+                )
+            )
+        else:
+            adjacency, ch_names = find_ch_adjacency(info, ch_type)
+    else:
+        ch_names = info.ch_names
+        n_channels = len(ch_names)
+        if adjacency.shape[0] != n_channels:
+            raise ValueError(
+                "``adjacency`` must have the same number of rows as the"
+                " number of channels in ``pick_info(inst.info, picks)``."
+                f" Found {adjacency.shape[0]} channels for ``adjacency``"
+                f" and {n_channels} for ``inst``."
+            )
+    adjacency = adjacency.todense()
+    adjacency = np.array(adjacency)
+
     if exclude_bads:
         for c, chan in enumerate(ch_names):
             if chan in inst.info["bads"]:
-                adjacency_matrix[c, :] = 0  # do not change bads
-                adjacency_matrix[:, c] = 0  # don't use bads to interpolate
-    # retrieve picks based on adjacency matrix
-    picks = dict(_picks_by_type(inst.info, exclude=[]))[ch_type]
-    info = pick_info(inst.info, picks)
-    assert ch_names == info.ch_names
+                adjacency[c, :] = 0  # do not change bads
+                adjacency[:, c] = 0  # don't use bads to interpolate
     # retrieve channel positions
     pos = inst._get_channel_positions(picks)
     # test spherical fit
@@ -129,18 +157,18 @@ def apply_spatial_filter(
     # apply filter
     if n_jobs == 1:
         spatial_filtered_data = []
-        for index, adjacency_vector in enumerate(adjacency_matrix):
+        for index, adjacency_vector in enumerate(adjacency):
             channel_data = _channel_spatial_filter(
                 index, data, adjacency_vector, interpolate_matrix
             )
             spatial_filtered_data.append(channel_data)
     else:
         parallel, p_fun, _ = parallel_func(
-            _channel_spatial_filter, n_jobs, total=len(adjacency_matrix)
+            _channel_spatial_filter, n_jobs, total=len(adjacency)
         )
         spatial_filtered_data = parallel(
             p_fun(index, data, adjacency_vector, interpolate_matrix)
-            for index, adjacency_vector in enumerate(adjacency_matrix)
+            for index, adjacency_vector in enumerate(adjacency)
         )
 
     data = np.array(spatial_filtered_data)
