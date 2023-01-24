@@ -60,6 +60,11 @@ stages:
           PYTHON_VERSION: '3.10'
           MNE_DEV: false
           CACHE_MNE_PATH: $(CACHE_PATH_MNE_LINUX)
+        linux 3.11:
+          VM_IMAGE: 'ubuntu-latest'
+          PYTHON_VERSION: '3.11'
+          MNE_DEV: false
+          CACHE_MNE_PATH: $(CACHE_PATH_MNE_LINUX)
         linux 3.10 MNE-dev:
           VM_IMAGE: 'ubuntu-latest'
           PYTHON_VERSION: '3.10'
@@ -80,6 +85,11 @@ stages:
           PYTHON_VERSION: '3.10'
           MNE_DEV: false
           CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
+        macOS 3.11:
+          VM_IMAGE: 'macOS-latest'
+          PYTHON_VERSION: '3.11'
+          MNE_DEV: false
+          CACHE_MNE_PATH: $(CACHE_PATH_MNE_MACOS)
         windows 3.8:
           VM_IMAGE: 'windows-latest'
           PYTHON_VERSION: '3.8'
@@ -93,6 +103,11 @@ stages:
         windows 3.10:
           VM_IMAGE: 'windows-latest'
           PYTHON_VERSION: '3.10'
+          MNE_DEV: false
+          CACHE_MNE_PATH: $(CACHE_PATH_MNE_WINDOWS)
+        windows 3.11:
+          VM_IMAGE: 'windows-latest'
+          PYTHON_VERSION: '3.11'
           MNE_DEV: false
           CACHE_MNE_PATH: $(CACHE_PATH_MNE_WINDOWS)
     pool:
