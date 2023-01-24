@@ -5,8 +5,7 @@ from mne.datasets import testing
 from mne.io import read_raw_fif
 
 from pycrostates.cluster import ModKMeans
-from pycrostates.utils._clusters import optimize_order, _optimize_order
-
+from pycrostates.utils._clusters import _optimize_order, optimize_order
 
 directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
@@ -42,25 +41,19 @@ def test__optimize_order():
     # No suffle
     current = template
     ignore_polarity = True
-    order = _optimize_order(
-        current, template, ignore_polarity=ignore_polarity
-    )
+    order = _optimize_order(current, template, ignore_polarity=ignore_polarity)
     assert np.all(order == np.arange(n_states))
 
     # Shuffle
     current = random_template
     ignore_polarity = False
-    order = _optimize_order(
-        current, template, ignore_polarity=ignore_polarity
-    )
+    order = _optimize_order(current, template, ignore_polarity=ignore_polarity)
     assert np.allclose(current[order], template)
 
     # Shuffle + ignore_polarity
     current = random_template
     ignore_polarity = True
-    order = _optimize_order(
-        current, template, ignore_polarity=ignore_polarity
-    )
+    order = _optimize_order(current, template, ignore_polarity=ignore_polarity)
     assert np.allclose(current[order], template)
 
     # Shuffle + sign + ignore_polarity
@@ -74,15 +67,12 @@ def test__optimize_order():
     # Shuffle + sign
     current = random_pol_template
     ignore_polarity = False
-    order = _optimize_order(
-        current, template, ignore_polarity=ignore_polarity
-    )
+    order = _optimize_order(current, template, ignore_polarity=ignore_polarity)
     corr = np.corrcoef(template, current[order])[n_states:, :n_states]
     corr_order = np.corrcoef(template, current[order])[n_states:, :n_states]
     assert np.trace(corr) <= np.trace(corr_order)
 
+
 def test_optimize_order():
     order = optimize_order(ModK_0, ModK_1)
     assert np.all(np.sort(np.unique(order)) == np.arange(len(order)))
-    
-    
