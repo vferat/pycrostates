@@ -158,7 +158,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         if n_zero > 1:  # XXX some systems have origin (0, 0, 0)
             raise ValueError(
                 "Could not extract channel positions for "
-                "{} channels".format(n_zero)
+                f"{n_zero} channels."
             )
         return pos
 

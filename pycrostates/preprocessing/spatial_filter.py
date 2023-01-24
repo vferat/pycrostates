@@ -87,7 +87,6 @@ def apply_spatial_filter(
     _check_type(ch_type, (str,), item_name="ch_type")
     _check_value(ch_type, ("eeg",), item_name="ch_type")
     _check_type(exclude_bads, (bool,), item_name="exclude_bads")
-    origin = _check_origin(origin, inst.info)
     n_jobs = _check_n_jobs(n_jobs)
     _check_preload(inst, "Apply spatial filter")
     if inst.get_montage() is None:
