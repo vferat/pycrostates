@@ -26,16 +26,14 @@ ModK_1.fit(raw, n_jobs=1)
 
 
 def test__optimize_order():
-    n_states = 5
-    n_electrodes = 3
-    # Random template
-    template = np.random.randint(-10, 10, (n_states, n_electrodes))
+    template = ModK_1._cluster_centers_
+    n_states, n_electrodes = template.shape
     # Shuffle template
     arr = np.arange(n_states)
     np.random.shuffle(arr)
     random_template = template[arr]
     # invert polarity
-    polarities = np.random.choice([-1, 1], n_states)
+    polarities = np.array([-1,1,-1,1,1])
     random_pol_template = polarities[:, np.newaxis] * random_template
 
     # No suffle
