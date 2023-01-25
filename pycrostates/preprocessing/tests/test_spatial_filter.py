@@ -1,5 +1,6 @@
 import mne
 import numpy as np
+import pytest
 from mne.channels import find_ch_adjacency
 from mne.datasets import testing
 from mne.io.pick import _picks_by_type
@@ -123,8 +124,22 @@ def test_spatial_filter_eeg_and_meg():
 
 
 def test_spatial_filter_custom_adjacency():
-    """TODO"""
+    """Test apply_spatial_filter with custom adjacency."""
     adjacency_matrix, ch_names = find_ch_adjacency(raw_all.info, "eeg")
-    new_inst = apply_spatial_filter(
-        raw_all.copy(), "eeg", adjacency=adjacency_matrix
-    )
+    apply_spatial_filter(raw_all.copy(), "eeg", adjacency=adjacency_matrix)
+    with pytest.raises(
+        ValueError, match="Adjacency must have exactly 2 dimensions"
+    ):
+        apply_spatial_filter(
+            raw_all.copy(), "eeg", adjacency=np.ones((len(ch_names)))
+        )
+    with pytest.raises(ValueError, match="Adjacency must be of shape"):
+        apply_spatial_filter(
+            raw_all.copy(), "eeg", adjacency=adjacency_matrix[:-2, :-2]
+        )
+    with pytest.raises(
+        ValueError, match="Values contained in adjacency can only be 0 or 1."
+    ):
+        adjacency_ = adjacency_matrix.copy()
+        adjacency_[0, 0] = 2
+        apply_spatial_filter(raw_all.copy(), "eeg", adjacency=adjacency_)

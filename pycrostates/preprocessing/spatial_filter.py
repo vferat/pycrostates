@@ -18,6 +18,44 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 
+def _check_adjacency(adjacency, info, ch_type):
+    """Check adjacency matrix."""
+    _check_type(adjacency, (csr_matrix, np.ndarray, str), "adjacency")
+    # auto
+    if isinstance(adjacency, str):
+        if adjacency != "auto":
+            raise (
+                ValueError(
+                    f"Adjacency can be either a scipy.sparse.csr_matrix"
+                    f"or 'auto' but got string '{adjacency}' instead."
+                )
+            )
+        adjacency, ch_names = find_ch_adjacency(info, ch_type)
+    # custom
+    if isinstance(adjacency, csr_matrix):
+        adjacency = adjacency.toarray()
+    if isinstance(adjacency, np.ndarray):
+        ch_names = info.ch_names
+        n_channels = len(ch_names)
+        if adjacency.ndim != 2:
+            raise ValueError(
+                "Adjacency must have exactly 2 dimensions but got "
+                f"{adjacency.ndim} dimensions instead."
+            )
+        if (adjacency.shape[0] != n_channels) or (
+            adjacency.shape[1] != n_channels
+        ):
+            raise ValueError(
+                "Adjacency must be of shape (n_channels, n_channels) "
+                f"but got {adjacency.shape} instead."
+            )
+        if not np.array_equal(adjacency, adjacency.astype(bool)):
+            raise ValueError(
+                "Values contained in adjacency can only be 0 or 1."
+            )
+    return (adjacency, ch_names)
+
+
 @fill_doc
 @verbose
 def apply_spatial_filter(
@@ -69,8 +107,8 @@ def apply_spatial_filter(
         Origin of the sphere in the head coordinate frame and in meters.
         Can be ``'auto'`` (default), which means a head-digitization-based
         origin fit.
-    adjacency: scipy.sparse.csr_matrix, shape (n_channels, n_channels) | str
-        An adjacency matrix. Can be created using 
+    adjacency: array or csr_matrix of shape (n_channels, n_channels) | str
+        An adjacency matrix. Can be created using
         `mne.channels.find_ch_adjacency` and edited with
         `mne.viz.plot_ch_adjacency`.
         If ``'auto'`` (default), the matrix will be automaticaly using
@@ -108,30 +146,7 @@ def apply_spatial_filter(
     picks = dict(_picks_by_type(inst.info, exclude=[]))[ch_type]
     info = pick_info(inst.info, picks)
     # adjacency matrix
-    _check_type(adjacency, (csr_matrix, str), "adjacency")
-    if isinstance(adjacency, str):
-        if adjacency != "auto":
-            raise (
-                ValueError(
-                    f"Adjaceny can be either a scipy.sparse.csr_matrix"
-                    f"or 'auto' but got '{adjacency}' instead"
-                )
-            )
-        else:
-            adjacency, ch_names = find_ch_adjacency(info, ch_type)
-    else:
-        ch_names = info.ch_names
-        n_channels = len(ch_names)
-        if adjacency.shape[0] != n_channels:
-            raise ValueError(
-                "``adjacency`` must have the same number of rows as the"
-                " number of channels in ``pick_info(inst.info, picks)``."
-                f" Found {adjacency.shape[0]} channels for ``adjacency``"
-                f" and {n_channels} for ``inst``."
-            )
-    adjacency = adjacency.todense()
-    adjacency = np.array(adjacency)
-
+    adjacency, ch_names = _check_adjacency(adjacency, info, ch_type)
     if exclude_bads:
         for c, chan in enumerate(ch_names):
             if chan in inst.info["bads"]:
