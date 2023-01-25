@@ -19,8 +19,9 @@ def _optimize_order(centers, template_centers, ignore_polarity=True):
 def optimize_order(inst, template_inst):
     """Find order that best match instance and template cluster centers.
 
-    Compute the optimal assignment of indices in instance cluster centers to indices of template cluster centers,
-    to maximize clusters auto-correlation as determined by the Hungarian algorithm.
+    Compute the optimal assignment of indices in instance cluster centers
+    to indices of template cluster centers, to maximize clusters
+    auto-correlation as determined by the Hungarian algorithm.
 
     Parameters
     ----------
@@ -29,7 +30,8 @@ def optimize_order(inst, template_inst):
     Returns
     -------
     order : list of int
-        The new order to apply to inst to maximize auto-correlation of cluster centers.
+        The new order to apply to inst to maximize auto-correlation
+        of cluster centers.
     """
     _check_type(inst, (_BaseCluster,), item_name="inst")
     inst._check_fit()
@@ -38,7 +40,8 @@ def optimize_order(inst, template_inst):
 
     if inst.n_clusters != template_inst.n_clusters:
         raise ValueError(
-            "Instance and the template must have the same number of cluster centers"
+            "Instance and the template must have the same "
+            "number of cluster centers"
         )
     if inst._ignore_polarity != template_inst._ignore_polarity:
         raise ValueError(
