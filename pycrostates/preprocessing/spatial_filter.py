@@ -111,7 +111,7 @@ def apply_spatial_filter(
         An adjacency matrix. Can be created using
         `mne.channels.find_ch_adjacency` and edited with
         `mne.viz.plot_ch_adjacency`.
-        If ``'auto'`` (default), the matrix will be automaticaly using
+        If ``'auto'`` (default), the matrix will be automatically using
         `mne.channels.find_ch_adjacency` and other parameters.
     %(n_jobs)s
     %(verbose)s
