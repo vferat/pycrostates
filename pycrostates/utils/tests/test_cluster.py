@@ -33,7 +33,7 @@ def test__optimize_order():
     np.random.shuffle(arr)
     random_template = template[arr]
     # invert polarity
-    polarities = np.array([-1,1,-1,1,1])
+    polarities = np.array([-1, 1, -1, 1, 1])
     random_pol_template = polarities[:, np.newaxis] * random_template
 
     # No suffle
