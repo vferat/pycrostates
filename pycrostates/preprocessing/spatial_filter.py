@@ -75,7 +75,7 @@ def apply_spatial_filter(
     The current implementation proceeds as follows:
 
     * An interpolation matrix is computed using
-      `mne.channels.interpolation._make_interpolation_matrix`.
+      mne.channels.interpolation._make_interpolation_matrix.
     * An ajdacency matrix is computed using
       `mne.channels.find_ch_adjacency`.
     * If ``exclude_bads`` is set to ``True``,
