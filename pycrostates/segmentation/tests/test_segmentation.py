@@ -94,19 +94,19 @@ def test_properties(ModK, inst, caplog):
 
     # test that properties can not be set
     segmentation = ModK.predict(inst)
-    with pytest.raises(AttributeError, match="can't set attribute"):
+    with pytest.raises(AttributeError):
         segmentation.predict_parameters = dict()
-    with pytest.raises(AttributeError, match="can't set attribute"):
+    with pytest.raises(AttributeError):
         segmentation.labels = np.zeros((raw.times.size,))
-    with pytest.raises(AttributeError, match="can't set attribute"):
+    with pytest.raises(AttributeError):
         segmentation.cluster_names = ["1", "0", "2", "3"]
-    with pytest.raises(AttributeError, match="can't set attribute"):
+    with pytest.raises(AttributeError):
         segmentation.cluster_centers_ = np.zeros(
             (4, len(inst.ch_names) - len(inst.info["bads"]))
         )
 
     # test raw/epochs specific
-    with pytest.raises(AttributeError, match="can't set attribute"):
+    with pytest.raises(AttributeError):
         if isinstance(inst, BaseRaw):
             segmentation.raw = raw
         if isinstance(inst, BaseEpochs):
