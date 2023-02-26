@@ -236,7 +236,6 @@ class AAHCluster(_BaseCluster):
 
         n_steps = n_frame - n_clusters
         while cluster.shape[1] > n_clusters:
-
             step = n_frame - cluster.shape[1]
 
             to_remove = np.argmin(GEV)
@@ -260,7 +259,6 @@ class AAHCluster(_BaseCluster):
             for c in cluster_to_update:
                 members = assignment == c
                 if ignore_polarity:
-
                     old_weight = len(new_assignment == c) / members.sum()
 
                     sgn = np.sign(old_cluster @ cluster[:, c])
