@@ -240,8 +240,10 @@ class AAHCluster(_BaseCluster):
             for c in cluster_to_update:
                 members = assignment == c
                 if ignore_polarity:
-                    evecs, _, _ = np.linalg.svd(data[:, members], full_matrices=False)
-                    cluster[:, c] = evecs[:,0]
+                    evecs, _, _ = np.linalg.svd(
+                        data[:, members], full_matrices=False
+                    )
+                    cluster[:, c] = evecs[:, 0]
                 else:
                     cluster[:, c] = np.mean(data[:, members], axis=1)
                     cluster[:, c] /= np.linalg.norm(
