@@ -1,6 +1,5 @@
 """Atomize and Agglomerate Hierarchical Clustering (AAHC)."""
 
-from functools import wraps as func_wraps
 from pathlib import Path
 from typing import Any, Optional, Tuple, Union
 
@@ -15,23 +14,6 @@ from ..utils._checks import _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
 from ._base import _BaseCluster
-
-# if we have numba, use its jit interface
-try:
-    from numba import njit
-except ImportError:
-
-    def njit(cache=False):  # pylint: disable=unused-argument
-        """Define dummy decorator for numba."""
-
-        def decorator(func):
-            @func_wraps(func)
-            def wrapper(*args, **kwargs):
-                return func(*args, **kwargs)
-
-            return wrapper
-
-        return decorator
 
 
 @fill_doc
@@ -232,16 +214,14 @@ class AAHCluster(_BaseCluster):
 
         GEV = np.sum(data * cluster, axis=0)
 
+        if ignore_polarity:
+            GEV = np.abs(GEV)
+
         assignment = np.arange(n_frame)
 
-        n_steps = n_frame - n_clusters
         while cluster.shape[1] > n_clusters:
-            step = n_frame - cluster.shape[1]
-
             to_remove = np.argmin(GEV)
             orphans = assignment == to_remove
-
-            old_cluster = cluster[:, to_remove].copy()
 
             cluster = np.delete(cluster, to_remove, axis=1)
             GEV = np.delete(GEV, to_remove, axis=0)
@@ -259,108 +239,22 @@ class AAHCluster(_BaseCluster):
             for c in cluster_to_update:
                 members = assignment == c
                 if ignore_polarity:
-                    old_weight = len(new_assignment == c) / members.sum()
-
-                    sgn = np.sign(old_cluster @ cluster[:, c])
-
-                    first_pc_init = (
-                        old_weight * sgn * old_cluster
-                        + (1.0 - old_weight) * cluster[:, c]
+                    evecs, _, _ = np.linalg.svd(
+                        data[:, members], full_matrices=False
                     )
-
-                    (
-                        first_pc,
-                        _,
-                        converged,
-                    ) = AAHCluster._first_principal_component(
-                        data[:, members], first_pc_init, max_iter=n_chan
-                    )
-                    if converged:
-                        logger.debug(
-                            "AAHC %d/%d: " "power iterations converged.",
-                            step,
-                            n_steps,
-                        )
-                    else:
-                        logger.debug(
-                            "AAHC %d/%d "
-                            "power iteration did not converge. "
-                            "Computing fallback solution.",
-                            step,
-                            n_steps,
-                        )
-                        # fall back to covariance estimation
-                        # and eigenvalue computation
-                        data_cov = data[:, members] @ data[:, members].T
-                        _, evecs = np.linalg.eigh(data_cov)
-                        # eigenvector at largest eigenvalue
-                        first_pc = evecs[:, -1]
-
-                    cluster[:, c] = first_pc
+                    cluster[:, c] = evecs[:, 0]
                 else:
                     cluster[:, c] = np.mean(data[:, members], axis=1)
                     cluster[:, c] /= np.linalg.norm(
                         cluster[:, c], axis=0, keepdims=True
                     )
-                new_fit = cluster[:, slice(c, c + 1)] * data[:, members]
+                new_fit = cluster[:, slice(c, c + 1)].T @ data[:, members]
                 if ignore_polarity:
                     new_fit = np.abs(new_fit)
                 GEV[c] = np.sum(new_fit)
         return cluster.T, assignment
 
     # pylint: enable=too-many-locals
-
-    @staticmethod
-    @njit(cache=True)
-    def _first_principal_component(
-        X: NDArray[float],
-        v0: NDArray[float],
-        tol: float = 1e-6,
-        max_iter: int = 100,
-    ) -> Tuple[NDArray[float], float, bool]:
-        """Compute first principal component.
-
-        Parameters
-        ----------
-        X : numpy.ndarray
-            Input data matrix with dimensions (channels x observations)
-        v0 : numpy.ndarray
-            Initial estimate of the principal vector with dimensions
-            (channels,).
-        tol : float (1e-6 by default)
-            Tolerance for convergence.
-        max_iter : int (100 by default)
-            Maximum number of iterations to estimate the first principal
-            component.
-
-        Returns
-        -------
-        v : numpy.ndarray
-            Estimated principal component vector.
-        eig : float
-            Eigenvalue of the covariance matrix of X (channels x channels)
-        converged : bool
-            False, if `max_iter` were reached.
-
-        See :footcite:t:`Roweis1997` for additional information.
-        """
-        v = v0.flatten()
-        assert v.shape[0] == X.shape[0]
-        v /= np.linalg.norm(v)
-
-        converged = False
-        for _ in range(max_iter):
-            s = np.sum((np.expand_dims(v, 0) @ X) * X, axis=1)
-
-            eig = s.dot(v)
-            s_norm = np.linalg.norm(s)
-
-            if np.linalg.norm(eig * v - s) / s_norm < tol:
-                converged = True
-                break
-            v = s / s_norm
-        return v, eig, converged
-
     # --------------------------------------------------------------------
 
     @property
