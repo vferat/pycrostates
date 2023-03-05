@@ -220,7 +220,6 @@ class AAHCluster(_BaseCluster):
         assignment = np.arange(n_frame)
 
         while cluster.shape[1] > n_clusters:
-
             to_remove = np.argmin(GEV)
             orphans = assignment == to_remove
 
