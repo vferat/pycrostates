@@ -125,7 +125,7 @@ stages:
       displayName: 'Install dependencies and MNE (stable)'
     - script: |
         python -m pip uninstall -y mne
-        python -m pip install --progress-bar off --no-deps https://github.com/mne-tools/mne-python/archive/main.zip
+        python -m pip install --progress-bar off --no-deps git+https://github.com/mne-tools/mne-python
       condition: eq(variables.MNE_DEV, 'true')
       displayName: 'Install MNE (main)'
     - script: mne sys_info -pd
