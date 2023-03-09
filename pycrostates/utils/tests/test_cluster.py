@@ -11,7 +11,7 @@ directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname, preload=False)
 raw.pick("eeg").crop(0, 10)
-raw.load_data().apply_proj()
+raw.load_data()
 # Fit one for general purposes
 n_clusters = 5
 ModK_0 = ModKMeans(

@@ -49,7 +49,7 @@ def optimize_order(inst, template_inst):
             f"ignore_polarity={inst._ignore_polarity} while "
             "template was fitted using ignore_polarity="
             f"{inst._ignore_polarity} which could lead to "
-            "missinterpretations."
+            "misinterpretations."
         )
     inst_centers = inst._cluster_centers_
     template_centers = template_inst._cluster_centers_
