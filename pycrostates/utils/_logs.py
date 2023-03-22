@@ -1,115 +1,93 @@
 import logging
-import sys
-from typing import Any, Callable, TypeVar
+from functools import wraps
+from pathlib import Path
+from typing import Callable, Optional, Union
 
 import mne
-from decorator import FunctionMaker
 
-from ._checks import _check_type
+from ._checks import _check_type, check_verbose
 from ._docs import fill_doc
-
-logger = logging.getLogger(__package__.split(".utils", maxsplit=1)[0])
-logger.propagate = False  # don't propagate (in case of multiple imports)
+from ._fixes import _WrapStdOut
 
 
-def init_logger(verbose="INFO"):
-    """
-    Initialize a logger.
+@fill_doc
+def _init_logger(
+    *, verbose: Optional[Union[bool, str, int]] = None
+) -> logging.Logger:
+    """Initialize a logger.
 
-    Assign sys.stdout as a handler of the logger.
-
-    Parameters
-    ----------
-    verbose : int | str
-        Logger verbosity.
-    """
-    set_log_level(verbose)
-    add_stream_handler(sys.stdout, verbose)
-
-
-def add_stream_handler(stream, verbose="INFO"):
-    """
-    Add a stream handler to the logger.
-
-    The handler redirects the logger output to the stream.
+    Assigns sys.stdout as the first handler of the logger.
 
     Parameters
     ----------
-    stream : The output stream, e.g. sys.stdout
-    verbose : int | str
-        Handler verbosity.
+    %(verbose)s
+
+    Returns
+    -------
+    logger : Logger
+        The initialized logger.
     """
-    handler = logging.StreamHandler(stream)
-    handler.setFormatter(LoggerFormatter())
+    # create logger
+    verbose = check_verbose(verbose)
+    logger = logging.getLogger(__package__.split(".utils", maxsplit=1)[0])
+    logger.propagate = False
+    logger.setLevel(verbose)
+
+    # add the main handler
+    handler = logging.StreamHandler(_WrapStdOut())
+    handler.setFormatter(_LoggerFormatter())
     logger.addHandler(handler)
 
-    _check_type(verbose, (bool, str, int, None), item_name="verbose")
-    if verbose is None:
-        verbose = "INFO"
-    set_handler_log_level(verbose, -1)
+    return logger
 
 
-def add_file_handler(fname, mode="a", verbose="INFO"):
-    """
-    Add a file handler to the logger.
-
-    The handler saves the logs to file.
+@fill_doc
+def add_file_handler(
+    fname: Union[str, Path],
+    mode: str = "a",
+    encoding: Optional[str] = None,
+    *,
+    verbose: Optional[Union[bool, str, int]] = None,
+) -> None:
+    """Add a file handler to the logger.
 
     Parameters
     ----------
     fname : str | Path
+        Path to the file where the logging output is saved.
     mode : str
         Mode in which the file is opened.
-    verbose : int | str
-        Handler verbosity.
+    encoding : str | None
+        If not None, encoding used to open the file.
+    %(verbose)s
     """
-    handler = logging.FileHandler(fname, mode)
-    handler.setFormatter(LoggerFormatter())
+    verbose = check_verbose(verbose)
+    handler = logging.FileHandler(fname, mode, encoding)
+    handler.setFormatter(_LoggerFormatter())
+    handler.setLevel(verbose)
     logger.addHandler(handler)
 
-    _check_type(verbose, (bool, str, int, None), item_name="verbose")
-    if verbose is None:
-        verbose = "INFO"
-    set_handler_log_level(verbose, -1)
 
-
-def set_handler_log_level(verbose, handler_id=0):
-    """
-    Set the log level for a specific handler.
-
-    First handler (ID 0) is always stdout, followed by user-defined handlers.
+@fill_doc
+def set_log_level(
+    verbose: Union[bool, str, int, None], apply_to_mne: bool = True
+) -> None:
+    """Set the log level for the logger and the first handler ``sys.stdout``.
 
     Parameters
     ----------
-    verbose : int | str
-        Logger verbosity.
-    handler_id : int
-        ID of the handler among 'logger.handlers'.
+    %(verbose)s
+    apply_to_mne : bool
+        If True, also changes the log level of MNE.
     """
-    _check_type(verbose, (bool, str, int, None), item_name="verbose")
-    if verbose is None:
-        verbose = "INFO"
-    logger.handlers[handler_id].setLevel = verbose
-
-
-def set_log_level(verbose, return_old_level=False):
-    """
-    Set the log level for the logger.
-
-    Parameters
-    ----------
-    verbose : int | str
-        Logger verbosity.
-    """
-    _check_type(verbose, (bool, str, int, None), item_name="verbose")
-    old_verbose = logger.level
-    if verbose is None:
-        verbose = "INFO"
+    _check_type(apply_to_mne, (bool,), "apply_to_mne")
+    verbose = check_verbose(verbose)
+    if apply_to_mne:
+        mne.set_log_level(verbose)
     logger.setLevel(verbose)
-    return old_verbose if return_old_level else None
 
 
-class LoggerFormatter(logging.Formatter):
+class _LoggerFormatter(logging.Formatter):
     """Format string Syntax for pycrostates."""
 
     # Format string syntax for the different Log levels
@@ -148,107 +126,51 @@ class LoggerFormatter(logging.Formatter):
         return self._formatters[logging.ERROR].format(record)
 
 
-# Provide help for static type checkers:
-# https://mypy.readthedocs.io/en/stable/generics.html#declaring-decorators
-_FuncT = TypeVar("_FuncT", bound=Callable[..., Any])
-
-
-def verbose(function: _FuncT) -> _FuncT:
-    """Verbose decorator to allow functions to override log-level.
+def verbose(f: Callable) -> Callable:
+    """Set the verbose for the function call from the kwargs.
 
     Parameters
     ----------
-    function : callable
-        Function to be decorated by setting the verbosity level.
+    f : callable
+        The function with a verbose argument.
 
     Returns
     -------
-    dec : callable
-        The decorated function.
+    f : callable
+        The function.
+    """
 
-    Notes
-    -----
-    This decorator is used to set the verbose level during a function or method
-    call, such as :func:`mne.compute_covariance`. The `verbose` keyword
-    argument can be 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL', True (an
-    alias for 'INFO'), or False (an alias for 'WARNING'). To set the global
-    verbosity level for all functions, use :func:`mne.set_log_level`.
-    This function also serves as a docstring filler.
-    """  # noqa: E501
-    # See https://decorator.readthedocs.io/en/latest/tests.documentation.html
-    # #dealing-with-third-party-decorators
-    try:
-        fill_doc(function)
-    except TypeError:  # nothing to add
-        pass
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if "verbose" in kwargs:
+            with _use_log_level(kwargs["verbose"]):
+                return f(*args, **kwargs)
+        else:
+            return f(*args, **kwargs)
 
-    # Anything using verbose should either have `verbose=None` in the signature
-    # or have a `self.verbose` attribute (if in a method). This code path
-    # will raise an error if neither is the case.
-    body = """\
-def %(name)s(%(signature)s):\n
-    try:
-        verbose
-    except UnboundLocalError:
-        try:
-            verbose = self.verbose
-        except NameError:
-            raise RuntimeError('Function %%s does not accept verbose parameter'
-                               %% (_function_,))
-        except AttributeError:
-            raise RuntimeError('Method %%s class does not have self.verbose'
-                               %% (_function_,))
-    else:
-        if verbose is None:
-            try:
-                verbose = self.verbose
-            except (NameError, AttributeError):
-                pass
-    if verbose is not None:
-        with _use_log_level_(verbose):
-            return _function_(%(shortsignature)s)
-    else:
-        return _function_(%(shortsignature)s)"""
-    evaldict = dict(_use_log_level_=use_log_level, _function_=function)
-    fm = FunctionMaker(function, None, None, None, None, function.__module__)
-    attrs = dict(
-        __wrapped__=function,
-        __qualname__=function.__qualname__,
-        __globals__=function.__globals__,
-    )
-    return fm.make(body, evaldict, addsource=True, **attrs)
+    return wrapper
 
 
-class use_log_level:
-    """Context handler for logging level.
+@fill_doc
+class _use_log_level:
+    """Context manager to change the logging level temporary.
 
     Parameters
     ----------
-    level : int
-        The level to use.
+    %(verbose)s
     """
 
-    def __init__(self, level):  # noqa: D102
-        self.level = level
+    def __init__(self, verbose: Union[bool, str, int, None] = None):
+        self._old_level = logger.level
+        self._level = verbose
 
-    def __enter__(self):  # noqa: D105
-        self.old_level = set_log_level(self.level, return_old_level=True)
+    def __enter__(self):
+        mne.set_log_level(self._level)
+        set_log_level(self._level)
 
-    def __exit__(self, *args):  # noqa: D105
-        set_log_level(self.old_level)
-
-
-def _set_verbose(verbose):
-    """
-    Similar to verbose decorator.
-
-    Parameters
-    ----------
-    verbose : int | str
-        Logger verbosity.
-    """
-    mne.set_log_level(verbose)
-    set_log_level(verbose)
+    def __exit__(self, *args):
+        mne.set_log_level(self._old_level)
+        set_log_level(self._old_level)
 
 
-init_logger()
+logger = _init_logger(verbose="WARNING")  # equivalent to verbose=None

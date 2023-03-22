@@ -24,8 +24,7 @@ from ..utils._checks import (
     _check_value,
 )
 from ..utils._docs import fill_doc
-from ..utils._logs import _set_verbose, logger
-from ..utils._logs import verbose as verbose_decorator
+from ..utils._logs import logger, verbose
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 from ..viz import plot_cluster_centers
 
@@ -185,6 +184,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @abstractmethod
     @fill_doc
+    @verbose
     def fit(
         self,
         inst: Union[BaseRaw, BaseEpochs, CHData],
@@ -217,8 +217,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         %(verbose)s
         """
         from ..io import ChData, ChInfo
-
-        _set_verbose(verbose)
 
         self._check_unfitted()
         _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
@@ -560,7 +558,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self._check_fit()
         _check_type(fname, ("path-like",), "fname")
 
-    @verbose_decorator
+    @verbose
     def predict(
         self,
         inst: Union[BaseRaw, BaseEpochs],
