@@ -2,8 +2,8 @@
 
 import pytest
 
-from .._docs import copy_doc, fill_doc
-from ..logs import verbose
+from pycrostates.utils._docs import copy_doc, fill_doc
+from pycrostates.utils._logs import verbose
 
 
 def test_fill_doc_function():
