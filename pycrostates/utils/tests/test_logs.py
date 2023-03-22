@@ -5,13 +5,20 @@ from typing import Optional, Union
 
 import pytest
 
-from .._logs import add_file_handler, logger, set_log_level, verbose
+from pycrostates.utils._logs import (
+    add_file_handler,
+    logger,
+    set_log_level,
+    verbose,
+)
 
 logger.propagate = True
 
 
 def test_default_log_level(caplog):
     """Test the default log level."""
+    set_log_level("WARNING")  # set to default
+
     caplog.clear()
     logger.debug("101")
     assert "101" not in caplog.text
