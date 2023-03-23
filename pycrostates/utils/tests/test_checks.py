@@ -1,5 +1,6 @@
 """Test _checks.py"""
 
+import logging
 import os
 import re
 
@@ -21,6 +22,7 @@ from pycrostates.utils._checks import (
     _check_tmin_tmax,
     _check_type,
     _check_value,
+    _check_verbose,
     _ensure_int,
 )
 
@@ -239,3 +241,22 @@ def test_check_picks_uniqueness():
     picks = _picks_to_idx(info, [1, 2, 3])
     with pytest.raises(ValueError, match="Only one datatype can be selected"):
         _check_picks_uniqueness(info, picks)
+
+
+def test_check_verbose():
+    """Test check_verbose checker."""
+    # valids
+    assert _check_verbose(12) == 12
+    assert _check_verbose("INFO") == logging.INFO
+    assert _check_verbose("DEBUG") == logging.DEBUG
+    assert _check_verbose(True) == logging.INFO
+    assert _check_verbose(False) == logging.WARNING
+    assert _check_verbose(None) == logging.WARNING
+
+    # invalids
+    with pytest.raises(TypeError, match="must be an instance of"):
+        _check_verbose(("INFO",))
+    with pytest.raises(ValueError, match="Invalid value"):
+        _check_verbose("101")
+    with pytest.raises(ValueError, match="negative integer, -101 is invalid."):
+        _check_verbose(-101)

@@ -302,7 +302,7 @@ def _check_picks_uniqueness(info, picks):
 
 
 @fill_doc
-def check_verbose(verbose: Any) -> int:
+def _check_verbose(verbose: Any) -> int:
     """Check that the value of verbose is valid.
 
     Parameters

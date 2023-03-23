@@ -5,7 +5,7 @@ from typing import Callable, Optional, Union
 
 import mne
 
-from ._checks import _check_type, check_verbose
+from ._checks import _check_type, _check_verbose
 from ._docs import fill_doc
 from ._fixes import _WrapStdOut
 
@@ -28,7 +28,7 @@ def _init_logger(
         The initialized logger.
     """
     # create logger
-    verbose = check_verbose(verbose)
+    verbose = _check_verbose(verbose)
     logger = logging.getLogger(__package__.split(".utils", maxsplit=1)[0])
     logger.propagate = False
     logger.setLevel(verbose)
@@ -61,7 +61,7 @@ def add_file_handler(
         If not None, encoding used to open the file.
     %(verbose)s
     """
-    verbose = check_verbose(verbose)
+    verbose = _check_verbose(verbose)
     handler = logging.FileHandler(fname, mode, encoding)
     handler.setFormatter(_LoggerFormatter())
     handler.setLevel(verbose)
@@ -81,7 +81,7 @@ def set_log_level(
         If True, also changes the log level of MNE.
     """
     _check_type(apply_to_mne, (bool,), "apply_to_mne")
-    verbose = check_verbose(verbose)
+    verbose = _check_verbose(verbose)
     if apply_to_mne:
         mne.set_log_level(verbose)
     logger.setLevel(verbose)
