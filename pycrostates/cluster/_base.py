@@ -558,6 +558,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self._check_fit()
         _check_type(fname, ("path-like",), "fname")
 
+    @fill_doc
     @verbose
     def predict(
         self,
