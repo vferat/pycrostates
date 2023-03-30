@@ -20,7 +20,6 @@ keys: Tuple[str, ...] = (
     "tmin_raw",
     "tmax_raw",
     "reject_by_annotation_raw",
-    "verbose",
 )
 
 for key in keys:
@@ -32,6 +31,16 @@ for key in keys:
     if ".. versionadded::" in entry:
         entry = entry.replace(".. versionadded::", ".. versionadded:: MNE ")
     docdict[key] = entry
+
+docdict[
+    "verbose"
+] = """
+verbose : int | str | bool | None
+    Sets the verbosity level. The verbosity increases gradually between
+    ``"CRITICAL"``, ``"ERROR"``, ``"WARNING"``, ``"INFO"`` and ``"DEBUG"``.
+    If None is provided, the verbosity is set to ``"WARNING"``.
+    If a bool is provided, the verbosity is set to ``"WARNING"`` for False and
+    to ``"INFO"`` for True."""
 
 # ---- Clusters ----
 docdict[

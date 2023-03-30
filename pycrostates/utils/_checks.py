@@ -1,15 +1,19 @@
 """Utility functions for checking types and values. Inspired from MNE."""
 
+import logging
 import multiprocessing as mp
 import operator
 import os
 from itertools import product
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from matplotlib.axes import Axes
 from mne import pick_info
 from mne.utils import check_random_state
+
+from ._docs import fill_doc
 
 
 def _ensure_int(item, item_name=None):
@@ -295,3 +299,48 @@ def _check_picks_uniqueness(info, picks):
             "Only one datatype can be selected, but 'picks' "
             f"results in {channels_msg}."
         )
+
+
+@fill_doc
+def _check_verbose(verbose: Any) -> int:
+    """Check that the value of verbose is valid.
+
+    Parameters
+    ----------
+    %(verbose)s
+
+    Returns
+    -------
+    verbose : int
+        The verbosity level as an integer.
+    """
+    logging_types = dict(
+        DEBUG=logging.DEBUG,
+        INFO=logging.INFO,
+        WARNING=logging.WARNING,
+        ERROR=logging.ERROR,
+        CRITICAL=logging.CRITICAL,
+    )
+
+    _check_type(verbose, (bool, str, "int", None), item_name="verbose")
+
+    if verbose is None:
+        verbose = logging.WARNING
+    elif isinstance(verbose, str):
+        verbose = verbose.upper()
+        _check_value(verbose, logging_types, item_name="verbose")
+        verbose = logging_types[verbose]
+    elif isinstance(verbose, bool):
+        if verbose:
+            verbose = logging.INFO
+        else:
+            verbose = logging.WARNING
+    elif isinstance(verbose, int):
+        verbose = _ensure_int(verbose)
+        if verbose <= 0:
+            raise ValueError(
+                "Argument 'verbose' can not be a negative integer, "
+                f"{verbose} is invalid."
+            )
+
+    return verbose
