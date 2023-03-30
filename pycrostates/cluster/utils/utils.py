@@ -21,12 +21,15 @@ def optimize_order(inst, template_inst):
     Optimizes the order of cluster centers in an instance of a clustering
     algorithm to maximize auto-correlation, based on a template instance
     as determined by the Hungarian algorithm.
-    The two instances must have the same number of cluster centers
+    The two cluster instances must have the same number of cluster centers
     and the same polarity setting.
 
     Parameters
     ----------
-    %(cluster)s
+    inst : :ref:`cluster`
+        Fitted clustering algorithm to reorder.
+    template_inst : :ref:`cluster`
+        Fitted clustering algorithm to use as template for reordering.
 
     Returns
     -------
