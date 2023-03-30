@@ -1,9 +1,8 @@
 import numpy as np
 import scipy
 
-from ..cluster._base import _BaseCluster
-from ._checks import _check_type
-from ._docs import fill_doc
+from ...utils._checks import _check_type
+from ...utils._docs import fill_doc
 
 
 def _optimize_order(centers, template_centers, ignore_polarity=True):
@@ -17,11 +16,13 @@ def _optimize_order(centers, template_centers, ignore_polarity=True):
 
 @fill_doc
 def optimize_order(inst, template_inst):
-    """Find order that best match instance and template cluster centers.
+    """Optimizes the order of cluster centers between two cluster instances.
 
-    Compute the optimal assignment of indices in instance cluster centers
-    to indices of template cluster centers, to maximize clusters
-    auto-correlation as determined by the Hungarian algorithm.
+    Optimizes the order of cluster centers in an instance of a clustering
+    algorithm to maximize auto-correlation, based on a template instance
+    as determined by the Hungarian algorithm.
+    The two instances must have the same number of cluster centers
+    and the same polarity setting.
 
     Parameters
     ----------
@@ -33,6 +34,8 @@ def optimize_order(inst, template_inst):
         The new order to apply to inst to maximize auto-correlation
         of cluster centers.
     """
+    from .._base import _BaseCluster
+
     _check_type(inst, (_BaseCluster,), item_name="inst")
     inst._check_fit()
     _check_type(template_inst, (_BaseCluster,), item_name="template_inst")

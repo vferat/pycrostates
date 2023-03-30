@@ -27,6 +27,7 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 from ..viz import plot_cluster_centers
+from .utils import optimize_order
 
 
 class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
@@ -364,8 +365,20 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 NDArray[int],
             ]
         ] = None,
+        template=None,
     ) -> None:
-        """Reorder the clusters.
+        """
+        Reorders the clusters of the fitted model.
+
+        Specify one of the following arguments to change the current order:
+
+        * ``mapping``: a dictionary that maps old cluster positions
+          to new positions,
+        * ``order``: a 1D iterable containing the new order,
+        * ``template``: a fitted clustering algorithm from which
+          to optimize order.
+
+        Only one argument can be set at a time.
 
         Parameters
         ----------
@@ -374,19 +387,29 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             key: old position, value: new position.
         order : list of int | tuple of int | array of int
             1D iterable containing the new order.
+            Positions are 0-indexed.
+        template : :ref:`cluster`
+            Fitted clustering algorithm use as template for
+            ordering optimization. For more details about current
+            implementation, check the
+            :func:`pycrostates.cluster.utils.optimize_order`
+            documentation.
 
         Notes
         -----
-        The positions are 0-indexed.
         Operates in-place.
         """
         self._check_fit()
 
-        if mapping is not None and order is not None:
+        if (mapping is not None) + (order is not None) + (
+            template is not None
+        ) > 1:
             raise ValueError(
-                "Only one of 'mapping' or 'order' must be provided."
+                "Only one of 'mapping', 'order' or 'template' "
+                "must be provided."
             )
 
+        # Mapping
         if mapping is not None:
             _check_type(mapping, (dict,), item_name="mapping")
             valids = tuple(range(self._n_clusters))
@@ -420,6 +443,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             # sanity-check
             assert len(set(order)) == self._n_clusters
 
+        # Order
         elif order is not None:
             _check_type(order, (list, tuple, np.ndarray), item_name="order")
             if isinstance(order, np.ndarray) and len(order.shape) != 1:
@@ -437,9 +461,13 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 )
             order = list(order)
 
+        # Cluster
+        elif template is not None:
+            order = optimize_order(self, template)
+
         else:
             logger.warning(
-                "Either 'mapping' or 'order' should not be 'None' "
+                "Either 'mapping', 'order' or 'template' should not be 'None' "
                 "for method 'reorder_clusters' to operate."
             )
             return

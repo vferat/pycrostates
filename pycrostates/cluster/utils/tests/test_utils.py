@@ -1,11 +1,11 @@
-"""Test Metrics."""
+"""Test cluster utils."""
 
 import numpy as np
 from mne.datasets import testing
 from mne.io import read_raw_fif
 
 from pycrostates.cluster import ModKMeans
-from pycrostates.utils._clusters import _optimize_order, optimize_order
+from pycrostates.cluster.utils.utils import _optimize_order, optimize_order
 
 directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"

@@ -409,9 +409,15 @@ def test_reorder(caplog):
         ModK_.reorder_clusters(order=np.array([[0, 1, 2, 3], [0, 1, 2, 3]]))
 
     ModK_.reorder_clusters()
-    assert "Either 'mapping' or 'order' should not be 'None' " in caplog.text
+    assert (
+        "Either 'mapping', 'order' or 'template' should not be 'None'"
+        in caplog.text
+    )
 
-    with pytest.raises(ValueError, match="Only one of 'mapping' or 'order'"):
+    with pytest.raises(
+        ValueError,
+        match="Only one of 'mapping', 'order' or 'template' must be provided.",
+    ):
         ModK_.reorder_clusters(mapping={0: 1}, order=[1, 0, 2, 3])
 
     # Test unfitted
@@ -422,6 +428,13 @@ def test_reorder(caplog):
         ModK_.reorder_clusters(mapping={0: 1})
     with pytest.raises(RuntimeError, match="must be fitted before"):
         ModK_.reorder_clusters(order=[1, 0, 2, 3])
+
+    # Test template
+    ModK_ = ModK.copy()
+    ModK__ = ModK_.copy()
+    ModK_.reorder_clusters(order=np.array([1, 0, 2, 3]))
+    ModK_.reorder_clusters(template=ModK__)
+    assert np.allclose(ModK_.cluster_centers_, ModK_.cluster_centers_)
 
 
 def test_properties(caplog):
@@ -746,7 +759,7 @@ def test_refit():
     ModK_.fit(raw, picks="mag")
     mag_ch_names = ModK_.info["ch_names"]
     mag_cluster_centers = ModK_.cluster_centers_
-    assert eeg_ch_names != mag_ch_names
+    assert not np.array_equal(eeg_ch_names, mag_ch_names)
     assert eeg_cluster_centers.shape != mag_cluster_centers.shape
 
     # invalid
@@ -764,7 +777,7 @@ def test_refit():
     with pytest.raises(RuntimeError, match="must be unfitted"):
         ModK_.fit(raw, picks="mag")  # works
     assert eeg_ch_names == ModK_.info["ch_names"]
-    assert np.allclose(eeg_cluster_centers, ModK_.cluster_centers_)
+    assert np.isclose(eeg_cluster_centers, ModK_.cluster_centers_).all()
 
 
 def test_predict_default(caplog):
