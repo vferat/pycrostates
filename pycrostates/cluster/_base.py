@@ -368,7 +368,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         template=None,
     ) -> None:
         """
-        Reorders the clusters of the fitted model.
+        Reorder the clusters of the fitted model.
 
         Specify one of the following arguments to change the current order:
 

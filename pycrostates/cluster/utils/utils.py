@@ -16,9 +16,9 @@ def _optimize_order(centers, template_centers, ignore_polarity=True):
 
 @fill_doc
 def optimize_order(inst, template_inst):
-    """Optimizes the order of cluster centers between two cluster instances.
+    """Optimize the order of cluster centers between two cluster instances.
 
-    Optimizes the order of cluster centers in an instance of a clustering
+    Optimize the order of cluster centers in an instance of a clustering
     algorithm to maximize auto-correlation, based on a template instance
     as determined by the Hungarian algorithm.
     The two cluster instances must have the same number of cluster centers
