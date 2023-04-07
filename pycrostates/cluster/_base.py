@@ -401,9 +401,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         """
         self._check_fit()
 
-        if (mapping is not None) + (order is not None) + (
-            template is not None
-        ) > 1:
+        if sum(x is not None for x in (mapping, order, template) > 1:
             raise ValueError(
                 "Only one of 'mapping', 'order' or 'template' "
                 "must be provided."
