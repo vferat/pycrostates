@@ -390,7 +390,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             Positions are 0-indexed.
         template : :ref:`cluster`
             Fitted clustering algorithm use as template for
-            ordering optimization. For more details about the 
+            ordering optimization. For more details about the
             current implementation, check the
             :func:`pycrostates.cluster.utils.optimize_order`
             documentation.
@@ -401,7 +401,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         """
         self._check_fit()
 
-        if sum(x is not None for x in (mapping, order, template) > 1:
+        if sum(x is not None for x in (mapping, order, template)) > 1:
             raise ValueError(
                 "Only one of 'mapping', 'order' or 'template' "
                 "must be provided."
