@@ -390,8 +390,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             Positions are 0-indexed.
         template : :ref:`cluster`
             Fitted clustering algorithm use as template for
-            ordering optimization. For more details about current
-            implementation, check the
+            ordering optimization. For more details about the 
+            current implementation, check the
             :func:`pycrostates.cluster.utils.optimize_order`
             documentation.
 
