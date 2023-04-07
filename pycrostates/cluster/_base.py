@@ -375,8 +375,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         * ``mapping``: a dictionary that maps old cluster positions
           to new positions,
         * ``order``: a 1D iterable containing the new order,
-        * ``template``: a fitted clustering algorithm from which
-          to optimize order.
+        * ``template``: a fitted clustering algorithm used as a reference
+           to match the order.
 
         Only one argument can be set at a time.
 
