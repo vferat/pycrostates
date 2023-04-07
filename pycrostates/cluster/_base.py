@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from copy import copy, deepcopy
 from itertools import groupby
 from pathlib import Path
@@ -13,7 +13,7 @@ from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 from scipy.signal import convolve2d
 
-from .._typing import CHData, Picks
+from .._typing import CHData, Cluster, Picks
 from ..segmentation import EpochsSegmentation, RawSegmentation
 from ..utils import _corr_vectors
 from ..utils._checks import (
@@ -30,7 +30,7 @@ from ..viz import plot_cluster_centers
 from .utils import optimize_order
 
 
-class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
+class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     """Base Class for Microstates Clustering algorithms."""
 
     @abstractmethod
@@ -365,7 +365,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 NDArray[int],
             ]
         ] = None,
-        template=None,
+        template: Optional[Cluster] = None,
     ) -> None:
         """
         Reorder the clusters of the fitted model.

@@ -1,11 +1,17 @@
 import numpy as np
 import scipy
+from numpy.typing import NDArray
 
+from ..._typing import Cluster
 from ...utils._checks import _check_type
 from ...utils._docs import fill_doc
 
 
-def _optimize_order(centers, template_centers, ignore_polarity=True):
+def _optimize_order(
+    centers: NDArray[float],
+    template_centers: NDArray[float],
+    ignore_polarity: bool = True,
+):
     n_states = len(centers)
     M = np.corrcoef(template_centers, centers)[:n_states, n_states:]
     if ignore_polarity:
@@ -15,7 +21,7 @@ def _optimize_order(centers, template_centers, ignore_polarity=True):
 
 
 @fill_doc
-def optimize_order(inst, template_inst):
+def optimize_order(inst: Cluster, template_inst: Cluster):
     """Optimize the order of cluster centers between two cluster instances.
 
     Optimize the order of cluster centers in an instance of a clustering
