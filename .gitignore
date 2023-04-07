@@ -137,4 +137,4 @@ dmypy.json
 
 # ----------------------------------------------------------------------------
 .DS_Store
-pycrostates/cluster/junit-results.xml
+junit-results.xml

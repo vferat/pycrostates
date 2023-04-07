@@ -53,7 +53,7 @@ def optimize_order(inst: Cluster, template_inst: Cluster):
     if inst.n_clusters != template_inst.n_clusters:
         raise ValueError(
             "Instance and the template must have the same "
-            "number of cluster centers"
+            "number of cluster centers."
         )
     if inst._ignore_polarity != template_inst._ignore_polarity:
         raise ValueError(

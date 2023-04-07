@@ -375,8 +375,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         * ``mapping``: a dictionary that maps old cluster positions
           to new positions,
         * ``order``: a 1D iterable containing the new order,
-        * ``template``: a fitted clustering algorithm from which
-          to optimize order.
+        * ``template``: a fitted clustering algorithm used as a reference
+           to match the order.
 
         Only one argument can be set at a time.
 
@@ -390,8 +390,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             Positions are 0-indexed.
         template : :ref:`cluster`
             Fitted clustering algorithm use as template for
-            ordering optimization. For more details about current
-            implementation, check the
+            ordering optimization. For more details about the 
+            current implementation, check the
             :func:`pycrostates.cluster.utils.optimize_order`
             documentation.
 
@@ -401,9 +401,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         """
         self._check_fit()
 
-        if (mapping is not None) + (order is not None) + (
-            template is not None
-        ) > 1:
+        if sum(x is not None for x in (mapping, order, template) > 1:
             raise ValueError(
                 "Only one of 'mapping', 'order' or 'template' "
                 "must be provided."
