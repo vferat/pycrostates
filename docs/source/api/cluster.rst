@@ -14,3 +14,17 @@ Cluster
 
    ModKMeans
    AAHCluster
+
+Utils
+-----
+
+.. currentmodule:: pycrostates.cluster.utils
+
+.. automodule:: pycrostates.cluster.utils
+   :no-members:
+   :no-inherited-members:
+
+.. autosummary::
+   :toctree: generated/
+
+   optimize_order

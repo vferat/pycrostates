@@ -528,9 +528,15 @@ def test_reorder(caplog):
         )
 
     aahCluster_.reorder_clusters()
-    assert "Either 'mapping' or 'order' should not be 'None' " in caplog.text
+    assert (
+        "Either 'mapping', 'order' or 'template' should not be 'None' "
+        in caplog.text
+    )
 
-    with pytest.raises(ValueError, match="Only one of 'mapping' or 'order'"):
+    with pytest.raises(
+        ValueError,
+        match="Only one of 'mapping', 'order' or 'template' must be provided.",
+    ):
         aahCluster_.reorder_clusters(mapping={0: 1}, order=[1, 0, 2, 3])
 
     # Test unfitted

@@ -43,7 +43,7 @@ class AAHCluster(_BaseCluster):
         self._n_clusters = _BaseCluster._check_n_clusters(n_clusters)
         self._cluster_names = [str(k) for k in range(self.n_clusters)]
 
-        # TODO : ignor_polarity=True for now.
+        # TODO : ignore_polarity=True for now.
         # After _BaseCluster and Metric support ignore_polarity
         # make the parameter an argument
         # https://github.com/vferat/pycrostates/pull/93#issue-1431122168
