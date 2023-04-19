@@ -170,7 +170,7 @@ def apply_spatial_filter(
     if isinstance(inst, BaseEpochs):
         data = np.hstack(data)
     # apply filter
-    logger.log(f"Applying spatial filter on {len(picks)} channels.")
+    logger.info(f"Applying spatial filter on {len(picks)} channels.")
     if n_jobs == 1:
         spatial_filtered_data = []
         for index, adjacency_vector in enumerate(adjacency):
