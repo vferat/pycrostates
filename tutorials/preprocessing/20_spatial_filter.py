@@ -58,7 +58,13 @@ plt.show()
 
 raw_filter = raw.copy()
 apply_spatial_filter(raw_filter, n_jobs=-1)
-
+#%%
+# .. note::
+#     You can provide your own adjacency matrix using the ``adjacency`` parameter
+#     of :func:`pycrostates.preprocessing.apply_spatial_filter`. To create a custom
+#     matrix you can either edit the default one by setting the ``edit`` parameter
+#     to ``True`` in :func:`mne.viz.plot_ch_adjacency` or create a
+#     :func:`scipy.sparse.csr_matrix` or :func:`np.ndarray` from scratch.
 #%%
 # To assess the impact of the spatial filter, we can display topographies from
 # random points in the recording.
