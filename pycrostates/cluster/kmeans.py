@@ -236,6 +236,7 @@ class ModKMeans(_BaseCluster):
         self._cluster_centers_ = best_maps
         self._labels_ = best_segmentation
         self._fitted = True
+        self._ignore_polarity = True
 
     @copy_doc(_BaseCluster.save)
     def save(self, fname: Union[str, Path]):

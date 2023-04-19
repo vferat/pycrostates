@@ -23,5 +23,11 @@ class CHInfo(ABC):
     pass
 
 
+class Cluster(ABC):
+    """Typing for a clustering class."""
+
+    pass
+
+
 RANDomState = Optional[Union[int, RandomState, Generator]]
 Picks = Optional[Union[str, NDArray[int]]]

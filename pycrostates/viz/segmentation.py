@@ -13,7 +13,7 @@ from numpy.typing import NDArray
 
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
-from ..utils._logs import _set_verbose, logger
+from ..utils._logs import logger, verbose
 
 
 @fill_doc
@@ -195,6 +195,7 @@ def plot_epoch_segmentation(
     return fig
 
 
+@verbose
 def _plot_segmentation(
     labels: NDArray[int],
     gfp: NDArray[float],
@@ -209,7 +210,6 @@ def _plot_segmentation(
     **kwargs,
 ):
     """Code snippet to plot segmentation for raw and epochs."""
-    _set_verbose(verbose)
     _check_type(labels, (np.ndarray,), "labels")  # 1D array (n_times, )
     _check_type(gfp, (np.ndarray,), "gfp")  # 1D array (n_times, )
     _check_type(times, (np.ndarray,), "times")  # 1D array (n_times, )

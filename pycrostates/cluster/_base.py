@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from copy import copy, deepcopy
 from itertools import groupby
 from pathlib import Path
@@ -13,7 +13,7 @@ from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 from scipy.signal import convolve2d
 
-from .._typing import CHData, Picks
+from .._typing import CHData, Cluster, Picks
 from ..segmentation import EpochsSegmentation, RawSegmentation
 from ..utils import _corr_vectors
 from ..utils._checks import (
@@ -24,13 +24,13 @@ from ..utils._checks import (
     _check_value,
 )
 from ..utils._docs import fill_doc
-from ..utils._logs import _set_verbose, logger
-from ..utils._logs import verbose as verbose_decorator
+from ..utils._logs import logger, verbose
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 from ..viz import plot_cluster_centers
+from .utils import optimize_order
 
 
-class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
+class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     """Base Class for Microstates Clustering algorithms."""
 
     @abstractmethod
@@ -38,6 +38,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self._n_clusters = None
         self._cluster_names = None
         self._cluster_centers_ = None
+        self._ignore_polarity = None
 
         # fit variables
         self._info = None
@@ -185,6 +186,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @abstractmethod
     @fill_doc
+    @verbose
     def fit(
         self,
         inst: Union[BaseRaw, BaseEpochs, CHData],
@@ -217,8 +219,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         %(verbose)s
         """
         from ..io import ChData, ChInfo
-
-        _set_verbose(verbose)
 
         self._check_unfitted()
         _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
@@ -365,8 +365,20 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 NDArray[int],
             ]
         ] = None,
+        template: Optional[Cluster] = None,
     ) -> None:
-        """Reorder the clusters.
+        """
+        Reorder the clusters of the fitted model.
+
+        Specify one of the following arguments to change the current order:
+
+        * ``mapping``: a dictionary that maps old cluster positions
+          to new positions,
+        * ``order``: a 1D iterable containing the new order,
+        * ``template``: a fitted clustering algorithm used as a reference
+           to match the order.
+
+        Only one argument can be set at a time.
 
         Parameters
         ----------
@@ -375,19 +387,27 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             key: old position, value: new position.
         order : list of int | tuple of int | array of int
             1D iterable containing the new order.
+            Positions are 0-indexed.
+        template : :ref:`cluster`
+            Fitted clustering algorithm use as template for
+            ordering optimization. For more details about the
+            current implementation, check the
+            :func:`pycrostates.cluster.utils.optimize_order`
+            documentation.
 
         Notes
         -----
-        The positions are 0-indexed.
         Operates in-place.
         """
         self._check_fit()
 
-        if mapping is not None and order is not None:
+        if sum(x is not None for x in (mapping, order, template)) > 1:
             raise ValueError(
-                "Only one of 'mapping' or 'order' must be provided."
+                "Only one of 'mapping', 'order' or 'template' "
+                "must be provided."
             )
 
+        # Mapping
         if mapping is not None:
             _check_type(mapping, (dict,), item_name="mapping")
             valids = tuple(range(self._n_clusters))
@@ -421,6 +441,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             # sanity-check
             assert len(set(order)) == self._n_clusters
 
+        # Order
         elif order is not None:
             _check_type(order, (list, tuple, np.ndarray), item_name="order")
             if isinstance(order, np.ndarray) and len(order.shape) != 1:
@@ -438,9 +459,13 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 )
             order = list(order)
 
+        # Cluster
+        elif template is not None:
+            order = optimize_order(self, template)
+
         else:
             logger.warning(
-                "Either 'mapping' or 'order' should not be 'None' "
+                "Either 'mapping', 'order' or 'template' should not be 'None' "
                 "for method 'reorder_clusters' to operate."
             )
             return
@@ -560,7 +585,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self._check_fit()
         _check_type(fname, ("path-like",), "fname")
 
-    @verbose_decorator
+    @fill_doc
+    @verbose
     def predict(
         self,
         inst: Union[BaseRaw, BaseEpochs],
