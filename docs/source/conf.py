@@ -171,6 +171,8 @@ numpydoc_xref_aliases = {
     "Axes": "matplotlib.axes.Axes",
     "colormap": ":doc:`colormap <matplotlib:tutorials/colors/colormaps>`",
     "Figure": "matplotlib.figure.Figure",
+    # Scipy
+    "csr_matrix": "scipy.sparse.csr_matrix",
 }
 numpydoc_xref_ignore = {
     "instance",

@@ -148,8 +148,8 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
 
         Returns
         -------
-        pos : array
-            Channel locations (n_channels, 3).
+        pos : array of shape (n_channels, 3)
+            Channel X/Y/Z locations.
         """
         picks = _picks_to_idx(self.info, picks)
         chs = self.info["chs"]

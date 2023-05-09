@@ -107,12 +107,12 @@ def apply_spatial_filter(
         Origin of the sphere in the head coordinate frame and in meters.
         Can be ``'auto'`` (default), which means a head-digitization-based
         origin fit.
-    adjacency : array or ~scipy.sparse.csr_matrix of shape (n_channels, n_channels) | str
+    adjacency : array or csr_matrix of shape (n_channels, n_channels) | str
         An adjacency matrix. Can be created using
         `mne.channels.find_ch_adjacency` and edited with
         `mne.viz.plot_ch_adjacency`.
-        If ``'auto'`` (default), the matrix will be automatically using
-        `mne.channels.find_ch_adjacency` and other parameters.
+        If ``'auto'`` (default), the matrix will be automatically created
+        using `mne.channels.find_ch_adjacency` and other parameters.
     %(n_jobs)s
     %(verbose)s
 
