@@ -23,11 +23,10 @@ This example demonstrates the effect of spatial filter on EEG data.
 #     ``pymatreader`` by default.
 
 import matplotlib.pyplot as plt
-import mne
 import numpy as np
 from mne.io import read_raw_eeglab
 from mne.channels import find_ch_adjacency
-from mne.viz import plot_ch_adjacency
+from mne.viz import plot_ch_adjacency, plot_topomap
 
 from pycrostates.datasets import lemon
 from pycrostates.preprocessing import apply_spatial_filter
@@ -72,24 +71,27 @@ apply_spatial_filter(raw_filter, n_jobs=-1)
 # random points in the recording.
 
 n = 10
-random_sample = np.random.randint(0, raw.n_times, n)
-sphere = np.array([0,0,0,0.1])
-fig, axes = plt.subplots(nrows=2, ncols=n, figsize=(10,2))
+random_sample = sorted(np.random.randint(0, raw.n_times, n))
+fig, axes = plt.subplots(nrows=2, ncols=n, figsize=(15, 4))
 for s, sample in enumerate(random_sample):
-    mne.viz.topomap._plot_topomap(
+    plot_topomap(
         raw.get_data()[:, sample],
         pos=raw.info,
         axes=axes[0, s],
-        sphere=sphere,
+        sphere=np.array([0,0,0,0.1]),
         show=False,
     )
-    mne.viz.topomap._plot_topomap(
+    plot_topomap(
         raw_filter.get_data()[:, sample],
         pos=raw_filter.info,
         axes=axes[1, s],
-        sphere=sphere,
+        sphere=np.array([0,0,0,0.1]),
         show=False,
     )
+    axes[0, s].set_title(f"Sample\n{sample}")
+axes[0, 0].set_ylabel("Raw")
+axes[1, 0].set_ylabel("Filtered")
+fig.tight_layout()
 plt.show()
 
 # After applying the spatial filter, the topographies are smoother.
