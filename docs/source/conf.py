@@ -132,8 +132,8 @@ autosectionlabel_prefix_document = True
 # -- intersphinx -------------------------------------------------------------
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "numpy": ("https://numpy.org/devdocs", None),
-    "scipy": ("https://scipy.github.io/devdocs", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy", None),
     "matplotlib": ("https://matplotlib.org", None),
     "mne": ("https://mne.tools/stable/", None),
     "joblib": ("https://joblib.readthedocs.io/en/latest", None),
@@ -171,6 +171,8 @@ numpydoc_xref_aliases = {
     "Axes": "matplotlib.axes.Axes",
     "colormap": ":doc:`colormap <matplotlib:tutorials/colors/colormaps>`",
     "Figure": "matplotlib.figure.Figure",
+    # Scipy
+    "csr_matrix": "scipy.sparse.csr_matrix",
 }
 numpydoc_xref_ignore = {
     "instance",

@@ -28,6 +28,8 @@ Enhancements
 - Support for AAHC clustering (:pr:`92` by `Reinmar Kobler`_)
 - Add ``Microstate Segmentation`` tutorial. (:pr:`91` by `Victor Férat`_)
 - Add :meth:`~pycrostates.segmentation.RawSegmentation.compute_transition_matrix` and :meth:`~pycrostates.segmentation.RawSegmentation.compute_expected_transition_matrix` to :class:`~pycrostates.segmentation.RawSegmentation` and :class:`~pycrostates.segmentation.EpochsSegmentation` (:pr:`91` by `Victor Férat`_)
+- Add :func:`pycrostates.preprocessing.apply_spatial_filter`. (:pr:`96` by `Victor Férat`_)
+
 
 Bugs
 ~~~~

@@ -138,6 +138,30 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         self._data = data
         return self
 
+    def _get_channel_positions(self, picks=None):
+        """Get channel locations from info.
+
+        Parameters
+        ----------
+        picks : str | list | slice | None
+            None selects the good data channels.
+
+        Returns
+        -------
+        pos : array of shape (n_channels, 3)
+            Channel X/Y/Z locations.
+        """
+        picks = _picks_to_idx(self.info, picks)
+        chs = self.info["chs"]
+        pos = np.array([chs[k]["loc"][:3] for k in picks])
+        n_zero = np.sum(np.sum(np.abs(pos), axis=1) == 0)
+        if n_zero > 1:  # XXX some systems have origin (0, 0, 0)
+            raise ValueError(
+                "Could not extract channel positions for "
+                f"{n_zero} channels."
+            )
+        return pos
+
     # --------------------------------------------------------------------
     @property
     def info(self) -> CHInfo:
@@ -146,3 +170,13 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         :type: ChInfo
         """
         return self._info
+
+    @property
+    def ch_names(self):
+        """Channel names."""
+        return self.info["ch_names"]
+
+    @property
+    def preload(self):
+        """Preload required by some MNE functions."""
+        return True

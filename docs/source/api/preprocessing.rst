@@ -10,5 +10,6 @@ Preprocessing
 .. autosummary::
    :toctree: generated/
 
+   apply_spatial_filter
    extract_gfp_peaks
    resample
