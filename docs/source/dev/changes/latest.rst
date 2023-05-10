@@ -19,24 +19,14 @@
 
 .. _latest:
 
-Current 0.3.0
+Current 0.4.0
 -------------
 
 Enhancements
 ~~~~~~~~~~~~
 
-- Improve changelog (:pr:`86` by `Victor Férat`_)
-- Add ``Microstate Segmentation`` tutorial (:pr:`91` by `Victor Férat`_)
-- Add :meth:`~pycrostates.segmentation.RawSegmentation.compute_transition_matrix` and :meth:`~pycrostates.segmentation.RawSegmentation.compute_expected_transition_matrix` to :class:`~pycrostates.segmentation.RawSegmentation` and :class:`~pycrostates.segmentation.EpochsSegmentation` (:pr:`91` by `Victor Férat`_)
-- Add :func:`pycrostates.preprocessing.apply_spatial_filter` (:pr:`96` by `Victor Férat`_)
-- Add auto-labeling/ordering of microstates maps (:pr:`105` by `Victor Férat`_)
-
 Bugs
 ~~~~
 
-- Compare projector if MNE version is above 1.2 (:pr:`77` by `Mathieu Scheltienne`_)
-
 API changes
 ~~~~~~~~~~~
-
-- Add support for AAHC clustering (:pr:`92` by `Reinmar Kobler`_)
