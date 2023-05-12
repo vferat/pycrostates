@@ -61,7 +61,7 @@ ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
 #
 # .. note::
 #
-#     Fitting a clustering algorithm is a computationaly expensive operation.
+#     Fitting a clustering algorithm is a computationally expensive operation.
 #     Depending on your configuration, you can change the argument ``n_jobs``
 #     to take advantage of multiprocessing to reduce computation time.
 

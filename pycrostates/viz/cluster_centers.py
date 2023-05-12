@@ -2,6 +2,7 @@
 
 from typing import List, Optional, Union
 
+import mne
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
@@ -20,6 +21,7 @@ def plot_cluster_centers(
     info: Union[Info, CHInfo],
     cluster_names: List[str] = None,
     axes: Optional[Union[Axes, NDArray[Axes]]] = None,
+    show_vector: Optional[bool] = False,
     *,
     block: bool = False,
     **kwargs,
@@ -34,6 +36,9 @@ def plot_cluster_centers(
     %(cluster_names)s
     %(axes_topo)s
     %(block)s
+    show_vector : bool
+        If True, plot a vector between channel locations
+        with highest and lowest values.
     **kwargs
         Additional keyword arguments are passed to
         :func:`mne.viz.plot_topomap`.
@@ -114,6 +119,16 @@ def plot_cluster_centers(
             ax = axes[i, j]
         # plot
         plot_topomap(center, info, axes=ax, show=False, **kwargs)
+        # Add min max vector
+        if show_vector:
+            i_min = np.argmin(center)
+            i_max = np.argmax(center)
+            pos = mne.channels.layout._find_topomap_coords(info, picks="all")
+            ax.plot(
+                [pos[i_min, 0], pos[i_max, 0]],
+                [pos[i_min, 1], pos[i_max, 1]],
+                "P-k",
+            )
         ax.set_title(name)
 
     if show:
