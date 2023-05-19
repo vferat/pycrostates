@@ -21,7 +21,7 @@ def plot_cluster_centers(
     info: Union[Info, CHInfo],
     cluster_names: List[str] = None,
     axes: Optional[Union[Axes, NDArray[Axes]]] = None,
-    show_vector: Optional[bool] = False,
+    show_watershed: Optional[bool] = False,
     *,
     block: bool = False,
     **kwargs,
@@ -35,10 +35,10 @@ def plot_cluster_centers(
         Info instance with a montage used to plot the topographic maps.
     %(cluster_names)s
     %(axes_topo)s
-    %(block)s
-    show_vector : bool
-        If True, plot a vector between channel locations
+    show_watershed : bool
+        If True, plot a line between channel locations
         with highest and lowest values.
+    %(block)s
     **kwargs
         Additional keyword arguments are passed to
         :func:`mne.viz.plot_topomap`.
@@ -55,6 +55,7 @@ def plot_cluster_centers(
     _check_type(cluster_names, (None, list, tuple), "cluster_names")
     if axes is not None:
         _check_axes(axes)
+    _check_type(show_watershed, (bool,), "show_watershed")
     _check_type(block, (bool,), "block")
 
     # check cluster_names
@@ -120,7 +121,7 @@ def plot_cluster_centers(
         # plot
         plot_topomap(center, info, axes=ax, show=False, **kwargs)
         # Add min max vector
-        if show_vector:
+        if show_watershed:
             i_min = np.argmin(center)
             i_max = np.argmax(center)
             pos = mne.channels.layout._find_topomap_coords(info, picks="all")
