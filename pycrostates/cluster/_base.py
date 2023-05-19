@@ -537,11 +537,15 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                 self._cluster_centers_[k] = -cluster
 
     @fill_doc
+    @verbose
     def plot(
         self,
         axes: Optional[Union[Axes, NDArray[Axes]]] = None,
+        show_gradient: Optional[bool] = False,
+        gradient_kwargs: Optional[dict] = None,
         *,
         block: bool = False,
+        verbose: Optional[str] = None,
         **kwargs,
     ):
         """
@@ -550,6 +554,13 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         Parameters
         ----------
         %(axes_topo)s
+        show_gradient : bool
+            If True, plot a line between channel locations
+            with highest and lowest values.
+        gradient_kwargs : dict
+            Additional keyword arguments to passed to
+            :func:`matplotlib.axes.Axes.plot` to plot
+            gradient line.
         %(block)s
         **kwargs
             Additional keyword arguments are passed to
@@ -568,7 +579,10 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             info,
             self._cluster_names,
             axes,
+            show_gradient=show_gradient,
+            gradient_kwargs=gradient_kwargs,
             block=block,
+            verbose=verbose,
             **kwargs,
         )
 
