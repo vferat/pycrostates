@@ -71,7 +71,7 @@ ModK.fit(raw, n_jobs=5)
 # Now that our algorithm is fitted, we can visualize the
 # :term:`cluster centers`, also called microstate maps or microstate
 # topographies using :meth:`pycrostates.cluster.ModKMeans.plot`.
-# Setting `show_gradient` will plot a line between maximum and minimum
+# Setting ``show_gradient`` will plot a line between maximum and minimum
 # value of each :topography to help visualization.
 
 ModK.plot(show_gradient=True)

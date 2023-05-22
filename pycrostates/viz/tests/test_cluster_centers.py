@@ -105,10 +105,7 @@ def test_plot_cluster_centers(caplog):
         gradient_kwargs={"color": "red"},
     )
     plt.close("all")
-    assert (
-        "`gradient_kwargs` has not effect"
-        in caplog.text
-    )
+    assert "`gradient_kwargs` has not effect" in caplog.text
 
 
 def test_with_grid_layout():

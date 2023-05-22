@@ -44,7 +44,7 @@ def plot_cluster_centers(
         with highest and lowest values.
     gradient_kwargs : dict
         Additional keyword arguments to passed to
-        :func:`matplotlib.axes.Axes.plot` to plot
+        :meth:`matplotlib.axes.Axes.plot` to plot
         gradient line.
     %(block)s
     %(verbose)s
