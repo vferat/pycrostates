@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from mne.io import Info
 from mne.viz import plot_topomap
-from mne.channels.layout._find_topomap_coords
+from mne.channels.layout import _find_topomap_coords
 from numpy.typing import NDArray
 
 from .._typing import CHInfo
@@ -146,7 +146,7 @@ def plot_cluster_centers(
         if show_gradient:
             i_min = np.argmin(center)
             i_max = np.argmax(center)
-            pos = mne.channels.layout._find_topomap_coords(info, picks="all")
+            pos = _find_topomap_coords(info, picks="all")
             if gradient_kwargs is not None:
                 ax.plot(
                     [pos[i_min, 0], pos[i_max, 0]],
