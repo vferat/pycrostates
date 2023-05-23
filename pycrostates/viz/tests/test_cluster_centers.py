@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from mne import create_info
 
 from pycrostates.io import ChInfo
-from pycrostates.utils._logs import logger
+from pycrostates import logger
 from pycrostates.viz import plot_cluster_centers
 
 logger.propagate = True
@@ -105,7 +105,7 @@ def test_plot_cluster_centers(caplog):
         gradient_kwargs={"color": "red"},
     )
     plt.close("all")
-    assert "`gradient_kwargs` has not effect" in caplog.text
+    assert "argument 'gradient_kwargs' has not effect when" in caplog.text
 
 
 def test_with_grid_layout():

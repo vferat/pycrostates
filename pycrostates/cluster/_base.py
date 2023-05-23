@@ -558,7 +558,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             If True, plot a line between channel locations
             with highest and lowest values.
         gradient_kwargs : dict
-            Additional keyword arguments to passed to
+            Additional keyword arguments passed to
             :meth:`matplotlib.axes.Axes.plot` to plot
             gradient line.
         %(block)s

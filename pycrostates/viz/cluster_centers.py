@@ -43,7 +43,7 @@ def plot_cluster_centers(
         If True, plot a line between channel locations
         with highest and lowest values.
     gradient_kwargs : dict
-        Additional keyword arguments to passed to
+        Additional keyword arguments passed to
         :meth:`matplotlib.axes.Axes.plot` to plot
         gradient line.
     %(block)s
@@ -74,9 +74,9 @@ def plot_cluster_centers(
         "gradient_kwargs",
     )
     if gradient_kwargs is not None and not show_gradient:
-        logger.warn(
-            "`gradient_kwargs` has not effect when `show_gradient`"
-            "is set to False."
+        logger.warning(
+            "The argument 'gradient_kwargs' has not effect when "
+            "the argument 'show_gradient' is set to False."
         )
     _check_type(block, (bool,), "block")
 
