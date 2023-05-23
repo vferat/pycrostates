@@ -24,7 +24,11 @@ def plot_cluster_centers(
     cluster_names: List[str] = None,
     axes: Optional[Union[Axes, NDArray[Axes]]] = None,
     show_gradient: Optional[bool] = False,
-    gradient_kwargs: Optional[dict] = None,
+    gradient_kwargs: Optional[dict] = {
+        "color": "black",
+        "linestyle": "-",
+        "marker": "P",
+    },
     *,
     block: bool = False,
     verbose: Optional[str] = None,
@@ -67,10 +71,7 @@ def plot_cluster_centers(
     _check_type(show_gradient, (bool,), "show_gradient")
     _check_type(
         gradient_kwargs,
-        (
-            None,
-            dict,
-        ),
+        (dict,),
         "gradient_kwargs",
     )
     if gradient_kwargs is not None and not show_gradient:
@@ -147,19 +148,11 @@ def plot_cluster_centers(
             i_min = np.argmin(center)
             i_max = np.argmax(center)
             pos = _find_topomap_coords(info, picks="all")
-            if gradient_kwargs is not None:
-                ax.plot(
-                    [pos[i_min, 0], pos[i_max, 0]],
-                    [pos[i_min, 1], pos[i_max, 1]],
-                    "P-k",
-                    **gradient_kwargs,
-                )
-            else:
-                ax.plot(
-                    [pos[i_min, 0], pos[i_max, 0]],
-                    [pos[i_min, 1], pos[i_max, 1]],
-                    "P-k",
-                )
+            ax.plot(
+                [pos[i_min, 0], pos[i_max, 0]],
+                [pos[i_min, 1], pos[i_max, 1]],
+                **gradient_kwargs,
+            )
         ax.set_title(name)
 
     if show:
