@@ -1,6 +1,6 @@
 """Visualization module for plotting cluster centers."""
 
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -24,7 +24,7 @@ def plot_cluster_centers(
     cluster_names: List[str] = None,
     axes: Optional[Union[Axes, NDArray[Axes]]] = None,
     show_gradient: Optional[bool] = False,
-    gradient_kwargs: Optional[dict] = {
+    gradient_kwargs: Dict[str, Any] = {
         "color": "black",
         "linestyle": "-",
         "marker": "P",

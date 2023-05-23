@@ -542,7 +542,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         axes: Optional[Union[Axes, NDArray[Axes]]] = None,
         show_gradient: Optional[bool] = False,
-        gradient_kwargs: Optional[dict] = {
+        gradient_kwargs: Dict[str, Any] = {
             "color": "black",
             "linestyle": "-",
             "marker": "P",
