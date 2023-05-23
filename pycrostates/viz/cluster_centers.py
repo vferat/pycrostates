@@ -5,9 +5,9 @@ from typing import List, Optional, Union
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
+from mne.channels.layout import _find_topomap_coords
 from mne.io import Info
 from mne.viz import plot_topomap
-from mne.channels.layout import _find_topomap_coords
 from numpy.typing import NDArray
 
 from .._typing import CHInfo

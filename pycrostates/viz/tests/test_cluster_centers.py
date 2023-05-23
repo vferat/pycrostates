@@ -5,8 +5,8 @@ import pytest
 from matplotlib import pyplot as plt
 from mne import create_info
 
-from pycrostates.io import ChInfo
 from pycrostates import logger
+from pycrostates.io import ChInfo
 from pycrostates.viz import plot_cluster_centers
 
 logger.propagate = True
