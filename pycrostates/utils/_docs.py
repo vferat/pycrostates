@@ -138,6 +138,27 @@ T : array of shape ``(n_cluster, n_cluster)``
     Array of transition probability values from one label to another.
     First axis indicates state ``"from"``. Second axis indicates state
     ``"to"``."""
+# ------ autoinformation -------
+docdict[
+    "labels_info"
+] = """
+labels : array (n_symbols, )
+    Symbolic sequence."""
+docdict[
+    "n_clusters_info"
+] = """
+n_clusters: int
+     Number of unique symbols."""
+docdict[
+    "k_info"
+] = """
+k: int
+    History length."""
+docdict[
+    "log_base"
+] = """
+log_base : float
+    The log base to use. Default to 2 (gives the unit of bits)."""
 
 # ------ Viz -------
 docdict[
