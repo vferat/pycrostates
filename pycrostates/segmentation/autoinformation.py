@@ -4,83 +4,55 @@
 # F. von Wegner, Partial Autoinformation to Characterize Symbolic Sequences
 # Front Physiol (2018) https://doi.org/10.3389/fphys.2018.01382
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+from numpy.typing import NDArray
+
+from ..utils._checks import _check_type
 
 # --- define logarithm
-#log = np.log
+# log = np.log
 log = np.log2
 
 # TODO: Adapt with unlabeled datapoints.
- 
-def H_1(x, ns):
-    """
-    Shannon entropy of the symbolic sequence x with ns symbols.
 
-    Args:
-        x: symbolic sequence, symbols = [0, 1, ..., ns-1]
-        ns: number of symbols
-    Returns:
-        h: Shannon entropy of x
-    """
 
-    n = len(x)
-    p = np.zeros(ns)  # symbol distribution
+def H_1(labels: NDArray[int], n_clusters: int, log_base: float = 2):
+    """Compute the Shannon entropy of the a symbolic sequence.
+
+    Parameters
+    ----------
+    labels : array (n_symbols, )
+        Symbolic sequence.
+    n_clusters: int
+        Number of unique symbols.
+    log_base : float
+        The log base to use, Default to 2 (gives the unit of bits).
+
+    Returns
+    -------
+    h : float
+        The Shannon entropy of the sequence.
+    """
+    _check_type(labels, (np.ndarray,), "labels")
+    _check_type(n_clusters, (int,), "n_clusters")
+    _check_type(log_base, (float,), "log_base")
+
+    n = len(labels)
+    p = np.zeros(n_clusters)  # symbol distribution
     for t in range(n):
-        p[x[t]] += 1.0
+        p[labels[t]] += 1.0
     p /= n
-    h = -np.sum(p[p>0]*log(p[p>0]))
+    h = -np.sum(p[p > 0] * (log(p[p > 0]) / np.log(log_base)))
     return h
 
 
-def H_2(x, y, ns):
+def ais(labels, n_clusters, k=1):
     """
-    Joint Shannon entropy of the symbolic sequences x, y, with ns symbols.
+    Compute the Active information storage (AIS).
 
-    Args:
-        x, y: symbolic sequences, symbols = [0, 1, ..., ns-1]
-        ns: number of symbols
-    Returns:
-        h: joint Shannon entropy of (x, y)
-    """
-
-    if (len(x) != len(y)):
-        print("H_2 warning : sequences of different lengths, using the shorter...")
-    n = min(len(x), len(y))
-    p = np.zeros((ns, ns)) # joint distribution
-    for t in range(n):
-        p[x[t],y[t]] += 1.0
-    p /= n
-    h = -np.sum(p[p>0]*log(p[p>0]))
-    return h
-
-
-def H_k(x, ns, k):
-    """
-    Joint Shannon entropy of k-histories x[t:t+k]
-
-    Args:
-        x: symbolic sequence, symbols = [0, 1, ..., ns-1]
-        ns: number of symbols
-        k: length of k-history
-    Returns:
-        h: joint Shannon entropy of x[t:t+k]
-    """
-
-    n = len(x)
-    p = np.zeros(tuple(k*[ns]))  # symbol joint distribution
-    for t in range(n-k):
-        p[tuple(x[t:t+k])] += 1.0
-    p /= (n-k) # normalize distribution
-    h = -np.sum(p[p>0]*log(p[p>0]))
-    #m = np.sum(p>0)
-    #h = h + (m-1)/(2*N) # Miller-Madow bias correction
-    return h
-
-
-def ais(x, ns, k=1):
-    """
-    Active information storage (AIS)
+    Compute the Active information storage (AIS) as
+    described in \ :footcite:p:`von2018partial`..
 
     TeX notation:
     I(X_{n+1} ; X_{n}^{(k)})
@@ -88,18 +60,27 @@ def ais(x, ns, k=1):
     = H(X_{n+1}) - H(X_{n+1},X_{n}^{(k)}) + H(X_{n}^{(k)})
     = H(X_{n+1}) + H(X_{n}^{(k)}) - H(X_{n+1}^{(k+1)})
 
-    Args:
+    Parameters
+    ----------
         x: symbolic sequence, symbols = [0, 1, ..., ns-1]
         ns: number of symbols
         k: history length (optional, default value k=1)
-    Returns:
-        a: active information storage
-    """
 
-    n = len(x)
-    h1 = H_k(x, ns, 1)
-    h2 = H_k(x, ns, k)
-    h3 = H_k(x, ns, k+1)
+    Returns
+    -------
+        a: active information storage
+        
+    References
+    ----------
+    .. footbibliography::
+    """
+    _check_type(labels, (np.ndarray,), "labels")
+    _check_type(n_clusters, (int,), "n_clusters")
+    _check_type(log_base, (float,), "log_base")
+    n = len(labels) # TODO: from original code unused or error ?
+    h1 = H_k(labels, n_clusters, 1)
+    h2 = H_k(labels, n_clusters, k)
+    h3 = H_k(labels, n_clusters, k + 1)
     a = h1 + h2 - h3
     return a
 
@@ -125,12 +106,12 @@ def aif(x, ns, kmax):
     n = len(x)
     a = np.zeros(kmax)
     for k in range(kmax):
-        nmax = n-k
+        nmax = n - k
         h1 = H_1(x[:nmax], ns)
-        h2 = H_1(x[k:k+nmax], ns)
-        h12 = H_2(x[:nmax], x[k:k+nmax], ns)
+        h2 = H_1(x[k : k + nmax], ns)
+        h12 = H_2(x[:nmax], x[k : k + nmax], ns)
         a[k] = h1 + h2 - h12
-        #if (k%10 == 0): print(f"\tAIF(k={k:d})\r", end="")
+        # if (k%10 == 0): print(f"\tAIF(k={k:d})\r", end="")
         print(f"\tAIF(k={k:d})\r", end="")
     print("")
     a /= a[0]  # normalize: a[0]=1.0
@@ -160,12 +141,12 @@ def paif(x, ns, kmax):
     p = np.zeros(kmax)
     a = aif(x, ns, 2)  # use AIF coeffs. for k=0, 1
     p[0], p[1] = a[0], a[1]
-    for k in range(2,kmax):
+    for k in range(2, kmax):
         h1 = H_k(x, ns, k)
-        h2 = H_k(x, ns, k-1)
-        h3 = H_k(x, ns, k+1)
-        p[k] = 2*h1 - h2 - h3
-        #if (k%5 == 0): print(f"\tPAIF(k={k:d})\r", end="")
+        h2 = H_k(x, ns, k - 1)
+        h3 = H_k(x, ns, k + 1)
+        p[k] = 2 * h1 - h2 - h3
+        # if (k%5 == 0): print(f"\tPAIF(k={k:d})\r", end="")
         print(f"\tPAIF(k={k:d})\r", end="")
     print("")
     p /= p[0]  # normalize: p[0]=1.0
@@ -188,14 +169,14 @@ def excess_entropy_rate(x, ns, kmax, doplot=False):
 
     h = np.zeros(kmax)
     for k in range(kmax):
-        h[k] = H_k(x, ns, k+1) # joint entropy for history length k+1
-    ks = np.arange(1, kmax+1) # history lengths
+        h[k] = H_k(x, ns, k + 1)  # joint entropy for history length k+1
+    ks = np.arange(1, kmax + 1)  # history lengths
     a, b = np.polyfit(ks, h, 1)
     # --- Figure ---
     if doplot:
-        plt.figure(figsize=(6,6))
-        plt.plot(ks, h, '-sk')
-        plt.plot(ks, a*ks+b, '-b')
+        plt.figure(figsize=(6, 6))
+        plt.plot(ks, h, "-sk")
+        plt.plot(ks, a * ks + b, "-b")
         plt.tight_layout()
         plt.title("Entropy rate & excess entropy")
         plt.show()
@@ -217,23 +198,24 @@ def Tk_hat(x, ns, k=1):
         Tk: transition matrix P(X_{n+1} | X_{n}^{(k)})
     """
 
-    n = len(x) # -k
+    n = len(x)  # -k
     L = ns**k  # number of possible k-histories
     pk = np.zeros(L)
-    Tk = np.zeros((L,ns))
+    Tk = np.zeros((L, ns))
     # --- map k-dim. histories to 1D indices ---
-    sh = tuple(k*[ns]) # shape of history array (ns...ns)
-    d = {} # dictionary idx -> i
-    for i, idx in enumerate(np.ndindex(sh)): d[idx] = i
-    for t in range(n-k):
-        idx = tuple(x[t:t+k]) # k-history
-        i = d[idx] # 1D index of k-history
-        j = x[t+k] # symbol following the p-history idx
-        pk[i] += 1.
-        Tk[i,j] += 1.
+    sh = tuple(k * [ns])  # shape of history array (ns...ns)
+    d = {}  # dictionary idx -> i
+    for i, idx in enumerate(np.ndindex(sh)):
+        d[idx] = i
+    for t in range(n - k):
+        idx = tuple(x[t : t + k])  # k-history
+        i = d[idx]  # 1D index of k-history
+        j = x[t + k]  # symbol following the p-history idx
+        pk[i] += 1.0
+        Tk[i, j] += 1.0
     pk /= pk.sum()
     p_row = Tk.sum(axis=1, keepdims=True)
-    p_row[p_row==0] = 1. # avoid division by zero
+    p_row[p_row == 0] = 1.0  # avoid division by zero
     Tk /= p_row  # normalize row sums to 1.0 to obtain a stochastic matrix
     return pk, Tk
 
@@ -254,9 +236,9 @@ def mc_k(pk, Tk, k, ns, n):
     """
 
     # --- map k-dim. histories to 1D indices ---
-    sh = tuple(k*[ns]) # shape of history array (ns...ns)
-    d = {} # dictionary idx -> i
-    dinv = np.zeros((ns**k,k)) # inverse of d
+    sh = tuple(k * [ns])  # shape of history array (ns...ns)
+    d = {}  # dictionary idx -> i
+    dinv = np.zeros((ns**k, k))  # inverse of d
     for i, idx in enumerate(np.ndindex(sh)):
         d[idx] = i
         dinv[i] = idx
@@ -268,13 +250,13 @@ def mc_k(pk, Tk, k, ns, n):
 
     # iterate transitions according to Tk, up to length n
     Tk_sum = np.cumsum(Tk, axis=1)
-    for t in range(n-k-1):
-        idx = tuple(x[t:t+k]) # current k-history
-        i = d[idx] # 1D index of k-history
+    for t in range(n - k - 1):
+        idx = tuple(x[t : t + k])  # current k-history
+        i = d[idx]  # 1D index of k-history
         j = np.min(np.argwhere(np.random.rand() < Tk_sum[i]))
-        x[t+k] = j # next sample according to Tk
+        x[t + k] = j  # next sample according to Tk
 
-    return x.astype('int')
+    return x.astype("int")
 
 
 def plot_aif_paif(x, ns, kmax):
@@ -300,14 +282,14 @@ def plot_aif_paif(x, ns, kmax):
     z = np.zeros(kmax)
     ymax = 1.1
 
-    fig, ax = plt.subplots(1, 2, figsize=(8,4)) # , sharex=True, sharey=True
+    fig, ax = plt.subplots(1, 2, figsize=(8, 4))  # , sharex=True, sharey=True
 
     # --- plot AIF ---
     ax[0].plot(lags, z, "-k", lw=1)
     ax[0].plot(lags, aif_, "ok", ms=ms_)
     for i in range(len(aif_)):
         ax[0].plot([i, i], [0, aif_[i]], "-k")
-    ax[0].tick_params(axis='both', labelsize=fs_tix)
+    ax[0].tick_params(axis="both", labelsize=fs_tix)
     ax[0].set_xlabel("lag", fontsize=fs_label)
     ax[0].set_ylabel(r"$\alpha_k$ [bits]", fontsize=fs_label)
     ax[0].set_ylim(-0.05, ymax)
@@ -318,7 +300,7 @@ def plot_aif_paif(x, ns, kmax):
     ax[1].plot(lags, paif_, "ok", ms=ms_)
     for i in range(len(paif_)):
         ax[1].plot([i, i], [0, paif_[i]], "-k")
-    ax[1].tick_params(axis='both', labelsize=fs_tix)
+    ax[1].tick_params(axis="both", labelsize=fs_tix)
     ax[1].set_xlabel("lag", fontsize=fs_label)
     ax[1].set_ylabel(r"$\pi_{k}$ [bits]", fontsize=fs_label)
     ax[1].set_ylim(-0.05, ymax)
