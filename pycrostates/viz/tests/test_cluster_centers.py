@@ -1,14 +1,20 @@
+import logging
+
 import numpy as np
 import pytest
 from matplotlib import pyplot as plt
 from mne import create_info
 
 from pycrostates.io import ChInfo
+from pycrostates.utils._logs import logger
 from pycrostates.viz import plot_cluster_centers
 
+logger.propagate = True
 
-def test_plot_cluster_centers():
+
+def test_plot_cluster_centers(caplog):
     """Test topographic plots for cluster_centers."""
+    caplog.set_level(logging.WARNING)
     cluster_centers = np.array([[1.1, 1, 1.2], [0.4, 0.8, 0.7]])
     info = create_info(["Oz", "Cz", "Fpz"], sfreq=1, ch_types="eeg")
     info.set_montage("standard_1020")
@@ -77,6 +83,29 @@ def test_plot_cluster_centers():
     # invalid show
     with pytest.raises(TypeError, match="'show' must be an "):
         plot_cluster_centers(cluster_centers, info, show=101)
+
+    # gradient
+    plot_cluster_centers(cluster_centers, info, show_gradient=True)
+    plt.close("all")
+
+    # gradient_kwargs
+    plot_cluster_centers(
+        cluster_centers,
+        info,
+        show_gradient=True,
+        gradient_kwargs={"color": "red"},
+    )
+    plt.close("all")
+
+    caplog.clear()
+    plot_cluster_centers(
+        cluster_centers,
+        info,
+        show_gradient=False,
+        gradient_kwargs={"color": "red"},
+    )
+    plt.close("all")
+    assert "argument 'gradient_kwargs' has not effect when" in caplog.text
 
 
 def test_with_grid_layout():

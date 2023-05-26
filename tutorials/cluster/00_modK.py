@@ -61,7 +61,7 @@ ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
 #
 # .. note::
 #
-#     Fitting a clustering algorithm is a computationaly expensive operation.
+#     Fitting a clustering algorithm is a computationally expensive operation.
 #     Depending on your configuration, you can change the argument ``n_jobs``
 #     to take advantage of multiprocessing to reduce computation time.
 
@@ -71,8 +71,10 @@ ModK.fit(raw, n_jobs=5)
 # Now that our algorithm is fitted, we can visualize the
 # :term:`cluster centers`, also called microstate maps or microstate
 # topographies using :meth:`pycrostates.cluster.ModKMeans.plot`.
+# Setting ``show_gradient`` will plot a line between maximum and minimum
+# value of each :topography to help visualization.
 
-ModK.plot()
+ModK.plot(show_gradient=True)
 
 #%%
 # The :term:`cluster centers` can be retrieved as a numpy array with the

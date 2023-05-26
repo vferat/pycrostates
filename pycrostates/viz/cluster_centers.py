@@ -1,10 +1,11 @@
-"""Visualisation module for plotting cluster centers."""
+"""Visualization module for plotting cluster centers."""
 
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
+from mne.channels.layout import _find_topomap_coords
 from mne.io import Info
 from mne.viz import plot_topomap
 from numpy.typing import NDArray
@@ -12,16 +13,25 @@ from numpy.typing import NDArray
 from .._typing import CHInfo
 from ..utils._checks import _check_axes, _check_type
 from ..utils._docs import fill_doc
+from ..utils._logs import logger, verbose
 
 
 @fill_doc
+@verbose
 def plot_cluster_centers(
     cluster_centers: NDArray[float],
     info: Union[Info, CHInfo],
     cluster_names: List[str] = None,
     axes: Optional[Union[Axes, NDArray[Axes]]] = None,
+    show_gradient: Optional[bool] = False,
+    gradient_kwargs: Dict[str, Any] = {
+        "color": "black",
+        "linestyle": "-",
+        "marker": "P",
+    },
     *,
     block: bool = False,
+    verbose: Optional[str] = None,
     **kwargs,
 ):
     """Create topographic maps for cluster centers.
@@ -33,7 +43,15 @@ def plot_cluster_centers(
         Info instance with a montage used to plot the topographic maps.
     %(cluster_names)s
     %(axes_topo)s
+    show_gradient : bool
+        If True, plot a line between channel locations
+        with highest and lowest values.
+    gradient_kwargs : dict
+        Additional keyword arguments passed to
+        :meth:`matplotlib.axes.Axes.plot` to plot
+        gradient line.
     %(block)s
+    %(verbose)s
     **kwargs
         Additional keyword arguments are passed to
         :func:`mne.viz.plot_topomap`.
@@ -50,6 +68,17 @@ def plot_cluster_centers(
     _check_type(cluster_names, (None, list, tuple), "cluster_names")
     if axes is not None:
         _check_axes(axes)
+    _check_type(show_gradient, (bool,), "show_gradient")
+    _check_type(
+        gradient_kwargs,
+        (dict,),
+        "gradient_kwargs",
+    )
+    if gradient_kwargs is not None and not show_gradient:
+        logger.warning(
+            "The argument 'gradient_kwargs' has not effect when "
+            "the argument 'show_gradient' is set to False."
+        )
     _check_type(block, (bool,), "block")
 
     # check cluster_names
@@ -78,8 +107,8 @@ def plot_cluster_centers(
         # make sure we have enough ax to plot
         if isinstance(axes, Axes) and n_clusters != 1:
             raise ValueError(
-                "Argument 'cluster_centers' and 'axes' must contain the same "
-                f"number of clusters and Axes. Provided: {n_clusters} "
+                "Argument 'cluster_centers' and 'axes' must contain the "
+                f"same number of clusters and Axes. Provided: {n_clusters} "
                 "microstates maps and only 1 axes."
             )
         elif axes.size != n_clusters:
@@ -114,6 +143,16 @@ def plot_cluster_centers(
             ax = axes[i, j]
         # plot
         plot_topomap(center, info, axes=ax, show=False, **kwargs)
+        # Add min max vector
+        if show_gradient:
+            i_min = np.argmin(center)
+            i_max = np.argmax(center)
+            pos = _find_topomap_coords(info, picks="all")
+            ax.plot(
+                [pos[i_min, 0], pos[i_max, 0]],
+                [pos[i_min, 1], pos[i_max, 1]],
+                **gradient_kwargs,
+            )
         ax.set_title(name)
 
     if show:
