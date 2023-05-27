@@ -15,7 +15,6 @@ from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
-from .autoinformation import H_1
 from .transitions import (
     _compute_expected_transition_matrix,
     _compute_transition_matrix,
@@ -86,30 +85,6 @@ class _BaseSegmentation(ABC):
             cluster_names=self._cluster_names,
             inst_repr=self._inst._repr_html_(),
         )
-
-    def H_1(self, log_base: float = 2):
-        """Compute the Shannon entropy of the microstate sequence.
-
-        Parameters
-        ----------
-        log_base : float
-            The log base to use, Default to 2 (gives the unit of bits).
-
-        Returns
-        -------
-        h : float
-            The Shannon entropy of the microstate sequence.
-        """
-        # reshape if epochs (returns a view)
-        labels = self._labels.reshape(-1)
-        # Ignore 0
-        labels = [label for label in labels if label != 0]
-        h = H_1(
-            labels=labels,
-            n_clusters=self._cluster_centers_.shape[0],
-            log_base=log_base,
-        )
-        return h
 
     def compute_parameters(
         self, norm_gfp: bool = True, return_dist: bool = False
@@ -274,10 +249,7 @@ class _BaseSegmentation(ABC):
         parameter to ``True`` when predicting the segmentation.
         """
         return _compute_transition_matrix(
-            self._labels,
-            self._cluster_centers_.shape[0],
-            stat,
-            ignore_self,
+            self._labels, self._cluster_centers_.shape[0], stat, ignore_self
         )
 
     @fill_doc
@@ -338,8 +310,7 @@ class _BaseSegmentation(ABC):
     # --------------------------------------------------------------------
     @staticmethod
     def _check_cluster_names(
-        cluster_names: List[str],
-        cluster_centers_: NDArray[float],
+        cluster_names: List[str], cluster_centers_: NDArray[float]
     ):
         """Check that the argument 'cluster_names' is valid."""
         _check_type(cluster_names, (list, None), "cluster_names")

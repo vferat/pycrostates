@@ -3,9 +3,9 @@
 # code from https://github.com/Frederic-vW/AIF-PAIF:
 # F. von Wegner, Partial Autoinformation to Characterize Symbolic Sequences
 # Front Physiol (2018) https://doi.org/10.3389/fphys.2018.01382
-
-import matplotlib.pyplot as plt
 import numpy as np
+import scipy.stats
+from mne.parallel import parallel_func
 from numpy.typing import NDArray
 
 from ..utils._checks import _check_type
@@ -14,9 +14,16 @@ from ..utils._docs import fill_doc
 # TODO: Adapt with unlabeled datapoints.
 # TODO: should we use n_clusters or np.sum(p>0) ?
 # TODO: should we normalize aif and paif?
+# The n_clusters parameter should reflect the total number of possible states,
+# including the ignored state, if applicable. If the ignored state is not
+# considered as a valid state, it should be excluded from the count of
+# n_clusters.
+
+#  the Shannon entropy is not affected by non-appearing states
+
 
 @fill_doc
-def H_1(labels: NDArray[int], n_clusters: int, log_base: float = 2):
+def entropy(labels: NDArray[int], state_to_ignore=-1, log_base: float = 2):
     r"""Compute the Shannon entropy of the a symbolic sequence.
 
     Compute the Shannon entropy
@@ -26,7 +33,6 @@ def H_1(labels: NDArray[int], n_clusters: int, log_base: float = 2):
     Parameters
     ----------
     %(labels_info)s
-    %(n_clusters_info)s
     %(log_base)s
 
     Returns
@@ -34,22 +40,19 @@ def H_1(labels: NDArray[int], n_clusters: int, log_base: float = 2):
     h : float
         The Shannon entropy of the sequence.
     """
-    _check_type(labels, (np.ndarray,), "labels")
-    _check_type(n_clusters, (int,), "n_clusters")
-    _check_type(log_base, (float,), "log_base")
-
-    n = len(labels)
-    p = np.zeros(n_clusters)  # symbol distribution
-    for t in range(n):
-        p[labels[t]] += 1.0
-    p /= n
-    h = -np.sum(p[p > 0] * (np.log(p[p > 0]) / np.log(log_base)))
-    return h
+    _check_type(labels, (np.ndarray,), "x")
+    _check_type(state_to_ignore, (int,), "log_base")
+    _check_type(log_base, ("numeric",), "log_base")
+    labels_without_ignore = labels[labels != state_to_ignore]
+    prob_dist = np.bincount(labels_without_ignore).astype(float)
+    prob_dist /= np.sum(prob_dist)
+    shannon_entropy = scipy.stats.entropy(prob_dist, base=log_base)
+    return shannon_entropy
 
 
 @fill_doc
-def H_2(
-    x: NDArray[int], y: NDArray[int], n_clusters: int, log_base: float = 2
+def joint_entropy(
+    x: NDArray[int], y: NDArray[int], state_to_ignore=-1, log_base: float = 2
 ):
     """
     Joint Shannon entropy of the symbolic sequences x, y, with n_clusters symbols.
@@ -58,7 +61,6 @@ def H_2(
     ----------
     x, y : array (n_symbols, )
         Symbolic sequences.
-    %(n_clusters_info)s
     %(log_base)s
 
     Returns
@@ -70,25 +72,29 @@ def H_2(
     _check_type(y, (np.ndarray,), "y")
     if len(x) != len(y):
         raise ValueError("Sequences of different lengths.")
-    _check_type(n_clusters, (int,), "n_clusters")
-    _check_type(log_base, (float,), "log_base")
 
-    n = len(x)
-    p = np.zeros((n_clusters, n_clusters))  # joint distribution
-    for t in range(n):
-        p[x[t], y[t]] += 1.0
-    p /= n
-    h = -np.sum(p[p > 0] * np.log(p[p > 0]) / np.log(log_base))
-    return h
+    _check_type(log_base, ("numeric",), "log_base")
+
+    # ignoring state_to_ignore
+    valid_indices = np.logical_and(x != state_to_ignore, y != state_to_ignore)
+    x_valid = x[valid_indices]
+    y_valid = y[valid_indices]
+
+    # Compute the joint probability distribution
+    n_clusters = np.max([x_valid, y_valid]) + 1
+    joint_prob = np.zeros((n_clusters, n_clusters))
+    for i in range(len(x_valid)):
+        joint_prob[x_valid[i], y_valid[i]] += 1
+    joint_prob /= len(x_valid)
+
+    # Compute the joint entropy
+    joint_entropy = scipy.stats.entropy(joint_prob.flatten(), base=log_base)
+    return joint_entropy
 
 
 @fill_doc
-def H_k(
-    labels: NDArray[int],
-    n_clusters: int,
-    k: int,
-    bias_correction: bool = False,
-    log_base: float = 2,
+def joint_entropy_history(
+    labels: NDArray[int], k: int, state_to_ignore=-1, log_base: float = 2
 ):
     r"""Compute the joint Shannon of k-histories x[t:t+k].
 
@@ -99,7 +105,6 @@ def H_k(
     Parameters
     ----------
     %(labels_info)s
-    %(n_clusters_info)s
     %(log_base)s
 
     Returns
@@ -112,23 +117,34 @@ def H_k(
     .. footbibliography::
     """
     _check_type(labels, (np.ndarray,), "labels")
-    _check_type(n_clusters, (int,), "n_clusters")
-    _check_type(k, (int,), "k")
-    _check_type(bias_correction, (bool,), "bias_correction")
-    _check_type(log_base, (float,), "log_base")
+    _check_type(k, ("int",), "k")
+    if k == 1:
+        raise ValueError(
+            "The joint Shannon entropy of k-histories is not directly applicable for k=1."
+        )
+    _check_type(log_base, ("numeric",), "log_base")
+    # Construct the k-history sequences while ignoring the state
+    histories = []
+    for i in range(len(labels) - k + 1):
+        history = tuple(labels[i : i + k])
+        if state_to_ignore not in history:
+            histories.append(history)
 
-    n = len(labels)
-    p = np.zeros(tuple(k * [n_clusters]))  # symbol joint distribution
-    for t in range(n - k):
-        p[tuple(labels[t : t + k])] += 1.0
-    p /= n - k  # normalize distribution
-    h = -np.sum(p[p > 0] * np.log(p[p > 0]) / np.log(log_base))
-    if bias_correction:
-        b = np.sum(p > 0)  # Should we include values where p=0 ?
-        h = h + (b - 1) / (2 * n)
-    return h
+    n_clusters = np.max(labels) + 1
+    # Compute the joint probability distribution
+    joint_dist = np.zeros(tuple(k * [n_clusters]))
+    for i in range(
+        len(labels) - k + 1
+    ):  # TODO: check if +1 (not in original code)
+        history = tuple(labels[i : i + k])
+        if state_to_ignore not in history:
+            joint_dist[history] += 1.0
+    # Compute the joint entropy
+    joint_entropy = scipy.stats.entropy(joint_dist.flatten(), base=log_base)
+    return joint_entropy
 
 
+# ---- TODO ---- #
 @fill_doc
 def ais(
     labels: NDArray[int],
@@ -170,17 +186,6 @@ def ais(
     _check_type(k, (int,), "k")
     _check_type(bias_correction, (bool,), "bias_correction")
     _check_type(log_base, (float,), "log_base")
-    hs = list()
-    for k_ in [1, k, k + 1]:
-        h = H_k(
-            labels,
-            n_clusters,
-            k_,
-            bias_correction=bias_correction,
-            log_base=log_base,
-        )
-        hs.append(h)
-    a = np.sum(hs)
     return a
 
 
@@ -191,6 +196,7 @@ def aif(
     kmax: int,
     bias_correction: bool = False,
     log_base: float = 2,
+    n_jobs: int = 1,
 ):
     """
     Time-lagged mutual information = Auto-information function (AIF)
@@ -208,12 +214,19 @@ def aif(
     kmax: int
         Maximum time lag;
     %(log_base)s
+    %(n_jobs)s
 
     Returns
     -------
     a: array (n_symbols, )
         time-lagged mutual information array for lags k=0, ..., kmax-1
     """
+    _check_type(labels, (np.ndarray,), "labels")
+    _check_type(n_clusters, (int,), "n_clusters")
+    _check_type(kmax, (int,), "k")
+    _check_type(bias_correction, (bool,), "bias_correction")
+    _check_type(log_base, (float,), "log_base")
+    n_jobs = _check_n_jobs(n_jobs)
 
     def a_function(
         labels,
@@ -224,15 +237,11 @@ def aif(
     ):
         n = len(labels)
         nmax = n - k
-        h1 = H_1(
-            labels[:nmax],
-            n_clusters,
-            bias_correction=bias_correction,
-            log_base=log_base,
-        )
-        h2 = H_1(
+        h1 = entropy(labels[:nmax], log_base=log_base)
+        h2 = H_k(
             labels[k : k + nmax],
             n_clusters,
+            k=1,
             bias_correction=bias_correction,
             log_base=log_base,
         )
@@ -246,14 +255,22 @@ def aif(
         a[k] = h1 + h2 - h12
 
     a = np.zeros(kmax)
-    for k in range(kmax):  # TODO: parallel computing.
-        a[k] = a_function(
+
+    parallel, p_fun, _ = parallel_func(a_function, n_jobs, total=kmax)
+
+    runs = parallel(
+        p_fun(
+            data,
             labels,
             n_clusters,
             k,
             bias_correction=bias_correction,
             log_base=log_base,
         )
+        for k in range(kmax)
+    )
+    print(type(a))
+    print(a.shape)
     a /= a[0]  # normalize: a[0]=1.0
     return a
 
