@@ -8,7 +8,7 @@ import scipy.stats
 from mne.parallel import parallel_func
 from numpy.typing import NDArray
 
-from ..utils._checks import _check_type
+from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
 
 # TODO: Adapt with unlabeled datapoints.
@@ -22,8 +22,38 @@ from ..utils._docs import fill_doc
 #  the Shannon entropy is not affected by non-appearing states
 
 
+def _check_log_base(log_base):
+    _check_type(
+        log_base,
+        (
+            "numeric",
+            str,
+        ),
+        "log_base",
+    )
+    if isinstance(log_base, str):
+        _check_value(
+            log_base,
+            ["bits", "natural", "dits"],
+            item_name="log_base",
+            extra="when string is provided",
+        )
+        if log_base == "bits":
+            log_base = 2
+        elif log_base == "natural":
+            log_base = np.e
+        elif log_base == "dits":
+            log_base = 10
+    else:
+        if log_base <= 0:
+            raise ValueError("If numeric, log_base must be >= 0.")
+    return log_base
+
+
 @fill_doc
-def entropy(labels: NDArray[int], state_to_ignore=-1, log_base: float = 2):
+def entropy(
+    labels: NDArray[int], state_to_ignore: int = -1, log_base: float = 2
+):
     r"""Compute the Shannon entropy of the a symbolic sequence.
 
     Compute the Shannon entropy
@@ -33,6 +63,7 @@ def entropy(labels: NDArray[int], state_to_ignore=-1, log_base: float = 2):
     Parameters
     ----------
     %(labels_info)s
+    %(state_to_ignore)s
     %(log_base)s
 
     Returns
@@ -42,7 +73,7 @@ def entropy(labels: NDArray[int], state_to_ignore=-1, log_base: float = 2):
     """
     _check_type(labels, (np.ndarray,), "x")
     _check_type(state_to_ignore, (int,), "log_base")
-    _check_type(log_base, ("numeric",), "log_base")
+    log_base = _check_log_base(log_base)
     labels_without_ignore = labels[labels != state_to_ignore]
     prob_dist = np.bincount(labels_without_ignore).astype(float)
     prob_dist /= np.sum(prob_dist)
@@ -55,12 +86,13 @@ def joint_entropy(
     x: NDArray[int], y: NDArray[int], state_to_ignore=-1, log_base: float = 2
 ):
     """
-    Joint Shannon entropy of the symbolic sequences x, y, with n_clusters symbols.
+    Joint Shannon entropy of the symbolic sequences x, y.
 
     Parameters
     ----------
     x, y : array (n_symbols, )
         Symbolic sequences.
+    %(state_to_ignore)s
     %(log_base)s
 
     Returns
@@ -72,8 +104,8 @@ def joint_entropy(
     _check_type(y, (np.ndarray,), "y")
     if len(x) != len(y):
         raise ValueError("Sequences of different lengths.")
-
-    _check_type(log_base, ("numeric",), "log_base")
+    _check_type(state_to_ignore, (int,), "log_base")
+    log_base = _check_log_base(log_base)
 
     # ignoring state_to_ignore
     valid_indices = np.logical_and(x != state_to_ignore, y != state_to_ignore)
@@ -105,6 +137,7 @@ def joint_entropy_history(
     Parameters
     ----------
     %(labels_info)s
+    %(state_to_ignore)s
     %(log_base)s
 
     Returns
@@ -118,15 +151,18 @@ def joint_entropy_history(
     """
     _check_type(labels, (np.ndarray,), "labels")
     _check_type(k, ("int",), "k")
+    _check_type(state_to_ignore, (int,), "log_base")
+    log_base = _check_log_base(log_base)
     if k == 1:
         raise ValueError(
-            "The joint Shannon entropy of k-histories is not directly applicable for k=1."
+            "The joint Shannon entropy of k-histories"
+            "is not directly applicable for k=1."
         )
-    _check_type(log_base, ("numeric",), "log_base")
+    log_base = _check_log_base(log_base)
     # Construct the k-history sequences while ignoring the state
     histories = []
     for i in range(len(labels) - k + 1):
-        history = tuple(labels[i : i + k])
+        history = tuple(labels[i: i + k])
         if state_to_ignore not in history:
             histories.append(history)
 
@@ -135,8 +171,8 @@ def joint_entropy_history(
     joint_dist = np.zeros(tuple(k * [n_clusters]))
     for i in range(
         len(labels) - k + 1
-    ):  # TODO: check if +1 (not in original code)
-        history = tuple(labels[i : i + k])
+    ):  # TODO: check +1 (not in original code)
+        history = tuple(labels[i: i + k])
         if state_to_ignore not in history:
             joint_dist[history] += 1.0
     # Compute the joint entropy
