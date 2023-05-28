@@ -51,38 +51,6 @@ def _check_log_base(log_base):
 
 
 @fill_doc
-def entropy(
-    labels: NDArray[int], state_to_ignore: int = -1, log_base: float = 2
-):
-    r"""Compute the Shannon entropy of the a symbolic sequence.
-
-    Compute the Shannon entropy
-    \ :footcite:p:`shannon1948mathematicalof`..
-    of the a symbolic sequence.
-
-    Parameters
-    ----------
-    %(labels_info)s
-    %(state_to_ignore)s
-    %(log_base)s
-
-    Returns
-    -------
-    h : float
-        The Shannon entropy of the sequence.
-    """
-    _check_type(labels, (np.ndarray,), "x")
-    _check_type(state_to_ignore, (int,), "state_to_ignore")
-    log_base = _check_log_base(log_base)
-
-    labels_without_ignore = labels[labels != state_to_ignore]
-    prob_dist = np.bincount(labels_without_ignore).astype(float)
-    prob_dist /= np.sum(prob_dist)
-    shannon_entropy = scipy.stats.entropy(prob_dist, base=log_base)
-    return shannon_entropy
-
-
-@fill_doc
 def joint_entropy(
     x: NDArray[int], y: NDArray[int], state_to_ignore=-1, log_base: float = 2
 ):
@@ -152,11 +120,6 @@ def joint_entropy_history(
     """
     _check_type(labels, (np.ndarray,), "labels")
     _check_type(k, ("int",), "k")
-    if k == 1:
-        raise ValueError(
-            "The joint Shannon entropy of k-histories"
-            "is not directly applicable for k=1."
-        )
     _check_type(state_to_ignore, (int,), "state_to_ignore")
     log_base = _check_log_base(log_base)
 
@@ -179,6 +142,37 @@ def joint_entropy_history(
     # Compute the joint entropy
     joint_entropy = scipy.stats.entropy(joint_dist.flatten(), base=log_base)
     return joint_entropy
+
+
+@fill_doc
+def entropy(
+    labels: NDArray[int], state_to_ignore: int = -1, log_base: float = 2
+):
+    r"""Compute the Shannon entropy of the a symbolic sequence.
+
+    Compute the Shannon entropy
+    \ :footcite:p:`shannon1948mathematicalof`..
+    of the a symbolic sequence.
+
+    Parameters
+    ----------
+    %(labels_info)s
+    %(state_to_ignore)s
+    %(log_base)s
+
+    Returns
+    -------
+    h : float
+        The Shannon entropy of the sequence.
+    """
+    _check_type(labels, (np.ndarray,), "x")
+    _check_type(state_to_ignore, (int,), "state_to_ignore")
+    log_base = _check_log_base(log_base)
+
+    h = joint_entropy_history(
+        labels, k=1, state_to_ignore=state_to_ignore, log_base=log_base
+    )
+    return h
 
 
 @fill_doc
