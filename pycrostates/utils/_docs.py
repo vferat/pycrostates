@@ -145,10 +145,10 @@ docdict[
 labels : array (n_symbols, )
     Symbolic sequence."""
 docdict[
-    "n_clusters_info"
+    "state_to_ignore"
 ] = """
-n_clusters: int
-     Number of unique symbols."""
+state_to_ignore: int
+    Ignore state with symbol state_to_ignore from analysis."""
 docdict[
     "k_info"
 ] = """
@@ -157,8 +157,13 @@ k: int
 docdict[
     "log_base"
 ] = """
-log_base : float
-    The log base to use. Default to 2 (gives the unit of bits)."""
+log_base : float, str
+    The log base to use. 
+    If string:
+        bits: log_base = 2
+        natural: log_base = np.e
+        dits: log_base = 10 
+    Default to 'bits' (log_base = 2)."""
 
 # ------ Viz -------
 docdict[
