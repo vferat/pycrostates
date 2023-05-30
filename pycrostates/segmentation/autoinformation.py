@@ -212,17 +212,10 @@ def ais(
     """
     _check_type(labels, (np.ndarray,), "labels")
     _check_type(k, (int,), "k")
-    if k == 1:
-        raise ValueError(
-            "The joint Shannon entropy of k-histories"
-            "is not directly applicable for k=1."
-        )
     _check_type(state_to_ignore, (int,), "state_to_ignore")
     log_base = _check_log_base(log_base)
 
-    h1 = entropy(
-        labels, state_to_ignore=state_to_ignore
-    )  # TODO: joint_entropy_history(k=1 != entropy ?)
+    h1 = entropy(labels, state_to_ignore=state_to_ignore)
     h2 = joint_entropy_history(
         labels, k, state_to_ignore=state_to_ignore, log_base=log_base
     )
@@ -233,7 +226,6 @@ def ais(
     return a
 
 
-# ---- TODO ---- #
 @fill_doc
 def aif(
     labels: NDArray[int],
@@ -264,11 +256,6 @@ def aif(
     """
     _check_type(labels, (np.ndarray,), "labels")
     _check_type(k, (int,), "k")
-    if k == 1:
-        raise ValueError(
-            "The joint Shannon entropy of k-histories"
-            "is not directly applicable for k=1."
-        )
     _check_type(state_to_ignore, (int,), "state_to_ignore")
     log_base = _check_log_base(log_base)
 
@@ -296,7 +283,6 @@ def aif(
 def aif_p(
     labels: NDArray[int],
     ks: int,
-    list,
     state_to_ignore=-1,
     log_base: float = 2,
     n_jobs: int = None,
@@ -324,12 +310,7 @@ def aif_p(
         time-lagged mutual information array for lags k=0, ..., kmax-1
     """
     _check_type(labels, (np.ndarray,), "labels")
-    _check_type(k, (int,), "k")
-    if ks == 1:
-        raise ValueError(
-            "The joint Shannon entropy of k-histories"
-            "is not directly applicable for k=1."
-        )
+    _check_type(ks, (int,), "k")
     _check_type(state_to_ignore, (int,), "state_to_ignore")
     log_base = _check_log_base(log_base)
     n_jobs = _check_n_jobs(n_jobs)
@@ -348,9 +329,8 @@ def aif_p(
 @fill_doc
 def paif(
     labels: NDArray[int],
-    n_clusters: int,
-    kmax: int,
-    bias_correction: bool = False,
+    k: int,
+    state_to_ignore=-1,
     log_base: float = 2,
 ):
     """
@@ -366,57 +346,90 @@ def paif(
     Parameters
     ----------
     %(labels_info)s
-    kmax: int
-        Maximum time lag;
+    %(k_info)s
+    %(state_to_ignore)s
     %(log_base)s
+
+    Returns
+    -------
+    p: float
+        Partial auto-information array for lags k.
+    """
+    _check_type(labels, (np.ndarray,), "labels")
+    _check_type(k, (int,), "k")
+    _check_type(state_to_ignore, (int,), "state_to_ignore")
+    log_base = _check_log_base(log_base)
+
+    h1 = joint_entropy_history(
+        labels,
+        k,
+        state_to_ignore=state_to_ignore,
+        log_base=log_base,
+    )
+    h2 = joint_entropy_history(
+        labels,
+        k - 1,
+        state_to_ignore=state_to_ignore,
+        log_base=log_base,
+    )
+    h3 = joint_entropy_history(
+        labels,
+        k + 1,
+        state_to_ignore=state_to_ignore,
+        log_base=log_base,
+    )
+    p = 2 * h1 - h2 - h3
+    return p
+
+
+@fill_doc
+def paif_p(
+    labels: NDArray[int],
+    ks: int,
+    state_to_ignore=-1,
+    log_base: float = 2,
+    n_jobs: int = None,
+):
+    """
+    Partial auto-information function (PAIF).
+
+    TeX notation:
+    I(X_{n+k} ; X_{n} | X_{n+k-1}^{(k-1)})
+    = H(X_{n+k} | X_{n+k-1}^{(k-1)}) - H(X_{n+k} | X_{n+k-1}^{(k-1)}, X_{n})
+    =   H(X_{n+k},X_{n+k-1}^{(k-1)}) - H(X_{n+k-1}^{(k-1)})
+      - H(X_{n+k},X_{n+k-1}^{(k)}) + H(X_{n+k-1}^{(k)})
+    = H(X_{n+k}^{(k)}) - H(X_{n+k-1}^{(k-1)}) - H(X_{n+k}^{(k+1)}) + H(X_{n+k-1}^{(k)})
+
+    Parameters
+    ----------
+    %(labels_info)s
+    %(k_info)s
+    %(state_to_ignore)s
+    %(log_base)s
+    %(n_jobs)s
 
     Returns
     -------
     p: array (n_symbols, )
         Partial auto-information array for lags k=0, ..., kmax-1
     """
+    _check_type(labels, (np.ndarray,), "labels")
+    _check_type(ks, (int,), "k")
+    if ks == 1:
+        raise ValueError(
+            "The joint Shannon entropy of k-histories"
+            "is not directly applicable for k=1."
+        )
+    _check_type(state_to_ignore, (int,), "state_to_ignore")
+    log_base = _check_log_base(log_base)
+    n_jobs = _check_n_jobs(n_jobs)
 
-    def p_function(
-        labels,
-        n_clusters,
-        k,
-        bias_correction=bias_correction,
-        log_base=log_base,
-    ):
-        h1 = H_k(
-            labels,
-            n_clusters,
-            k,
-            bias_correction=bias_correction,
-            log_base=log_base,
-        )
-        h2 = H_k(
-            labels,
-            n_clusters,
-            k - 1,
-            bias_correction=bias_correction,
-            log_base=log_base,
-        )
-        h3 = H_k(
-            labels,
-            n_clusters,
-            k + 1,
-            bias_correction=bias_correction,
-            log_base=log_base,
-        )
-        p = 2 * h1 - h2 - h3
-        return p
+    if isinstance(ks, int):
+        ks = list(range(ks))
 
-    p = np.zeros(kmax)
-    a = aif(labels, n_clusters, 2)  # use AIF coeffs. for k=0, 1
-    p[0], p[1] = a[0], a[1]
-    for k in range(2, kmax):
-        p[k] = p_function(
-            labels,
-            n_clusters,
-            k,
-            bias_correction=bias_correction,
-            log_base=log_base,
-        )
-    p /= p[0]  # normalize: p[0]=1.0
-    return p
+    parallel, p_fun, _ = parallel_func(paif, n_jobs, total=len(ks))
+    runs = parallel(
+        p_fun(labels, k, state_to_ignore=state_to_ignore, log_base=log_base)
+        for k in ks
+    )
+    return runs
