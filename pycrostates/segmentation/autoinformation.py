@@ -227,14 +227,14 @@ def ais(
 
 
 @fill_doc
-def aif(
+def ai(
     labels: NDArray[int],
     k: int,
     state_to_ignore=-1,
     log_base: float = 2,
 ):
     """
-    Time-lagged mutual information = Auto-information function (AIF)
+    Computes the Auto-information for lag k.
 
     TeX notation:
     I(X_{n+k} ; X_{n})
@@ -280,7 +280,7 @@ def aif(
 
 
 @fill_doc
-def aif_p(
+def aif(
     labels: NDArray[int],
     ks: int,
     state_to_ignore=-1,
@@ -288,7 +288,7 @@ def aif_p(
     n_jobs: int = None,
 ):
     """
-    Time-lagged mutual information = Auto-information function (AIF)
+    Compute the Auto-information function (AIF).
 
     TeX notation:
     I(X_{n+k} ; X_{n})
@@ -318,7 +318,7 @@ def aif_p(
     if isinstance(ks, int):
         ks = list(range(ks))
 
-    parallel, p_fun, _ = parallel_func(aif, n_jobs, total=len(ks))
+    parallel, p_fun, _ = parallel_func(ai, n_jobs, total=len(ks))
     runs = parallel(
         p_fun(labels, k, state_to_ignore=state_to_ignore, log_base=log_base)
         for k in ks
@@ -327,14 +327,14 @@ def aif_p(
 
 
 @fill_doc
-def paif(
+def pai(
     labels: NDArray[int],
     k: int,
     state_to_ignore=-1,
     log_base: float = 2,
 ):
     """
-    Partial auto-information function (PAIF).
+    Compute the partial auto-information function for lag k.
 
     TeX notation:
     I(X_{n+k} ; X_{n} | X_{n+k-1}^{(k-1)})
@@ -359,7 +359,9 @@ def paif(
     _check_type(k, (int,), "k")
     _check_type(state_to_ignore, (int,), "state_to_ignore")
     log_base = _check_log_base(log_base)
-
+    # use AIF coeffs. for k=0, 1 #TODO: why not k=0 undefined ans k=1 same formula as k> 1?
+    if k <= 1:
+        return(ai(labels, k, state_to_ignore=state_to_ignore, log_base=log_base))
     h1 = joint_entropy_history(
         labels,
         k,
@@ -383,7 +385,7 @@ def paif(
 
 
 @fill_doc
-def paif_p(
+def paif(
     labels: NDArray[int],
     ks: int,
     state_to_ignore=-1,
@@ -391,7 +393,7 @@ def paif_p(
     n_jobs: int = None,
 ):
     """
-    Partial auto-information function (PAIF).
+    Compute the Partial auto-information function.
 
     TeX notation:
     I(X_{n+k} ; X_{n} | X_{n+k-1}^{(k-1)})
@@ -415,11 +417,6 @@ def paif_p(
     """
     _check_type(labels, (np.ndarray,), "labels")
     _check_type(ks, (int,), "k")
-    if ks == 1:
-        raise ValueError(
-            "The joint Shannon entropy of k-histories"
-            "is not directly applicable for k=1."
-        )
     _check_type(state_to_ignore, (int,), "state_to_ignore")
     log_base = _check_log_base(log_base)
     n_jobs = _check_n_jobs(n_jobs)
@@ -427,7 +424,7 @@ def paif_p(
     if isinstance(ks, int):
         ks = list(range(ks))
 
-    parallel, p_fun, _ = parallel_func(paif, n_jobs, total=len(ks))
+    parallel, p_fun, _ = parallel_func(pai, n_jobs, total=len(ks))
     runs = parallel(
         p_fun(labels, k, state_to_ignore=state_to_ignore, log_base=log_base)
         for k in ks
