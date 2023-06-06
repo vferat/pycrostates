@@ -361,7 +361,9 @@ def pai(
     log_base = _check_log_base(log_base)
     # use AIF coeffs. for k=0, 1 #TODO: why not k=0 undefined ans k=1 same formula as k> 1?
     if k <= 1:
-        return(ai(labels, k, state_to_ignore=state_to_ignore, log_base=log_base))
+        return ai(
+            labels, k, state_to_ignore=state_to_ignore, log_base=log_base
+        )
     h1 = joint_entropy_history(
         labels,
         k,
@@ -430,3 +432,48 @@ def paif(
         for k in ks
     )
     return runs
+
+
+def excess_entropy_rate(
+    labels: NDArray[int],
+    ks: int,
+    state_to_ignore=-1,
+    log_base: float = 2,
+):
+    """
+    Estimate the entropy rate and the excess entropy from a linear fit:
+    H(X_{n}^{(k)}) = a * k + b (history length k vs. joint entropy H_k)
+
+    Parameters
+    ----------
+    %(labels_info)s
+    ks: int
+        maximum lag in sample.
+    %(state_to_ignore)s
+    %(log_base)s
+    %(n_jobs)s
+
+    Returns
+    -------
+    a: float
+        entropy rate (slope)
+    b: float
+        excess entropy (intercept)
+    """
+    _check_type(labels, (np.ndarray,), "labels")
+    _check_type(ks, (int,), "k")
+    _check_type(state_to_ignore, (int,), "state_to_ignore")
+    log_base = _check_log_base(log_base)
+    n_jobs = _check_n_jobs(n_jobs)
+
+    hs = list()
+    if isinstance(ks, int):
+        ks = list(range(ks))
+    for k in ks:
+        # TODO: joint entropy for history length k+1 ?
+        h = joint_entropy_history(
+            labels, k + 1, state_to_ignore=state_to_ignore, log_base=log_base
+        )
+        h.append(h)
+    a, b = np.polyfit(ks, hs, 1)
+    return (a, b)
