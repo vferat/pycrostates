@@ -48,13 +48,17 @@ def test_check_type():
         pass
 
     _check_type(foo_function, ("callable",))
-
+    _check_type((1, 0, 1), ("array-like",))
+    _check_type([1, 0, 1], ("array-like",))
+    _check_type(np.array([1, 0, 1]), ("array-like",))
     assert _check_type(101, ("numeric",)) == 101
     assert _check_type(101.0, ("numeric",)) == 101.0
 
     # invalids
     with pytest.raises(TypeError, match="Item must be an instance of"):
         _check_type(101, (float,))
+    with pytest.raises(TypeError, match="Item must be an instance of"):
+        _check_type(101, ("array-like",))
     with pytest.raises(TypeError, match="'number' must be an instance of"):
         _check_type(101, (float,), "number")
 
