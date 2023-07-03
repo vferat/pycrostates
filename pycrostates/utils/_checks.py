@@ -258,9 +258,7 @@ def _check_tmin_tmax(inst, tmin, tmax):
         if arg is None:
             continue
         if arg < 0:
-            raise ValueError(
-                f"Argument '{name}' must be positive. Provided '{arg}'."
-            )
+            raise ValueError(f"Argument '{name}' must be positive. Provided '{arg}'.")
     # check tmax is shorter than instance
     if tmax is not None and inst.times[-1] < tmax:
         raise ValueError(
