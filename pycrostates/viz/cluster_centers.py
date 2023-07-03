@@ -118,7 +118,7 @@ def plot_cluster_centers(
             raise ValueError(
                 "Argument 'cluster_centers' and 'axes' must contain the same "
                 f"number of clusters and Axes. Provided: {n_clusters} "
-                "microstates maps and {axes.size} axes."
+                f"microstates maps and {axes.size} axes."
             )
         figs = [ax.get_figure() for ax in axes.flatten()]
         if len(set(figs)) == 1:
