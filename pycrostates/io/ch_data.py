@@ -152,7 +152,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         n_zero = np.sum(np.sum(np.abs(pos), axis=1) == 0)
         if n_zero > 1:  # XXX some systems have origin (0, 0, 0)
             raise ValueError(
-                "Could not extract channel positions for " f"{n_zero} channels."
+                f"Could not extract channel positions for {n_zero} channels."
             )
         return pos
 

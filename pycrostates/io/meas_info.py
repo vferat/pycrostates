@@ -283,7 +283,7 @@ class ChInfo(CHInfo, Info):
             _check_type(ch_type, (str,))
             if ch_type not in ch_types_dict:
                 raise KeyError(
-                    f"kind must be one of {list(ch_types_dict)}, not " f"{ch_type}."
+                    f"kind must be one of {list(ch_types_dict)}, not {ch_type}."
                 )
             this_ch_dict = ch_types_dict[ch_type]
             kind = this_ch_dict["kind"]

@@ -427,6 +427,6 @@ class ModKMeans(_BaseCluster):
         _check_type(tol, ("numeric",), item_name="tol")
         if tol <= 0:
             raise ValueError(
-                "The tolerance must be a positive number. " f"Provided: '{tol}'."
+                "The tolerance must be a positive number. Provided: '{tol}'."
             )
         return tol
