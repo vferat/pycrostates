@@ -328,7 +328,7 @@ class ChInfo(CHInfo, Info):
         # invalid attributes
         _inv_attributes = ()
         # invalid methods/properties
-        _inv_methods = "pick_channels"  # TODO: Can be removed when req. for MNE = 1.1.0
+        _inv_methods = ()
         if name in _inv_attributes or name in _inv_methods:
             raise AttributeError(
                 f"'{self.__class__.__name__}' has not attribute '{name}'"

@@ -42,7 +42,7 @@ classifiers = [
 dependencies = [
     'numpy>=1.21',
     'scipy',
-    'mne>=1.0.0',
+    'mne>=1.1.0',
     'joblib',
     'matplotlib',
     'scikit-learn',
