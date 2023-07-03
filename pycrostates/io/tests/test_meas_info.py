@@ -120,9 +120,7 @@ def test_create_from_info_invalid_arguments():
         ChInfo(info, ch_names=ch_names)
     with pytest.raises(RuntimeError, match="If 'info' is provided"):
         ChInfo(info, ch_types=ch_types)
-    with pytest.raises(
-        TypeError, match="'info' must be an instance of None or Info"
-    ):
+    with pytest.raises(TypeError, match="'info' must be an instance of None or Info"):
         ChInfo(info=ch_names)
 
 
