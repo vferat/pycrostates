@@ -51,7 +51,7 @@ def test_ChData():
     # test that data is copied
     data_ = ch_data.get_data()
     data_[0, :] = 0.0
-    assert not np.allclose(data_, data)
+    assert not np.allclose(data_, data, rtol=1e-7, atol=0)
     assert_allclose(ch_data._data, data)
 
     # test get_data() with picks

@@ -267,22 +267,22 @@ def test_aahClusterMeans():
     # Test copy
     aahCluster2 = aahCluster1.copy()
     _check_fitted(aahCluster2)
-    assert np.isclose(
+    assert_allclose(
         aahCluster2._cluster_centers_, aahCluster1._cluster_centers_
-    ).all()
+    )
     assert np.isclose(aahCluster2.GEV_, aahCluster1.GEV_)
-    assert np.isclose(aahCluster2._labels_, aahCluster1._labels_).all()
+    assert_allclose(aahCluster2._labels_, aahCluster1._labels_)
     aahCluster2.fitted = False
     _check_fitted(aahCluster1)
     _check_unfitted(aahCluster2)
 
     aahCluster3 = aahCluster1.copy(deep=False)
     _check_fitted(aahCluster3)
-    assert np.isclose(
+    assert_allclose(
         aahCluster3._cluster_centers_, aahCluster1._cluster_centers_
-    ).all()
+    )
     assert np.isclose(aahCluster3.GEV_, aahCluster1.GEV_)
-    assert np.isclose(aahCluster3._labels_, aahCluster1._labels_).all()
+    assert_allclose(aahCluster3._labels_, aahCluster1._labels_)
     aahCluster3.fitted = False
     _check_fitted(aahCluster1)
     _check_unfitted(aahCluster3)
@@ -314,52 +314,52 @@ def test_invert_polarity():
     aahCluster_ = aah_cluster.copy()
     cluster_centers_ = deepcopy(aahCluster_._cluster_centers_)
     aahCluster_.invert_polarity([True, False, True, False])
-    assert np.isclose(
+    assert_allclose(
         aahCluster_._cluster_centers_[0, :], -cluster_centers_[0, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         aahCluster_._cluster_centers_[1, :], cluster_centers_[1, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         aahCluster_._cluster_centers_[2, :], -cluster_centers_[2, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         aahCluster_._cluster_centers_[3, :], cluster_centers_[3, :]
-    ).all()
+    )
 
     # bool
     aahCluster_ = aah_cluster.copy()
     cluster_centers_ = deepcopy(aahCluster_._cluster_centers_)
     aahCluster_.invert_polarity(True)
-    assert np.isclose(
+    assert_allclose(
         aahCluster_._cluster_centers_[0, :], -cluster_centers_[0, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         aahCluster_._cluster_centers_[1, :], -cluster_centers_[1, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         aahCluster_._cluster_centers_[2, :], -cluster_centers_[2, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         aahCluster_._cluster_centers_[3, :], -cluster_centers_[3, :]
-    ).all()
+    )
 
     # np.array
     aahCluster_ = aah_cluster.copy()
     cluster_centers_ = deepcopy(aahCluster_._cluster_centers_)
     aahCluster_.invert_polarity(np.array([True, False, True, False]))
-    assert np.isclose(
+    assert_allclose(
         aahCluster_._cluster_centers_[0, :], -cluster_centers_[0, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         aahCluster_._cluster_centers_[1, :], cluster_centers_[1, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         aahCluster_._cluster_centers_[2, :], -cluster_centers_[2, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         aahCluster_._cluster_centers_[3, :], cluster_centers_[3, :]
-    ).all()
+    )
 
     # Test invalid arguments
     with pytest.raises(ValueError, match="not a 2D iterable"):
@@ -450,37 +450,37 @@ def test_reorder(caplog):
     # Test mapping
     aahCluster_ = aah_cluster.copy()
     aahCluster_.reorder_clusters(mapping={0: 1})
-    assert np.isclose(
+    assert_allclose(
         aah_cluster._cluster_centers_[0, :],
         aahCluster_._cluster_centers_[1, :],
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         aah_cluster._cluster_centers_[1, :],
         aahCluster_._cluster_centers_[0, :],
-    ).all()
+    )
     assert aah_cluster._cluster_names[0] == aahCluster_._cluster_names[1]
     assert aah_cluster._cluster_names[0] == aahCluster_._cluster_names[1]
 
     # Test order
     aahCluster_ = aah_cluster.copy()
     aahCluster_.reorder_clusters(order=[1, 0, 2, 3])
-    assert np.isclose(
+    assert_allclose(
         aah_cluster._cluster_centers_[0], aahCluster_._cluster_centers_[1]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         aah_cluster._cluster_centers_[1], aahCluster_._cluster_centers_[0]
-    ).all()
+    )
     assert aah_cluster._cluster_names[0] == aahCluster_._cluster_names[1]
     assert aah_cluster._cluster_names[0] == aahCluster_._cluster_names[1]
 
     aahCluster_ = aah_cluster.copy()
     aahCluster_.reorder_clusters(order=np.array([1, 0, 2, 3]))
-    assert np.isclose(
+    assert_allclose(
         aah_cluster._cluster_centers_[0], aahCluster_._cluster_centers_[1]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         aah_cluster._cluster_centers_[1], aahCluster_._cluster_centers_[0]
-    ).all()
+    )
     assert aah_cluster._cluster_names[0] == aahCluster_._cluster_names[1]
     assert aah_cluster._cluster_names[0] == aahCluster_._cluster_names[1]
 
@@ -783,14 +783,14 @@ def test_fit_data_shapes():
     aahCluster_reject_omit.fit(raw_, reject_by_annotation="omit")
 
     # Compare 'omit' and True
-    assert np.isclose(
+    assert_allclose(
         aahCluster_reject_omit._fitted_data,
         aahCluster_reject_True._fitted_data,
-    ).all()
+    )
     assert np.isclose(aahCluster_reject_omit.GEV_, aahCluster_reject_True.GEV_)
-    assert np.isclose(
+    assert_allclose(
         aahCluster_reject_omit._labels_, aahCluster_reject_True._labels_
-    ).all()
+    )
     # due to internal randomness, the sign can be flipped
     sgn = np.sign(
         np.sum(
@@ -800,10 +800,10 @@ def test_fit_data_shapes():
         )
     )
     aahCluster_reject_True._cluster_centers_ *= sgn[:, None]
-    assert np.isclose(
+    assert_allclose(
         aahCluster_reject_omit._cluster_centers_,
         aahCluster_reject_True._cluster_centers_,
-    ).all()
+    )
 
     # Make sure there is a shape diff between True and False
     assert (
@@ -835,9 +835,9 @@ def test_fit_data_shapes():
         aahCluster_rej_5_end._fitted_data, raw_, "eeg", 5, None, "omit"
     )
     assert aahCluster_rej_0_5._fitted_data.shape != fitted_data_0_5.shape
-    assert np.isclose(
+    assert_allclose(
         fitted_data_5_end, aahCluster_rej_5_end._fitted_data
-    ).all()
+    )
 
 
 def test_refit():
@@ -966,15 +966,18 @@ def test_predict_default(caplog):
     segmentation_no_annot = aah_cluster.predict(
         raw_eeg, factor=0, reject_edges=True, reject_by_annotation="omit"
     )
-    assert not np.isclose(
-        segmentation_rej_True._labels, segmentation_rej_False._labels
-    ).all()
-    assert np.isclose(
+    assert not np.allclose(
+        segmentation_rej_True._labels,
+        segmentation_rej_False._labels,
+        rtol=1e-7,
+        atol=0,
+    )
+    assert_allclose(
         segmentation_no_annot._labels, segmentation_rej_False._labels
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         segmentation_rej_None._labels, segmentation_rej_False._labels
-    ).all()
+    )
 
     # test different half_window_size
     segmentation1 = aah_cluster.predict(
@@ -986,9 +989,15 @@ def test_predict_default(caplog):
     segmentation3 = aah_cluster.predict(
         raw_eeg, factor=0, reject_edges=False, half_window_size=3
     )
-    assert not np.isclose(segmentation1._labels, segmentation2._labels).all()
-    assert not np.isclose(segmentation1._labels, segmentation3._labels).all()
-    assert not np.isclose(segmentation2._labels, segmentation3._labels).all()
+    assert not np.allclose(
+        segmentation1._labels, segmentation2._labels, rtol=1e-7, atol=0
+    )
+    assert not np.allclose(
+        segmentation1._labels, segmentation3._labels, rtol=1e-7, atol=0
+    )
+    assert not np.allclose(
+        segmentation2._labels, segmentation3._labels, rtol=1e-7, atol=0
+    )
 
 
 # pylint: enable=too-many-statements

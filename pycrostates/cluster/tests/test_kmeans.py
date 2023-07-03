@@ -160,18 +160,18 @@ def test_ModKMeans():
     # Test copy
     ModK2 = ModK1.copy()
     _check_fitted(ModK2)
-    assert np.isclose(ModK2._cluster_centers_, ModK1._cluster_centers_).all()
+    assert_allclose(ModK2._cluster_centers_, ModK1._cluster_centers_)
     assert np.isclose(ModK2.GEV_, ModK1.GEV_)
-    assert np.isclose(ModK2._labels_, ModK1._labels_).all()
+    assert_allclose(ModK2._labels_, ModK1._labels_)
     ModK2.fitted = False
     _check_fitted(ModK1)
     _check_unfitted(ModK2)
 
     ModK3 = ModK1.copy(deep=False)
     _check_fitted(ModK3)
-    assert np.isclose(ModK3._cluster_centers_, ModK1._cluster_centers_).all()
+    assert_allclose(ModK3._cluster_centers_, ModK1._cluster_centers_)
     assert np.isclose(ModK3.GEV_, ModK1.GEV_)
-    assert np.isclose(ModK3._labels_, ModK1._labels_).all()
+    assert_allclose(ModK3._labels_, ModK1._labels_)
     ModK3.fitted = False
     _check_fitted(ModK1)
     _check_unfitted(ModK3)
@@ -203,52 +203,52 @@ def test_invert_polarity():
     ModK_ = ModK.copy()
     cluster_centers_ = deepcopy(ModK_._cluster_centers_)
     ModK_.invert_polarity([True, False, True, False])
-    assert np.isclose(
+    assert_allclose(
         ModK_._cluster_centers_[0, :], -cluster_centers_[0, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         ModK_._cluster_centers_[1, :], cluster_centers_[1, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         ModK_._cluster_centers_[2, :], -cluster_centers_[2, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         ModK_._cluster_centers_[3, :], cluster_centers_[3, :]
-    ).all()
+    )
 
     # bool
     ModK_ = ModK.copy()
     cluster_centers_ = deepcopy(ModK_._cluster_centers_)
     ModK_.invert_polarity(True)
-    assert np.isclose(
+    assert_allclose(
         ModK_._cluster_centers_[0, :], -cluster_centers_[0, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         ModK_._cluster_centers_[1, :], -cluster_centers_[1, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         ModK_._cluster_centers_[2, :], -cluster_centers_[2, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         ModK_._cluster_centers_[3, :], -cluster_centers_[3, :]
-    ).all()
+    )
 
     # np.array
     ModK_ = ModK.copy()
     cluster_centers_ = deepcopy(ModK_._cluster_centers_)
     ModK_.invert_polarity(np.array([True, False, True, False]))
-    assert np.isclose(
+    assert_allclose(
         ModK_._cluster_centers_[0, :], -cluster_centers_[0, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         ModK_._cluster_centers_[1, :], cluster_centers_[1, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         ModK_._cluster_centers_[2, :], -cluster_centers_[2, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         ModK_._cluster_centers_[3, :], cluster_centers_[3, :]
-    ).all()
+    )
 
     # Test invalid arguments
     with pytest.raises(ValueError, match="not a 2D iterable"):
@@ -335,35 +335,35 @@ def test_reorder(caplog):
     # Test mapping
     ModK_ = ModK.copy()
     ModK_.reorder_clusters(mapping={0: 1})
-    assert np.isclose(
+    assert_allclose(
         ModK._cluster_centers_[0, :], ModK_._cluster_centers_[1, :]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         ModK._cluster_centers_[1, :], ModK_._cluster_centers_[0, :]
-    ).all()
+    )
     assert ModK._cluster_names[0] == ModK_._cluster_names[1]
     assert ModK._cluster_names[0] == ModK_._cluster_names[1]
 
     # Test order
     ModK_ = ModK.copy()
     ModK_.reorder_clusters(order=[1, 0, 2, 3])
-    assert np.isclose(
+    assert_allclose(
         ModK._cluster_centers_[0], ModK_._cluster_centers_[1]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         ModK._cluster_centers_[1], ModK_._cluster_centers_[0]
-    ).all()
+    )
     assert ModK._cluster_names[0] == ModK_._cluster_names[1]
     assert ModK._cluster_names[0] == ModK_._cluster_names[1]
 
     ModK_ = ModK.copy()
     ModK_.reorder_clusters(order=np.array([1, 0, 2, 3]))
-    assert np.isclose(
+    assert_allclose(
         ModK._cluster_centers_[0], ModK_._cluster_centers_[1]
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         ModK._cluster_centers_[1], ModK_._cluster_centers_[0]
-    ).all()
+    )
     assert ModK._cluster_names[0] == ModK_._cluster_names[1]
     assert ModK._cluster_names[0] == ModK_._cluster_names[1]
 
@@ -699,16 +699,16 @@ def test_fit_data_shapes():
     ModK_reject_omit.fit(raw_, n_jobs=1, reject_by_annotation="omit")
 
     # Compare 'omit' and True
-    assert np.isclose(
+    assert_allclose(
         ModK_reject_omit._fitted_data, ModK_reject_True._fitted_data
-    ).all()
+    )
     assert np.isclose(ModK_reject_omit.GEV_, ModK_reject_True.GEV_)
-    assert np.isclose(
+    assert_allclose(
         ModK_reject_omit._labels_, ModK_reject_True._labels_
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         ModK_reject_omit._cluster_centers_, ModK_reject_True._cluster_centers_
-    ).all()
+    )
 
     # Make sure there is a shape diff between True and False
     assert (
@@ -740,7 +740,7 @@ def test_fit_data_shapes():
         ModK_rej_5_end._fitted_data, raw_, "eeg", 5, None, "omit"
     )
     assert ModK_rej_0_5._fitted_data.shape != fitted_data_0_5.shape
-    assert np.isclose(fitted_data_5_end, ModK_rej_5_end._fitted_data).all()
+    assert_allclose(fitted_data_5_end, ModK_rej_5_end._fitted_data)
 
 
 def test_refit():
@@ -778,7 +778,7 @@ def test_refit():
     with pytest.raises(RuntimeError, match="must be unfitted"):
         ModK_.fit(raw, picks="mag")  # works
     assert eeg_ch_names == ModK_.info["ch_names"]
-    assert np.isclose(eeg_cluster_centers, ModK_.cluster_centers_).all()
+    assert_allclose(eeg_cluster_centers, ModK_.cluster_centers_)
 
 
 def test_predict_default(caplog):
@@ -870,15 +870,18 @@ def test_predict_default(caplog):
     segmentation_no_annot = ModK.predict(
         raw_eeg, factor=0, reject_edges=True, reject_by_annotation="omit"
     )
-    assert not np.isclose(
-        segmentation_rej_True._labels, segmentation_rej_False._labels
-    ).all()
-    assert np.isclose(
+    assert not np.allclose(
+        segmentation_rej_True._labels,
+        segmentation_rej_False._labels,
+        rtol=1e-7,
+        atol=0,
+    )
+    assert_allclose(
         segmentation_no_annot._labels, segmentation_rej_False._labels
-    ).all()
-    assert np.isclose(
+    )
+    assert_allclose(
         segmentation_rej_None._labels, segmentation_rej_False._labels
-    ).all()
+    )
 
     # test different half_window_size
     segmentation1 = ModK.predict(
@@ -890,9 +893,15 @@ def test_predict_default(caplog):
     segmentation3 = ModK.predict(
         raw_eeg, factor=0, reject_edges=False, half_window_size=3
     )
-    assert not np.isclose(segmentation1._labels, segmentation2._labels).all()
-    assert not np.isclose(segmentation1._labels, segmentation3._labels).all()
-    assert not np.isclose(segmentation2._labels, segmentation3._labels).all()
+    assert not np.allclose(
+        segmentation1._labels, segmentation2._labels, rtol=1e-7, atol=0
+    )
+    assert not np.allclose(
+        segmentation1._labels, segmentation3._labels, rtol=1e-7, atol=0
+    )
+    assert not np.allclose(
+        segmentation2._labels, segmentation3._labels, rtol=1e-7, atol=0
+    )
 
 
 def test_picks_fit_predict(caplog):
@@ -1106,9 +1115,9 @@ def test_n_jobs():
     )
     ModK_.fit(raw_eeg, n_jobs=2)
     _check_fitted(ModK_)
-    assert np.isclose(ModK_._cluster_centers_, ModK._cluster_centers_).all()
+    assert_allclose(ModK_._cluster_centers_, ModK._cluster_centers_)
     assert np.isclose(ModK_.GEV_, ModK.GEV_)
-    assert np.isclose(ModK_._labels_, ModK._labels_).all()
+    assert_allclose(ModK_._labels_, ModK._labels_)
 
 
 def test_fit_not_converged(caplog):
@@ -1176,10 +1185,10 @@ def test_randomseed():
     )
     ModK3.fit(raw_eeg, n_jobs=1)
 
-    assert np.isclose(ModK1._cluster_centers_, ModK2._cluster_centers_).all()
-    assert not np.isclose(
-        ModK1._cluster_centers_, ModK3._cluster_centers_
-    ).all()
+    assert_allclose(ModK1._cluster_centers_, ModK2._cluster_centers_)
+    assert not np.allclose(
+        ModK1._cluster_centers_, ModK3._cluster_centers_, rtol=1e-7, atol=0
+    )
 
 
 def test_contains_mixin():
