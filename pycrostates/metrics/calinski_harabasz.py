@@ -1,9 +1,7 @@
 """Calinski Harabasz score."""
 
 import numpy as np
-from sklearn.metrics import (
-    calinski_harabasz_score as sk_calinski_harabasz_score,
-)
+from sklearn.metrics import calinski_harabasz_score as sk_calinski_harabasz_score
 
 from ..cluster._base import _BaseCluster
 from ..utils._checks import _check_type

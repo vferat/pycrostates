@@ -15,7 +15,6 @@ from ..utils._checks import _check_axes, _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
-
 _GRADIENT_KWARGS_DEFAULTS: Dict[str, str] = {
     "color": "black",
     "linestyle": "-",
@@ -86,9 +85,7 @@ def plot_cluster_centers(
 
     # check cluster_names
     if cluster_names is None:
-        cluster_names = [
-            str(k) for k in range(1, cluster_centers.shape[0] + 1)
-        ]
+        cluster_names = [str(k) for k in range(1, cluster_centers.shape[0] + 1)]
     if len(cluster_names) != cluster_centers.shape[0]:
         raise ValueError(
             "Argument 'cluster_centers' and 'cluster_names' should have the "

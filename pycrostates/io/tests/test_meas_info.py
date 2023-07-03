@@ -121,7 +121,7 @@ def test_create_from_info_invalid_arguments():
     with pytest.raises(RuntimeError, match="If 'info' is provided"):
         ChInfo(info, ch_types=ch_types)
     with pytest.raises(
-        TypeError, match="'info' must be an instance of None " "or Info"
+        TypeError, match="'info' must be an instance of None or Info"
     ):
         ChInfo(info=ch_names)
 
@@ -221,8 +221,7 @@ def test_create_without_arguments():
     """Test error raised if both arguments are None."""
     with pytest.raises(
         RuntimeError,
-        match="Either 'info' or 'ch_names' and "
-        "'ch_types' must not be None.",
+        match="Either 'info' or 'ch_names' and 'ch_types' must not be None.",
     ):
         ChInfo()
 
@@ -262,13 +261,9 @@ def test_montage():
         if montage.get_positions()[key] is None:
             assert montage2.get_positions()[key] is None
         elif isinstance(montage.get_positions()[key], str):
-            assert (
-                montage.get_positions()[key] == montage2.get_positions()[key]
-            )
+            assert montage.get_positions()[key] == montage2.get_positions()[key]
         elif isinstance(montage.get_positions()[key], np.ndarray):
-            assert_allclose(
-                montage.get_positions()[key], montage2.get_positions()[key]
-            )
+            assert_allclose(montage.get_positions()[key], montage2.get_positions()[key])
         elif isinstance(montage.get_positions()[key], OrderedDict):
             for k, v in montage.get_positions()[key].items():
                 assert_allclose(

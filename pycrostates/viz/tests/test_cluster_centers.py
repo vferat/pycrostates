@@ -74,9 +74,7 @@ def test_plot_cluster_centers(caplog):
     ):
         plot_cluster_centers(cluster_centers, info=chinfo, cluster_names=["A"])
     f, ax = plt.subplots(1, 1)
-    with pytest.raises(
-        ValueError, match="Argument 'cluster_centers' and 'axes' must "
-    ):
+    with pytest.raises(ValueError, match="Argument 'cluster_centers' and 'axes' must "):
         plot_cluster_centers(cluster_centers, info=chinfo, axes=ax)
     plt.close("all")
 

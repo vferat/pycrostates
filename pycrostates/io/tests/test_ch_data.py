@@ -9,15 +9,9 @@ from pycrostates.io import ChData, ChInfo
 times = np.linspace(0, 5, 2000)
 signals = np.array([np.sin(2 * np.pi * k * times) for k in (7, 22, 37)])
 coeffs = np.random.rand(6, 3)
-data = np.dot(coeffs, signals) + np.random.normal(
-    0, 0.1, (coeffs.shape[0], times.size)
-)
-info = create_info(
-    ["Fpz", "Cz", "CPz", "Oz", "M1", "M2"], sfreq=400, ch_types="eeg"
-)
-ch_info = ChInfo(
-    ch_names=["Fpz", "Cz", "CPz", "Oz", "M1", "M2"], ch_types="eeg"
-)
+data = np.dot(coeffs, signals) + np.random.normal(0, 0.1, (coeffs.shape[0], times.size))
+info = create_info(["Fpz", "Cz", "CPz", "Oz", "M1", "M2"], sfreq=400, ch_types="eeg")
+ch_info = ChInfo(ch_names=["Fpz", "Cz", "CPz", "Oz", "M1", "M2"], ch_types="eeg")
 ch_info_types = ChInfo(
     ch_names=["Fpz", "Cz", "MEG01", "STIM01", "GRAD01", "EOG"],
     ch_types=["eeg", "eeg", "mag", "stim", "grad", "eog"],
@@ -103,13 +97,9 @@ def test_ChData_picks(picks, exclude, ch_names):
 
 def test_ChData_invalid_arguments():
     """Test error raised when invalid arguments are provided to ChData."""
-    with pytest.raises(
-        TypeError, match="'data' must be an instance of ndarray"
-    ):
+    with pytest.raises(TypeError, match="'data' must be an instance of ndarray"):
         ChData(list(data[0, :]), create_info(1, 400, "eeg"))
-    with pytest.raises(
-        TypeError, match="'info' must be an instance of Info or ChInfo"
-    ):
+    with pytest.raises(TypeError, match="'info' must be an instance of Info or ChInfo"):
         ChData(data, 101)
     with pytest.raises(ValueError, match="'data' should be a 2D array"):
         ChData(data.reshape(6, 5, 400), ch_info)

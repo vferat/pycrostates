@@ -48,9 +48,7 @@ def _compute_transition_matrix(
 ) -> NDArray[float]:
     """Compute observed transition."""
     # common error checking
-    _check_value(
-        stat, ("count", "probability", "proportion", "percent"), "stat"
-    )
+    _check_value(stat, ("count", "probability", "proportion", "percent"), "stat")
     _check_type(ignore_self, (bool,), "ignore_self")
 
     # reshape if epochs (returns a view)

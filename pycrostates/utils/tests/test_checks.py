@@ -72,9 +72,7 @@ def test_check_value():
     # invalids
     with pytest.raises(ValueError, match="Invalid value for the parameter."):
         _check_value(5, [1, 2, 3, 4])
-    with pytest.raises(
-        ValueError, match="Invalid value for the 'number' parameter."
-    ):
+    with pytest.raises(ValueError, match="Invalid value for the 'number' parameter."):
         _check_value(5, [1, 2, 3, 4], "number")
 
 
@@ -110,9 +108,7 @@ def test_check_random_state():
     rs = _check_random_state(rng)
     assert isinstance(rs, Generator)
 
-    with pytest.raises(
-        ValueError, match=re.escape("[101] cannot be used to seed")
-    ):
+    with pytest.raises(ValueError, match=re.escape("[101] cannot be used to seed")):
         _check_random_state([101])
 
 
@@ -154,9 +150,7 @@ def test_check_reject_by_annotation():
         TypeError, match="'reject_by_annotation' must be an instance of"
     ):
         _check_reject_by_annotation(1)
-    with pytest.raises(
-        ValueError, match="'reject_by_annotation' only allows for"
-    ):
+    with pytest.raises(ValueError, match="'reject_by_annotation' only allows for"):
         _check_reject_by_annotation("101")
 
 
@@ -182,13 +176,9 @@ def test_check_tmin_tmax():
     _check_tmin_tmax(epochs, 0, 0.5)
 
     # test invalid tmin/tmax
-    with pytest.raises(
-        ValueError, match="Argument 'tmax' must be shorter than"
-    ):
+    with pytest.raises(ValueError, match="Argument 'tmax' must be shorter than"):
         _check_tmin_tmax(raw, 1, 6)
-    with pytest.raises(
-        ValueError, match="Argument 'tmax' must be shorter than"
-    ):
+    with pytest.raises(ValueError, match="Argument 'tmax' must be shorter than"):
         _check_tmin_tmax(epochs, 1, 6)
     with pytest.raises(ValueError, match="Argument 'tmin' must be positive"):
         _check_tmin_tmax(raw, -1, 4)
@@ -202,13 +192,9 @@ def test_check_tmin_tmax():
         ValueError, match="Argument 'tmax' must be strictly larger than 'tmin'"
     ):
         _check_tmin_tmax(epochs, 0.3, 0.1)
-    with pytest.raises(
-        ValueError, match="Argument 'tmin' must be shorter than"
-    ):
+    with pytest.raises(ValueError, match="Argument 'tmin' must be shorter than"):
         _check_tmin_tmax(raw, 6, None)
-    with pytest.raises(
-        ValueError, match="Argument 'tmin' must be shorter than"
-    ):
+    with pytest.raises(ValueError, match="Argument 'tmin' must be shorter than"):
         _check_tmin_tmax(epochs, 2, None)
 
 

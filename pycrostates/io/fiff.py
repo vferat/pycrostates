@@ -114,8 +114,7 @@ def _write_cluster(
     _check_type(cluster_names, (list,), "cluster_names")
     if len(cluster_names) != cluster_centers_.shape[0]:
         raise ValueError(
-            "Argument 'cluster_names' and 'cluster_centers_' shapes do not "
-            "match."
+            "Argument 'cluster_names' and 'cluster_centers_' shapes do not match."
         )
     _check_type(fitted_data, (np.ndarray,), "fitted_data")
     if fitted_data.ndim != 2:
@@ -162,9 +161,7 @@ def _write_cluster(
             fid, FIFF.FIFF_MNE_ICA_INTERFACE_PARAMS, _serialize(fit_parameters)
         )
         # write fit_variables
-        write_string(
-            fid, FIFF.FIFF_MNE_ICA_MISC_PARAMS, _serialize(fit_variables)
-        )
+        write_string(fid, FIFF.FIFF_MNE_ICA_MISC_PARAMS, _serialize(fit_variables))
         # ------------------------------------------------------------
 
         # close writing block
@@ -216,13 +213,13 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
                 fit_parameters["tol"] = ModKMeans._check_tol(value)
         elif algorithm == "AAHCluster":
             if key == "ignore_polarity":
-                fit_parameters[
-                    "ignore_polarity"
-                ] = AAHCluster._check_ignore_polarity(value)
+                fit_parameters["ignore_polarity"] = AAHCluster._check_ignore_polarity(
+                    value
+                )
             elif key == "normalize_input":
-                fit_parameters[
-                    "normalize_input"
-                ] = AAHCluster._check_normalize_input(value)
+                fit_parameters["normalize_input"] = AAHCluster._check_normalize_input(
+                    value
+                )
         # pylint: enable=protected-access
         if key == "GEV_":
             _check_type(value, ("numeric",), "GEV_")
@@ -318,9 +315,7 @@ def _read_cluster(fname: Union[str, Path]):
         fit_variables,
     )
     if any(elt is None for elt in data):
-        raise RuntimeError(
-            "One of the required tag was not found in .fif file."
-        )
+        raise RuntimeError("One of the required tag was not found in .fif file.")
     algorithm, version = _check_fit_parameters_and_variables(
         fit_parameters, fit_variables
     )
@@ -590,9 +585,7 @@ def _read_meas_info(fid, tree):
     info["custom_ref_applied"] = custom_ref_applied
 
     # add coordinate transformation
-    info["dev_head_t"] = (
-        Transform("meg", "head") if dev_head_t is None else dev_head_t
-    )
+    info["dev_head_t"] = Transform("meg", "head") if dev_head_t is None else dev_head_t
     info["ctf_head_t"] = ctf_head_t
     info["dev_ctf_t"] = dev_ctf_t
     if dev_head_t is not None and ctf_head_t is not None and dev_ctf_t is None:

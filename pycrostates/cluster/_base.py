@@ -225,14 +225,10 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         if isinstance(inst, (BaseRaw, BaseEpochs)):
             tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)
         if isinstance(inst, BaseRaw):
-            reject_by_annotation = _check_reject_by_annotation(
-                reject_by_annotation
-            )
+            reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
 
         # picks
-        picks_bads_inc = _picks_to_idx(
-            inst.info, picks, none="all", exclude=[]
-        )
+        picks_bads_inc = _picks_to_idx(inst.info, picks, none="all", exclude=[])
         picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
         _check_picks_uniqueness(inst.info, picks)
         ch_not_used = set(picks_bads_inc) - set(picks)
@@ -256,9 +252,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             del msg
 
         # retrieve numpy array
-        kwargs = (
-            dict() if isinstance(inst, ChData) else dict(tmin=tmin, tmax=tmax)
-        )
+        kwargs = dict() if isinstance(inst, ChData) else dict(tmin=tmin, tmax=tmax)
         if isinstance(inst, BaseRaw):
             kwargs["reject_by_annotation"] = reject_by_annotation
         data = inst.get_data(picks=picks, **kwargs)
@@ -271,15 +265,9 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         info = pick_info(inst.info, picks, copy=True)
         if info["bads"] != []:
             if len(info["bads"]) == 1:
-                msg = (
-                    "The channel %s is set as bad and will be used for "
-                    "fitting."
-                )
+                msg = "The channel %s is set as bad and will be used for fitting."
             else:
-                msg = (
-                    "The channels %s are set as bad and will be used for "
-                    "fitting."
-                )
+                msg = "The channels %s are set as bad and will be used for fitting."
             logger.warning(msg, ", ".join(ch_name for ch_name in info["bads"]))
             del msg
         self._info = ChInfo(info=info)
@@ -314,9 +302,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         self._check_fit()
 
         if mapping is not None and new_names is not None:
-            raise ValueError(
-                "Only one of 'mapping' or 'new_names' must be provided."
-            )
+            raise ValueError("Only one of 'mapping' or 'new_names' must be provided.")
 
         if mapping is not None:
             _check_type(mapping, (dict,), item_name="mapping")
@@ -339,8 +325,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
             # convert to dict
             mapping = {
-                old_name: new_names[k]
-                for k, old_name in enumerate(self._cluster_names)
+                old_name: new_names[k] for k, old_name in enumerate(self._cluster_names)
             }
 
         else:
@@ -351,8 +336,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             return
 
         self._cluster_names = [
-            mapping[name] if name in mapping else name
-            for name in self._cluster_names
+            mapping[name] if name in mapping else name for name in self._cluster_names
         ]
 
     def reorder_clusters(
@@ -403,8 +387,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
         if sum(x is not None for x in (mapping, order, template)) > 1:
             raise ValueError(
-                "Only one of 'mapping', 'order' or 'template' "
-                "must be provided."
+                "Only one of 'mapping', 'order' or 'template' must be provided."
             )
 
         # Mapping
@@ -420,9 +403,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
             # check uniqueness
             if len(set(mapping.values())) != len(mapping.values()):
-                raise ValueError(
-                    "Position in the new order can not be repeated."
-                )
+                raise ValueError("Position in the new order can not be repeated.")
             # check that a cluster is not moved twice
             for key in mapping:
                 if key in mapping.values():
@@ -677,9 +658,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         _check_type(factor, ("int",), item_name="factor")
         _check_type(half_window_size, ("int",), item_name="half_window_size")
         _check_type(tol, ("numeric",), item_name="tol")
-        _check_type(
-            min_segment_length, ("int",), item_name="min_segment_length"
-        )
+        _check_type(min_segment_length, ("int",), item_name="min_segment_length")
         _check_type(reject_edges, (bool,), item_name="reject_edges")
         _check_type(
             reject_by_annotation,
@@ -710,9 +689,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                     "The current fit contains bad channels %s"
                     + " which will be used for prediction."
                 )
-            logger.warning(
-                msg, ", ".join(ch_name for ch_name in self._info["bads"])
-            )
+            logger.warning(msg, ", ".join(ch_name for ch_name in self._info["bads"]))
             del msg
 
         # check that the instance as the required channels (good + bads)
@@ -1019,9 +996,9 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
         w = np.zeros((Nu, Nt))
         w[(rmat == labels)] = 1
-        e = np.sum(
-            Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) ** 2
-        ) / (Nt * (Ne - 1))
+        e = np.sum(Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) ** 2) / (
+            Nt * (Ne - 1)
+        )
         window = np.ones((1, 2 * half_window_size + 1))
 
         S0 = 0
@@ -1035,9 +1012,9 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             labels = dlt
             w = np.zeros((Nu, Nt))
             w[(rmat == labels)] = 1
-            Su = np.sum(
-                Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) ** 2
-            ) / (Nt * (Ne - 1))
+            Su = np.sum(Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) ** 2) / (
+                Nt * (Ne - 1)
+            )
             if np.abs(Su - S0) <= np.abs(tol * Su):
                 break
             S0 = Su
@@ -1064,8 +1041,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                 skip_condition = [
                     k in (0, len(segments) - 1),  # ignore edge segments
                     segment[0] == -1,  # ignore segments labelled with 0
-                    min_segment_length
-                    <= len(segment),  # ignore large segments
+                    min_segment_length <= len(segment),  # ignore large segments
                 ]
                 if any(skip_condition):
                     idx += len(segment)

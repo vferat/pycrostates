@@ -78,8 +78,7 @@ def plot_raw_segmentation(
     # make sure shapes are correct
     if data.shape[1] != labels.size:
         raise ValueError(
-            "Argument 'labels' and 'raw' do not have the same number of "
-            "samples."
+            "Argument 'labels' and 'raw' do not have the same number of samples."
         )
 
     fig, axes, show = _plot_segmentation(
@@ -155,8 +154,7 @@ def plot_epoch_segmentation(
     # make sure shapes are correct
     if data.shape[1] != labels.size:
         raise ValueError(
-            "Argument 'labels' and 'epochs' do not have the same number of "
-            "samples."
+            "Argument 'labels' and 'epochs' do not have the same number of samples."
         )
 
     fig, axes, show = _plot_segmentation(

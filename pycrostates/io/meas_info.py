@@ -206,15 +206,11 @@ class ChInfo(CHInfo, Info):
             raise RuntimeError(
                 "Either 'info' or 'ch_names' and 'ch_types' must not be None."
             )
-        if info is None and all(
-            arg is not None for arg in (ch_names, ch_types)
-        ):
+        if info is None and all(arg is not None for arg in (ch_names, ch_types)):
             _check_type(ch_names, (None, "int", list, tuple), "ch_names")
             _check_type(ch_types, (None, str, list, tuple), "ch_types")
             self._init_from_channels(ch_names, ch_types)
-        elif info is not None and all(
-            arg is None for arg in (ch_names, ch_types)
-        ):
+        elif info is not None and all(arg is None for arg in (ch_names, ch_types)):
             _check_type(info, (None, Info), "info")
             self._init_from_info(info)
         else:
@@ -287,8 +283,7 @@ class ChInfo(CHInfo, Info):
             _check_type(ch_type, (str,))
             if ch_type not in ch_types_dict:
                 raise KeyError(
-                    f"kind must be one of {list(ch_types_dict)}, not "
-                    f"{ch_type}."
+                    f"kind must be one of {list(ch_types_dict)}, not " f"{ch_type}."
                 )
             this_ch_dict = ch_types_dict[ch_type]
             kind = this_ch_dict["kind"]
@@ -333,9 +328,7 @@ class ChInfo(CHInfo, Info):
         # invalid attributes
         _inv_attributes = ()
         # invalid methods/properties
-        _inv_methods = (
-            "pick_channels"  # TODO: Can be removed when req. for MNE = 1.1.0
-        )
+        _inv_methods = "pick_channels"  # TODO: Can be removed when req. for MNE = 1.1.0
         if name in _inv_attributes or name in _inv_methods:
             raise AttributeError(
                 f"'{self.__class__.__name__}' has not attribute '{name}'"

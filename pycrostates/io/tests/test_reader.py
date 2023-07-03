@@ -18,9 +18,7 @@ fname = directory / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname, preload=False)
 raw.crop(0, 10).pick("eeg")
 raw.load_data().apply_proj()
-ModK = ModKMeans(
-    n_clusters=4, n_init=10, max_iter=100, tol=1e-4, random_state=1
-)
+ModK = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4, random_state=1)
 ModK.fit(raw, picks="eeg")
 
 

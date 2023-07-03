@@ -5,12 +5,7 @@ from typing import Optional, Union
 
 import pytest
 
-from pycrostates.utils._logs import (
-    add_file_handler,
-    logger,
-    set_log_level,
-    verbose,
-)
+from pycrostates.utils._logs import add_file_handler, logger, set_log_level, verbose
 
 logger.propagate = True
 
@@ -40,9 +35,7 @@ def test_default_log_level(caplog):
     assert "101" in caplog.text
 
 
-@pytest.mark.parametrize(
-    "level", ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
-)
+@pytest.mark.parametrize("level", ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"))
 def test_logger(level, caplog):
     """Test basic logger functionalities."""
     level_functions = {

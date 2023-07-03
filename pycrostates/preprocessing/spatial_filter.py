@@ -42,17 +42,13 @@ def _check_adjacency(adjacency, info, ch_type):
                 "Adjacency must have exactly 2 dimensions but got "
                 f"{adjacency.ndim} dimensions instead."
             )
-        if (adjacency.shape[0] != n_channels) or (
-            adjacency.shape[1] != n_channels
-        ):
+        if (adjacency.shape[0] != n_channels) or (adjacency.shape[1] != n_channels):
             raise ValueError(
                 "Adjacency must be of shape (n_channels, n_channels) "
                 f"but got {adjacency.shape} instead."
             )
         if not np.array_equal(adjacency, adjacency.astype(bool)):
-            raise ValueError(
-                "Values contained in adjacency can only be 0 or 1."
-            )
+            raise ValueError("Values contained in adjacency can only be 0 or 1.")
     return (adjacency, ch_names)
 
 
@@ -207,9 +203,7 @@ def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix):
         print(index)
         return data[index]
     # neighbor_matrix shape (n_neighbor, n_samples)
-    neighbor_matrix = np.array(
-        [neighbor_indices.flatten().tolist()] * data.shape[-1]
-    ).T
+    neighbor_matrix = np.array([neighbor_indices.flatten().tolist()] * data.shape[-1]).T
 
     # Create a mask
     max_mask = neighbors_data == np.amax(neighbors_data, keepdims=True, axis=0)
@@ -217,10 +211,7 @@ def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix):
     keep_mask = ~(max_mask | min_mask)
 
     keep_indices = np.array(
-        [
-            neighbor_matrix[:, i][keep_mask[:, i]]
-            for i in range(keep_mask.shape[-1])
-        ]
+        [neighbor_matrix[:, i][keep_mask[:, i]] for i in range(keep_mask.shape[-1])]
     )
     channel_data = data[index]
     for i, keep_ind in enumerate(keep_indices):

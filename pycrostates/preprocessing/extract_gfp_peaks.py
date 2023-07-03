@@ -87,15 +87,11 @@ def extract_gfp_peaks(
         )
     tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)
     if isinstance(inst, BaseRaw):
-        reject_by_annotation = _check_reject_by_annotation(
-            reject_by_annotation
-        )
+        reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
 
     # retrieve picks
     picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
-    picks_all = _picks_to_idx(
-        inst.info, inst.ch_names, none="all", exclude="bads"
-    )
+    picks_all = _picks_to_idx(inst.info, inst.ch_names, none="all", exclude="bads")
     _check_picks_uniqueness(inst.info, picks)
 
     # set kwargs for .get_data()
@@ -130,8 +126,7 @@ def extract_gfp_peaks(
     if isinstance(inst, BaseEpochs):
         n_samples *= len(inst)
     logger.info(
-        "%s GFP peaks extracted out of %s samples (%.2f%% of the original "
-        "data).",
+        "%s GFP peaks extracted out of %s samples (%.2f%% of the original data).",
         peaks.shape[1],
         n_samples,
         peaks.shape[1] / n_samples * 100,

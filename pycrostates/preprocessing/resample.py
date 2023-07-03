@@ -78,9 +78,7 @@ def resample(
     if isinstance(inst, (BaseRaw, BaseEpochs)):
         tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)
     if isinstance(inst, BaseRaw):
-        reject_by_annotation = _check_reject_by_annotation(
-            reject_by_annotation
-        )
+        reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
     _check_type(n_resamples, (None, "int"), "n_resamples")
     _check_type(n_samples, (None, "int"), "n_samples")
     _check_type(coverage, (None, "numeric"), "coverage")

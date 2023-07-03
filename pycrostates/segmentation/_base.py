@@ -15,10 +15,7 @@ from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
-from .transitions import (
-    _compute_expected_transition_matrix,
-    _compute_transition_matrix,
-)
+from .transitions import _compute_expected_transition_matrix, _compute_transition_matrix
 
 
 @fill_doc
@@ -72,13 +69,9 @@ class _BaseSegmentation(ABC):
         return s
 
     def _repr_html_(self, caption=None):
-        from ..html_templates import (  # pylint: disable=C0415
-            repr_templates_env,
-        )
+        from ..html_templates import repr_templates_env  # pylint: disable=C0415
 
-        template = repr_templates_env.get_template(
-            "BaseSegmentation.html.jinja"
-        )
+        template = repr_templates_env.get_template("BaseSegmentation.html.jinja")
         return template.render(
             name=self.__class__.__name__,
             n_clusters=len(self._cluster_centers_),
@@ -86,9 +79,7 @@ class _BaseSegmentation(ABC):
             inst_repr=self._inst._repr_html_(),
         )
 
-    def compute_parameters(
-        self, norm_gfp: bool = True, return_dist: bool = False
-    ):
+    def compute_parameters(self, norm_gfp: bool = True, return_dist: bool = False):
         """Compute microstate parameters.
 
         Parameters
@@ -184,12 +175,8 @@ class _BaseSegmentation(ABC):
                 dist_gev = (labeled_gfp * dist_corr) ** 2 / np.sum(gfp**2)
                 params[f"{state_name}_gev"] = np.sum(dist_gev)
 
-                s_segments = np.array(
-                    [len(group) for s_, group in segments if s_ == s]
-                )
-                occurrences = (
-                    len(s_segments) / len(np.where(labels != -1)[0]) * sfreq
-                )
+                s_segments = np.array([len(group) for s_, group in segments if s_ == s])
+                occurrences = len(s_segments) / len(np.where(labels != -1)[0]) * sfreq
                 params[f"{state_name}_occurrences"] = occurrences
 
                 timecov = np.sum(s_segments) / len(np.where(labels != -1)[0])
@@ -211,15 +198,9 @@ class _BaseSegmentation(ABC):
                 params[f"{state_name}_occurrences"] = 0.0
 
                 if return_dist:
-                    params[f"{state_name}_dist_corr"] = np.array(
-                        [], dtype=float
-                    )
-                    params[f"{state_name}_dist_gev"] = np.array(
-                        [], dtype=float
-                    )
-                    params[f"{state_name}_dist_durs"] = np.array(
-                        [], dtype=float
-                    )
+                    params[f"{state_name}_dist_corr"] = np.array([], dtype=float)
+                    params[f"{state_name}_dist_gev"] = np.array([], dtype=float)
+                    params[f"{state_name}_dist_durs"] = np.array([], dtype=float)
 
         params["unlabeled"] = len(np.argwhere(labels == -1)) / len(gfp)
         return params
@@ -256,9 +237,7 @@ class _BaseSegmentation(ABC):
         )
 
     @fill_doc
-    def compute_expected_transition_matrix(
-        self, stat="probability", ignore_self=True
-    ):
+    def compute_expected_transition_matrix(self, stat="probability", ignore_self=True):
         """Compute the expected transition matrix.
 
         Compute the theoretical transition matrix as if time course was

@@ -58,9 +58,7 @@ def test__optimize_order():
     # Shuffle + sign + ignore_polarity
     current = random_pol_template
     ignore_polarity = True
-    order_ = _optimize_order(
-        current, template, ignore_polarity=ignore_polarity
-    )
+    order_ = _optimize_order(current, template, ignore_polarity=ignore_polarity)
     assert np.all(order == order_)
 
     # Shuffle + sign

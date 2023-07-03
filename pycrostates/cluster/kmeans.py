@@ -207,9 +207,7 @@ class ModKMeans(_BaseCluster):
                 for init in inits
             )
             try:
-                best_run = np.nanargmax(
-                    [run[0] if run[3] else np.nan for run in runs]
-                )
+                best_run = np.nanargmax([run[0] if run[3] else np.nan for run in runs])
                 best_gev, best_maps, best_segmentation, _ = runs[best_run]
                 count_converged = sum(run[3] for run in runs)
             except ValueError:
@@ -306,9 +304,7 @@ class ModKMeans(_BaseCluster):
         data_sum_sq = np.sum(data**2)
 
         # Select random time points for our initial topographic maps
-        init_times = random_state.choice(
-            n_samples, size=n_clusters, replace=False
-        )
+        init_times = random_state.choice(n_samples, size=n_clusters, replace=False)
         maps = data[:, init_times].T
         # Normalize the maps
         maps /= np.linalg.norm(maps, axis=1, keepdims=True)
@@ -332,9 +328,7 @@ class ModKMeans(_BaseCluster):
                 maps[state] /= np.linalg.norm(maps[state])
 
             # Estimate residual noise
-            act_sum_sq = np.sum(
-                np.sum(maps[segmentation].T * data, axis=0) ** 2
-            )
+            act_sum_sq = np.sum(np.sum(maps[segmentation].T * data, axis=0) ** 2)
             residual = abs(data_sum_sq - act_sum_sq)
             residual /= float(n_samples * (n_channels - 1))
 
@@ -433,7 +427,6 @@ class ModKMeans(_BaseCluster):
         _check_type(tol, ("numeric",), item_name="tol")
         if tol <= 0:
             raise ValueError(
-                "The tolerance must be a positive number. "
-                f"Provided: '{tol}'."
+                "The tolerance must be a positive number. " f"Provided: '{tol}'."
             )
         return tol
