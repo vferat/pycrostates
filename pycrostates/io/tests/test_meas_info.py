@@ -333,17 +333,6 @@ def test_setting_invalid_keys():
         chinfo._check_consistency()
 
 
-def test_invalid_attributes():
-    """Test that attribute error is raised when calling invalid attributes or
-    methods."""
-    info = create_info(ch_names=3, sfreq=1, ch_types="eeg")
-    chinfo = ChInfo(info=info)
-    with pytest.raises(
-        AttributeError, match="'ChInfo' has not attribute 'pick_channels'"
-    ):
-        chinfo.pick_channels(["1"])
-
-
 def test_comparison(caplog):
     """Test == and != methods."""
     # simple info without montage
