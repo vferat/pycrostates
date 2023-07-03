@@ -14,6 +14,7 @@ from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import RawArray, read_raw_fif
 from mne.io.pick import _picks_to_idx
+from numpy.testing import assert_allclose
 
 from pycrostates import __version__
 from pycrostates.cluster import AAHCluster
@@ -870,7 +871,7 @@ def test_refit():
     with pytest.raises(RuntimeError, match="must be unfitted"):
         aahCluster_.fit(raw, picks="mag")  # works
     assert eeg_ch_names == aahCluster_.info["ch_names"]
-    assert np.allclose(eeg_cluster_centers, aahCluster_.cluster_centers_)
+    assert_allclose(eeg_cluster_centers, aahCluster_.cluster_centers_)
 
 
 # pylint: disable=too-many-statements
@@ -1281,9 +1282,9 @@ def test_save(tmp_path, caplog):
     segmentation1 = aahCluster1.predict(raw_eeg, picks="eeg")
     segmentation2 = aahCluster2.predict(raw_eeg, picks="eeg")
 
-    assert np.allclose(segmentation._labels, segmentation1._labels)
-    assert np.allclose(segmentation._labels, segmentation2._labels)
-    assert np.allclose(segmentation1._labels, segmentation2._labels)
+    assert_allclose(segmentation._labels, segmentation1._labels)
+    assert_allclose(segmentation._labels, segmentation2._labels)
+    assert_allclose(segmentation1._labels, segmentation2._labels)
 
 
 def test_comparison(caplog):

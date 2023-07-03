@@ -2,11 +2,11 @@
 
 import os
 
-import numpy as np
 import pytest
 from mne.datasets import testing
 from mne.io import read_raw_fif
 from mne.preprocessing import ICA
+from numpy.testing import assert_allclose
 
 from pycrostates import __version__
 from pycrostates.cluster import ModKMeans
@@ -90,9 +90,9 @@ def test_write_and_read(tmp_path, caplog):
     segmentation1 = ModK1.predict(raw2, picks="eeg")
     segmentation2 = ModK2.predict(raw2, picks="eeg")
 
-    assert np.allclose(segmentation._labels, segmentation1._labels)
-    assert np.allclose(segmentation._labels, segmentation2._labels)
-    assert np.allclose(segmentation1._labels, segmentation2._labels)
+    assert_allclose(segmentation._labels, segmentation1._labels)
+    assert_allclose(segmentation._labels, segmentation2._labels)
+    assert_allclose(segmentation1._labels, segmentation2._labels)
 
 
 def test_invalid_write(tmp_path):

@@ -4,6 +4,7 @@ import pytest
 from mne import BaseEpochs, Epochs, make_fixed_length_events
 from mne.datasets import testing
 from mne.io import BaseRaw, read_raw_fif
+from numpy.testing import assert_allclose
 
 from pycrostates.cluster import ModKMeans
 from pycrostates.segmentation import EpochsSegmentation, RawSegmentation
@@ -66,9 +67,9 @@ def test_properties(ModK, inst, caplog):
     assert isinstance(predict_parameters, dict)
 
     cluster_centers_ -= 10
-    assert np.allclose(cluster_centers_, segmentation._cluster_centers_ - 10)
+    assert_allclose(cluster_centers_, segmentation._cluster_centers_ - 10)
     labels -= 10
-    assert np.allclose(labels, segmentation._labels - 10)
+    assert_allclose(labels, segmentation._labels - 10)
     predict_parameters["test"] = 10
     assert "test" not in segmentation._predict_parameters
 
@@ -308,11 +309,11 @@ def test_compute_transition_matrix_stat(ModK, inst):
         segmentation.compute_transition_matrix(stat="wrong")
     T = segmentation.compute_transition_matrix(stat="count")
     T = segmentation.compute_transition_matrix(stat="probability")
-    assert np.allclose(np.sum(T, axis=1), 1)
+    assert_allclose(np.sum(T, axis=1), 1)
     T = segmentation.compute_transition_matrix(stat="proportion")
-    assert np.allclose(np.sum(T, axis=1), 1)
+    assert_allclose(np.sum(T, axis=1), 1)
     T = segmentation.compute_transition_matrix(stat="percent")
-    assert np.allclose(np.sum(T, axis=1), 100)
+    assert_allclose(np.sum(T, axis=1), 100)
 
 
 def test_compute_expected_transition_matrix_Raw():
@@ -341,8 +342,8 @@ def test_compute_expected_transition_matrix_stat(ModK, inst):
     ):
         segmentation.compute_expected_transition_matrix(stat="count")
     T = segmentation.compute_expected_transition_matrix(stat="probability")
-    assert np.allclose(np.sum(T, axis=1), 1)
+    assert_allclose(np.sum(T, axis=1), 1)
     T = segmentation.compute_expected_transition_matrix(stat="proportion")
-    assert np.allclose(np.sum(T, axis=1), 1)
+    assert_allclose(np.sum(T, axis=1), 1)
     T = segmentation.compute_expected_transition_matrix(stat="percent")
-    assert np.allclose(np.sum(T, axis=1), 100)
+    assert_allclose(np.sum(T, axis=1), 100)

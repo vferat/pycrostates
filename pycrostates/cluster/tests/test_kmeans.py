@@ -14,6 +14,7 @@ from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import RawArray, read_raw_fif
 from mne.io.pick import _picks_to_idx
+from numpy.testing import assert_allclose
 
 from pycrostates import __version__
 from pycrostates.cluster import ModKMeans
@@ -434,7 +435,7 @@ def test_reorder(caplog):
     ModK__ = ModK_.copy()
     ModK_.reorder_clusters(order=np.array([1, 0, 2, 3]))
     ModK_.reorder_clusters(template=ModK__)
-    assert np.allclose(ModK_.cluster_centers_, ModK_.cluster_centers_)
+    assert_allclose(ModK_.cluster_centers_, ModK_.cluster_centers_)
 
 
 def test_properties(caplog):
@@ -1260,9 +1261,9 @@ def test_save(tmp_path, caplog):
     segmentation1 = ModK1.predict(raw_eeg, picks="eeg")
     segmentation2 = ModK2.predict(raw_eeg, picks="eeg")
 
-    assert np.allclose(segmentation._labels, segmentation1._labels)
-    assert np.allclose(segmentation._labels, segmentation2._labels)
-    assert np.allclose(segmentation1._labels, segmentation2._labels)
+    assert_allclose(segmentation._labels, segmentation1._labels)
+    assert_allclose(segmentation._labels, segmentation2._labels)
+    assert_allclose(segmentation1._labels, segmentation2._labels)
 
 
 def test_comparison(caplog):

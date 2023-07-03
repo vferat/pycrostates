@@ -11,6 +11,7 @@ from mne.io import read_raw_fif
 from mne.io.constants import FIFF
 from mne.transforms import Transform
 from mne.utils import check_version
+from numpy.testing import assert_allclose
 
 from pycrostates.io import ChInfo
 from pycrostates.utils._logs import logger, set_log_level
@@ -265,12 +266,12 @@ def test_montage():
                 montage.get_positions()[key] == montage2.get_positions()[key]
             )
         elif isinstance(montage.get_positions()[key], np.ndarray):
-            assert np.allclose(
+            assert_allclose(
                 montage.get_positions()[key], montage2.get_positions()[key]
             )
         elif isinstance(montage.get_positions()[key], OrderedDict):
             for k, v in montage.get_positions()[key].items():
-                assert np.allclose(
+                assert_allclose(
                     montage.get_positions()[key][k],
                     montage2.get_positions()[key][k],
                 )
