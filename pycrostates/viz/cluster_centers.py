@@ -16,6 +16,13 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 
+_GRADIENT_KWARGS_DEFAULTS: Dict[str, str] = {
+    "color": "black",
+    "linestyle": "-",
+    "marker": "P",
+}
+
+
 @fill_doc
 @verbose
 def plot_cluster_centers(
@@ -24,11 +31,7 @@ def plot_cluster_centers(
     cluster_names: List[str] = None,
     axes: Optional[Union[Axes, NDArray[Axes]]] = None,
     show_gradient: Optional[bool] = False,
-    gradient_kwargs: Dict[str, Any] = {
-        "color": "black",
-        "linestyle": "-",
-        "marker": "P",
-    },
+    gradient_kwargs: Dict[str, Any] = _GRADIENT_KWARGS_DEFAULTS,
     *,
     block: bool = False,
     verbose: Optional[str] = None,
@@ -74,7 +77,7 @@ def plot_cluster_centers(
         (dict,),
         "gradient_kwargs",
     )
-    if gradient_kwargs is not None and not show_gradient:
+    if gradient_kwargs != _GRADIENT_KWARGS_DEFAULTS and not show_gradient:
         logger.warning(
             "The argument 'gradient_kwargs' has not effect when "
             "the argument 'show_gradient' is set to False."
