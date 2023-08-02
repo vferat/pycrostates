@@ -17,8 +17,10 @@ to segment."""
 from . import utils  # noqa: F401
 from .aahc import AAHCluster  # noqa: F401
 from .kmeans import ModKMeans  # noqa: F401
+from ._custom import Custom
 
 __all__ = (
     "ModKMeans",
     "AAHCluster",
+    "Custom"
 )
