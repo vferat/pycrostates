@@ -23,14 +23,7 @@ from ..utils._docs import fill_doc
 
 
 def _check_log_base(log_base):
-    _check_type(
-        log_base,
-        (
-            "numeric",
-            str,
-        ),
-        "log_base",
-    )
+    _check_type(log_base, ("numeric", str), "log_base")
     if isinstance(log_base, str):
         _check_value(
             log_base,
@@ -89,7 +82,7 @@ def _joint_entropy(
     joint_prob /= len(x_valid)
 
     # Compute the joint entropy
-    joint_entropy = scipy.stats._entropy(joint_prob.flatten(), base=log_base)
+    joint_entropy = scipy.stats.entropy(joint_prob.flatten(), base=log_base)
     return joint_entropy
 
 
@@ -179,12 +172,67 @@ def _entropy(
     return h
 
 
+def lz76(labels: NDArray[int], state_to_ignore: int = -1, log_base: float = 2):
+    r"""Compute the Lempel–Ziv complexity of the microstate symbolic sequence.
+
+    Compute the Lempel–Ziv complexity
+    \ :footcite:p:`lempel1976complexity`..
+    of the microstate symbolic sequence.
+
+    Parameters
+    ----------
+    %(labels_info)s
+    %(state_to_ignore)s
+    %(log_base)s
+
+    Returns
+    -------
+    c : float
+        The Lempel–Ziv complexity.
+
+    References
+    ----------
+    .. footbibliography::
+    """
+    _check_type(labels, (np.ndarray,), "x")
+    _check_type(state_to_ignore, (int,), "state_to_ignore")
+    log_base = _check_log_base(log_base)
+    n = len(labels)
+    i = 0
+    c = 1
+    l = 1
+    k = 1
+    k_max = k
+    stop = 0
+    b = 0
+    while stop == 0:
+        if labels[i + k] != labels[l + k]:
+            if k > k_max:
+                k_max = k
+            i += 1
+            if i == l:
+                c += 1
+                l += k_max
+                if l + 1 > n - 1:
+                    stop = 1
+                else:
+                    i = 0
+                    k = 1
+                    k_max = 1
+            else:
+                k = 1
+        else:
+            k += 1
+            if l + k > n - 1:
+                c += 1
+                stop = 1
+    b = 1.0 * float(n) / np.log2(float(n))  # TODO: check if this is correct
+    return c / b
+
+
 @fill_doc
 def _ais(
-    labels: NDArray[int],
-    k: int,
-    state_to_ignore=-1,
-    log_base: float = 2,
+    labels: NDArray[int], k: int, state_to_ignore=-1, log_base: float = 2
 ):
     r"""
     Compute the Active information storage (ais).
@@ -219,7 +267,7 @@ def _ais(
     _check_type(state_to_ignore, (int,), "state_to_ignore")
     log_base = _check_log_base(log_base)
 
-    h1 = _entropy(labels, state_to_ignore=state_to_ignore)
+    h1 = _entropy(labels, state_to_ignore=state_to_ignore, log_base=log_base)
     h2 = _joint_entropy_history(
         labels, k, state_to_ignore=state_to_ignore, log_base=log_base
     )
@@ -232,12 +280,7 @@ def _ais(
 
 ### Auto information
 @fill_doc
-def _ai(
-    labels: NDArray[int],
-    k: int,
-    state_to_ignore=-1,
-    log_base: float = 2,
-):
+def _ai(labels: NDArray[int], k: int, state_to_ignore=-1, log_base: float = 2):
     """
     Computes the Auto-information for lag k.
 
@@ -340,10 +383,7 @@ def aif():
 ###  Partial auto-information
 @fill_doc
 def _pai(
-    labels: NDArray[int],
-    k: int,
-    state_to_ignore=-1,
-    log_base: float = 2,
+    labels: NDArray[int], k: int, state_to_ignore=-1, log_base: float = 2
 ):
     """
     Compute the partial auto-information function for lag k.
@@ -376,22 +416,13 @@ def _pai(
             labels, k, state_to_ignore=state_to_ignore, log_base=log_base
         )
     h1 = _joint_entropy_history(
-        labels,
-        k,
-        state_to_ignore=state_to_ignore,
-        log_base=log_base,
+        labels, k, state_to_ignore=state_to_ignore, log_base=log_base
     )
     h2 = _joint_entropy_history(
-        labels,
-        k - 1,
-        state_to_ignore=state_to_ignore,
-        log_base=log_base,
+        labels, k - 1, state_to_ignore=state_to_ignore, log_base=log_base
     )
     h3 = _joint_entropy_history(
-        labels,
-        k + 1,
-        state_to_ignore=state_to_ignore,
-        log_base=log_base,
+        labels, k + 1, state_to_ignore=state_to_ignore, log_base=log_base
     )
     p = 2 * h1 - h2 - h3
     return p
