@@ -15,6 +15,7 @@ from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
+from .autoinformation import _entropy
 from .transitions import (
     _compute_expected_transition_matrix,
     _compute_transition_matrix,
@@ -306,6 +307,36 @@ class _BaseSegmentation(ABC):
             axes,
             block=block,
         )
+
+    @fill_doc
+    def entropy(self, log_base: float = 2.0, ignore_self: bool = False):
+        r"""Compute the Shannon entropy of the  microstate segmentation.
+
+        Compute the Shannon entropy
+        \ :footcite:p:`shannon1948mathematicalof`.
+        of the microstate sequence.
+
+        Parameters
+        ----------
+        %(log_base)s
+        %(ignore_self)s
+
+        Returns
+        -------
+        entropy : float
+            The entropy of the microstate segmentation.
+
+        References
+        ----------
+        .. footbibliography::
+        """
+        _check_type(ignore_self, (bool,), "ignore_self")
+        # reshape if epochs (returns a view)
+        labels = self._labels.reshape(-1)
+        # ignore transition to itself (i.e. 1 -> 1)
+        if ignore_self:
+            labels = [s for s, _ in itertools.groupby(labels)]
+        return _entropy(labels, state_to_ignore=-1, log_base=log_base)
 
     # --------------------------------------------------------------------
     @staticmethod

@@ -1,0 +1,87 @@
+"""
+Microstate Segmentation
+=======================
+
+This tutorial introduces .
+"""
+
+#%%
+# .. include:: ../../../../links.inc
+
+#%%
+# Segmentation
+# ------------
+#
+# We start by fitting a modified K-means
+# (:class:`~pycrostates.cluster.ModKMeans`) with a sample dataset. For more
+# details about fitting a clustering algorithm, please refer to
+# :ref:`this tutorial <sphx_glr_generated_auto_tutorials_cluster_00_modK.py>`.
+#
+# .. note::
+#
+#     The lemon datasets used in this tutorial is composed of EEGLAB files. To
+#     use the MNE reader :func:`mne.io.read_raw_eeglab`, the ``pymatreader``
+#     optional dependency is required. Use the following installation method
+#     appropriate for your environment:
+#
+#     - ``pip install pymatreader``
+#     - ``conda install -c conda-forge pymatreader``
+#
+#     Note that an environment created via the `MNE installers`_ includes
+#     ``pymatreader`` by default.
+#
+# .. note::
+#
+#     This tutorial uses ``seaborn`` for enhanced visualization. Use the
+#     following installation method appropriate for your environment:
+#
+#     - ``pip install seaborn``
+#     - ``conda install -c conda-forge seaborn``
+
+# sphinx_gallery_thumbnail_number = 2
+
+import numpy as np
+import seaborn as sns
+from matplotlib import pyplot as plt
+from mne.io import read_raw_eeglab
+
+from pycrostates.cluster import ModKMeans
+from pycrostates.datasets import lemon
+
+raw_fname = lemon.data_path(subject_id="010017", condition="EC")
+raw = read_raw_eeglab(raw_fname, preload=False)
+raw.crop(0, 60)  # crop the dataset to speed up computation
+raw.load_data()
+raw.set_eeg_reference("average")  # Apply a common average reference
+
+ModK = ModKMeans(n_clusters=5, random_state=42)
+ModK.fit(raw, n_jobs=2)
+ModK.reorder_clusters(order=[4, 1, 3, 2, 0])
+ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
+ModK.plot()
+
+#%%
+# Once a set of cluster centers has been fitted, It can be used to predict the
+# microstate segmentation with the method
+# :meth:`pycrostates.cluster.ModKMeans.predict`. It returns either a
+# `~pycrostates.segmentation.RawSegmentation` or an
+# `~pycrostates.segmentation.EpochsSegmentation` depending on the object to
+# segment. Below, the provided instance is a continuous `~mne.io.Raw` object:
+
+segmentation = ModK.predict(
+    raw,
+    reject_by_annotation=True,
+    factor=10,
+    half_window_size=10,
+    min_segment_length=5,
+    reject_edges=True,
+)
+
+#%%
+#
+#
+
+#%%
+# References
+# ----------
+# .. footbibliography::
