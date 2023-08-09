@@ -287,12 +287,12 @@ class _BaseSegmentation(ABC):
     def entropy(
         self,
         ignore_self: Optional[bool] = False,
-        log_base: Optional[float] = 2,
+        log_base: Optional[Union[float, str]] = 2,
     ):
         r"""Compute the Shannon entropy of the segmentation.
 
         Compute the Shannon entropy
-        \ :footcite:p:`shannon1948mathematicalof`..
+        \ :footcite:p:`shannon1948mathematical`..
         of the microstate symbolic sequence.
 
         Parameters
@@ -321,18 +321,16 @@ class _BaseSegmentation(ABC):
         self,
         history_length: int,
         ignore_self: Optional[bool] = False,
-        log_base: Optional[float] = 2,
+        log_base: Optional[Union[float, str]] = 2,
         n_jobs: int = 1,
     ):
         r"""
         Estimate the entropy rate and the excess_entropy of the segmentation.
 
         Estimate the entropy rate and the excess_entropy from a linear fit:
-
         .. math::
         H(X_{n}^{(k)}) = a \cdot k + b
-
-        where `a` is the entropy rate and `b` the excess entropy
+        where ``a`` is the entropy rate and ``b`` the excess entropy
         as described in \ :footcite:p:`von2018partial`.
 
         Parameters

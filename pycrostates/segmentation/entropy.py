@@ -82,7 +82,7 @@ def _joint_entropy_history(
     labels: NDArray[int],
     k: int,
     state_to_ignore: Optional[Union[int, None]] = -1,
-    log_base: float = 2,
+    log_base: Optional[Union[float, str]] = 2,
 ):
     r"""Compute the joint Shannon of k-histories x[t:t+k].
 
@@ -101,7 +101,7 @@ def _joint_entropy_history(
     """
     _check_type(labels, (np.ndarray,), "labels")
     _check_type(k, ("int",), "k")
-    _check_type(state_to_ignore, (int,), "state_to_ignore")
+    _check_type(state_to_ignore, (int, None,), "state_to_ignore")
     log_base = _check_log_base(log_base)
 
     # Construct the k-history sequences while ignoring the state
@@ -129,7 +129,7 @@ def _joint_entropy_history(
 def _entropy(
     labels: NDArray[int],
     state_to_ignore: Optional[Union[int, None]] = -1,
-    log_base: float = 2,
+    log_base: Optional[Union[float, str]] = 2,
 ):
     r"""Compute the Shannon entropy of the a symbolic sequence.
 
@@ -146,7 +146,7 @@ def _entropy(
         The Shannon entropy of the sequence.
     """
     _check_type(labels, (np.ndarray,), "labels")
-    _check_type(state_to_ignore, (int,), "state_to_ignore")
+    _check_type(state_to_ignore, (int, None,), "state_to_ignore")
     log_base = _check_log_base(log_base)
 
     h = _joint_entropy_history(
@@ -160,7 +160,7 @@ def entropy(
     segmentation: [Segmentation, NDArray[int]],
     state_to_ignore: Optional[Union[int, None]] = -1,
     ignore_self: Optional[bool] = False,
-    log_base: Optional[float] = 2,
+    log_base: Optional[Union[float, str]] = 2,
 ):
     r"""Compute the Shannon entropy of the a symbolic sequence.
 
@@ -184,7 +184,7 @@ def entropy(
     .. footbibliography::
     """
     labels = _check_segmentation(segmentation)
-    _check_type(state_to_ignore, (int,), "state_to_ignore")
+    _check_type(state_to_ignore, (int, None,), "state_to_ignore")
     _check_type(ignore_self, (bool,), "ignore_self")
     log_base = _check_log_base(log_base)
     # ignore transition to itself (i.e. AAABBBBC -> ABC)
@@ -201,7 +201,7 @@ def _excess_entropy_rate(
     labels: NDArray[int],
     history_length: int,
     state_to_ignore: Optional[Union[int, None]] = -1,
-    log_base: Optional[float] = 2,
+    log_base: Optional[Union[float, str]] = 2,
     n_jobs: int = 1,
 ):
     """
@@ -248,7 +248,7 @@ def excess_entropy_rate(
     history_length: int,
     state_to_ignore: Optional[Union[int, None]] = -1,
     ignore_self: Optional[bool] = False,
-    log_base: Optional[float] = 2,
+    log_base: Optional[Union[float, str]] = 2,
     n_jobs: int = 1,
 ):
     r"""
@@ -290,7 +290,7 @@ def excess_entropy_rate(
     """
     labels = _check_segmentation(segmentation)
     _check_type(history_length, (int,), "history_length")
-    _check_type(state_to_ignore, (int,), "state_to_ignore")
+    _check_type(state_to_ignore, (int, None,), "state_to_ignore")
     _check_type(ignore_self, (bool,), "ignore_self")
     log_base = _check_log_base(log_base)
     n_jobs = _check_n_jobs(n_jobs)

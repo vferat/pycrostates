@@ -67,6 +67,8 @@ def test__joint_entropy_history():
     labels = np.random.randint(-1, 4, 100)
     r = _joint_entropy_history(labels, 10, state_to_ignore=-1, log_base=2)
     assert isinstance(r, float)
+    r = _joint_entropy_history(labels, 10, state_to_ignore=None, log_base=2)
+    assert isinstance(r, float)
 
 
 def test_entropy():
@@ -82,15 +84,64 @@ def test_entropy():
     )
     assert np.allclose(r, r_)
 
+    r = entropy(
+        epochs_segmentation, state_to_ignore=-1, ignore_self=False, log_base=2
+    )
+    assert isinstance(r, float)
+
+    r = entropy(
+        epochs_segmentation,
+        state_to_ignore=None,
+        ignore_self=False,
+        log_base=2,
+    )
+    assert isinstance(r, float)
+
+    r = entropy(
+        epochs_segmentation, state_to_ignore=-1, ignore_self=True, log_base=2
+    )
+    assert isinstance(r, float)
+
 
 def test_excess_entropy_rate():
+    # Array
+    labels = np.random.randint(-1, 4, 100)
     a, b, residuals, lags, runs = excess_entropy_rate(
+        labels,
+        history_length=10,
+        state_to_ignore=-1,
+        ignore_self=False,
+        log_base=2,
+    )
+    # Raw
+    excess_entropy_rate(
         raw_segmentation,
         history_length=10,
         state_to_ignore=-1,
         ignore_self=False,
         log_base=2,
     )
-    assert isinstance(a, float)
-    assert isinstance(b, float)
-    assert isinstance(residuals, float)
+    # Epochs
+    excess_entropy_rate(
+        epochs_segmentation,
+        history_length=10,
+        state_to_ignore=-1,
+        ignore_self=False,
+        log_base=2,
+    )
+    # state_to_ignore
+    excess_entropy_rate(
+        labels,
+        history_length=10,
+        state_to_ignore=None,
+        ignore_self=False,
+        log_base=2,
+    )
+    # ignore_self
+    excess_entropy_rate(
+        labels,
+        history_length=10,
+        state_to_ignore=None,
+        ignore_self=True,
+        log_base=2,
+    )
