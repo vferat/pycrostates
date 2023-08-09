@@ -1,4 +1,4 @@
-from .autoinformation import aif, excess_entropy_rate, paif  # noqa: F401
+from .information import entropy, aif, paif, excess_entropy_rate  # noqa: F401
 from .segmentation import EpochsSegmentation, RawSegmentation  # noqa: F401
 from .transitions import (  # noqa: F401
     compute_expected_transition_matrix,
