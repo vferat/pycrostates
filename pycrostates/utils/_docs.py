@@ -143,7 +143,8 @@ docdict[
     "segmentation_or_labels"
 ] = """
 segmentation : :ref:`segmentation` or array of shape ``(n_samples,)``
-    Either a Segmentation object or an array of integers representing the microstate symbolic sequence."""
+    Either a Segmentation object or an array of integers
+    representing the microstate symbolic sequence."""
 docdict[
     "labels_info"
 ] = """
@@ -158,11 +159,11 @@ docdict[
     "log_base"
 ] = """
 log_base : float, str
-    The log base to use. 
+    The log base to use.
     If string:
         bits: log_base = 2
         natural: log_base = np.e
-        dits: log_base = 10 
+        dits: log_base = 10
     Default to 'bits' (log_base = 2)."""
 # ------ Viz -------
 docdict[

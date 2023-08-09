@@ -28,6 +28,7 @@ class Cluster(ABC):
 
     pass
 
+
 class Segmentation(ABC):
     """Typing for a clustering class."""
 

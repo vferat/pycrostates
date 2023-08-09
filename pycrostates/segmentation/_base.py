@@ -15,11 +15,12 @@ from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
+from .entropy import entropy, excess_entropy_rate
 from .transitions import (
     _compute_expected_transition_matrix,
     _compute_transition_matrix,
 )
-from .entropy import entropy, excess_entropy_rate
+
 
 @fill_doc
 class _BaseSegmentation(ABC):
@@ -280,11 +281,14 @@ class _BaseSegmentation(ABC):
             stat=stat,
             ignore_self=ignore_self,
         )
+
     # Information ------------------------------------------------------------
     @fill_doc
-    def entropy(self,
+    def entropy(
+        self,
         ignore_self: Optional[bool] = False,
-        log_base: Optional[float] = 2):
+        log_base: Optional[float] = 2,
+    ):
         r"""Compute the Shannon entropy of the segmentation.
 
         Compute the Shannon entropy
@@ -305,7 +309,12 @@ class _BaseSegmentation(ABC):
         ----------
         .. footbibliography::
         """
-        return(entropy(self, ignore_self=ignore_self, state_to_ignore=-1, log_base=log_base))
+        return entropy(
+            self,
+            ignore_self=ignore_self,
+            state_to_ignore=-1,
+            log_base=log_base,
+        )
 
     @fill_doc
     def excess_entropy_rate(
@@ -315,7 +324,9 @@ class _BaseSegmentation(ABC):
         log_base: Optional[float] = 2,
         n_jobs: int = 1,
     ):
-        """
+        r"""
+        Estimate the entropy rate and the excess_entropy of the segmentation.
+
         Estimate the entropy rate and the excess_entropy from a linear fit:
 
         .. math::
@@ -328,7 +339,8 @@ class _BaseSegmentation(ABC):
         ----------
         %(segmentation_or_labels)s
         history_length: int
-            Maximum history length in sample from which to estimate the excess entropy rate.
+            Maximum history length in sample
+            to estimate the excess entropy rate.
         %(ignore_self)s
         %(log_base)s
         %(n_jobs)s
@@ -350,7 +362,15 @@ class _BaseSegmentation(ABC):
         ----------
         .. footbibliography::
         """
-        return(excess_entropy_rate(self, history_length=history_length, log_base=log_base, state_to_ignore=-1, ignore_self=ignore_self, n_jobs=n_jobs))
+        return excess_entropy_rate(
+            self,
+            history_length=history_length,
+            log_base=log_base,
+            state_to_ignore=-1,
+            ignore_self=ignore_self,
+            n_jobs=n_jobs,
+        )
+
     @fill_doc
     def plot_cluster_centers(
         self,

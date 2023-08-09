@@ -4,17 +4,17 @@
 # F. von Wegner, Partial Autoinformation to Characterize Symbolic Sequences
 # Front Physiol (2018) https://doi.org/10.3389/fphys.2018.01382
 import itertools
+from typing import Optional, Union
 
 import numpy as np
 import scipy.stats
 from mne.parallel import parallel_func
-
 from numpy.typing import NDArray
-from typing import List, Optional, Tuple, Union
-from .._typing import Segmentation
 
+from .._typing import Segmentation
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
 from ..utils._docs import fill_doc
+
 # TODO: should we normalize aif and paif?
 # The n_clusters parameter should reflect the total number of possible states,
 # including the ignored state, if applicable. If the ignored state is not
@@ -22,6 +22,7 @@ from ..utils._docs import fill_doc
 # n_clusters.
 
 #  the Shannon entropy is not affected by non-appearing states
+
 
 def _check_log_base(log_base):
     _check_type(
@@ -52,9 +53,17 @@ def _check_log_base(log_base):
 
 
 # TODO: define segmentation_or_labels in docs
-def _check_segmentation(segmentation, item_name='segmentation'):
+def _check_segmentation(segmentation, item_name="segmentation"):
     from ._base import _BaseSegmentation
-    _check_type(segmentation, (_BaseSegmentation, np.ndarray,), item_name)
+
+    _check_type(
+        segmentation,
+        (
+            _BaseSegmentation,
+            np.ndarray,
+        ),
+        item_name,
+    )
     if isinstance(segmentation, _BaseSegmentation):
         labels = segmentation._labels
         # reshape if epochs (returns a view)
@@ -65,12 +74,15 @@ def _check_segmentation(segmentation, item_name='segmentation'):
         if not np.issubdtype(segmentation.dtype, np.integer):
             raise ValueError(f"{item_name} must be an array of integers.")
         labels = segmentation
-    return(labels)
+    return labels
 
 
 @fill_doc
 def _joint_entropy_history(
-    labels: NDArray[int], k: int, state_to_ignore: Optional[Union[int, None]] = -1, log_base: float = 2
+    labels: NDArray[int],
+    k: int,
+    state_to_ignore: Optional[Union[int, None]] = -1,
+    log_base: float = 2,
 ):
     r"""Compute the joint Shannon of k-histories x[t:t+k].
 
@@ -115,7 +127,9 @@ def _joint_entropy_history(
 
 @fill_doc
 def _entropy(
-    labels: NDArray[int],  state_to_ignore: Optional[Union[int, None]] = -1, log_base: float = 2
+    labels: NDArray[int],
+    state_to_ignore: Optional[Union[int, None]] = -1,
+    log_base: float = 2,
 ):
     r"""Compute the Shannon entropy of the a symbolic sequence.
 
@@ -142,7 +156,7 @@ def _entropy(
 
 
 @fill_doc
-def entropy(    
+def entropy(
     segmentation: [Segmentation, NDArray[int]],
     state_to_ignore: Optional[Union[int, None]] = -1,
     ignore_self: Optional[bool] = False,
@@ -178,9 +192,10 @@ def entropy(
         labels = np.array([s for s, _ in itertools.groupby(labels)])
 
     h = _entropy(labels, state_to_ignore=state_to_ignore, log_base=log_base)
-    return(h)
+    return h
 
-###  Excess entropy rate
+
+# Excess entropy rate
 @fill_doc
 def _excess_entropy_rate(
     labels: NDArray[int],
@@ -196,7 +211,7 @@ def _excess_entropy_rate(
     ----------
     %(labels_info)s
     history_length: int
-        Maximum history length in sample from which to estimate the excess entropy rate.
+        Maximum history length in sample to estimate the excess entropy rate.
     %(state_to_ignore)s
     %(log_base)s
     %(n_jobs)s
@@ -236,9 +251,10 @@ def excess_entropy_rate(
     log_base: Optional[float] = 2,
     n_jobs: int = 1,
 ):
-    """
-    Estimate the entropy rate and the excess_entropy from a linear fit:
+    r"""
+    Estimate the entropy rate and the excess_entropy of the segmentation.
 
+    Estimate the entropy rate and the excess_entropy from a linear fit:
     .. math::
     H(X_{n}^{(k)}) = a \cdot k + b
 
@@ -249,7 +265,7 @@ def excess_entropy_rate(
     ----------
     %(segmentation_or_labels)s
     history_length: int
-        Maximum history length in sample from which to estimate the excess entropy rate.
+        Maximum history length in sample to estimate the excess entropy rate.
     %(state_to_ignore)s
     %(ignore_self)s
     %(log_base)s
@@ -279,13 +295,15 @@ def excess_entropy_rate(
     log_base = _check_log_base(log_base)
     n_jobs = _check_n_jobs(n_jobs)
 
-     # ignore transition to itself (i.e. 1 -> 1)
+    # ignore transition to itself (i.e. 1 -> 1)
     if ignore_self:
         labels = np.array([s for s, _ in itertools.groupby(labels)])
 
     eer = _excess_entropy_rate(
-        labels, history_length,
+        labels,
+        history_length,
         state_to_ignore=state_to_ignore,
-        log_base=log_base, n_jobs=n_jobs
+        log_base=log_base,
+        n_jobs=n_jobs,
     )
     return eer
