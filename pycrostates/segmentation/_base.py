@@ -351,7 +351,7 @@ class _BaseSegmentation(ABC):
             entropy rate (slope)
         b: float
             excess entropy (intercept)
-        residuals: float
+        residual: float
             sum of squared residuals of the least squares fit
         lags: np.ndarray shape (history_length,)
             the lag (in sample) used for the fit

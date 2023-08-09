@@ -222,7 +222,7 @@ def _excess_entropy_rate(
         entropy rate (slope)
     b: float
         excess entropy (intercept)
-    residuals: float
+    residual: float
          sum of squared residuals of the least squares fit
     lags: np.ndarray shape (history_length,)
         the lag (in sample) used for the fit
@@ -239,7 +239,7 @@ def _excess_entropy_rate(
     )
 
     (a, b), residuals, _, _, _ = np.polyfit(lags, runs, 1, full=True)
-    return (a, b, residuals, lags, runs)
+    return (a, b, residuals[0], lags, runs)
 
 
 @fill_doc
@@ -277,7 +277,7 @@ def excess_entropy_rate(
         entropy rate (slope)
     b: float
         excess entropy (intercept)
-    residuals: float
+    residual: float
          sum of squared residuals of the least squares fit
     lags: np.ndarray shape (history_length,)
         the lag (in sample) used for the fit
