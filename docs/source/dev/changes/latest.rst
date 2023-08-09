@@ -25,6 +25,8 @@ Current 0.4.0
 Enhancements
 ~~~~~~~~~~~~
 
+- Add :meth:`~pycrostates.segmentation.RawSegmentation.entropy` and  :meth:`~pycrostates.segmentation.RawSegmentation.excess_entropy_rate` to :class:`~pycrostates.segmentation.RawSegmentation` and :class:`~pycrostates.segmentation.EpochsSegmentation` (:pr:`112` by `Victor Férat`_ and `Frederic von Wegner`_)
+
 Bugs
 ~~~~
 

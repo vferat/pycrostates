@@ -9,7 +9,7 @@ This tutorial introduces .
 # .. include:: ../../../../links.inc
 
 #%%
-# Segmentation
+# Entropy
 # ------------
 #
 # We start by fitting a modified K-means
