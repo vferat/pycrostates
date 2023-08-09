@@ -15,12 +15,11 @@ from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
-from .autoinformation import _entropy
 from .transitions import (
     _compute_expected_transition_matrix,
     _compute_transition_matrix,
 )
-
+from .entropy import entropy, excess_entropy_rate
 
 @fill_doc
 class _BaseSegmentation(ABC):
@@ -281,7 +280,77 @@ class _BaseSegmentation(ABC):
             stat=stat,
             ignore_self=ignore_self,
         )
+    # Information ------------------------------------------------------------
+    @fill_doc
+    def entropy(self,
+        ignore_self: Optional[bool] = False,
+        log_base: Optional[float] = 2):
+        r"""Compute the Shannon entropy of the segmentation.
 
+        Compute the Shannon entropy
+        \ :footcite:p:`shannon1948mathematicalof`..
+        of the microstate symbolic sequence.
+
+        Parameters
+        ----------
+        %(ignore_self)s
+        %(log_base)s
+
+        Returns
+        -------
+        h : float
+            The Shannon entropy.
+
+        References
+        ----------
+        .. footbibliography::
+        """
+        return(entropy(self, ignore_self=ignore_self, state_to_ignore=-1, log_base=log_base))
+
+    @fill_doc
+    def excess_entropy_rate(
+        self,
+        history_length: int,
+        ignore_self: Optional[bool] = False,
+        log_base: Optional[float] = 2,
+        n_jobs: int = 1,
+    ):
+        """
+        Estimate the entropy rate and the excess_entropy from a linear fit:
+
+        .. math::
+        H(X_{n}^{(k)}) = a \cdot k + b
+
+        where `a` is the entropy rate and `b` the excess entropy
+        as described in \ :footcite:p:`von2018partial`.
+
+        Parameters
+        ----------
+        %(segmentation_or_labels)s
+        history_length: int
+            Maximum history length in sample from which to estimate the excess entropy rate.
+        %(ignore_self)s
+        %(log_base)s
+        %(n_jobs)s
+
+        Returns
+        -------
+        a: float
+            entropy rate (slope)
+        b: float
+            excess entropy (intercept)
+        residuals: float
+            sum of squared residuals of the least squares fit
+        lags: np.ndarray shape (history_length,)
+            the lag (in sample) used for the fit
+        joint_entropies: np.ndarray shape (history_length,)
+            the joint entropy value for each lag
+
+        References
+        ----------
+        .. footbibliography::
+        """
+        return(excess_entropy_rate(self, history_length=history_length, log_base=log_base, state_to_ignore=-1, ignore_self=ignore_self, n_jobs=n_jobs))
     @fill_doc
     def plot_cluster_centers(
         self,
@@ -307,36 +376,6 @@ class _BaseSegmentation(ABC):
             axes,
             block=block,
         )
-
-    @fill_doc
-    def entropy(self, log_base: float = 2.0, ignore_self: bool = False):
-        r"""Compute the Shannon entropy of the  microstate segmentation.
-
-        Compute the Shannon entropy
-        \ :footcite:p:`shannon1948mathematicalof`.
-        of the microstate sequence.
-
-        Parameters
-        ----------
-        %(log_base)s
-        %(ignore_self)s
-
-        Returns
-        -------
-        entropy : float
-            The entropy of the microstate segmentation.
-
-        References
-        ----------
-        .. footbibliography::
-        """
-        _check_type(ignore_self, (bool,), "ignore_self")
-        # reshape if epochs (returns a view)
-        labels = self._labels.reshape(-1)
-        # ignore transition to itself (i.e. 1 -> 1)
-        if ignore_self:
-            labels = [s for s, _ in itertools.groupby(labels)]
-        return _entropy(labels, state_to_ignore=-1, log_base=log_base)
 
     # --------------------------------------------------------------------
     @staticmethod

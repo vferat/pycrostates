@@ -140,6 +140,11 @@ T : array of shape ``(n_cluster, n_cluster)``
     ``"to"``."""
 # ------ autoinformation -------
 docdict[
+    "segmentation_or_labels"
+] = """
+segmentation : :ref:`segmentation` or array of shape ``(n_samples,)``
+    Either a Segmentation object or an array of integers representing the microstate symbolic sequence."""
+docdict[
     "labels_info"
 ] = """
 labels : array (n_symbols, )
@@ -150,11 +155,6 @@ docdict[
 state_to_ignore: int
     Ignore state with symbol state_to_ignore from analysis."""
 docdict[
-    "k_info"
-] = """
-k: int
-    History length."""
-docdict[
     "log_base"
 ] = """
 log_base : float, str
@@ -164,7 +164,6 @@ log_base : float, str
         natural: log_base = np.e
         dits: log_base = 10 
     Default to 'bits' (log_base = 2)."""
-
 # ------ Viz -------
 docdict[
     "cmap"

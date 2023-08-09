@@ -8,13 +8,13 @@ import itertools
 import numpy as np
 import scipy.stats
 from mne.parallel import parallel_func
+
 from numpy.typing import NDArray
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 from .._typing import Segmentation
 
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
 from ..utils._docs import fill_doc
-
 from ._base import _BaseSegmentation
 # TODO: should we normalize aif and paif?
 # The n_clusters parameter should reflect the total number of possible states,
@@ -63,13 +63,14 @@ def _check_segmentation(segmentation, item_name='segmentation'):
         # reshape if epochs (returns a view)
         labels = labels.reshape(-1)
     if isinstance(segmentation, np.ndarray):
+        pass
         # TODO: check that it is a 1D array of integers
     return(labels)
 
 
 @fill_doc
 def _joint_entropy(
-    x: NDArray[int], y: NDArray[int], state_to_ignore=-1, log_base: float = 2
+    x: NDArray[int], y: NDArray[int], state_to_ignore: Optional[Union[int, None]]=-1, log_base: float = 2
 ):
     """
     Joint Shannon entropy of the symbolic sequences x, y.
@@ -90,7 +91,7 @@ def _joint_entropy(
     _check_type(y, (np.ndarray,), "y")
     if len(x) != len(y):
         raise ValueError("Sequences of different lengths.")
-    _check_type(state_to_ignore, (int,), "state_to_ignore")
+    _check_type(state_to_ignore, (int, None,), "state_to_ignore")
     log_base = _check_log_base(log_base)
 
     # ignoring state_to_ignore
@@ -112,7 +113,7 @@ def _joint_entropy(
 
 @fill_doc
 def _joint_entropy_history(
-    labels: NDArray[int], k: int, state_to_ignore=-1, log_base: float = 2
+    labels: NDArray[int], k: int, state_to_ignore: Optional[Union[int, None]] = -1, log_base: float = 2
 ):
     r"""Compute the joint Shannon of k-histories x[t:t+k].
 
@@ -156,9 +157,37 @@ def _joint_entropy_history(
 
 
 @fill_doc
+def _entropy(
+    labels: NDArray[int],  state_to_ignore: Optional[Union[int, None]] = -1, log_base: float = 2
+):
+    r"""Compute the Shannon entropy of the a symbolic sequence.
+
+    Parameters
+    ----------
+    labels: np.ndarray
+        the symbolic sequence.
+    %(state_to_ignore)s
+    %(log_base)s
+
+    Returns
+    -------
+    h : float
+        The Shannon entropy of the sequence.
+    """
+    _check_type(labels, (np.ndarray,), "labels")
+    _check_type(state_to_ignore, (int,), "state_to_ignore")
+    log_base = _check_log_base(log_base)
+
+    h = _joint_entropy_history(
+        labels, k=1, state_to_ignore=state_to_ignore, log_base=log_base
+    )
+    return h
+
+
+@fill_doc
 def entropy(    
     segmentation: [Segmentation, NDArray[int]],
-    state_to_ignore: Optional[int, None] = -1,
+    state_to_ignore: Optional[Union[int, None]] = -1,
     ignore_self: Optional[bool] = False,
     log_base: Optional[float] = 2,
 ):
@@ -172,7 +201,6 @@ def entropy(
     ----------
     %(segmentation_or_labels)s
     %(state_to_ignore)s
-    %(ignore_self)s
     %(log_base)s
 
     Returns
@@ -192,10 +220,8 @@ def entropy(
     if ignore_self:
         labels = [s for s, _ in itertools.groupby(labels)]
     segmentation = _check_segmentation(segmentation)
-    h = _joint_entropy_history(
-        labels, k=1, state_to_ignore=state_to_ignore, log_base=log_base
-    )
-    return(h)
+    h = _entropy(labels, state_to_ignore=state_to_ignore, log_base=log_base)
+    return()
 
 
 @fill_doc
@@ -358,7 +384,7 @@ def aif():
 def _pai(
     labels: NDArray[int],
     k: int,
-    state_to_ignore=-1,
+    state_to_ignore: Optional[Union[int, None]] = -1,
     log_base: float = 2,
 ):
     """
@@ -448,7 +474,7 @@ def paif(
                 NDArray[int],
             ],
     log_base: Optional[float] = 2,
-    state_to_ignore: Optional[int, None] = -1,
+    state_to_ignore: Optional[Union[int, None]] = -1,
     ignore_self: Optional[bool] = False,
     n_jobs: Optional[int, None] = None,
 ):
@@ -493,12 +519,8 @@ def paif(
 @fill_doc
 def _excess_entropy_rate(
     labels: NDArray[int],
-    lags: Union[
-                List[int],
-                Tuple[int, ...],
-                NDArray[int],
-            ],
-    state_to_ignore: Optional[int, None] = -1,
+    history_length: int,
+    state_to_ignore: Optional[Union[int, None]] = -1,
     log_base: Optional[float] = 2,
     n_jobs: Optional[int, None] = None,
 ):
@@ -508,7 +530,8 @@ def _excess_entropy_rate(
     Parameters
     ----------
     %(labels_info)s
-    %(lags)s
+    history_length: int
+        Maximum history length in sample from which to estimate the excess entropy rate.
     %(state_to_ignore)s
     %(log_base)s
     %(n_jobs)s
@@ -522,6 +545,7 @@ def _excess_entropy_rate(
     residuals: float
          sum of squared residuals of the least squares fit
     """
+    lags = np.arange(1, history_length + 1)
     parallel, p_fun, _ = parallel_func(
         _joint_entropy_history, n_jobs, total=len(lags)
     )
@@ -537,13 +561,9 @@ def _excess_entropy_rate(
 @fill_doc
 def excess_entropy_rate(
     segmentation: [Segmentation, NDArray[int]],
-    lags: Union[
-                List[int],
-                Tuple[int, ...],
-                NDArray[int],
-            ],
+    history_length: int,
     log_base: Optional[float] = 2,
-    state_to_ignore: Optional[int, None] = -1,
+    state_to_ignore: Optional[Union[int, None]] = -1,
     ignore_self: Optional[bool] = False,
     n_jobs: Optional[int, None] = None,
 ):
@@ -559,7 +579,8 @@ def excess_entropy_rate(
     Parameters
     ----------
     %(segmentation_or_labels)s
-    %(lags)s
+    history_length: int
+        Maximum history length in sample from which to estimate the excess entropy rate.
     %(state_to_ignore)s
     %(log_base)s
     %(ignore_self)s
@@ -579,7 +600,7 @@ def excess_entropy_rate(
     .. footbibliography::
     """
     labels = _check_segmentation(segmentation)
-    _check_lags(lags)
+    _check_type(history_length, (int,), "history_length")
     _check_type(state_to_ignore, (int,), "state_to_ignore")
     _check_type(ignore_self, (bool,), "ignore_self")
     log_base = _check_log_base(log_base)
@@ -587,67 +608,10 @@ def excess_entropy_rate(
      # ignore transition to itself (i.e. 1 -> 1)
     if ignore_self:
         labels = [s for s, _ in itertools.groupby(labels)]
-    labels = _check_segmentation(segmentation)
     eer = _excess_entropy_rate(
-        labels, lags, state_to_ignore=-1, ignore_self=ignore_self, log_base=log_base, n_jobs=n_jobs
+        labels, history_length,
+        state_to_ignore=state_to_ignore,
+        ignore_self=ignore_self,
+        log_base=log_base, n_jobs=n_jobs
     )
     return eer
-
-
-@fill_doc
-def _lz76(labels: NDArray[int], state_to_ignore: int = -1, log_base: float = 2):
-    r"""Compute the Lempel–Ziv complexity of the microstate symbolic sequence.
-
-    Compute the Lempel–Ziv complexity
-    \ :footcite:p:`lempel1976complexity`..
-    of the microstate symbolic sequence.
-
-    Parameters
-    ----------
-    %(labels_info)s
-    %(state_to_ignore)s
-    %(log_base)s
-
-    Returns
-    -------
-    c : float
-        The Lempel–Ziv complexity.
-
-    References
-    ----------
-    .. footbibliography::
-    """
-    _check_type(labels, (np.ndarray,), "x")
-    _check_type(state_to_ignore, (int,), "state_to_ignore")
-    log_base = _check_log_base(log_base)
-    n = len(labels)
-    i = 0
-    c = 1
-    l = 1
-    k = 1
-    k_max = k
-    stop = 0
-    b = 0
-    while (stop == 0):
-        if (labels[i+k] != labels[l+k]):
-            if (k > k_max):
-                k_max = k
-            i += 1
-            if (i == l):
-                c += 1
-                l += k_max
-                if (l+1 > n-1):
-                    stop = 1
-                else:
-                    i = 0
-                    k = 1
-                    k_max = 1
-            else:
-                k = 1
-        else:
-            k += 1
-            if (l+k > n-1):
-                c += 1
-                stop = 1
-    b = 1.0*float(n)/np.log2(float(n)) #TODO: check if this is correct
-    return c/b

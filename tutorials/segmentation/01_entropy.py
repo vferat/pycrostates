@@ -39,9 +39,6 @@ This tutorial introduces .
 #     - ``conda install -c conda-forge seaborn``
 
 # sphinx_gallery_thumbnail_number = 2
-
-import numpy as np
-import seaborn as sns
 from matplotlib import pyplot as plt
 from mne.io import read_raw_eeglab
 
@@ -78,9 +75,27 @@ segmentation = ModK.predict(
 )
 
 #%%
-#
-#
+# Entropy
+# TODO: explain the concept of entropy and its application to MS analysis
+h = segmentation.entropy(ignore_self=False)
 
+#%%
+# We can also ignore state repetitions (i.e. self-transitions) by setting the ignore_self to True.
+# This is useful when you don't want to take state duration into account.
+h = segmentation.entropy(ignore_self=True)
+
+#%%
+# Excess entropy
+# TODO: explain the concept of excess entropy and its application to MS analysis and parameters.
+import matplotlib.pyplot as plt
+
+a, b, residuals, lags, joint_entropies = segmentation.excess_entropy_rate(history_length=12)
+
+plt.figure()
+plt.plot(lags, joint_entropies, '-sk')
+plt.plot(lags, a*lags+b, '-b')
+plt.title("Entropy rate & excess entropy")
+plt.show()
 #%%
 # References
 # ----------
