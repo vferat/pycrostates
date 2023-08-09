@@ -4,6 +4,7 @@ import logging
 import multiprocessing as mp
 import operator
 import os
+from collections.abc import Sequence
 from itertools import product
 from pathlib import Path
 from typing import Any
@@ -71,6 +72,7 @@ _types = {
     "path-like": (str, Path, os.PathLike),
     "int": (_IntLike(),),
     "callable": (_Callable(),),
+    "array-like": (Sequence, np.ndarray),
 }
 
 
