@@ -8,8 +8,12 @@ from pycrostates.cluster import ModKMeans
 from pycrostates.utils._logs import logger, set_log_level
 
 from ..entropy import (
+    _auto_information,
+    _check_lags,
     _check_segmentation,
+    _joint_entropy,
     _joint_entropy_history,
+    auto_information_function,
     entropy,
     excess_entropy_rate,
 )
@@ -61,6 +65,29 @@ def test__check_segmentation():
     r = _check_segmentation(epochs_segmentation)
     assert isinstance(r, np.ndarray)
     assert r.ndim == 1
+
+
+def test_check_lags():
+    _check_lags(np.arange(10))
+    assert np.allclose(_check_lags(10), np.arange(10))
+    assert np.allclose(_check_lags([1, 2, 3]), np.array([1, 2, 3]))
+    assert np.allclose(_check_lags((1, 2, 3)), np.array([1, 2, 3]))
+    with pytest.raises(ValueError, match="If integer, lags must be >= 1."):
+        _check_lags(-1)
+    with pytest.raises(ValueError, match="Lags values must be positive."):
+        _check_lags([1, 2, -3])
+    with pytest.raises(ValueError, match="Lags values must be integers."):
+        _check_lags([1, 2, 3.0])
+
+
+def test__joint_entropy():
+    x = np.random.randint(-1, 4, 100)
+    y = np.random.randint(-1, 4, 100)
+    r = _joint_entropy(x, y, state_to_ignore=-1, log_base=2)
+    r_ = _joint_entropy(x, y, state_to_ignore=None, log_base=2)
+    assert r != r_
+    with pytest.raises(ValueError, match="Sequences of different lengths."):
+        r = _joint_entropy(x, y[1:], state_to_ignore=None, log_base=2)
 
 
 def test__joint_entropy_history():
@@ -141,6 +168,68 @@ def test_excess_entropy_rate():
     excess_entropy_rate(
         labels,
         history_length=10,
+        state_to_ignore=None,
+        ignore_self=True,
+        log_base=2,
+    )
+
+
+def test__auto_information():
+    labels = np.random.randint(-1, 4, 100)
+    r = _auto_information(labels, 10, state_to_ignore=-1, log_base=2)
+    assert isinstance(r, float)
+    r = _auto_information(labels, 10, state_to_ignore=None, log_base=2)
+    assert isinstance(r, float)
+
+
+def test_auto_information_function():
+    # Array
+    labels = np.random.randint(-1, 4, 100)
+    lags, runs = auto_information_function(
+        labels,
+        lags=10,
+        state_to_ignore=-1,
+        ignore_self=False,
+        log_base=2,
+    )
+    assert np.all(lags == np.arange(10))
+    assert isinstance(runs, np.ndarray)
+    # Raw
+    auto_information_function(
+        raw_segmentation,
+        lags=10,
+        state_to_ignore=-1,
+        ignore_self=False,
+        log_base=2,
+    )
+    # Epochs
+    auto_information_function(
+        epochs_segmentation,
+        lags=10,
+        state_to_ignore=-1,
+        ignore_self=False,
+        log_base=2,
+    )
+    # state_to_ignore
+    auto_information_function(
+        labels,
+        lags=10,
+        state_to_ignore=None,
+        ignore_self=False,
+        log_base=2,
+    )
+    # ignore_self
+    auto_information_function(
+        labels,
+        lags=10,
+        state_to_ignore=None,
+        ignore_self=True,
+        log_base=2,
+    )
+    # lags
+    auto_information_function(
+        labels,
+        lags=[1, 3, 10],
         state_to_ignore=None,
         ignore_self=True,
         log_base=2,

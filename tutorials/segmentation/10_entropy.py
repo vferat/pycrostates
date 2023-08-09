@@ -96,6 +96,19 @@ plt.plot(lags, joint_entropies, '-sk')
 plt.plot(lags, a*lags+b, '-b')
 plt.title("Entropy rate & excess entropy")
 plt.show()
+
+#%%
+# auto_information_function
+# TODO: explain the auto_information_function and parameters.
+from pycrostates.segmentation import auto_information_function
+import numpy as np
+
+lags, ai = auto_information_function(segmentation, lags=np.arange(1, 20), ignore_self=False, state_to_ignore=-1, n_jobs=2)
+
+plt.figure()
+plt.plot(lags, ai, '-sk')
+plt.title("Auto information function")
+plt.show()
 #%%
 # References
 # ----------
