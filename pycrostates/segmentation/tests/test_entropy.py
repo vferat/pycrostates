@@ -13,9 +13,11 @@ from ..entropy import (
     _check_segmentation,
     _joint_entropy,
     _joint_entropy_history,
+    _partial_auto_information,
     auto_information_function,
     entropy,
     excess_entropy_rate,
+    partial_auto_information_function,
 )
 
 set_log_level("INFO")
@@ -212,6 +214,68 @@ def test_auto_information_function():
     )
     # state_to_ignore
     auto_information_function(
+        labels,
+        lags=10,
+        state_to_ignore=None,
+        ignore_self=False,
+        log_base=2,
+    )
+    # ignore_self
+    auto_information_function(
+        labels,
+        lags=10,
+        state_to_ignore=None,
+        ignore_self=True,
+        log_base=2,
+    )
+    # lags
+    auto_information_function(
+        labels,
+        lags=[1, 3, 10],
+        state_to_ignore=None,
+        ignore_self=True,
+        log_base=2,
+    )
+
+
+def test__partial_auto_information():
+    labels = np.random.randint(-1, 4, 100)
+    r = _partial_auto_information(labels, 10, state_to_ignore=-1, log_base=2)
+    assert isinstance(r, float)
+    r = _partial_auto_information(labels, 10, state_to_ignore=None, log_base=2)
+    assert isinstance(r, float)
+
+
+def test_partial_auto_information_function():
+    # Array
+    labels = np.random.randint(-1, 4, 100)
+    lags, runs = partial_auto_information_function(
+        labels,
+        lags=10,
+        state_to_ignore=-1,
+        ignore_self=False,
+        log_base=2,
+    )
+    assert np.all(lags == np.arange(10))
+    assert isinstance(runs, np.ndarray)
+    # Raw
+    partial_auto_information_function(
+        raw_segmentation,
+        lags=10,
+        state_to_ignore=-1,
+        ignore_self=False,
+        log_base=2,
+    )
+    # Epochs
+    partial_auto_information_function(
+        epochs_segmentation,
+        lags=10,
+        state_to_ignore=-1,
+        ignore_self=False,
+        log_base=2,
+    )
+    # state_to_ignore
+    partial_auto_information_function(
         labels,
         lags=10,
         state_to_ignore=None,
