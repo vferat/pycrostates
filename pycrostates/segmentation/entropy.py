@@ -68,8 +68,7 @@ def _joint_entropy(
     state_to_ignore: Optional[Union[int, None]] = -1,
     log_base: Optional[Union[float, str]] = 2,
 ):
-    """
-    Joint Shannon entropy of the symbolic sequences x, y.
+    """Joint Shannon entropy of the symbolic sequences x, y.
 
     Parameters
     ----------
@@ -206,6 +205,7 @@ def _entropy(
     labels: np.ndarray
         the symbolic sequence.
     %(state_to_ignore)s
+    %(ignore_self)s
     %(log_base)s
 
     Returns
@@ -239,14 +239,14 @@ def entropy(
 ):
     r"""Compute the Shannon entropy of the a symbolic sequence.
 
-    Compute the Shannon entropy
-    \ :footcite:p:`shannon1948mathematicalof`..
-    of a symbolic sequence.
+    Compute the Shannon entropy :footcite:t:`shannon1948mathematical`
+    of the microstate symbolic sequence.
 
     Parameters
     ----------
     %(segmentation_or_labels)s
     %(state_to_ignore)s
+    %(ignore_self)s
     %(log_base)s
 
     Returns
@@ -286,13 +286,12 @@ def _excess_entropy_rate(
     log_base: Optional[Union[float, str]] = 2,
     n_jobs: int = 1,
 ):
-    """
-    Estimate the entropy rate and the excess_entropy from a linear fit.
+    """Estimate the entropy rate and the excess_entropy from a linear fit.
 
     Parameters
     ----------
     %(labels_info)s
-    history_length: int
+    history_length : int
         Maximum history length in sample to estimate the excess entropy rate.
     %(state_to_ignore)s
     %(log_base)s
@@ -301,15 +300,15 @@ def _excess_entropy_rate(
     Returns
     -------
     a: float
-        entropy rate (slope)
+        Entropy rate (slope).
     b: float
-        excess entropy (intercept)
+        Excess entropy (intercept).
     residual: float
-         sum of squared residuals of the least squares fit
+        Sum of squared residuals of the least squares fit.
     lags: np.ndarray shape (history_length,)
-        the lag (in sample) used for the fit
+        Lag values in sample used for the fit.
     joint_entropies: np.ndarray shape (history_length,)
-        the joint entropy value for each lag
+        Joint entropy value for each lag.
     """
     lags = np.arange(1, history_length + 1)
     parallel, p_fun, _ = parallel_func(
@@ -333,20 +332,21 @@ def excess_entropy_rate(
     log_base: Optional[Union[float, str]] = 2,
     n_jobs: int = 1,
 ):
-    r"""
-    Estimate the entropy rate and the excess_entropy of the segmentation.
+    r"""Estimate the entropy rate and the excess_entropy of the segmentation.
 
     Estimate the entropy rate and the excess_entropy from a linear fit:
-    .. math::
-    H(X_{n}^{(k)}) = a \cdot k + b
 
-    where `a` is the entropy rate and `b` the excess entropy
+    .. math::
+
+        H(X_{n}^{(k)}) = a \cdot k + b
+
+    where ``a`` is the entropy rate and ``b`` the excess entropy
     as described in \ :footcite:p:`von2018partial`.
 
     Parameters
     ----------
     %(segmentation_or_labels)s
-    history_length: int
+    history_length : int
         Maximum history length in sample to estimate the excess entropy rate.
     %(state_to_ignore)s
     %(ignore_self)s
@@ -356,15 +356,15 @@ def excess_entropy_rate(
     Returns
     -------
     a: float
-        entropy rate (slope)
+        Entropy rate (slope).
     b: float
-        excess entropy (intercept)
+        Excess entropy (intercept).
     residual: float
-         sum of squared residuals of the least squares fit
+        Sum of squared residuals of the least squares fit.
     lags: np.ndarray shape (history_length,)
-        the lag (in sample) used for the fit
+        Lag values in sample used for the fit.
     joint_entropies: np.ndarray shape (history_length,)
-        the joint entropy value for each lag
+        Joint entropy value for each lag.
 
     References
     ----------
@@ -405,15 +405,14 @@ def _auto_information(
     state_to_ignore: Optional[Union[int, None]] = -1,
     log_base: Optional[Union[float, str]] = 2,
 ):
-    """
-    Compute the Auto-information for lag k.
+    """Compute the Auto-information for lag k.
 
     Parameters
     ----------
     labels: np.ndarray shape (n_samples,)
         sequence of discrete state
     k: int
-        lag
+        Lag value in sample.
     %(state_to_ignore)s
     %(log_base)s
 
@@ -421,6 +420,7 @@ def _auto_information(
     -------
     a: float
         time-lagged auto-information for lag k.
+
     """
     _check_type(labels, (np.ndarray,), "labels")
     _check_type(k, (_IntLike(),), "k")
@@ -468,31 +468,39 @@ def auto_information_function(
     log_base: Optional[Union[float, str]] = 2,
     n_jobs: int = 1,
 ):
-    """
-    Compute the Auto-information function (aif).
+    r"""Compute the Auto-information function (aif).
 
-    TeX notation:
-    I(X_{n+k} ; X_{n})
-    = H(X_{n+k}) - H(X_{n+k} | X_{n})
-    = H(X_{n+k}) - H(X_{n+k},X_{n}) + H(X_{n})
-    = H(X_{n+k}) + H(X_{n}) - H(X_{n+k},X_{n})
+    Compute the Auto-information function (aif)
+    as described in \ :footcite:p:`von2018partial`.
+
+    .. math::
+
+        I(X_{n+k} ; X_{n})
+        = H(X_{n+k}) - H(X_{n+k} | X_{n})
+        = H(X_{n+k}) - H(X_{n+k},X_{n}) + H(X_{n})
+        = H(X_{n+k}) + H(X_{n}) - H(X_{n+k},X_{n})
 
     Parameters
     ----------
     %(segmentation_or_labels)s
-    lags : int, list, tuple, or array of shape ``(n_lags,)``
-        The lags at which to compute the auto-information function.
+    lags : int | list | tuple | array of shape ``(n_lags,)``
+        Lags at which to compute the auto-information function.
         If int, will use lags = np.arange(lags).
     %(state_to_ignore)s
+    %(ignore_self)s
     %(log_base)s
     %(n_jobs)s
 
     Returns
     -------
-    lags: array (n_lags, )
-        the lag values.
-    a: float (n_lags, )
-        time-lagged mutual information array for each lag.
+    lags : array of shape ``(n_lags,)``
+        Lag values in sample.
+    ai : array of shape ``(n_lags,)``
+        Time-lagged mutual information array for each lag.
+
+    References
+    ----------
+    .. footbibliography::
     """
     labels = _check_segmentation(segmentation)
     lags = _check_lags(lags)
@@ -522,7 +530,7 @@ def auto_information_function(
     return lags, runs
 
 
-#  Partial auto-information
+# Partial auto-information
 @fill_doc
 def _partial_auto_information(
     labels: NDArray[int],
@@ -530,14 +538,13 @@ def _partial_auto_information(
     state_to_ignore: Optional[Union[int, None]] = -1,
     log_base: Optional[Union[float, str]] = 2,
 ):
-    """
-    Compute the partial auto-information for lag k.
+    """Compute the partial auto-information for lag k.
 
     Parameters
     ----------
     %(labels_info)s
     k: int
-        the lag in sample.
+        Lag values in sample.
     %(state_to_ignore)s
     %(log_base)s
 
@@ -586,31 +593,40 @@ def partial_auto_information_function(
     log_base: Optional[Union[float, str]] = 2,
     n_jobs: Optional[int] = 1,
 ):
-    """
-    Compute the Partial auto-information function.
+    r"""Compute the Partial auto-information function.
 
-    TeX notation:
-    I(X_{n+k} ; X_{n} | X_{n+k-1}^{(k-1)})
-    = H(X_{n+k} | X_{n+k-1}^{(k-1)}) - H(X_{n+k} | X_{n+k-1}^{(k-1)}, X_{n})
-    =   H(X_{n+k},X_{n+k-1}^{(k-1)}) - H(X_{n+k-1}^{(k-1)})
-      - H(X_{n+k},X_{n+k-1}^{(k)}) + H(X_{n+k-1}^{(k)})
-    = H(X_{n+k}^{(k)}) - H(X_{n+k-1}^{(k-1)}) - H(X_{n+k}^{(k+1)}) + H(X_{n+k-1}^{(k)})
+    Compute the Partial auto-information function
+    as described in \ :footcite:p:`von2018partial`.
+
+    .. math::
+
+        I(X_{n+k} ; X_{n} | X_{n+k-1}^{(k-1)})
+        = H(X_{n+k} | X_{n+k-1}^{(k-1)}) - H(X_{n+k} | X_{n+k-1}^{(k-1)}, X_{n})
+        =   H(X_{n+k},X_{n+k-1}^{(k-1)}) - H(X_{n+k-1}^{(k-1)})
+        - H(X_{n+k},X_{n+k-1}^{(k)}) + H(X_{n+k-1}^{(k)})
+        = H(X_{n+k}^{(k)}) - H(X_{n+k-1}^{(k-1)}) - H(X_{n+k}^{(k+1)}) + H(X_{n+k-1}^{(k)})
 
     Parameters
     ----------
     %(segmentation_or_labels)s
-    lags : int, list, tuple, or array of shape ``(n_lags,)``
+    lags : int | list | tuple | array of shape ``(n_lags,)``
         The lags at which to compute the auto-information function.
         If int, will use lags = np.arange(lags).
+    %(state_to_ignore)s
+    %(ignore_self)s
     %(log_base)s
     %(n_jobs)s
 
     Returns
     -------
-    lags: array (n_lags, )
-        the lag values.
-    p: array (n_symbols, )
+    lags: array of shape ``(n_lags,)``
+        Lag values in sample.
+    p: array of shape ``(n_lags,)``
         Partial auto-information array for each lag.
+
+    References
+    ----------
+    .. footbibliography::
     """  # noqa: E501
     labels = _check_segmentation(segmentation)
     lags = _check_lags(lags)

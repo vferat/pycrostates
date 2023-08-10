@@ -29,14 +29,6 @@ This tutorial introduces .
 #
 #     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
-#
-# .. note::
-#
-#     This tutorial uses ``seaborn`` for enhanced visualization. Use the
-#     following installation method appropriate for your environment:
-#
-#     - ``pip install seaborn``
-#     - ``conda install -c conda-forge seaborn``
 
 # sphinx_gallery_thumbnail_number = 2
 from matplotlib import pyplot as plt

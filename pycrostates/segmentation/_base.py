@@ -289,10 +289,9 @@ class _BaseSegmentation(ABC):
         ignore_self: Optional[bool] = False,
         log_base: Optional[Union[float, str]] = 2,
     ):
-        r"""Compute the Shannon entropy of the segmentation.
+        """Compute the Shannon entropy of the segmentation.
 
-        Compute the Shannon entropy
-        \ :footcite:p:`shannon1948mathematical`..
+        Compute the Shannon entropy :footcite:t:`shannon1948mathematical`
         of the microstate symbolic sequence.
 
         Parameters

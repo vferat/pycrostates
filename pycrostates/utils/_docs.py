@@ -142,7 +142,7 @@ T : array of shape ``(n_cluster, n_cluster)``
 docdict[
     "segmentation_or_labels"
 ] = """
-segmentation : :ref:`segmentation` or array of shape ``(n_samples,)``
+segmentation : RawSegmentation | RawSegmentation | array of shape ``(n_samples,)``
     Either a Segmentation object or an array of integers
     representing the microstate symbolic sequence."""
 docdict[
@@ -153,18 +153,18 @@ labels : array (n_symbols, )
 docdict[
     "state_to_ignore"
 ] = """
-state_to_ignore: int
-    Ignore state with symbol state_to_ignore from analysis."""
+state_to_ignore : int
+    Ignore state with symbol ``state_to_ignore`` from analysis."""
 docdict[
     "log_base"
 ] = """
 log_base : float, str
     The log base to use.
     If string:
-        bits: log_base = 2
-        natural: log_base = np.e
-        dits: log_base = 10
-    Default to 'bits' (log_base = 2)."""
+        * ``bits``: log_base = ``2``
+        * ``natural``: log_base = ``np.e``
+        * ``dits``: log_base = ``10``
+    Default to ``bits``."""
 # ------ Viz -------
 docdict[
     "cmap"
