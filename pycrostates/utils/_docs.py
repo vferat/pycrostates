@@ -142,7 +142,8 @@ T : array of shape ``(n_cluster, n_cluster)``
 docdict[
     "segmentation_or_labels"
 ] = """
-segmentation : RawSegmentation | RawSegmentation | array of shape ``(n_samples,)``
+segmentation : RawSegmentation | EpochsSegmentation""" \
+    """ | array of shape ``(n_samples,)``
     Either a Segmentation object or an array of integers
     representing the microstate symbolic sequence."""
 docdict[
@@ -161,9 +162,9 @@ docdict[
 log_base : float, str
     The log base to use.
     If string:
-        * ``bits``: log_base = ``2``
-        * ``natural``: log_base = ``np.e``
-        * ``dits``: log_base = ``10``
+    * ``bits``: log_base = ``2``
+    * ``natural``: log_base = ``np.e``
+    * ``dits``: log_base = ``10``
     Default to ``bits``."""
 # ------ Viz -------
 docdict[
