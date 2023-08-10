@@ -15,7 +15,7 @@ from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
-from .entropy import entropy, excess_entropy_rate
+from .entropy import entropy
 from .transitions import (
     _compute_expected_transition_matrix,
     _compute_transition_matrix,
