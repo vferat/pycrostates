@@ -17,7 +17,6 @@ __all__ = (
     "excess_entropy_rate",
     "auto_information_function",
     "partial_auto_information_function",
-    "auto_information_function",
     "EpochsSegmentation",
     "RawSegmentation",
 )

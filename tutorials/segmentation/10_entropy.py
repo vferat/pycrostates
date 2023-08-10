@@ -87,9 +87,10 @@ h = segmentation.entropy(ignore_self=True)
 #%%
 # Excess entropy
 # TODO: explain the concept of excess entropy and its application to MS analysis and parameters.
+from pycrostates.segmentation import excess_entropy_rate
 import matplotlib.pyplot as plt
 
-a, b, residuals, lags, joint_entropies = segmentation.excess_entropy_rate(history_length=12)
+a, b, residuals, lags, joint_entropies = excess_entropy_rate(segmentation, history_length=12, state_to_ignore=-1, ignore_self=False)
 
 plt.figure()
 plt.plot(lags, joint_entropies, '-sk')
@@ -109,6 +110,21 @@ plt.figure()
 plt.plot(lags, ai, '-sk')
 plt.title("Auto information function")
 plt.show()
+
+#%%
+# partial_auto_information_function
+# TODO: explain the partial_auto_information_function and parameters.
+from pycrostates.segmentation import partial_auto_information_function
+import numpy as np
+
+lags, pai = partial_auto_information_function(segmentation, lags=np.arange(1, 5), ignore_self=False, state_to_ignore=-1, n_jobs=1)
+
+plt.figure()
+plt.plot(lags, pai, '-sk')
+plt.title("Partial Auto information function")
+plt.show()
+
+
 #%%
 # References
 # ----------

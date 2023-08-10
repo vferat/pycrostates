@@ -308,65 +308,13 @@ class _BaseSegmentation(ABC):
         References
         ----------
         .. footbibliography::
+
         """
         return entropy(
             self,
             ignore_self=ignore_self,
             state_to_ignore=-1,
             log_base=log_base,
-        )
-
-    @fill_doc
-    def excess_entropy_rate(
-        self,
-        history_length: int,
-        ignore_self: Optional[bool] = False,
-        log_base: Optional[Union[float, str]] = 2,
-        n_jobs: int = 1,
-    ):
-        r"""
-        Estimate the entropy rate and the excess_entropy of the segmentation.
-
-        Estimate the entropy rate and the excess_entropy from a linear fit:
-        .. math::
-        H(X_{n}^{(k)}) = a \cdot k + b
-        where ``a`` is the entropy rate and ``b`` the excess entropy
-        as described in \ :footcite:p:`von2018partial`.
-
-        Parameters
-        ----------
-        %(segmentation_or_labels)s
-        history_length: int
-            Maximum history length in sample
-            to estimate the excess entropy rate.
-        %(ignore_self)s
-        %(log_base)s
-        %(n_jobs)s
-
-        Returns
-        -------
-        a: float
-            entropy rate (slope)
-        b: float
-            excess entropy (intercept)
-        residual: float
-            sum of squared residuals of the least squares fit
-        lags: np.ndarray shape (history_length,)
-            the lag (in sample) used for the fit
-        joint_entropies: np.ndarray shape (history_length,)
-            the joint entropy value for each lag
-
-        References
-        ----------
-        .. footbibliography::
-        """
-        return excess_entropy_rate(
-            self,
-            history_length=history_length,
-            log_base=log_base,
-            state_to_ignore=-1,
-            ignore_self=ignore_self,
-            n_jobs=n_jobs,
         )
 
     @fill_doc

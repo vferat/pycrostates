@@ -15,14 +15,6 @@ from .._typing import Segmentation
 from ..utils._checks import _check_n_jobs, _check_type, _check_value, _IntLike
 from ..utils._docs import fill_doc
 
-# TODO: should we normalize aif and paif?
-# The n_clusters parameter should reflect the total number of possible states,
-# including the ignored state, if applicable. If the ignored state is not
-# considered as a valid state, it should be excluded from the count of
-# n_clusters.
-
-#  the Shannon entropy is not affected by non-appearing states
-
 
 def _check_log_base(log_base):
     _check_type(
@@ -615,10 +607,10 @@ def partial_auto_information_function(
 
     Returns
     -------
-    p: array (n_symbols, )
-        Partial auto-information array for each lag.
     lags: array (n_lags, )
         the lag values.
+    p: array (n_symbols, )
+        Partial auto-information array for each lag.
     """  # noqa: E501
     labels = _check_segmentation(segmentation)
     lags = _check_lags(lags)
