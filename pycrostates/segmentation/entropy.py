@@ -183,7 +183,7 @@ def _joint_entropy_history(
     # Construct the k-history sequences while ignoring the state
     histories = []
     for i in range(len(labels) - k + 1):
-        history = tuple(labels[i: i + k])
+        history = tuple(labels[i : i + k])
         if state_to_ignore not in history:
             histories.append(history)
 
@@ -193,7 +193,7 @@ def _joint_entropy_history(
     for i in range(
         len(labels) - k + 1
     ):  # TODO: check +1 (not in original code)
-        history = tuple(labels[i: i + k])
+        history = tuple(labels[i : i + k])
         if state_to_ignore not in history:
             joint_dist[history] += 1.0
     # Compute the joint entropy
@@ -448,13 +448,13 @@ def _auto_information(
         labels[:nmax], state_to_ignore=state_to_ignore, log_base=log_base
     )
     h2 = _entropy(
-        labels[k: k + nmax],
+        labels[k : k + nmax],
         state_to_ignore=state_to_ignore,
         log_base=log_base,
     )
     h12 = _joint_entropy(
         labels[:nmax],
-        labels[k: k + nmax],
+        labels[k : k + nmax],
         state_to_ignore=state_to_ignore,
         log_base=log_base,
     )
