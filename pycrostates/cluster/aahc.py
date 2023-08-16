@@ -160,6 +160,7 @@ class AAHCluster(_BaseCluster):
         # extension.
         # pylint: disable=import-outside-toplevel
         from ..io.fiff import _write_cluster
+
         # pylint: enable=import-outside-toplevel
 
         _write_cluster(
