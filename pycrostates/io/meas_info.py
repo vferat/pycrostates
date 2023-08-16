@@ -28,66 +28,62 @@ class ChInfo(CHInfo, Info):
     """Atemporal measurement information.
 
     Similar to a :class:`mne.Info` class, but without any temporal information.
-    Only the channel-related information are present. A
-    :class:`~pycrostates.io.ChInfo` can be created either:
+    Only the channel-related information are present. A :class:`~pycrostates.io.ChInfo`
+    can be created either:
 
-    - by providing a :class:`~mne.Info` class from which information are
-      retrieved.
-    - by providing the ``ch_names`` and the ``ch_types`` to create a new
-      instance.
+    - by providing a :class:`~mne.Info` class from which information are retrieved.
+    - by providing the ``ch_names`` and the ``ch_types`` to create a new instance.
 
     Only one of those 2 methods should be used at once.
 
-    .. warning:: The only entry that should be manually changed by the user
-                 is ``info['bads']``. All other entries should be
-                 considered read-only, though they can be modified by various
-                 functions or methods (which have safeguards to ensure all
-                 fields remain in sync).
+    .. warning:: The only entry that should be manually changed by the user is
+                 ``info['bads']``. All other entries should be considered read-only,
+                 though they can be modified by various functions or methods (which have
+                 safeguards to ensure all fields remain in sync).
 
     Parameters
     ----------
     info : Info | None
-        MNE measurement information instance from which channel-related
-        variables are retrieved.
+        MNE measurement information instance from which channel-related variables are
+        retrieved.
     ch_names : list of str | int | None
-        Channel names. If an int, a list of channel names will be created
-        from ``range(ch_names)``.
+        Channel names. If an int, a list of channel names will be created from
+        ``range(ch_names)``.
     ch_types : list of str | str | None
         Channel types. If str, all channels are assumed to be of the same type.
 
     Attributes
     ----------
     bads : list of str
-        List of bad (noisy/broken) channels, by name. These channels will by
-        default be ignored by many processing steps.
+        List of bad (noisy/broken) channels, by name. These channels will by default be
+        ignored by many processing steps.
     ch_names : tuple of str
         The names of the channels.
     chs : tuple of dict
-        A list of channel information dictionaries, one per channel.
-        See Notes for more information.
+        A list of channel information dictionaries, one per channel. See Notes for more
+        information.
     comps : list of dict
-        CTF software gradient compensation data.
-        See Notes for more information.
+        CTF software gradient compensation data. See Notes for more information.
     ctf_head_t : dict | None
-        The transformation from 4D/CTF head coordinates to Neuromag head
-        coordinates. This is only present in 4D/CTF data.
-    custom_ref_applied : int
-        Whether a custom (=other than average) reference has been applied to
-        the EEG data. This flag is checked by some algorithms that require an
-        average reference to be set.
-    dev_ctf_t : dict | None
-        The transformation from device coordinates to 4D/CTF head coordinates.
+        The transformation from 4D/CTF head coordinates to Neuromag head coordinates.
         This is only present in 4D/CTF data.
+    custom_ref_applied : int
+        Whether a custom (=other than average) reference has been applied to the EEG
+        data. This flag is checked by some algorithms that require an average reference
+        to be set.
+    dev_ctf_t : dict | None
+        The transformation from device coordinates to 4D/CTF head coordinates. This is
+        only present in 4D/CTF data.
     dev_head_t : dict | None
         The device to head transformation.
     dig : tuple of dict | None
-        The Polhemus digitization data in head coordinates.
-        See Notes for more information.
+        The Polhemus digitization data in head coordinates. See Notes for more
+        information.
     nchan : int
         Number of channels.
     projs : list of Projection
-        List of SSP operators that operate on the data.
-        See :class:`mne.Projection` for details.
+        List of SSP operators that operate on the data. See :class:`mne.Projection` for
+        details.
 
     Notes
     -----
@@ -96,9 +92,8 @@ class ChInfo(CHInfo, Info):
     * ``chs`` list of dict:
 
         cal : float
-            The calibration factor to bring the channels to physical
-            units. Used in product with ``range`` to scale the data read
-            from disk.
+            The calibration factor to bring the channels to physical units. Used in
+            product with ``range`` to scale the data read from disk.
         ch_name : str
             The channel name.
         coil_type : int
@@ -108,18 +103,16 @@ class ChInfo(CHInfo, Info):
         kind : int
             The kind of channel, e.g. ``FIFFV_EEG_CH``.
         loc : array, shape (12,)
-            Channel location. For MEG this is the position plus the
-            normal given by a 3x3 rotation matrix. For EEG this is the
-            position followed by reference position (with 6 unused).
-            The values are specified in device coordinates for MEG and in
-            head coordinates for EEG channels, respectively.
+            Channel location. For MEG this is the position plus the normal given by a
+            3x3 rotation matrix. For EEG this is the position followed by reference
+            position (with 6 unused). The values are specified in device coordinates for
+            MEG and in head coordinates for EEG channels, respectively.
         logno : int
-            Logical channel number, conventions in the usage of this
-            number vary.
+            Logical channel number, conventions in the usage of this number vary.
         range : float
-            The hardware-oriented part of the calibration factor.
-            This should be only applied to the continuous raw data.
-            Used in product with ``cal`` to scale data read from disk.
+            The hardware-oriented part of the calibration factor. This should be only
+            applied to the continuous raw data. Used in product with ``cal`` to scale
+            data read from disk.
         scanno : int
             Scanning order number, starting from 1.
         unit : int
@@ -144,14 +137,12 @@ class ChInfo(CHInfo, Info):
     * ``dig`` list of dict:
 
         kind : int
-            The kind of channel,
-            e.g. ``FIFFV_POINT_EEG``, ``FIFFV_POINT_CARDINAL``.
+            The kind of channel, e.g. ``FIFFV_POINT_EEG``, ``FIFFV_POINT_CARDINAL``.
         r : array, shape (3,)
             3D position in m. and coord_frame.
         ident : int
-            Number specifying the identity of the point.
-            e.g. ``FIFFV_POINT_NASION`` if kind is ``FIFFV_POINT_CARDINAL``, or
-            42 if kind is ``FIFFV_POINT_EEG``.
+            Number specifying the identity of the point. e.g. ``FIFFV_POINT_NASION`` if
+            kind is ``FIFFV_POINT_CARDINAL``, or 42 if kind is ``FIFFV_POINT_EEG``.
         coord_frame : int
             The coordinate frame used, e.g. ``FIFFV_COORD_HEAD``.
     """
@@ -160,33 +151,27 @@ class ChInfo(CHInfo, Info):
     # fmt: off
     _attributes = {
         "bads": _check_bads,
-        "ch_names": "ch_names cannot be set directly. "
-                    "Please use methods inst.add_channels(), "
-                    "inst.drop_channels(), inst.pick_channels(), "
-                    "inst.rename_channels(), inst.reorder_channels() "
-                    "and inst.set_channel_types() instead.",
-        "chs": "chs cannot be set directly. "
-               "Please use methods inst.add_channels(), "
-               "inst.drop_channels(), inst.pick_channels(), "
-               "inst.rename_channels(), inst.reorder_channels() "
-               "and inst.set_channel_types() instead.",
+        "ch_names": "ch_names cannot be set directly. Please use methods "
+                    "inst.add_channels(), inst.drop_channels(), inst.pick_channels(), "
+                    "inst.rename_channels(), inst.reorder_channels() and "
+                    "inst.set_channel_types() instead.",
+        "chs": "chs cannot be set directly. Please use methods inst.add_channels(), "
+               "inst.drop_channels(), inst.pick_channels(), inst.rename_channels(), "
+               "inst.reorder_channels() and inst.set_channel_types() instead.",
         "comps": "comps cannot be set directly. "
-                 "Please use method Raw.apply_gradient_compensation() "
-                 "instead.",
+                 "Please use method Raw.apply_gradient_compensation() instead.",
         "ctf_head_t": "ctf_head_t cannot be set directly.",
         "custom_ref_applied": "custom_ref_applied cannot be set directly. "
-                              "Please use method inst.set_eeg_reference() "
-                              "instead.",
+                              "Please use method inst.set_eeg_reference() instead.",
         "dev_ctf_t": "dev_ctf_t cannot be set directly.",
         "dev_head_t": _check_dev_head_t,
-        "dig": "dig cannot be set directly. "
-               "Please use method inst.set_montage() instead.",
-        "nchan": "nchan cannot be set directly. "
-                 "Please use methods inst.add_channels(), "
-                 "inst.drop_channels(), and inst.pick_channels() instead.",
-        "projs": "projs cannot be set directly. "
-                 "Please use methods inst.add_proj() and inst.del_proj() "
+        "dig": "dig cannot be set directly. Please use method inst.set_montage() "
+               "instead.",
+        "nchan": "nchan cannot be set directly. Please use methods "
+                 "inst.add_channels(), inst.drop_channels(), and inst.pick_channels() "
                  "instead.",
+        "projs": "projs cannot be set directly. Please use methods inst.add_proj() and "
+                 "inst.del_proj() instead.",
     }
     # fmt: on
 
@@ -216,8 +201,7 @@ class ChInfo(CHInfo, Info):
         else:
             raise RuntimeError(
                 "If 'info' is provided, 'ch_names' and 'ch_types' must be "
-                "None. If 'ch_names' and 'ch_types' are provided, 'info' "
-                "must be None."
+                "None. If 'ch_names' and 'ch_types' are provided, 'info' must be None."
             )
 
     def _init_from_info(self, info: Info):
@@ -404,9 +388,8 @@ class ChInfo(CHInfo, Info):
                 val = self._attributes[key](val)  # attribute checker function
         else:
             raise RuntimeError(
-                f"Info does not support setting the key {repr(key)}. "
-                "Supported keys are "
-                f"{', '.join(repr(k) for k in self._attributes)}"
+                f"Info does not support setting the key {repr(key)}. Supported keys "
+                f"are {', '.join(repr(k) for k in self._attributes)}"
             )
         super().__setitem__(key, val)  # calls the dict __setitem__
 
@@ -452,7 +435,7 @@ class ChInfo(CHInfo, Info):
         ):
             raise RuntimeError(
                 f"{prepend_error}info channel name inconsistency detected, "
-                "please notify developers."
+                "please notify the developers."
             )
 
         for pi, proj in enumerate(self.get("projs", [])):

@@ -34,11 +34,10 @@ docdict[
     "verbose"
 ] = """
 verbose : int | str | bool | None
-    Sets the verbosity level. The verbosity increases gradually between
-    ``"CRITICAL"``, ``"ERROR"``, ``"WARNING"``, ``"INFO"`` and ``"DEBUG"``.
-    If None is provided, the verbosity is set to ``"WARNING"``.
-    If a bool is provided, the verbosity is set to ``"WARNING"`` for False and
-    to ``"INFO"`` for True."""
+    Sets the verbosity level. The verbosity increases gradually between ``"CRITICAL"``,
+    ``"ERROR"``, ``"WARNING"``, ``"INFO"`` and ``"DEBUG"``. If None is provided, the
+    verbosity is set to ``"WARNING"``. If a bool is provided, the verbosity is set to
+    ``"WARNING"`` for False and to ``"INFO"`` for True."""
 
 # ---- Clusters ----
 docdict[
@@ -63,9 +62,9 @@ docdict[
     "cluster"
 ] = """
 cluster : :ref:`cluster`
-    Fitted clustering algorithm from which to compute score.
-    For more details about current clustering implementations,
-    check the :ref:`Clustering` section of the documentation.
+    Fitted clustering algorithm from which to compute score. For more details about
+    current clustering implementations, check the :ref:`Clustering` section of the
+    documentation.
 """
 
 # ------ I/O -------
@@ -109,33 +108,32 @@ stat : str
     Aggregate statistic to compute transitions. Can be:
 
     * ``count``: show the number of observations of each transition.
-    * ``probability`` or ``proportion``: normalize count such as the
-      probabilities along the first axis is always equal to ``1``.
-    * ``percent``: normalize count such as the
-      probabilities along the first axis is always equal to ``100``."""
+    * ``probability`` or ``proportion``: normalize count such as the probabilities along
+      the first axis is always equal to ``1``.
+    * ``percent``: normalize count such as the probabilities along the first axis is
+      always equal to ``100``."""
 docdict[
     "stat_expected_transitions"
 ] = """
 stat : str
     Aggregate statistic to compute transitions. Can be:
 
-    * ``probability`` or ``proportion``: normalize count such as the
-      probabilities along the first axis is always equal to ``1``.
-    * ``percent``: normalize count such as the
-      probabilities along the first axis is always equal to ``100``."""
+    * ``probability`` or ``proportion``: normalize count such as the probabilities along
+      the first axis is always equal to ``1``.
+    * ``percent``: normalize count such as the probabilities along the first axis is
+      always equal to ``100``."""
 docdict[
     "ignore_self"
 ] = """
 ignore_self : bool
-    If True, ignores the transition from one state to itself.
-    This is equivalent to setting the duration of all states to 1 sample."""
+    If True, ignores the transition from one state to itself. This is equivalent to
+    setting the duration of all states to 1 sample."""
 docdict[
     "transition_matrix"
 ] = """
 T : array of shape ``(n_cluster, n_cluster)``
     Array of transition probability values from one label to another.
-    First axis indicates state ``"from"``. Second axis indicates state
-    ``"to"``."""
+    First axis indicates state ``"from"``. Second axis indicates state ``"to"``."""
 
 # ------ Viz -------
 docdict[
@@ -152,22 +150,21 @@ docdict[
     "axes_topo"
 ] = """
 axes : Axes | None
-    Either ``None`` to create a new figure or axes (or an array of
-    axes) on which the topographic map should be plotted. If the number of
-    microstates maps to plot is ``≥ 1``, an array of axes of size
-    ``n_clusters`` should be provided."""
+    Either ``None`` to create a new figure or axes (or an array of axes) on which the
+    topographic map should be plotted. If the number of microstates maps to plot is
+    ``≥ 1``, an array of axes of size ``n_clusters`` should be provided."""
 docdict[
     "axes_seg"
 ] = """
 axes : Axes | None
-    Either ``None`` to create a new figure or axes on which the
-    segmentation is plotted."""
+    Either ``None`` to create a new figure or axes on which the segmentation is
+    plotted."""
 docdict[
     "axes_cbar"
 ] = """
 cbar_axes : Axes | None
-    Axes on which to draw the colorbar, otherwise the colormap takes
-    space from the main axes."""
+    Axes on which to draw the colorbar, otherwise the colormap takes space from the main
+    axes."""
 
 # ------------------------- Documentation functions --------------------------
 docdict_indented: Dict[int, Dict[str, str]] = {}

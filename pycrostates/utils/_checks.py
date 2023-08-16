@@ -144,8 +144,7 @@ def _check_value(item, allowed_values, item_name=None, extra=None):
     item_name : str | None
         Name of the item to show inside the error message.
     extra : str | None
-        Extra string to append to the invalid value sentence, e.g.
-        "when using ico mode".
+        Extra string to append to the invalid value sentence, e.g. "with ico mode".
 
     Raises
     ------
@@ -179,11 +178,10 @@ def _check_value(item, allowed_values, item_name=None, extra=None):
 
 
 def _check_n_jobs(n_jobs):
-    """
-    Check n_jobs parameter.
+    """Check n_jobs parameter.
 
-    Check that n_jobs is a positive integer or a negative integer for all
-    cores. CUDA is not supported.
+    Check that n_jobs is a positive integer or a negative integer for all cores. CUDA is
+    not supported.
     """
     _check_type(n_jobs, ("int",), "n_jobs")
     if n_jobs <= 0:
@@ -292,8 +290,7 @@ def _check_picks_uniqueness(info, picks):
             "%s '%s' channel(s)" % t for t in zip(counts, ch_types)
         )
         raise ValueError(
-            "Only one datatype can be selected, but 'picks' "
-            f"results in {channels_msg}."
+            f"Only one datatype can be selected, but 'picks' results in {channels_msg}."
         )
 
 

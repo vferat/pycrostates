@@ -16,9 +16,8 @@ def compute_transition_matrix(
 ) -> NDArray[float]:
     """Compute the observed transition matrix.
 
-    Count the number of transitions from one state to another and aggregate the
-    result as statistic. Transitions "from" and "to" unlabeled segments ``-1``
-    are ignored.
+    Count the number of transitions from one state to another and aggregate the result
+    as statistic. Transitions "from" and "to" unlabeled segments ``-1`` are ignored.
 
     Parameters
     ----------
@@ -84,10 +83,10 @@ def compute_expected_transition_matrix(
 ) -> NDArray[float]:
     """Compute the expected transition matrix.
 
-    Compute the theoretical transition matrix as if time course was
-    ignored, but microstate proportions was kept (i.e. shuffled segmentation).
-    This matrix can be used to quantify/correct the effect of microstate
-    time coverage on the observed transition matrix obtained with the
+    Compute the theoretical transition matrix as if time course was ignored, but
+    microstate proportions was kept (i.e. shuffled segmentation). This matrix can be
+    used to quantify/correct the effect of microstate time coverage on the observed
+    transition matrix obtained with the
     :func:`pycrostates.segmentation.compute_transition_matrix`.
     Transition "from" and "to" unlabeled segments ``-1`` are ignored.
 
@@ -174,8 +173,7 @@ def _check_labels_n_clusters(
         raise ValueError(
             "The argument 'labels' must contain the labels of each timepoint "
             "encoded as consecutive positive integers (0-indexed). Make sure "
-            f"you are providing an integer array. '{labels.dtype}' is "
-            "invalid."
+            f"you are providing an integer array. '{labels.dtype}' is invalid."
         )
     # check for negative integers except -1
     if np.any(labels < -1):

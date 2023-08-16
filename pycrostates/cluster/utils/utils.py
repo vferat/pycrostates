@@ -24,11 +24,10 @@ def _optimize_order(
 def optimize_order(inst: Cluster, template_inst: Cluster):
     """Optimize the order of cluster centers between two cluster instances.
 
-    Optimize the order of cluster centers in an instance of a clustering
-    algorithm to maximize auto-correlation, based on a template instance
-    as determined by the Hungarian algorithm.
-    The two cluster instances must have the same number of cluster centers
-    and the same polarity setting.
+    Optimize the order of cluster centers in an instance of a clustering algorithm to
+    maximize auto-correlation, based on a template instance as determined by the
+    Hungarian algorithm. The two cluster instances must have the same number of cluster
+    centers and the same polarity setting.
 
     Parameters
     ----------
@@ -40,8 +39,7 @@ def optimize_order(inst: Cluster, template_inst: Cluster):
     Returns
     -------
     order : list of int
-        The new order to apply to inst to maximize auto-correlation
-        of cluster centers.
+        The new order to apply to inst to maximize auto-correlation of cluster centers.
     """
     from .._base import _BaseCluster
 

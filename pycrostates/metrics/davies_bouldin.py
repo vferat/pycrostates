@@ -14,10 +14,9 @@ from ..utils._docs import fill_doc
 def davies_bouldin_score(cluster):  # lower the better
     r"""Compute the Davies-Bouldin score.
 
-    This function computes the Davies-Bouldin
-    score\ :footcite:p:`Davies-Bouldin` with
-    :func:`sklearn.metrics.davies_bouldin_score` from a fitted
-    :ref:`Clustering` instance.
+    This function computes the Davies-Bouldin score\ :footcite:p:`Davies-Bouldin` with
+    :func:`sklearn.metrics.davies_bouldin_score` from a fitted :ref:`Clustering`
+    instance.
 
     Parameters
     ----------
@@ -31,9 +30,9 @@ def davies_bouldin_score(cluster):  # lower the better
     Notes
     -----
     For more details regarding the implementation, please refer to
-    :func:`sklearn.metrics.davies_bouldin_score`.
-    This function was modified in order to use the absolute spatial correlation
-    for distance computations instead of the euclidean distance.
+    :func:`sklearn.metrics.davies_bouldin_score`. This function was modified in order to
+    use the absolute spatial correlation for distance computations instead of the
+    euclidean distance.
 
     References
     ----------

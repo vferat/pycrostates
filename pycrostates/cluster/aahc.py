@@ -156,11 +156,10 @@ class AAHCluster(_BaseCluster):
     @copy_doc(_BaseCluster.save)
     def save(self, fname: Union[str, Path]):
         super().save(fname)
-        # TODO: to be replaced by a general writer than infers the writer from
-        # the file extension.
+        # TODO: to be replaced by a general writer than infers the writer from the file
+        # extension.
         # pylint: disable=import-outside-toplevel
         from ..io.fiff import _write_cluster
-
         # pylint: enable=import-outside-toplevel
 
         _write_cluster(
@@ -250,7 +249,6 @@ class AAHCluster(_BaseCluster):
 
     # pylint: enable=too-many-locals
     # --------------------------------------------------------------------
-
     @property
     def normalize_input(self) -> bool:
         """If set, the input data is normalized along the channel dimension.

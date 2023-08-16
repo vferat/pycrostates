@@ -28,14 +28,13 @@ class ModKMeans(_BaseCluster):
     ----------
     %(n_clusters)s
     n_init : int
-        Number of time the k-means algorithm is run with different centroid
-        seeds. The final result will be the run with the highest Global
-        Explained Variance (GEV).
+        Number of time the k-means algorithm is run with different centroid seeds. The
+        final result will be the run with the highest Global Explained Variance (GEV).
     max_iter : int
         Maximum number of iterations of the K-means algorithm for a single run.
     tol : float
-        Relative tolerance with regards estimate residual noise in the cluster
-        centers of two consecutive iterations to declare convergence.
+        Relative tolerance with regards estimate residual noise in the cluster centers
+        of two consecutive iterations to declare convergence.
     %(random_state)s
 
     References
@@ -151,16 +150,15 @@ class ModKMeans(_BaseCluster):
         Parameters
         ----------
         inst : Raw | Epochs | ChData
-            MNE `~mne.io.Raw`, `~mne.Epochs` or `~pycrostates.io.ChData` object
-            from which to extract :term:`cluster centers`.
+            MNE `~mne.io.Raw`, `~mne.Epochs` or `~pycrostates.io.ChData` object from
+            which to extract :term:`cluster centers`.
         picks : str | list | slice | None
-            Channels to include. Note that all channels selected must have the
-            same type. Slices and lists of integers will be interpreted as
-            channel indices. In lists, channel name strings (e.g.
-            ``['Fp1', 'Fp2']``) will pick the given channels. Can also be the
-            string values “all” to pick all channels, or “data” to pick data
-            channels. ``"eeg"`` (default) will pick all eeg channels.
-            Note that channels in ``info['bads']`` will be included if their
+            Channels to include. Note that all channels selected must have the same
+            type. Slices and lists of integers will be interpreted as channel indices.
+            In lists, channel name strings (e.g. ``['Fp1', 'Fp2']``) will pick the given
+            channels. Can also be the string values ``“all”`` to pick all channels, or
+            ``“data”`` to pick data channels. ``"eeg"`` (default) will pick all eeg
+            channels. Note that channels in ``info['bads']`` will be included if their
             names or indices are explicitly provided.
         %(tmin_raw)s
         %(tmax_raw)s
@@ -224,8 +222,8 @@ class ModKMeans(_BaseCluster):
             )
         else:
             logger.error(
-                "All the K-means run failed to converge. Please adapt the "
-                "tolerance and the maximum number of iteration."
+                "All the K-means run failed to converge. Please adapt the tolerance "
+                "and the maximum number of iteration."
             )
             self.fitted = False  # reset variables related to fit
             return  # break early
@@ -427,6 +425,6 @@ class ModKMeans(_BaseCluster):
         _check_type(tol, ("numeric",), item_name="tol")
         if tol <= 0:
             raise ValueError(
-                "The tolerance must be a positive number. Provided: '{tol}'."
+                f"The tolerance must be a positive number. Provided: '{tol}'."
             )
         return tol

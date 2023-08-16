@@ -46,17 +46,14 @@ def plot_cluster_centers(
     %(cluster_names)s
     %(axes_topo)s
     show_gradient : bool
-        If True, plot a line between channel locations
-        with highest and lowest values.
+        If True, plot a line between channel locations with highest and lowest values.
     gradient_kwargs : dict
-        Additional keyword arguments passed to
-        :meth:`matplotlib.axes.Axes.plot` to plot
+        Additional keyword arguments passed to :meth:`matplotlib.axes.Axes.plot` to plot
         gradient line.
     %(block)s
     %(verbose)s
     **kwargs
-        Additional keyword arguments are passed to
-        :func:`mne.viz.plot_topomap`.
+        Additional keyword arguments are passed to :func:`mne.viz.plot_topomap`.
 
     Returns
     -------
@@ -78,8 +75,8 @@ def plot_cluster_centers(
     )
     if gradient_kwargs != _GRADIENT_KWARGS_DEFAULTS and not show_gradient:
         logger.warning(
-            "The argument 'gradient_kwargs' has not effect when "
-            "the argument 'show_gradient' is set to False."
+            "The argument 'gradient_kwargs' has not effect when the argument "
+            "'show_gradient' is set to False."
         )
     _check_type(block, (bool,), "block")
 
@@ -88,8 +85,8 @@ def plot_cluster_centers(
         cluster_names = [str(k) for k in range(1, cluster_centers.shape[0] + 1)]
     if len(cluster_names) != cluster_centers.shape[0]:
         raise ValueError(
-            "Argument 'cluster_centers' and 'cluster_names' should have the "
-            "same number of elements."
+            "Argument 'cluster_centers' and 'cluster_names' should have the same "
+            "number of elements."
         )
 
     # create axes if needed, and retrieve figure

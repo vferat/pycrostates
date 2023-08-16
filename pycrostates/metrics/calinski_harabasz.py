@@ -12,10 +12,9 @@ from ..utils._docs import fill_doc
 def calinski_harabasz_score(cluster):  # higher the better
     r"""Compute the Calinski-Harabasz score.
 
-    This function computes the Calinski-Harabasz
-    score\ :footcite:p:`Calinski-Harabasz` with
-    :func:`sklearn.metrics.calinski_harabasz_score` from a fitted
-    :ref:`Clustering` instance.
+    This function computes the Calinski-Harabasz score\ :footcite:p:`Calinski-Harabasz`
+    with :func:`sklearn.metrics.calinski_harabasz_score` from a fitted :ref:`Clustering`
+    instance.
 
     Parameters
     ----------

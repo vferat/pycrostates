@@ -15,12 +15,11 @@ def _corr_vectors(A, B, axis=0):
     # written by Marijn van Vliet <w.m.vanvliet@gmail.com>
     """Compute pairwise correlation of multiple pairs of vectors.
 
-    Fast way to compute correlation of multiple pairs of vectors without
-    computing all pairs as would with corr(A,B). Borrowed from Oli at
-    StackOverflow. Note the resulting coefficients vary slightly from the ones
-    obtained from corr due to differences in the order of the calculations.
-    (Differences are of a magnitude of 1e-9 to 1e-17 depending on the tested
-    data).
+    Fast way to compute correlation of multiple pairs of vectors without computing all
+    pairs as would with corr(A,B). Borrowed from Oli at StackOverflow. Note the
+    resulting coefficients vary slightly from the ones obtained from corr due to
+    differences in the order of the calculations. (Differences are of a magnitude of
+    1e-9 to 1e-17 depending on the tested data).
 
     Parameters
     ----------

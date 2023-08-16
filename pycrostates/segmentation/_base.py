@@ -24,7 +24,7 @@ class _BaseSegmentation(ABC):
 
     Parameters
     ----------
-    labels : array (n_samples, ) or (n_epochs, n_samples)
+    labels : array of shape (n_samples, ) or (n_epochs, n_samples)
         Microstates labels attributed to each sample, i.e. the segmentation.
     inst : Raw | Epochs
         MNE instance used to predict the segmentation.
@@ -97,34 +97,32 @@ class _BaseSegmentation(ABC):
 
             Available parameters are listed below:
 
-            * ``mean_corr``: Mean correlation value for each time point
-              assigned to a given state.
+            * ``mean_corr``: Mean correlation value for each time point assigned to a
+              given state.
             * ``gev``: Global explained variance expressed by a given state.
-              It is the sum of global explained variance values of each
-              time point assigned to a given state.
+              It is the sum of global explained variance values of each time point
+              assigned to a given state.
             * ``timecov``: Time coverage, the proportion of time during which
               a given state is active. This metric is expressed as a ratio.
             * ``meandurs``: Mean durations of segments assigned to a given
               state. This metric is expressed in seconds (s).
             * ``occurrences``: Occurrences per second, the mean number of
-              segment assigned to a given state per second. This metrics is
-              expressed in segment per second.
+              segment assigned to a given state per second. This metrics is expressed
+              in segment per second.
             * ``dist_corr`` (req. ``return_dist=True``): Distribution of
               correlations values of each time point assigned to a given state.
             * ``dist_gev`` (req. ``return_dist=True``): Distribution of global
-              explained variances values of each time point assigned to a given
-              state.
+              explained variances values of each time point assigned to a given state.
             * ``dist_durs`` (req. ``return_dist=True``): Distribution of
-              durations of each segments assigned to a given state. Each value
-              is expressed in seconds (s).
+              durations of each segments assigned to a given state. Each value is
+              expressed in seconds (s).
 
         Warnings
         --------
-        When working with `~mne.Epochs`, this method will put together
-        segments of all epochs. This could lead to wrong interpretation
-        especially on state durations. To avoid this behaviour,
-        make sure to set the ``reject_edges`` parameter to ``True``
-        when creating the segmentation.
+        When working with `~mne.Epochs`, this method will put together segments of all
+        epochs. This could lead to wrong interpretation especially on state durations.
+        To avoid this behaviour, make sure to set the ``reject_edges`` parameter to
+        ``True`` when creating the segmentation.
         """
         _check_type(norm_gfp, (bool,), "norm_gfp")
         _check_type(return_dist, (bool,), "return_dist")
@@ -133,8 +131,7 @@ class _BaseSegmentation(ABC):
         sfreq = self._inst.info["sfreq"]
 
         # don't copy the data/labels array, get_data, swapaxes, reshape are
-        # returning a new view of the array, which is fine since we do not
-        # modify it.
+        # returning a new view of the array, which is fine since we do not modify it.
         labels = self._labels  # same pointer, no memory overhead.
         if isinstance(self._inst, BaseRaw):
             data = self._inst.get_data()
@@ -208,9 +205,9 @@ class _BaseSegmentation(ABC):
     def compute_transition_matrix(self, stat="probability", ignore_self=True):
         """Compute the observed transition matrix.
 
-        Count the number of transitions from one state to another
-        and aggregate the result as statistic.
-        Transition "from" and "to" unlabeled segments ``-1`` are ignored.
+        Count the number of transitions from one state to another and aggregate the
+        result as statistic. Transition "from" and "to" unlabeled segments ``-1`` are
+        ignored.
 
         Parameters
         ----------
@@ -223,11 +220,10 @@ class _BaseSegmentation(ABC):
 
         Warnings
         --------
-        When working with `~mne.Epochs`, this method will take into account
-        transitions that occur between epochs. This could lead to wrong
-        interpretation when working with discontinuous data.
-        To avoid this behaviour, make sure to set the ``reject_edges``
-        parameter to ``True`` when predicting the segmentation.
+        When working with `~mne.Epochs`, this method will take into account transitions
+        that occur between epochs. This could lead to wrong interpretation when working
+        with discontinuous data. To avoid this behaviour, make sure to set the
+        ``reject_edges`` parameter to ``True`` when predicting the segmentation.
         """
         return _compute_transition_matrix(
             self._labels,
@@ -240,11 +236,11 @@ class _BaseSegmentation(ABC):
     def compute_expected_transition_matrix(self, stat="probability", ignore_self=True):
         """Compute the expected transition matrix.
 
-        Compute the theoretical transition matrix as if time course was
-        ignored, but microstate proportions kept (i.e. shuffled segmentation).
-        This matrix can be used to quantify/correct the effect of microstate
-        time coverage on the observed transition matrix obtained with
-        the method ``compute_expected_transition_matrix``.
+        Compute the theoretical transition matrix as if time course was ignored, but
+        microstate proportions kept (i.e. shuffled segmentation). This matrix can be
+        used to quantify/correct the effect of microstate time coverage on the observed
+        transition matrix obtained with the method
+        ``compute_expected_transition_matrix``.
         Transition "from" and "to" unlabeled segments ``-1`` are ignored.
 
         Parameters

@@ -88,8 +88,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             # check fit
             if self._fitted + other._fitted == 0:  # Both False
                 raise RuntimeError(
-                    "Clustering algorithms must be fitted before using '==' "
-                    "comparison."
+                    "Clustering algorithms must be fitted before using '==' comparison."
                 )
             if self._fitted + other._fitted == 1:  # One False
                 return False
@@ -130,8 +129,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             if self._cluster_names != other._cluster_names:
                 logger.warning(
                     "Cluster names differ between both clustering solution. "
-                    "Consider using '.rename_clusters' to change the cluster "
-                    "names."
+                    "Consider using '.rename_clusters' to change the cluster names."
                 )
 
             return True
@@ -205,13 +203,12 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             MNE `~mne.io.Raw`, `~mne.Epochs` or `~pycrostates.io.ChData` object
             from which to extract :term:`cluster centers`.
         picks : str | list | slice | None
-            Channels to include. Note that all channels selected must have the
-            same type. Slices and lists of integers will be interpreted as
-            channel indices. In lists, channel name strings (e.g.
-            ``['Fp1', 'Fp2']``) will pick the given channels. Can also be the
-            string values “all” to pick all channels, or “data” to pick data
-            channels. ``"eeg"`` (default) will pick all eeg channels.
-            Note that channels in ``info['bads']`` will be included if their
+            Channels to include. Note that all channels selected must have the same
+            type. Slices and lists of integers will be interpreted as channel indices.
+            In lists, channel name strings (e.g. ``['Fp1', 'Fp2']``) will pick the given
+            channels. Can also be the string values ``“all”`` to pick all channels, or
+            ``“data”`` to pick data channels. ``"eeg"`` (default) will pick all eeg
+            channels. Note that channels in ``info['bads']`` will be included if their
             names or indices are explicitly provided.
         %(tmin_raw)s
         %(tmax_raw)s
@@ -235,15 +232,14 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         if len(ch_not_used) != 0:
             if len(ch_not_used) == 1:
                 msg = (
-                    "The channel %s is set as bad and ignored. To include "
-                    "it, either remove it from inst.info['bads'] or "
-                    "provide it explicitly in the 'picks' argument."
+                    "The channel %s is set as bad and ignored. To include it, either "
+                    "remove it from inst.info['bads'] or provide it explicitly in the "
+                    "'picks' argument."
                 )
             else:
                 msg = (
-                    "The channels %s are set as bads and ignored. To "
-                    "include them, either remove them from "
-                    "inst.info['bads'] or provide them "
+                    "The channels %s are set as bads and ignored. To include them, "
+                    "either remove them from inst.info['bads'] or provide them "
                     "explicitly in the 'picks' argument."
                 )
             logger.warning(
@@ -289,11 +285,11 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         Parameters
         ----------
         mapping : dict
-            Mapping from the old names to the new names. The keys are the old
-            names and the values are the new names.
+            Mapping from the old names to the new names. The keys are the old names and
+            the values are the new names.
         new_names : list | tuple
-            1D iterable containing the new cluster names. The length of the
-            iterable should match the number of clusters.
+            1D iterable containing the new cluster names. The length of the iterable
+            should match the number of clusters.
 
         Notes
         -----
@@ -316,8 +312,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             if len(new_names) != self._n_clusters:
                 raise ValueError(
                     "Argument 'new_names' should contain 'n_clusters': "
-                    f"{self._n_clusters} elements. "
-                    f"Provided '{len(new_names)}'."
+                    f"{self._n_clusters} elements. Provided '{len(new_names)}'."
                 )
 
             # sanity-check
@@ -330,8 +325,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
         else:
             logger.warning(
-                "Either 'mapping' or 'new_names' should not be 'None' "
-                "for method 'rename_clusters' to operate."
+                "Either 'mapping' or 'new_names' should not be 'None' for method "
+                "'rename_clusters' to operate."
             )
             return
 
@@ -356,11 +351,10 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
         Specify one of the following arguments to change the current order:
 
-        * ``mapping``: a dictionary that maps old cluster positions
-          to new positions,
+        * ``mapping``: a dictionary that maps old cluster positions to new positions,
         * ``order``: a 1D iterable containing the new order,
-        * ``template``: a fitted clustering algorithm used as a reference
-           to match the order.
+        * ``template``: a fitted clustering algorithm used as a reference to match the
+          order.
 
         Only one argument can be set at a time.
 
@@ -370,14 +364,11 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             Mapping from the old order to the new order.
             key: old position, value: new position.
         order : list of int | tuple of int | array of int
-            1D iterable containing the new order.
-            Positions are 0-indexed.
+            1D iterable containing the new order. Positions are 0-indexed.
         template : :ref:`cluster`
-            Fitted clustering algorithm use as template for
-            ordering optimization. For more details about the
-            current implementation, check the
-            :func:`pycrostates.cluster.utils.optimize_order`
-            documentation.
+            Fitted clustering algorithm use as template for ordering optimization. For
+            more details about the current implementation, check the
+            :func:`pycrostates.cluster.utils.optimize_order` documentation.
 
         Notes
         -----
@@ -408,9 +399,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             for key in mapping:
                 if key in mapping.values():
                     raise ValueError(
-                        "A position can not be present in both the old and "
-                        f"new order. Position '{key}' is mapped to "
-                        f"'{mapping[key]}' and position "
+                        "A position can not be present in both the old and new order. "
+                        f"Position '{key}' is mapped to '{mapping[key]}' and position "
                         f"'{inverse_mapping[key]}' is mapped to '{key}'."
                     )
 
@@ -446,8 +436,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
         else:
             logger.warning(
-                "Either 'mapping', 'order' or 'template' should not be 'None' "
-                "for method 'reorder_clusters' to operate."
+                "Either 'mapping', 'order' or 'template' should not be 'None' for "
+                "method 'reorder_clusters' to operate."
             )
             return
 
@@ -475,16 +465,16 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         invert : bool | list of bool | array of bool
             List of bool of length ``n_clusters``.
             True will invert map polarity, while False will have no effect.
-            If a bool is provided, it is applied to all maps.
+            If a `bool` is provided, it is applied to all maps.
 
         Notes
         -----
         Operates in-place.
 
-        Inverting polarities has no effect on the other steps
-        of the analysis as polarity is ignored in the current methodology.
-        This function is only used for tuning visualization
-        (i.e. for visual inspection and/or to generate figure for an article).
+        Inverting polarities has no effect on the other steps of the analysis as
+        polarity is ignored in the current methodology. This function is only used for
+        tuning visualization (i.e. for visual inspection and/or to generate figure for
+        an article).
         """
         self._check_fit()
 
@@ -507,8 +497,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                 _check_type(inv, (bool, np.bool_), item_name="invert")
         if len(invert) != self._n_clusters:
             raise ValueError(
-                "Argument 'invert' should be either a bool or a list of bools "
-                f"of length 'n_clusters' ({self._n_clusters}). The provided "
+                "Argument 'invert' should be either a bool or a list of bools of "
+                f"length 'n_clusters' ({self._n_clusters}). The provided "
                 f"'invert' length is '{len(invert)}'."
             )
 
@@ -540,17 +530,15 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         ----------
         %(axes_topo)s
         show_gradient : bool
-            If True, plot a line between channel locations
-            with highest and lowest values.
+            If True, plot a line between channel locations with highest and lowest
+            values.
         gradient_kwargs : dict
-            Additional keyword arguments passed to
-            :meth:`matplotlib.axes.Axes.plot` to plot
-            gradient line.
+            Additional keyword arguments passed to :meth:`matplotlib.axes.Axes.plot` to
+            plot gradient line.
         %(block)s
         %(verbose)s
         **kwargs
-            Additional keyword arguments are passed to
-            :func:`mne.viz.plot_topomap`.
+            Additional keyword arguments are passed to :func:`mne.viz.plot_topomap`.
 
         Returns
         -------
@@ -574,8 +562,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @abstractmethod
     def save(self, fname: Union[str, Path]):
-        """
-        Save clustering solution to disk.
+        """Save clustering solution to disk.
 
         Parameters
         ----------
@@ -602,38 +589,35 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     ):
         r"""Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
 
-        Segment instance into microstate sequence using the segmentation
-        smoothing algorithm\ :footcite:p:`Marqui1995`.
+        Segment instance into microstate sequence using the segmentation smoothing
+        algorithm\ :footcite:p:`Marqui1995`.
 
         Parameters
         ----------
         inst : Raw | Epochs
-            MNE `~mne.io.Raw` or `~mne.Epochs` object containing the data to
-            use for prediction.
+            MNE `~mne.io.Raw` or `~mne.Epochs` object containing the data to use for
+            prediction.
         picks : str | list | slice | None
-            Channels to include. Note that all channels selected must have the
-            same type. Slices and lists of integers will be interpreted as
-            channel indices. In lists, channel name strings (e.g.
-            ``['Fp1', 'Fp2']``) will pick the given channels.
-            Can also be the string values “all” to pick all channels, or “data”
-            to pick data channels. ``None`` (default) will pick all channels
-            used during fitting (e.g., ``self.info['ch_names']``).
-            Note that channels in ``info['bads']`` will be included if their
-            names or indices are explicitly provided.
+            Channels to include. Note that all channels selected must have the same
+            type. Slices and lists of integers will be interpreted as channel indices.
+            In lists, channel name strings (e.g. ``['Fp1', 'Fp2']``) will pick the given
+            channels. Can also be the string values ``“all”`` to pick all channels, or
+            ``“data”`` to pick data channels. ``None`` (default) will pick all channels
+            used during fitting (e.g., ``self.info['ch_names']``). Note that channels in
+            ``info['bads']`` will be included if their names or indices are explicitly
+            provided.
         factor : int
-            Factor used for label smoothing. ``0`` means no smoothing.
-            Default to 0.
+            Factor used for label smoothing. ``0`` means no smoothing. Default to 0.
         half_window_size : int
-            Number of samples used for the half window size while smoothing
-            labels. The half window size is defined as
-            ``window_size = 2 * half_window_size + 1``. It has no effect if
-            ``factor=0`` (default). Default to 1.
+            Number of samples used for the half window size while smoothing labels. The
+            half window size is defined as ``window_size = 2 * half_window_size + 1``.
+            It has no effect if ``factor=0`` (default). Default to 1.
         tol : float
             Convergence tolerance.
         min_segment_length : int
-            Minimum segment length (in samples). If a segment is shorter than
-            this value, it will be recursively reasigned to neighbouring
-            segments based on absolute spatial correlation.
+            Minimum segment length (in samples). If a segment is shorter than this
+            value, it will be recursively reasigned to neighbouring segments based on
+            absolute spatial correlation.
         reject_edges : bool
             If ``True``, set first and last segments to unlabeled.
         %(reject_by_annotation_raw)s
@@ -642,10 +626,9 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         Returns
         -------
         segmentation : RawSegmentation | EpochsSegmentation
-            Microstate sequence derivated from instance data. Timepoints are
-            labeled according to cluster centers number: ``0`` for the first
-            center, ``1`` for the second, etc..
-            ``-1`` is used for unlabeled time points.
+            Microstate sequence derivated from instance data. Timepoints are labeled
+            according to cluster centers number: ``0`` for the first center, ``1`` for
+            the second, etc.. ``-1`` is used for unlabeled time points.
 
         References
         ----------
@@ -670,9 +653,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                 reject_by_annotation = True
             else:
                 raise ValueError(
-                    "Argument 'reject_by_annotation' can be set to 'True', "
-                    f"'False' or 'omit' (True). '{reject_by_annotation}' is "
-                    "not supported."
+                    "Argument 'reject_by_annotation' can be set to 'True', 'False' or "
+                    f"'omit' (True). '{reject_by_annotation}' is not supported."
                 )
         elif reject_by_annotation is None:
             reject_by_annotation = False
@@ -681,13 +663,13 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         if self._info["bads"] != []:
             if len(self._info["bads"]) == 1:
                 msg = (
-                    "The current fit contains bad channel %s"
-                    + " which will be used for prediction."
+                    "The current fit contains bad channel %s which will be used for "
+                    "prediction."
                 )
             else:
                 msg = (
-                    "The current fit contains bad channels %s"
-                    + " which will be used for prediction."
+                    "The current fit contains bad channels %s which will be used for "
+                    "prediction."
                 )
             logger.warning(msg, ", ".join(ch_name for ch_name in self._info["bads"]))
             del msg
@@ -718,8 +700,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             else:
                 msg = (
                     f"The channels {missing_non_existing_channel} were used "
-                    "during fitting but are missing from the provided "
-                    "instance."
+                    "during fitting but are missing from the provided instance."
                 )
             raise ValueError(msg)
 
@@ -728,20 +709,18 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             missing_existing_channel = list(missing_existing_channel)
             if len(missing_existing_channel) == 1:
                 msg = (
-                    f"The channel {missing_existing_channel[0]} is required "
-                    "to predict because it was included during fitting. The "
-                    "provided 'picks' argument does not select "
-                    f"{missing_existing_channel[0]}. To include it, either "
-                    "remove it from inst.info['bads'] or provide its name or "
-                    "indice explicitly in the 'picks' argument."
+                    f"The channel {missing_existing_channel[0]} is required to predict "
+                    "because it was included during fitting. The provided 'picks' "
+                    f"argument does not select {missing_existing_channel[0]}. To "
+                    "include it, either remove it from inst.info['bads'] or provide "
+                    "its name or indice explicitly in the 'picks' argument."
                 )
             else:
                 msg = (
-                    f"The channels {missing_existing_channel} are required "
-                    " to predict because they were included during fitting. "
-                    "The provided 'picks' argument does not select "
-                    f"{missing_existing_channel}. To include then, either "
-                    "remove them from inst.info['bads'] or provide their "
+                    f"The channels {missing_existing_channel} are required to predict "
+                    "because they were included during fitting. The provided 'picks' "
+                    f"argument does not select {missing_existing_channel}. To include "
+                    "then, either remove them from inst.info['bads'] or provide their "
                     "names or indices explicitly in the 'picks' argument."
                 )
             raise ValueError(msg)
@@ -751,15 +730,15 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         if len(unused_ch) != 0:
             if len(unused_ch) == 1:
                 msg = (
-                    "The provided instance and the 'picks' argument results "
-                    "in the selection of %s which was not used during "
-                    "fitting. Thus, it will not be used for prediction."
+                    "The provided instance and the 'picks' argument results in the "
+                    "selection of %s which was not used during fitting. Thus, it will "
+                    "not be used for prediction."
                 )
             else:
                 msg = (
-                    "The provided instance and the 'picks' argument results "
-                    "in the selection of %s which were not used during "
-                    "fitting. Thus, they will not be used for prediction."
+                    "The provided instance and the 'picks' argument results in the "
+                    "selection of %s which were not used during fitting. Thus, they "
+                    "will not be used for prediction."
                 )
             logger.warning(msg, ", ".join(ch_name for ch_name in unused_ch))
             del msg
@@ -768,13 +747,13 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         if len(info["bads"]) != 0:
             if len(info["bads"]) == 1:
                 msg = (
-                    "The channel %s is set as bad in the instance but was "
-                    "selected. It will be used for prediction."
+                    "The channel %s is set as bad in the instance but was selected. It "
+                    "will be used for prediction."
                 )
             else:
                 msg = (
-                    "The channels %s are set as bad in the instance but were "
-                    "selected. They will be used for prediction."
+                    "The channels %s are set as bad in the instance but were selected. "
+                    "They will be used for prediction."
                 )
             logger.warning(msg, ", ".join(ch_name for ch_name in info["bads"]))
             del msg
@@ -791,8 +770,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             logger.info("Segmenting data without smoothing.")
         else:
             logger.info(
-                "Segmenting data with factor %s and effective smoothing "
-                "window size: %.4f (s).",
+                "Segmenting data with factor %s and effective smoothing window size: "
+                "%.4f (s).",
                 factor,
                 (2 * half_window_size + 1) / inst.info["sfreq"],
             )
@@ -1029,8 +1008,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     ) -> NDArray[int]:
         """Reject segments that are too short.
 
-        Reject segments that are too short by replacing the labels with the
-        adjacent labels based on data correlation.
+        Reject segments that are too short by replacing the labels with the adjacent
+        labels based on data correlation.
         """
         while True:
             # list all segments
@@ -1143,8 +1122,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         if fitted and not self._fitted:
             logger.warning(
                 "The property 'fitted' can not be set to 'True' directly. "
-                "Please use the .fit() method to fit the clustering "
-                "algorithm."
+                "Please use the .fit() method to fit the clustering algorithm."
             )
         elif fitted and self._fitted:
             logger.warning(
@@ -1164,7 +1142,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
         Returns None if cluster algorithm has not been fitted.
 
-        :type: `~numpy.array` (n_clusters, n_channels) | None
+        :type: `~numpy.array` of shape (n_clusters, n_channels) | None
         """
         if self._cluster_centers_ is None:
             assert not self._fitted  # sanity-check
@@ -1176,7 +1154,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     def fitted_data(self) -> NDArray[float]:
         """Data array used to fit the clustering algorithm.
 
-        :type: `~numpy.array` shape (n_channels, n_samples) | None
+        :type: `~numpy.array` of shape (n_channels, n_samples) | None
         """
         if self._fitted_data is None:
             assert not self._fitted  # sanity-check
@@ -1188,7 +1166,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     def labels_(self) -> NDArray[int]:
         """Microstate label attributed to each sample of the fitted data.
 
-        :type: `~numpy.array` shape (n_samples, ) | None
+        :type: `~numpy.array` of shape (n_samples, ) | None
         """
         if self._labels_ is None:
             assert not self._fitted  # sanity-check
