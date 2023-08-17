@@ -42,17 +42,13 @@ def _check_adjacency(adjacency, info, ch_type):
                 "Adjacency must have exactly 2 dimensions but got "
                 f"{adjacency.ndim} dimensions instead."
             )
-        if (adjacency.shape[0] != n_channels) or (
-            adjacency.shape[1] != n_channels
-        ):
+        if (adjacency.shape[0] != n_channels) or (adjacency.shape[1] != n_channels):
             raise ValueError(
                 "Adjacency must be of shape (n_channels, n_channels) "
                 f"but got {adjacency.shape} instead."
             )
         if not np.array_equal(adjacency, adjacency.astype(bool)):
-            raise ValueError(
-                "Values contained in adjacency can only be 0 or 1."
-            )
+            raise ValueError("Values contained in adjacency can only be 0 or 1.")
     return (adjacency, ch_names)
 
 
@@ -69,50 +65,42 @@ def apply_spatial_filter(
 ):
     r"""Apply a spatial filter.
 
-    Adapted from \ :footcite:t:`michel2019eeg`.
-    Apply an instantaneous filter which interpolates channels
-    with local neighbors while removing outliers.
+    Adapted from \ :footcite:t:`michel2019eeg`. Apply an instantaneous filter which
+    interpolates channels with local neighbors while removing outliers.
     The current implementation proceeds as follows:
 
     * An interpolation matrix is computed using
-      mne.channels.interpolation._make_interpolation_matrix.
-    * An ajdacency matrix is computed using
-      `mne.channels.find_ch_adjacency`.
-    * If ``exclude_bads`` is set to ``True``,
-      bad channels are removed from the ajdacency matrix.
-    * For each timepoint and each channel,
-      a reduced adjacency matrix is built by removing neighbors
-      with lowest and highest value.
-    * For each timepoint and each channel,
-      a reduced interpolation matrix is built by extracting neighbor
-      weights based on the reduced adjacency matrix.
+      ``mne.channels.interpolation._make_interpolation_matrix``.
+    * An ajdacency matrix is computed using `mne.channels.find_ch_adjacency`.
+    * If ``exclude_bads`` is set to ``True``, bad channels are removed from the
+      ajdacency matrix.
+    * For each timepoint and each channel, a reduced adjacency matrix is built by
+      removing neighbors with lowest and highest value.
+    * For each timepoint and each channel, a reduced interpolation matrix is built by
+      extracting neighbor weights based on the reduced adjacency matrix.
     * The reduced interpolation matrices are normalized.
-    * The channel's timepoints are interpolated
-      using their reduced interpolation matrix.
+    * The channel's timepoints are interpolated using their reduced interpolation
+      matrix.
 
     Parameters
     ----------
     inst : Raw | Epochs | ChData
         Instance to filter spatially.
     ch_type : str
-        The channel type on which to apply the spatial filter.
-        Currently only supports ``'eeg'``.
+        The channel type on which to apply the spatial filter. Currently only supports
+        ``'eeg'``.
     exclude_bads : bool
-        If set to ``True``, bad channels will be removed
-        from the adjacency matrix and therefore not used
-        to interpolate neighbors. In addition, bad channels
-        will not be filtered.
-        If set to ``False``, proceed as if all channels were good.
+        If set to ``True``, bad channels will be removed from the adjacency matrix and
+        therefore not used to interpolate neighbors. In addition, bad channels will not
+        be filtered. If set to ``False``, proceed as if all channels were good.
     origin : array of shape (3,) | str
-        Origin of the sphere in the head coordinate frame and in meters.
-        Can be ``'auto'`` (default), which means a head-digitization-based
-        origin fit.
+        Origin of the sphere in the head coordinate frame and in meters. Can be
+        ``'auto'`` (default), which means a head-digitization-based origin fit.
     adjacency : array or csr_matrix of shape (n_channels, n_channels) | str
-        An adjacency matrix. Can be created using
-        `mne.channels.find_ch_adjacency` and edited with
-        `mne.viz.plot_ch_adjacency`.
-        If ``'auto'`` (default), the matrix will be automatically created
-        using `mne.channels.find_ch_adjacency` and other parameters.
+        An adjacency matrix. Can be created using `mne.channels.find_ch_adjacency` and
+        edited with `mne.viz.plot_ch_adjacency`. If ``'auto'`` (default), the matrix
+        will be automatically created using `mne.channels.find_ch_adjacency` and other
+        parameters.
     %(n_jobs)s
     %(verbose)s
 
@@ -137,10 +125,9 @@ def apply_spatial_filter(
     _check_preload(inst, "Apply spatial filter")
     if inst.get_montage() is None:
         raise ValueError(
-            "No montage was set on your data, but spatial filter"
-            "can only work if digitization points for the EEG "
-            "channels are available. Consider calling inst.set_montage() "
-            "to apply a montage."
+            "No montage was set on your data, but spatial filter can only work if "
+            "digitization points for the EEG channels are available. Consider calling "
+            "inst.set_montage() to apply a montage."
         )
     # retrieve picks
     picks = dict(_picks_by_type(inst.info, exclude=[]))[ch_type]
@@ -160,8 +147,8 @@ def apply_spatial_filter(
     distance = np.mean(distance / np.mean(distance))
     if np.abs(1.0 - distance) > 0.1:
         logger.warn(
-            "Your spherical fit is poor, interpolation results are "
-            "likely to be inaccurate."
+            "Your spherical fit is poor, interpolation results are likely to be "
+            "inaccurate."
         )
     pos = pos - origin
     interpolate_matrix = _make_interpolation_matrix(pos, pos)
@@ -207,9 +194,7 @@ def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix):
         print(index)
         return data[index]
     # neighbor_matrix shape (n_neighbor, n_samples)
-    neighbor_matrix = np.array(
-        [neighbor_indices.flatten().tolist()] * data.shape[-1]
-    ).T
+    neighbor_matrix = np.array([neighbor_indices.flatten().tolist()] * data.shape[-1]).T
 
     # Create a mask
     max_mask = neighbors_data == np.amax(neighbors_data, keepdims=True, axis=0)
@@ -217,10 +202,7 @@ def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix):
     keep_mask = ~(max_mask | min_mask)
 
     keep_indices = np.array(
-        [
-            neighbor_matrix[:, i][keep_mask[:, i]]
-            for i in range(keep_mask.shape[-1])
-        ]
+        [neighbor_matrix[:, i][keep_mask[:, i]] for i in range(keep_mask.shape[-1])]
     )
     channel_data = data[index]
     for i, keep_ind in enumerate(keep_indices):

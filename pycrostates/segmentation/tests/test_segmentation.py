@@ -4,6 +4,7 @@ import pytest
 from mne import BaseEpochs, Epochs, make_fixed_length_events
 from mne.datasets import testing
 from mne.io import BaseRaw, read_raw_fif
+from numpy.testing import assert_allclose
 
 from pycrostates.cluster import ModKMeans
 from pycrostates.segmentation import EpochsSegmentation, RawSegmentation
@@ -22,12 +23,8 @@ raw = raw.load_data().filter(1, 40).apply_proj()
 events = make_fixed_length_events(raw, 1)
 epochs = Epochs(raw, events, preload=True)
 
-ModK_raw = ModKMeans(
-    n_clusters=4, n_init=10, max_iter=100, tol=1e-4, random_state=1
-)
-ModK_epochs = ModKMeans(
-    n_clusters=4, n_init=10, max_iter=100, tol=1e-4, random_state=1
-)
+ModK_raw = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4, random_state=1)
+ModK_epochs = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4, random_state=1)
 ModK_raw.fit(raw, n_jobs=1)
 ModK_epochs.fit(epochs, n_jobs=1)
 
@@ -66,9 +63,9 @@ def test_properties(ModK, inst, caplog):
     assert isinstance(predict_parameters, dict)
 
     cluster_centers_ -= 10
-    assert np.allclose(cluster_centers_, segmentation._cluster_centers_ - 10)
+    assert_allclose(cluster_centers_, segmentation._cluster_centers_ - 10)
     labels -= 10
-    assert np.allclose(labels, segmentation._labels - 10)
+    assert_allclose(labels, segmentation._labels - 10)
     predict_parameters["test"] = 10
     assert "test" not in segmentation._predict_parameters
 
@@ -216,9 +213,7 @@ def test_plot_segmentation(ModK, inst):
 def test_invalid_segmentation(Segmentation, inst, bad_inst, caplog):
     """Test that we can not create an invalid segmentation."""
     labels = np.zeros((inst.times.size))
-    cluster_centers = np.zeros(
-        (4, len(inst.ch_names) - len(inst.info["bads"]))
-    )
+    cluster_centers = np.zeros((4, len(inst.ch_names) - len(inst.info["bads"])))
     cluster_names = ["a", "b", "c", "d"]
 
     # types
@@ -236,25 +231,17 @@ def test_invalid_segmentation(Segmentation, inst, bad_inst, caplog):
         Segmentation(labels, inst, cluster_centers, cluster_names, [])
 
     # values
-    with pytest.raises(
-        ValueError, match="number of cluster centers and cluster names"
-    ):
+    with pytest.raises(ValueError, match="number of cluster centers and cluster names"):
         Segmentation(labels, inst, cluster_centers, cluster_names[:2], None)
     with pytest.raises(ValueError, match="should be a 2D array"):
-        Segmentation(
-            labels, inst, cluster_centers.flatten(), cluster_names, None
-        )
+        Segmentation(labels, inst, cluster_centers.flatten(), cluster_names, None)
 
     # raw/epochs specific
     with pytest.raises(ValueError, match="and labels do not have"):
         if isinstance(inst, BaseRaw):
-            Segmentation(
-                labels[:10], inst, cluster_centers, cluster_names, None
-            )
+            Segmentation(labels[:10], inst, cluster_centers, cluster_names, None)
         if isinstance(inst, BaseEpochs):
-            Segmentation(
-                np.zeros((2, 10)), inst, cluster_centers, cluster_names, None
-            )
+            Segmentation(np.zeros((2, 10)), inst, cluster_centers, cluster_names, None)
 
     with pytest.raises(ValueError, match="'labels' should be"):
         if isinstance(inst, BaseRaw):
@@ -271,9 +258,7 @@ def test_invalid_segmentation(Segmentation, inst, bad_inst, caplog):
     # unsupported predict_parameters
     caplog.clear()
     if isinstance(inst, BaseRaw):
-        Segmentation(
-            labels, inst, cluster_centers, cluster_names, dict(test=101)
-        )
+        Segmentation(labels, inst, cluster_centers, cluster_names, dict(test=101))
     if isinstance(inst, BaseEpochs):
         Segmentation(
             np.zeros((len(inst), inst.times.size)),
@@ -297,22 +282,18 @@ def test_compute_transition_matrix_Epochs():
     segmentation.compute_transition_matrix(ignore_self=False)
 
 
-@pytest.mark.parametrize(
-    "ModK, inst", [(ModK_raw, raw), (ModK_epochs, epochs)]
-)
+@pytest.mark.parametrize("ModK, inst", [(ModK_raw, raw), (ModK_epochs, epochs)])
 def test_compute_transition_matrix_stat(ModK, inst):
     segmentation = ModK.predict(inst)
-    with pytest.raises(
-        ValueError, match="Invalid value for the 'stat' parameter"
-    ):
+    with pytest.raises(ValueError, match="Invalid value for the 'stat' parameter"):
         segmentation.compute_transition_matrix(stat="wrong")
     T = segmentation.compute_transition_matrix(stat="count")
     T = segmentation.compute_transition_matrix(stat="probability")
-    assert np.allclose(np.sum(T, axis=1), 1)
+    assert_allclose(np.sum(T, axis=1), 1)
     T = segmentation.compute_transition_matrix(stat="proportion")
-    assert np.allclose(np.sum(T, axis=1), 1)
+    assert_allclose(np.sum(T, axis=1), 1)
     T = segmentation.compute_transition_matrix(stat="percent")
-    assert np.allclose(np.sum(T, axis=1), 100)
+    assert_allclose(np.sum(T, axis=1), 100)
 
 
 def test_compute_expected_transition_matrix_Raw():
@@ -327,22 +308,16 @@ def test_compute_expected_transition_matrix_Epochs():
     segmentation.compute_expected_transition_matrix(ignore_self=False)
 
 
-@pytest.mark.parametrize(
-    "ModK, inst", [(ModK_raw, raw), (ModK_epochs, epochs)]
-)
+@pytest.mark.parametrize("ModK, inst", [(ModK_raw, raw), (ModK_epochs, epochs)])
 def test_compute_expected_transition_matrix_stat(ModK, inst):
     segmentation = ModK.predict(inst)
-    with pytest.raises(
-        ValueError, match="Invalid value for the 'stat' parameter"
-    ):
+    with pytest.raises(ValueError, match="Invalid value for the 'stat' parameter"):
         segmentation.compute_expected_transition_matrix(stat="wrong")
-    with pytest.raises(
-        ValueError, match="Invalid value for the 'stat' parameter"
-    ):
+    with pytest.raises(ValueError, match="Invalid value for the 'stat' parameter"):
         segmentation.compute_expected_transition_matrix(stat="count")
     T = segmentation.compute_expected_transition_matrix(stat="probability")
-    assert np.allclose(np.sum(T, axis=1), 1)
+    assert_allclose(np.sum(T, axis=1), 1)
     T = segmentation.compute_expected_transition_matrix(stat="proportion")
-    assert np.allclose(np.sum(T, axis=1), 1)
+    assert_allclose(np.sum(T, axis=1), 1)
     T = segmentation.compute_expected_transition_matrix(stat="percent")
-    assert np.allclose(np.sum(T, axis=1), 100)
+    assert_allclose(np.sum(T, axis=1), 100)

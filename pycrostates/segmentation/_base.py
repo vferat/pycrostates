@@ -15,10 +15,7 @@ from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
-from .transitions import (
-    _compute_expected_transition_matrix,
-    _compute_transition_matrix,
-)
+from .transitions import _compute_expected_transition_matrix, _compute_transition_matrix
 
 
 @fill_doc
@@ -27,7 +24,7 @@ class _BaseSegmentation(ABC):
 
     Parameters
     ----------
-    labels : array (n_samples, ) or (n_epochs, n_samples)
+    labels : array of shape (n_samples, ) or (n_epochs, n_samples)
         Microstates labels attributed to each sample, i.e. the segmentation.
     inst : Raw | Epochs
         MNE instance used to predict the segmentation.
@@ -72,13 +69,9 @@ class _BaseSegmentation(ABC):
         return s
 
     def _repr_html_(self, caption=None):
-        from ..html_templates import (  # pylint: disable=C0415
-            repr_templates_env,
-        )
+        from ..html_templates import repr_templates_env  # pylint: disable=C0415
 
-        template = repr_templates_env.get_template(
-            "BaseSegmentation.html.jinja"
-        )
+        template = repr_templates_env.get_template("BaseSegmentation.html.jinja")
         return template.render(
             name=self.__class__.__name__,
             n_clusters=len(self._cluster_centers_),
@@ -86,9 +79,7 @@ class _BaseSegmentation(ABC):
             inst_repr=self._inst._repr_html_(),
         )
 
-    def compute_parameters(
-        self, norm_gfp: bool = True, return_dist: bool = False
-    ):
+    def compute_parameters(self, norm_gfp: bool = True, return_dist: bool = False):
         """Compute microstate parameters.
 
         Parameters
@@ -106,34 +97,32 @@ class _BaseSegmentation(ABC):
 
             Available parameters are listed below:
 
-            * ``mean_corr``: Mean correlation value for each time point
-              assigned to a given state.
+            * ``mean_corr``: Mean correlation value for each time point assigned to a
+              given state.
             * ``gev``: Global explained variance expressed by a given state.
-              It is the sum of global explained variance values of each
-              time point assigned to a given state.
+              It is the sum of global explained variance values of each time point
+              assigned to a given state.
             * ``timecov``: Time coverage, the proportion of time during which
               a given state is active. This metric is expressed as a ratio.
             * ``meandurs``: Mean durations of segments assigned to a given
               state. This metric is expressed in seconds (s).
             * ``occurrences``: Occurrences per second, the mean number of
-              segment assigned to a given state per second. This metrics is
-              expressed in segment per second.
+              segment assigned to a given state per second. This metrics is expressed
+              in segment per second.
             * ``dist_corr`` (req. ``return_dist=True``): Distribution of
               correlations values of each time point assigned to a given state.
             * ``dist_gev`` (req. ``return_dist=True``): Distribution of global
-              explained variances values of each time point assigned to a given
-              state.
+              explained variances values of each time point assigned to a given state.
             * ``dist_durs`` (req. ``return_dist=True``): Distribution of
-              durations of each segments assigned to a given state. Each value
-              is expressed in seconds (s).
+              durations of each segments assigned to a given state. Each value is
+              expressed in seconds (s).
 
         Warnings
         --------
-        When working with `~mne.Epochs`, this method will put together
-        segments of all epochs. This could lead to wrong interpretation
-        especially on state durations. To avoid this behaviour,
-        make sure to set the ``reject_edges`` parameter to ``True``
-        when creating the segmentation.
+        When working with `~mne.Epochs`, this method will put together segments of all
+        epochs. This could lead to wrong interpretation especially on state durations.
+        To avoid this behaviour, make sure to set the ``reject_edges`` parameter to
+        ``True`` when creating the segmentation.
         """
         _check_type(norm_gfp, (bool,), "norm_gfp")
         _check_type(return_dist, (bool,), "return_dist")
@@ -142,8 +131,7 @@ class _BaseSegmentation(ABC):
         sfreq = self._inst.info["sfreq"]
 
         # don't copy the data/labels array, get_data, swapaxes, reshape are
-        # returning a new view of the array, which is fine since we do not
-        # modify it.
+        # returning a new view of the array, which is fine since we do not modify it.
         labels = self._labels  # same pointer, no memory overhead.
         if isinstance(self._inst, BaseRaw):
             data = self._inst.get_data()
@@ -184,12 +172,8 @@ class _BaseSegmentation(ABC):
                 dist_gev = (labeled_gfp * dist_corr) ** 2 / np.sum(gfp**2)
                 params[f"{state_name}_gev"] = np.sum(dist_gev)
 
-                s_segments = np.array(
-                    [len(group) for s_, group in segments if s_ == s]
-                )
-                occurrences = (
-                    len(s_segments) / len(np.where(labels != -1)[0]) * sfreq
-                )
+                s_segments = np.array([len(group) for s_, group in segments if s_ == s])
+                occurrences = len(s_segments) / len(np.where(labels != -1)[0]) * sfreq
                 params[f"{state_name}_occurrences"] = occurrences
 
                 timecov = np.sum(s_segments) / len(np.where(labels != -1)[0])
@@ -211,15 +195,9 @@ class _BaseSegmentation(ABC):
                 params[f"{state_name}_occurrences"] = 0.0
 
                 if return_dist:
-                    params[f"{state_name}_dist_corr"] = np.array(
-                        [], dtype=float
-                    )
-                    params[f"{state_name}_dist_gev"] = np.array(
-                        [], dtype=float
-                    )
-                    params[f"{state_name}_dist_durs"] = np.array(
-                        [], dtype=float
-                    )
+                    params[f"{state_name}_dist_corr"] = np.array([], dtype=float)
+                    params[f"{state_name}_dist_gev"] = np.array([], dtype=float)
+                    params[f"{state_name}_dist_durs"] = np.array([], dtype=float)
 
         params["unlabeled"] = len(np.argwhere(labels == -1)) / len(gfp)
         return params
@@ -227,9 +205,9 @@ class _BaseSegmentation(ABC):
     def compute_transition_matrix(self, stat="probability", ignore_self=True):
         """Compute the observed transition matrix.
 
-        Count the number of transitions from one state to another
-        and aggregate the result as statistic.
-        Transition "from" and "to" unlabeled segments ``-1`` are ignored.
+        Count the number of transitions from one state to another and aggregate the
+        result as statistic. Transition "from" and "to" unlabeled segments ``-1`` are
+        ignored.
 
         Parameters
         ----------
@@ -242,11 +220,10 @@ class _BaseSegmentation(ABC):
 
         Warnings
         --------
-        When working with `~mne.Epochs`, this method will take into account
-        transitions that occur between epochs. This could lead to wrong
-        interpretation when working with discontinuous data.
-        To avoid this behaviour, make sure to set the ``reject_edges``
-        parameter to ``True`` when predicting the segmentation.
+        When working with `~mne.Epochs`, this method will take into account transitions
+        that occur between epochs. This could lead to wrong interpretation when working
+        with discontinuous data. To avoid this behaviour, make sure to set the
+        ``reject_edges`` parameter to ``True`` when predicting the segmentation.
         """
         return _compute_transition_matrix(
             self._labels,
@@ -256,16 +233,14 @@ class _BaseSegmentation(ABC):
         )
 
     @fill_doc
-    def compute_expected_transition_matrix(
-        self, stat="probability", ignore_self=True
-    ):
+    def compute_expected_transition_matrix(self, stat="probability", ignore_self=True):
         """Compute the expected transition matrix.
 
-        Compute the theoretical transition matrix as if time course was
-        ignored, but microstate proportions kept (i.e. shuffled segmentation).
-        This matrix can be used to quantify/correct the effect of microstate
-        time coverage on the observed transition matrix obtained with
-        the method ``compute_expected_transition_matrix``.
+        Compute the theoretical transition matrix as if time course was ignored, but
+        microstate proportions kept (i.e. shuffled segmentation). This matrix can be
+        used to quantify/correct the effect of microstate time coverage on the observed
+        transition matrix obtained with the method
+        ``compute_expected_transition_matrix``.
         Transition "from" and "to" unlabeled segments ``-1`` are ignored.
 
         Parameters

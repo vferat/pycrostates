@@ -3,6 +3,7 @@
 import numpy as np
 from mne.datasets import testing
 from mne.io import read_raw_fif
+from numpy.testing import assert_allclose
 
 from pycrostates.cluster import ModKMeans
 from pycrostates.cluster.utils.utils import _optimize_order, optimize_order
@@ -46,20 +47,18 @@ def test__optimize_order():
     current = random_template
     ignore_polarity = False
     order = _optimize_order(current, template, ignore_polarity=ignore_polarity)
-    assert np.allclose(current[order], template)
+    assert_allclose(current[order], template)
 
     # Shuffle + ignore_polarity
     current = random_template
     ignore_polarity = True
     order = _optimize_order(current, template, ignore_polarity=ignore_polarity)
-    assert np.allclose(current[order], template)
+    assert_allclose(current[order], template)
 
     # Shuffle + sign + ignore_polarity
     current = random_pol_template
     ignore_polarity = True
-    order_ = _optimize_order(
-        current, template, ignore_polarity=ignore_polarity
-    )
+    order_ = _optimize_order(current, template, ignore_polarity=ignore_polarity)
     assert np.all(order == order_)
 
     # Shuffle + sign

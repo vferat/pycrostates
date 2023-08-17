@@ -32,9 +32,8 @@ class RawSegmentation(_BaseSegmentation):
         _check_type(self._inst, (BaseRaw,), item_name="raw")
         if self._labels.ndim != 1:
             raise ValueError(
-                "Argument 'labels' should be a 1D array. The provided array "
-                f"shape is {self._labels.shape} which has {self._labels.ndim} "
-                "dimensions."
+                "Argument 'labels' should be a 1D array. The provided array shape "
+                f"is {self._labels.shape} which has {self._labels.ndim} dimensions."
             )
 
         if self._inst.times.size != self._labels.shape[-1]:
@@ -115,9 +114,8 @@ class EpochsSegmentation(_BaseSegmentation):
 
         if self._labels.ndim != 2:
             raise ValueError(
-                "Argument 'labels' should be a 2D array. The provided array "
-                f"shape is {self._labels.shape} which has {self._labels.ndim} "
-                "dimensions."
+                "Argument 'labels' should be a 2D array. The provided array shape "
+                f"is {self._labels.shape} which has {self._labels.ndim} dimensions."
             )
         if len(self._inst) != self._labels.shape[0]:
             raise ValueError(
@@ -129,8 +127,7 @@ class EpochsSegmentation(_BaseSegmentation):
             raise ValueError(
                 "Provided MNE epochs and labels do not have the same number "
                 f"of samples. The 'epochs' have {self._inst.times.size} "
-                f"samples, while the 'labels' has {self._labels.shape[-1]} "
-                "samples."
+                f"samples, while the 'labels' has {self._labels.shape[-1]} samples."
             )
 
     @fill_doc

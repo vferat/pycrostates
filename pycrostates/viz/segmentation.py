@@ -78,8 +78,7 @@ def plot_raw_segmentation(
     # make sure shapes are correct
     if data.shape[1] != labels.size:
         raise ValueError(
-            "Argument 'labels' and 'raw' do not have the same number of "
-            "samples."
+            "Argument 'labels' and 'raw' do not have the same number of samples."
         )
 
     fig, axes, show = _plot_segmentation(
@@ -155,8 +154,7 @@ def plot_epoch_segmentation(
     # make sure shapes are correct
     if data.shape[1] != labels.size:
         raise ValueError(
-            "Argument 'labels' and 'epochs' do not have the same number of "
-            "samples."
+            "Argument 'labels' and 'epochs' do not have the same number of samples."
         )
 
     fig, axes, show = _plot_segmentation(
@@ -216,8 +214,8 @@ def _plot_segmentation(
     _check_type(n_clusters, ("int",), "n_clusters")
     if n_clusters <= 0:
         raise ValueError(
-            f"Provided number of clusters {n_clusters} is invalid. The number "
-            "of clusters must be strictly positive."
+            f"Provided number of clusters {n_clusters} is invalid. The number of "
+            "clusters must be strictly positive."
         )
     _check_type(cluster_names, (None, list, tuple), "cluster_names")
     _check_type(cmap, (None, str, colors.Colormap), "cmap")
@@ -272,10 +270,8 @@ def _plot_segmentation(
                 times, gfp, color=color, where=x, step=None, interpolate=False
             )
     logger.info(
-        "For visualization purposes, "
-        "the last segment appears truncated by 1 sample. "
-        "In the case where the last segment is 1 sample long, "
-        "it does not appear."
+        "For visualization purposes, the last segment appears truncated by 1 sample. "
+        "In the case where the last segment is 1 sample long, it does not appear."
     )
 
     # commonm formatting

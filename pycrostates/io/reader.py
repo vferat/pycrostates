@@ -33,9 +33,7 @@ def read_cluster(fname: Union[str, Path]):
     ext = "".join(fname.suffixes)
     if ext in readers:
         cluster, version = readers[ext](fname)
-        logger.info(
-            "Cluster solution loaded was saved with pycrostates '%s'.", version
-        )
+        logger.info("Cluster solution loaded was saved with pycrostates '%s'.", version)
         return cluster
     else:
         raise ValueError("File format is not supported.")
