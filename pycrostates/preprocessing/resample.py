@@ -48,14 +48,13 @@ def resample(
     %(tmax_raw)s
     %(reject_by_annotation_raw)s
     n_resamples : int
-        Number of resamples to draw. Each epoch can be used to fit a separate
-        clustering solution. See notes for additional information.
+        Number of resamples to draw. Each epoch can be used to fit a separate clustering
+        solution. See notes for additional information.
     n_samples : int
-        Length of each epoch (in samples). See notes for additional
-        information.
+        Length of each epoch (in samples). See notes for additional information.
     coverage : float
-        Strictly positive ratio between resampling data size and size of the
-        original recording. See notes for additional information.
+        Strictly positive ratio between resampling data size and size of the original
+        recording. See notes for additional information.
     replace : bool
         Whether or not to allow resampling with replacement.
     %(random_state)s
@@ -68,9 +67,8 @@ def resample(
 
     Notes
     -----
-    Only two of ``n_resamples``, ``n_samples`` and ``coverage``
-    parameters must be defined, the non-defined one will be
-    determine at runtime by the 2 other parameters.
+    Only two of ``n_resamples``, ``n_samples`` and ``coverage`` parameters must be
+    defined, the non-defined one will be determine at runtime by the 2 other parameters.
     """
     from ..io import ChData
 
@@ -78,9 +76,7 @@ def resample(
     if isinstance(inst, (BaseRaw, BaseEpochs)):
         tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)
     if isinstance(inst, BaseRaw):
-        reject_by_annotation = _check_reject_by_annotation(
-            reject_by_annotation
-        )
+        reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
     _check_type(n_resamples, (None, "int"), "n_resamples")
     _check_type(n_samples, (None, "int"), "n_samples")
     _check_type(coverage, (None, "numeric"), "coverage")

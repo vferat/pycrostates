@@ -38,17 +38,11 @@ def test_contains_mixin():
 
     # test with info equal to None
     foo = Foo(None)
-    with pytest.raises(
-        ValueError, match="Instance 'Foo' attribute 'info' is None."
-    ):
+    with pytest.raises(ValueError, match="Instance 'Foo' attribute 'info' is None."):
         "eeg" in foo
-    with pytest.raises(
-        ValueError, match="Instance 'Foo' attribute 'info' is None."
-    ):
+    with pytest.raises(ValueError, match="Instance 'Foo' attribute 'info' is None."):
         foo.get_channel_types()
-    with pytest.raises(
-        ValueError, match="Instance 'Foo' attribute 'info' is None."
-    ):
+    with pytest.raises(ValueError, match="Instance 'Foo' attribute 'info' is None."):
         foo.compensation_grade
 
     # test without attribute info
@@ -82,13 +76,9 @@ def test_montage_mixin():
 
     # test with info equal to None
     foo = Foo(None)
-    with pytest.raises(
-        ValueError, match="Instance 'Foo' attribute 'info' is None."
-    ):
+    with pytest.raises(ValueError, match="Instance 'Foo' attribute 'info' is None."):
         foo.set_montage("standard_1020")
-    with pytest.raises(
-        ValueError, match="Instance 'Foo' attribute 'info' is None."
-    ):
+    with pytest.raises(ValueError, match="Instance 'Foo' attribute 'info' is None."):
         foo.get_montage()
 
     # test without attribute info

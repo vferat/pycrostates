@@ -33,32 +33,29 @@ def extract_gfp_peaks(
 ) -> CHData:
     """:term:`Global Field Power` (:term:`GFP`) peaks extraction.
 
-    Extract :term:`Global Field Power` (:term:`GFP`) peaks from
-    :class:`~mne.Epochs` or :class:`~mne.io.Raw`.
+    Extract :term:`Global Field Power` (:term:`GFP`) peaks from :class:`~mne.Epochs` or
+    :class:`~mne.io.Raw`.
 
     Parameters
     ----------
     inst : Raw | Epochs
         Instance from which to extract :term:`global field power` (GFP) peaks.
     picks : str | list | slice | None
-        Channels to use for GFP computation.
-        Note that all channels selected must have the
-        same type. Slices and lists of integers will be interpreted as
-        channel indices. In lists, channel name strings (e.g.
-        ``['Fp1', 'Fp2']``) will pick the given channels. Can also be the
-        string values “all” to pick all channels, or “data” to pick data
-        channels. ``"eeg"`` (default) will pick all eeg channels.
-        Note that channels in ``info['bads']`` will be included if their
+        Channels to use for GFP computation. Note that all channels selected must have
+        the same type. Slices and lists of integers will be interpreted as channel
+        indices. In lists, channel name strings (e.g. ``['Fp1', 'Fp2']``) will pick the
+        given channels. Can also be the string values ``“all”`` to pick all channels, or
+        ``“data”`` to pick data channels. ``"eeg"`` (default) will pick all eeg
+        channels. Note that channels in ``info['bads']`` will be included if their
         names or indices are explicitly provided.
     return_all : bool
-        If True, the returned `~pycrostates.io.ChData` instance will
-        include all channels.
-        If False (default), the returned `~pycrostates.io.ChData` instance will
-        only include channels used for GFP computation (i.e ``picks``).
+        If True, the returned `~pycrostates.io.ChData` instance will include all
+        channels. If False (default), the returned `~pycrostates.io.ChData` instance
+        will only include channels used for GFP computation (i.e ``picks``).
     min_peak_distance : int
-        Required minimal horizontal distance (``≥ 1`) in samples between
-        neighboring peaks. Smaller peaks are removed first until the condition
-        is fulfilled for all remaining peaks. Default to ``1``.
+        Required minimal horizontal distance (``≥ 1`) in samples between neighboring
+        peaks. Smaller peaks are removed first until the condition is fulfilled for all
+        remaining peaks. Default to ``1``.
     %(tmin_raw)s
     %(tmax_raw)s
     %(reject_by_annotation_raw)s
@@ -72,9 +69,9 @@ def extract_gfp_peaks(
     Notes
     -----
     The :term:`Global Field Power` (:term:`GFP`) peaks are extracted with
-    :func:`scipy.signal.find_peaks`. Only the ``distance`` argument is
-    filled with the value provided in ``min_peak_distance``. The other
-    arguments are set to their default values.
+    :func:`scipy.signal.find_peaks`. Only the ``distance`` argument is filled with the
+    value provided in ``min_peak_distance``. The other arguments are set to their
+    default values.
     """
     from ..io import ChData
 
@@ -87,15 +84,11 @@ def extract_gfp_peaks(
         )
     tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)
     if isinstance(inst, BaseRaw):
-        reject_by_annotation = _check_reject_by_annotation(
-            reject_by_annotation
-        )
+        reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
 
     # retrieve picks
     picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
-    picks_all = _picks_to_idx(
-        inst.info, inst.ch_names, none="all", exclude="bads"
-    )
+    picks_all = _picks_to_idx(inst.info, inst.ch_names, none="all", exclude="bads")
     _check_picks_uniqueness(inst.info, picks)
 
     # set kwargs for .get_data()
@@ -130,8 +123,7 @@ def extract_gfp_peaks(
     if isinstance(inst, BaseEpochs):
         n_samples *= len(inst)
     logger.info(
-        "%s GFP peaks extracted out of %s samples (%.2f%% of the original "
-        "data).",
+        "%s GFP peaks extracted out of %s samples (%.2f%% of the original data).",
         peaks.shape[1],
         n_samples,
         peaks.shape[1] / n_samples * 100,
@@ -151,13 +143,13 @@ def _extract_gfp_peaks(
     data : array of shape (n_channels, n_samples)
         The data to extract GFP peaks from.
     min_peak_distance : int
-        Required minimal horizontal distance (>= 1) in samples between
-        neighboring peaks. Smaller peaks are removed first until the condition
-        is fulfilled for all remaining peaks. Default to 2.
+        Required minimal horizontal distance (>= 1) in samples between neighboring
+        peaks. Smaller peaks are removed first until the condition is fulfilled for all
+        remaining peaks. Default to 2.
 
     Returns
     -------
-    peaks : array of shape (n_picks)
+    peaks : array of shape (n_picks,)
         The indices when peaks occur.
     """
     gfp = np.std(data, axis=0)

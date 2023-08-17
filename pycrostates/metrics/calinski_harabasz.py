@@ -1,9 +1,7 @@
 """Calinski Harabasz score."""
 
 import numpy as np
-from sklearn.metrics import (
-    calinski_harabasz_score as sk_calinski_harabasz_score,
-)
+from sklearn.metrics import calinski_harabasz_score as sk_calinski_harabasz_score
 
 from ..cluster._base import _BaseCluster
 from ..utils._checks import _check_type
@@ -14,10 +12,9 @@ from ..utils._docs import fill_doc
 def calinski_harabasz_score(cluster):  # higher the better
     r"""Compute the Calinski-Harabasz score.
 
-    This function computes the Calinski-Harabasz
-    score\ :footcite:p:`Calinski-Harabasz` with
-    :func:`sklearn.metrics.calinski_harabasz_score` from a fitted
-    :ref:`Clustering` instance.
+    This function computes the Calinski-Harabasz score\ :footcite:p:`Calinski-Harabasz`
+    with :func:`sklearn.metrics.calinski_harabasz_score` from a fitted :ref:`Clustering`
+    instance.
 
     Parameters
     ----------

@@ -43,9 +43,7 @@ def _ensure_int(item, item_name=None):
         item = int(operator.index(item))
     except TypeError:
         item_name = "Item" if item_name is None else "'%s'" % item_name
-        raise TypeError(
-            "%s must be an int, got %s instead." % (item_name, type(item))
-        )
+        raise TypeError("%s must be an int, got %s instead." % (item_name, type(item)))
 
     return item
 
@@ -146,8 +144,7 @@ def _check_value(item, allowed_values, item_name=None, extra=None):
     item_name : str | None
         Name of the item to show inside the error message.
     extra : str | None
-        Extra string to append to the invalid value sentence, e.g.
-        "when using ico mode".
+        Extra string to append to the invalid value sentence, e.g. "with ico mode".
 
     Raises
     ------
@@ -174,20 +171,17 @@ def _check_value(item, allowed_values, item_name=None, extra=None):
             options += ", ".join([f"{repr(v)}" for v in allowed_values[:-1]])
             options += f", and {repr(allowed_values[-1])}"
         raise ValueError(
-            msg.format(
-                item_name=item_name, extra=extra, options=options, item=item
-            )
+            msg.format(item_name=item_name, extra=extra, options=options, item=item)
         )
 
     return item
 
 
 def _check_n_jobs(n_jobs):
-    """
-    Check n_jobs parameter.
+    """Check n_jobs parameter.
 
-    Check that n_jobs is a positive integer or a negative integer for all
-    cores. CUDA is not supported.
+    Check that n_jobs is a positive integer or a negative integer for all cores. CUDA is
+    not supported.
     """
     _check_type(n_jobs, ("int",), "n_jobs")
     if n_jobs <= 0:
@@ -262,9 +256,7 @@ def _check_tmin_tmax(inst, tmin, tmax):
         if arg is None:
             continue
         if arg < 0:
-            raise ValueError(
-                f"Argument '{name}' must be positive. " f"Provided '{arg}'."
-            )
+            raise ValueError(f"Argument '{name}' must be positive. Provided '{arg}'.")
     # check tmax is shorter than instance
     if tmax is not None and inst.times[-1] < tmax:
         raise ValueError(
@@ -298,8 +290,7 @@ def _check_picks_uniqueness(info, picks):
             "%s '%s' channel(s)" % t for t in zip(counts, ch_types)
         )
         raise ValueError(
-            "Only one datatype can be selected, but 'picks' "
-            f"results in {channels_msg}."
+            f"Only one datatype can be selected, but 'picks' results in {channels_msg}."
         )
 
 

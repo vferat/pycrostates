@@ -42,7 +42,7 @@ classifiers = [
 dependencies = [
     'numpy>=1.21',
     'scipy',
-    'mne>=1.0.0',
+    'mne>=1.1.0',
     'joblib',
     'matplotlib',
     'scikit-learn',
@@ -73,8 +73,8 @@ style = [
     'black',
     'codespell',
     'isort',
-    'flake8',
     'pydocstyle[toml]',
+    'ruff',
 ]
 test = [
     'pymatreader',
@@ -107,8 +107,8 @@ exclude = ['pycrostates*tests']
 "pycrostates.html_templates" = ["repr/*.jinja"]
 
 [tool.black]
-line-length = 79
-target-version = ['py37']
+line-length = 88
+target-version = ['py39']
 include = '\.pyi?$'
 extend-exclude = '''
 (
@@ -124,8 +124,8 @@ extend-exclude = '''
 [tool.isort]
 profile = 'black'
 multi_line_output = 3
-line_length = 79
-py_version = 37
+line_length = 88
+py_version = 39
 extend_skip_glob = [
     'setup.py',
     'docs/*',
@@ -135,10 +135,20 @@ extend_skip_glob = [
 
 [tool.pydocstyle]
 convention = 'numpy'
-ignore-decorators= '(copy_doc|property|.*setter|.*getter)'
+ignore-decorators= '(copy_doc|property|.*setter|.*getter|pyqtSlot|Slot)'
 match = '^(?!setup|__init__|test_).*\.py'
-match-dir = '^(?!docs|tutorials|build|dist|\.).*'
+match-dir = '^pycrostates.*'
 add_ignore = 'D100,D104,D107'
+
+[tool.ruff]
+line-length = 88
+extend-exclude = [
+    "doc",
+    "setup.py",
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
 
 [tool.pytest.ini_options]
 minversion = '6.0'
@@ -161,5 +171,6 @@ omit = [
 exclude_lines = [
     'pragma: no cover',
     'if __name__ == .__main__.:',
+    'if TYPE_CHECKING:',
 ]
 precision = 2

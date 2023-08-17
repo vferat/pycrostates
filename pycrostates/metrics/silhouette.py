@@ -13,10 +13,8 @@ from ..utils._docs import fill_doc
 def silhouette_score(cluster):  # higher the better
     r"""Compute the mean Silhouette Coefficient.
 
-    This function computes the Silhouette
-    Coefficient\ :footcite:p:`Silhouettes` with
-    :func:`sklearn.metrics.silhouette_score` from a fitted
-    :ref:`Clustering` instance.
+    This function computes the Silhouette Coefficient\ :footcite:p:`Silhouettes` with
+    :func:`sklearn.metrics.silhouette_score` from a fitted :ref:`Clustering` instance.
 
     Parameters
     ----------

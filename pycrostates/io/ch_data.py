@@ -16,8 +16,8 @@ from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
     """ChData stores atemporal data with its spatial information.
 
-    ChData is similar to a raw instance where temporality has been removed.
-    Only the spatial information, stored as a `~pycrostates.io.ChInfo` is
+    `~pycrostates.io.ChData` is similar to a raw instance where temporality has been
+    removed. Only the spatial information, stored as a `~pycrostates.io.ChInfo` is
     retained.
 
     Parameters
@@ -25,8 +25,8 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
     data : array
         Data array of shape ``(n_channels, n_samples)``.
     info : mne.Info | ChInfo
-        Atemporal measurement information. If a `mne.Info` is provided, it is
-        converted to a `~pycrostates.io.ChInfo`.
+        Atemporal measurement information. If a `mne.Info` is provided, it is converted
+        to a `~pycrostates.io.ChInfo`.
     """
 
     def __init__(self, data: NDArray[float], info: Union[Info, CHInfo]):
@@ -36,15 +36,13 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         _check_type(info, (Info, ChInfo), "info")
         if data.ndim != 2:
             raise ValueError(
-                "Argument 'data' should be a 2D array "
-                "(n_channels, n_samples). The provided array "
-                f"shape is {data.shape} which has {data.ndim} "
+                "Argument 'data' should be a 2D array (n_channels, n_samples). The "
+                f"provided array shape is {data.shape} which has {data.ndim} "
                 "dimensions."
             )
         if not len(info["ch_names"]) == data.shape[0]:
             raise ValueError(
-                "Argument 'data' and 'info' do not have the same "
-                "number of channels."
+                "Argument 'data' and 'info' do not have the same number of channels."
             )
         self._data = data
         self._info = info if isinstance(info, ChInfo) else ChInfo(info)
@@ -60,12 +58,8 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         from ..html_templates import repr_templates_env
 
         template = repr_templates_env.get_template("ChData.html.jinja")
-        info_repr = (
-            self._info._repr_html_()
-        )  # pylint: disable=protected-access
-        return template.render(
-            n_samples=self._data.shape[-1], info_repr=info_repr
-        )
+        info_repr = self._info._repr_html_()  # pylint: disable=protected-access
+        return template.render(n_samples=self._data.shape[-1], info_repr=info_repr)
 
     def __eq__(self, other: Any) -> bool:
         """Equality == method."""
@@ -123,8 +117,8 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         ----------
         %(picks_all)s
         exclude : list | str
-            Set of channels to exclude, only used when picking based on
-            types (e.g., ``exclude="bads"`` when ``picks="meg"``).
+            Set of channels to exclude, only used when picking based on types (e.g.,
+            ``exclude="bads"`` when ``picks="meg"``).
 
         Returns
         -------
@@ -157,8 +151,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         n_zero = np.sum(np.sum(np.abs(pos), axis=1) == 0)
         if n_zero > 1:  # XXX some systems have origin (0, 0, 0)
             raise ValueError(
-                "Could not extract channel positions for "
-                f"{n_zero} channels."
+                f"Could not extract channel positions for {n_zero} channels."
             )
         return pos
 

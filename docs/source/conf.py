@@ -156,6 +156,7 @@ numpydoc_xref_aliases = {
     "bool": ":class:`python:bool`",
     "Path": "pathlib.Path",
     # MNE
+    "ConductorModel": "mne.bem.ConductorModel",
     "DigMontage": "mne.channels.DigMontage",
     "Epochs": "mne.Epochs",
     "Evoked": "mne.Evoked",
@@ -169,6 +170,7 @@ numpydoc_xref_aliases = {
     "EpochsSegmentation": "pycrostates.segmentation.EpochsSegmentation",
     # Matplotlib
     "Axes": "matplotlib.axes.Axes",
+    "Axes3D": "mpl_toolkits.mplot3d.axes3d.Axes3D",
     "colormap": ":doc:`colormap <matplotlib:tutorials/colors/colormaps>`",
     "Figure": "matplotlib.figure.Figure",
     # Scipy
@@ -178,9 +180,11 @@ numpydoc_xref_ignore = {
     "instance",
     "of",
     "shape",
+    "n_ch_groups",
     "n_channels",
     "n_clusters",
     "n_epochs",
+    "n_picks",
     "n_samples",
 }
 
