@@ -1,8 +1,10 @@
-"""Partial autoinformation module for segmented data."""
+"""Partial autoinformation module for segmented data.
 
-# code from https://github.com/Frederic-vW/AIF-PAIF:
-# F. von Wegner, Partial Autoinformation to Characterize Symbolic Sequences
-# Front Physiol (2018) https://doi.org/10.3389/fphys.2018.01382
+Code from https://github.com/Frederic-vW/AIF-PAIF
+F. von Wegner, Partial Autoinformation to Characterize Symbolic Sequences
+Front Physiol (2018) https://doi.org/10.3389/fphys.2018.01382
+"""
+
 import itertools
 from typing import List, Optional, Tuple, Union
 
@@ -12,45 +14,36 @@ from mne.parallel import parallel_func
 from numpy.typing import NDArray
 
 from .._typing import Segmentation
-from ..utils._checks import _check_n_jobs, _check_type, _check_value, _IntLike
+from ..utils._checks import _check_n_jobs, _check_type, _check_value, _ensure_int
 from ..utils._docs import fill_doc
 
 
 def _check_log_base(log_base):
-    _check_type(
-        log_base,
-        (
-            "numeric",
-            str,
-        ),
-        "log_base",
-    )
+    _check_type(log_base, ("numeric", str), "log_base")
     if isinstance(log_base, str):
+        mapping = {"bits": 2, "natureal": np.e, "dits": 10}
         _check_value(
             log_base,
-            ["bits", "natural", "dits"],
-            item_name="log_base",
+            mapping,
+            "log_base",
             extra="when string is provided",
         )
-        if log_base == "bits":
-            log_base = 2
-        elif log_base == "natural":
-            log_base = np.e
-        elif log_base == "dits":
-            log_base = 10
-    else:
-        if log_base <= 0:
-            raise ValueError("If numeric, log_base must be >= 0.")
+        log_base = mapping[log_base]
+    if log_base <= 0:
+        raise ValueError(
+            f"If numeric, 'log_base' must be a positive number. '{log_base}' is "
+            "invalid."
+        )
     return log_base
 
 
 def _check_lags(lags):
-    _check_type(lags, (int, np.ndarray, list, tuple), "lags")
+    _check_type(lags, ("int", "array-like"), "lags")
     if isinstance(lags, int):
         if lags < 1:
             raise ValueError("If integer, lags must be >= 1.")
         lags = np.arange(lags)
-    elif isinstance(lags, (list, tuple)):
+    elif not isinstance(lags, np.ndarray):
         lags = np.array(lags)
     if lags.ndim != 1:
         raise ValueError("Lags must be a 1D array.")
@@ -65,15 +58,17 @@ def _check_lags(lags):
 def _joint_entropy(
     x: NDArray[int],
     y: NDArray[int],
-    state_to_ignore: Optional[Union[int, None]] = -1,
-    log_base: Optional[Union[float, str]] = 2,
+    state_to_ignore: Optional[int] = -1,
+    log_base: Union[float, str] = 2,
 ):
     """Joint Shannon entropy of the symbolic sequences x, y.
 
     Parameters
     ----------
-    x, y : array (n_symbols, )
-        Symbolic sequences.
+    x : array (n_symbols, )
+        Symbolic sequence.
+    y : array (n_symbols, )
+        Symbolic sequence.
     %(state_to_ignore)s
     %(log_base)s
 
@@ -86,14 +81,8 @@ def _joint_entropy(
     _check_type(y, (np.ndarray,), "y")
     if len(x) != len(y):
         raise ValueError("Sequences of different lengths.")
-    _check_type(
-        state_to_ignore,
-        (
-            int,
-            None,
-        ),
-        "state_to_ignore",
-    )
+    if state_to_ignore is not None:
+        state_to_ignore = _ensure_int(state_to_ignore, "state_to_ignore")
     log_base = _check_log_base(log_base)
 
     # ignoring state_to_ignore
@@ -113,17 +102,10 @@ def _joint_entropy(
     return joint_entropy
 
 
-def _check_segmentation(segmentation, item_name="segmentation"):
+def _check_segmentation(segmentation, item_name: str = "segmentation"):
     from ._base import _BaseSegmentation
 
-    _check_type(
-        segmentation,
-        (
-            _BaseSegmentation,
-            np.ndarray,
-        ),
-        item_name,
-    )
+    _check_type(segmentation, (_BaseSegmentation, np.ndarray), item_name)
     if isinstance(segmentation, _BaseSegmentation):
         labels = segmentation._labels
         # reshape if epochs (returns a view)
@@ -141,8 +123,8 @@ def _check_segmentation(segmentation, item_name="segmentation"):
 def _joint_entropy_history(
     labels: NDArray[int],
     k: int,
-    state_to_ignore: Optional[Union[int, None]] = -1,
-    log_base: Optional[Union[float, str]] = 2,
+    state_to_ignore: Optional[int] = -1,
+    log_base: Union[float, str] = 2,
 ):
     r"""Compute the joint Shannon of k-histories x[t:t+k].
 
@@ -161,14 +143,8 @@ def _joint_entropy_history(
     """
     _check_type(labels, (np.ndarray,), "labels")
     _check_type(k, ("int",), "k")
-    _check_type(
-        state_to_ignore,
-        (
-            int,
-            None,
-        ),
-        "state_to_ignore",
-    )
+    if state_to_ignore is not None:
+        state_to_ignore = _ensure_int(state_to_ignore, "state_to_ignore")
     log_base = _check_log_base(log_base)
 
     # Construct the k-history sequences while ignoring the state
@@ -181,9 +157,7 @@ def _joint_entropy_history(
     n_clusters = np.max(labels) + 1
     # Compute the joint probability distribution
     joint_dist = np.zeros(tuple(k * [n_clusters]))
-    for i in range(
-        len(labels) - k + 1
-    ):  # TODO: check +1 (not in original code)
+    for i in range(len(labels) - k + 1):  # TODO: check +1 (not in original code)
         history = tuple(labels[i : i + k])
         if state_to_ignore not in history:
             joint_dist[history] += 1.0
@@ -195,15 +169,15 @@ def _joint_entropy_history(
 @fill_doc
 def _entropy(
     labels: NDArray[int],
-    state_to_ignore: Optional[Union[int, None]] = -1,
-    log_base: Optional[Union[float, str]] = 2,
+    state_to_ignore: Optional[int] = -1,
+    log_base: Union[float, str] = 2,
 ):
     r"""Compute the Shannon entropy of the a symbolic sequence.
 
     Parameters
     ----------
-    labels: np.ndarray
-        the symbolic sequence.
+    labels: array
+        Symbolic sequence.
     %(state_to_ignore)s
     %(ignore_self)s
     %(log_base)s
@@ -214,14 +188,8 @@ def _entropy(
         The Shannon entropy of the sequence.
     """
     _check_type(labels, (np.ndarray,), "labels")
-    _check_type(
-        state_to_ignore,
-        (
-            int,
-            None,
-        ),
-        "state_to_ignore",
-    )
+    if state_to_ignore is not None:
+        _ensure_int(state_to_ignore, "state_to_ignore")
     log_base = _check_log_base(log_base)
 
     h = _joint_entropy_history(
@@ -233,14 +201,14 @@ def _entropy(
 @fill_doc
 def entropy(
     segmentation: [Segmentation, NDArray[int]],
-    state_to_ignore: Optional[Union[int, None]] = -1,
-    ignore_self: Optional[bool] = False,
-    log_base: Optional[Union[float, str]] = 2,
+    state_to_ignore: Optional[int] = -1,
+    ignore_self: bool = False,
+    log_base: Union[float, str] = 2,
 ):
-    r"""Compute the Shannon entropy of the a symbolic sequence.
+    r"""Compute the Shannon entropy of a symbolic sequence.
 
-    Compute the Shannon entropy :footcite:t:`shannon1948mathematical`
-    of the microstate symbolic sequence.
+    Compute the Shannon entropy\ :footcite:p:`shannon1948mathematical` of the microstate
+    symbolic sequence.
 
     Parameters
     ----------
@@ -259,14 +227,8 @@ def entropy(
     .. footbibliography::
     """
     labels = _check_segmentation(segmentation)
-    _check_type(
-        state_to_ignore,
-        (
-            int,
-            None,
-        ),
-        "state_to_ignore",
-    )
+    if state_to_ignore is not None:
+        state_to_ignore = _ensure_int(state_to_ignore, "state_to_ignore")
     _check_type(ignore_self, (bool,), "ignore_self")
     log_base = _check_log_base(log_base)
     # ignore transition to itself (i.e. AAABBBBC -> ABC)
@@ -277,13 +239,13 @@ def entropy(
     return h
 
 
-# Excess entropy rate
+# -- excess entropy rate ---------------------------------------------------------------
 @fill_doc
 def _excess_entropy_rate(
     labels: NDArray[int],
     history_length: int,
-    state_to_ignore: Optional[Union[int, None]] = -1,
-    log_base: Optional[Union[float, str]] = 2,
+    state_to_ignore: Optional[int] = -1,
+    log_base: Union[float, str] = 2,
     n_jobs: int = 1,
 ):
     """Estimate the entropy rate and the excess_entropy from a linear fit.
@@ -305,15 +267,13 @@ def _excess_entropy_rate(
         Excess entropy (intercept).
     residual: float
         Sum of squared residuals of the least squares fit.
-    lags: np.ndarray shape (history_length,)
+    lags: array of shape (history_length,)
         Lag values in sample used for the fit.
-    joint_entropies: np.ndarray shape (history_length,)
+    joint_entropies: array of shape (history_length,)
         Joint entropy value for each lag.
     """
     lags = np.arange(1, history_length + 1)
-    parallel, p_fun, _ = parallel_func(
-        _joint_entropy_history, n_jobs, total=len(lags)
-    )
+    parallel, p_fun, _ = parallel_func(_joint_entropy_history, n_jobs, total=len(lags))
     runs = parallel(
         p_fun(labels, k, state_to_ignore=state_to_ignore, log_base=log_base)
         for k in lags
@@ -327,21 +287,21 @@ def _excess_entropy_rate(
 def excess_entropy_rate(
     segmentation: [Segmentation, NDArray[int]],
     history_length: int,
-    state_to_ignore: Optional[Union[int, None]] = -1,
-    ignore_self: Optional[bool] = False,
-    log_base: Optional[Union[float, str]] = 2,
+    state_to_ignore: Optional[int] = -1,
+    ignore_self: bool = False,
+    log_base: Union[float, str] = 2,
     n_jobs: int = 1,
 ):
-    r"""Estimate the entropy rate and the excess_entropy of the segmentation.
+    r"""Estimate the entropy rate and the ``excess_entropy`` of the segmentation.
 
-    Estimate the entropy rate and the excess_entropy from a linear fit:
+    The entropy rate and the ``excess_entropy`` are estimated from a linear fit:
 
     .. math::
 
         H(X_{n}^{(k)}) = a \cdot k + b
 
     where ``a`` is the entropy rate and ``b`` the excess entropy
-    as described in \ :footcite:p:`von2018partial`.
+    as described in\ :footcite:p:`von2018partial`.
 
     Parameters
     ----------
@@ -361,9 +321,9 @@ def excess_entropy_rate(
         Excess entropy (intercept).
     residual: float
         Sum of squared residuals of the least squares fit.
-    lags: np.ndarray shape (history_length,)
+    lags: array of shape (history_length,)
         Lag values in sample used for the fit.
-    joint_entropies: np.ndarray shape (history_length,)
+    joint_entropies: array of shape (history_length,)
         Joint entropy value for each lag.
 
     References
@@ -372,14 +332,8 @@ def excess_entropy_rate(
     """
     labels = _check_segmentation(segmentation)
     _check_type(history_length, (int,), "history_length")
-    _check_type(
-        state_to_ignore,
-        (
-            int,
-            None,
-        ),
-        "state_to_ignore",
-    )
+    if state_to_ignore is not None:
+        state_to_ignore = _ensure_int(state_to_ignore, "state_to_ignore")
     _check_type(ignore_self, (bool,), "ignore_self")
     log_base = _check_log_base(log_base)
     n_jobs = _check_n_jobs(n_jobs)
@@ -388,22 +342,21 @@ def excess_entropy_rate(
     if ignore_self:
         labels = np.array([s for s, _ in itertools.groupby(labels)])
 
-    eer = _excess_entropy_rate(
+    return _excess_entropy_rate(
         labels,
         history_length,
         state_to_ignore=state_to_ignore,
         log_base=log_base,
         n_jobs=n_jobs,
     )
-    return eer
 
 
 @fill_doc
 def _auto_information(
     labels: NDArray[int],
     k: int,
-    state_to_ignore: Optional[Union[int, None]] = -1,
-    log_base: Optional[Union[float, str]] = 2,
+    state_to_ignore: Optional[int] = -1,
+    log_base: Union[float, str] = 2,
 ):
     """Compute the Auto-information for lag k.
 
@@ -423,22 +376,13 @@ def _auto_information(
 
     """
     _check_type(labels, (np.ndarray,), "labels")
-    _check_type(k, (_IntLike(),), "k")
-    _check_type(
-        state_to_ignore,
-        (
-            int,
-            None,
-        ),
-        "state_to_ignore",
-    )
+    k = _ensure_int(k, "k")
+    if state_to_ignore is not None:
+        state_to_ignore = _ensure_int(state_to_ignore, "state_to_ignore")
     log_base = _check_log_base(log_base)
 
-    n = len(labels)
-    nmax = n - k
-    h1 = _entropy(
-        labels[:nmax], state_to_ignore=state_to_ignore, log_base=log_base
-    )
+    nmax = len(labels) - k
+    h1 = _entropy(labels[:nmax], state_to_ignore=state_to_ignore, log_base=log_base)
     h2 = _entropy(
         labels[k : k + nmax],
         state_to_ignore=state_to_ignore,
@@ -463,15 +407,12 @@ def auto_information_function(
         Tuple[int, ...],
         NDArray[int],
     ],
-    state_to_ignore: Optional[Union[int, None]] = -1,
-    ignore_self: Optional[bool] = False,
-    log_base: Optional[Union[float, str]] = 2,
+    state_to_ignore: Optional[int] = -1,
+    ignore_self: bool = False,
+    log_base: Union[float, str] = 2,
     n_jobs: int = 1,
 ):
-    r"""Compute the Auto-information function (aif).
-
-    Compute the Auto-information function (aif)
-    as described in \ :footcite:p:`von2018partial`.
+    r"""Compute the Auto-information function (aif) as described in\ :footcite:p:`von2018partial`.
 
     .. math::
 
@@ -501,17 +442,11 @@ def auto_information_function(
     References
     ----------
     .. footbibliography::
-    """
+    """  # noqa: E501
     labels = _check_segmentation(segmentation)
     lags = _check_lags(lags)
-    _check_type(
-        state_to_ignore,
-        (
-            int,
-            None,
-        ),
-        "state_to_ignore",
-    )
+    if state_to_ignore is not None:
+        state_to_ignore = _ensure_int(state_to_ignore, "state_to_ignore")
     log_base = _check_log_base(log_base)
     n_jobs = _check_n_jobs(n_jobs)
 
@@ -519,9 +454,7 @@ def auto_information_function(
     if ignore_self:
         labels = np.array([s for s, _ in itertools.groupby(labels)])
 
-    parallel, p_fun, _ = parallel_func(
-        _auto_information, n_jobs, total=len(lags)
-    )
+    parallel, p_fun, _ = parallel_func(_auto_information, n_jobs, total=len(lags))
     runs = parallel(
         p_fun(labels, k, state_to_ignore=state_to_ignore, log_base=log_base)
         for k in lags
@@ -535,8 +468,8 @@ def auto_information_function(
 def _partial_auto_information(
     labels: NDArray[int],
     k: int,
-    state_to_ignore: Optional[Union[int, None]] = -1,
-    log_base: Optional[Union[float, str]] = 2,
+    state_to_ignore: Optional[int] = -1,
+    log_base: Union[float, str] = 2,
 ):
     """Compute the partial auto-information for lag k.
 
@@ -588,9 +521,9 @@ def partial_auto_information_function(
         Tuple[int, ...],
         NDArray[int],
     ],
-    state_to_ignore: Optional[Union[int, None]] = -1,
-    ignore_self: Optional[bool] = False,
-    log_base: Optional[Union[float, str]] = 2,
+    state_to_ignore: Optional[int] = -1,
+    ignore_self: bool = False,
+    log_base: Union[float, str] = 2,
     n_jobs: Optional[int] = 1,
 ):
     r"""Compute the Partial auto-information function.
@@ -609,7 +542,7 @@ def partial_auto_information_function(
     Parameters
     ----------
     %(segmentation_or_labels)s
-    lags : int | list | tuple | array of shape ``(n_lags,)``
+    lags : int | list, tuple, array of shape ``(n_lags,)``
         The lags at which to compute the auto-information function.
         If int, will use lags = np.arange(lags).
     %(state_to_ignore)s
@@ -630,14 +563,8 @@ def partial_auto_information_function(
     """  # noqa: E501
     labels = _check_segmentation(segmentation)
     lags = _check_lags(lags)
-    _check_type(
-        state_to_ignore,
-        (
-            int,
-            None,
-        ),
-        "state_to_ignore",
-    )
+    if state_to_ignore is not None:
+        state_to_ignore = _ensure_int(state_to_ignore, "state_to_ignore")
     _check_type(ignore_self, (bool,), "ignore_self")
     log_base = _check_log_base(log_base)
     n_jobs = _check_n_jobs(n_jobs)

@@ -136,13 +136,13 @@ T : array of shape ``(n_cluster, n_cluster)``
     First axis indicates state ``"from"``. Second axis indicates state ``"to"``."""
 
 # ------ autoinformation -------
-docdict[
-    "segmentation_or_labels"
-] = """
-segmentation : RawSegmentation | EpochsSegmentation""" \
+docdict["segmentation_or_labels"] = (
+    """
+segmentation : RawSegmentation | EpochsSegmentation"""
     """ | array of shape ``(n_samples,)``
     Either a Segmentation object or an array of integers
     representing the microstate symbolic sequence."""
+)
 docdict[
     "labels_info"
 ] = """
@@ -151,12 +151,12 @@ labels : array (n_symbols, )
 docdict[
     "state_to_ignore"
 ] = """
-state_to_ignore : int
+state_to_ignore : int | None
     Ignore state with symbol ``state_to_ignore`` from analysis."""
 docdict[
     "log_base"
 ] = """
-log_base : float, str
+log_base : float | str
     The log base to use.
     If string:
     * ``bits``: log_base = ``2``

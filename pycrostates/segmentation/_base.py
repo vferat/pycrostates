@@ -261,8 +261,8 @@ class _BaseSegmentation(ABC):
     @fill_doc
     def entropy(
         self,
-        ignore_self: Optional[bool] = False,
-        log_base: Optional[Union[float, str]] = 2
+        ignore_self: bool = False,
+        log_base: Union[float, str] = 2,
     ):
         """Compute the Shannon entropy of the segmentation.
 

@@ -33,12 +33,8 @@ raw = raw.load_data().filter(1, 40).apply_proj()
 events = make_fixed_length_events(raw, 1)
 epochs = Epochs(raw, events, preload=True)
 
-ModK_raw = ModKMeans(
-    n_clusters=4, n_init=10, max_iter=100, tol=1e-4, random_state=1
-)
-ModK_epochs = ModKMeans(
-    n_clusters=4, n_init=10, max_iter=100, tol=1e-4, random_state=1
-)
+ModK_raw = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4, random_state=1)
+ModK_epochs = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4, random_state=1)
 ModK_raw.fit(raw, n_jobs=1)
 ModK_epochs.fit(epochs, n_jobs=1)
 
@@ -101,9 +97,7 @@ def test__joint_entropy_history():
 
 
 def test_entropy():
-    r = entropy(
-        raw_segmentation, state_to_ignore=-1, ignore_self=False, log_base=2
-    )
+    r = entropy(raw_segmentation, state_to_ignore=-1, ignore_self=False, log_base=2)
     assert isinstance(r, float)
     r_ = entropy(
         raw_segmentation._labels,
@@ -113,9 +107,7 @@ def test_entropy():
     )
     assert np.allclose(r, r_)
 
-    r = entropy(
-        epochs_segmentation, state_to_ignore=-1, ignore_self=False, log_base=2
-    )
+    r = entropy(epochs_segmentation, state_to_ignore=-1, ignore_self=False, log_base=2)
     assert isinstance(r, float)
 
     r = entropy(
@@ -126,9 +118,7 @@ def test_entropy():
     )
     assert isinstance(r, float)
 
-    r = entropy(
-        epochs_segmentation, state_to_ignore=-1, ignore_self=True, log_base=2
-    )
+    r = entropy(epochs_segmentation, state_to_ignore=-1, ignore_self=True, log_base=2)
     assert isinstance(r, float)
 
 
