@@ -4,12 +4,11 @@ from collections import OrderedDict
 
 import numpy as np
 import pytest
-from mne import create_info
+from mne import Transform, create_info
 from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import read_raw_fif
 from mne.io.constants import FIFF
-from mne.transforms import Transform
 from mne.utils import check_version
 from numpy.testing import assert_allclose
 
