@@ -5,19 +5,28 @@ from numbers import Number
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
-from mne.io import Info
+from mne import Info, Projection, Transform
 from mne.io.constants import FIFF
-from mne.io.meas_info import (
-    _check_bads,
-    _check_ch_keys,
-    _check_dev_head_t,
-    _unique_channel_names,
-)
-from mne.io.pick import get_channel_type_constants
-from mne.io.proj import Projection
-from mne.io.tag import _ch_coord_dict
-from mne.transforms import Transform
 from mne.utils import check_version
+
+if check_version("mne", "1.6"):
+    from mne._fiff.meas_info import (
+        _check_bads,
+        _check_ch_keys,
+        _check_dev_head_t,
+        _unique_channel_names,
+    )
+    from mne._fiff.pick import get_channel_type_constants
+    from mne._fiff.tag import _ch_coord_dict
+else:
+    from mne.io.meas_info import (
+        _check_bads,
+        _check_ch_keys,
+        _check_dev_head_t,
+        _unique_channel_names,
+    )
+    from mne.io.pick import get_channel_type_constants
+    from mne.io.tag import _ch_coord_dict
 
 from .._typing import CHInfo
 from ..utils._checks import _check_type, _IntLike
