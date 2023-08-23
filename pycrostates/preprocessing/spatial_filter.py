@@ -6,11 +6,16 @@ from mne.bem import _check_origin
 from mne.channels import find_ch_adjacency
 from mne.channels.interpolation import _make_interpolation_matrix
 from mne.io import BaseRaw
-from mne.io.pick import _picks_by_type
+from mne.utils import check_version
 from mne.parallel import parallel_func
 from mne.utils.check import _check_preload
 from numpy.typing import NDArray
 from scipy.sparse import csr_matrix
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_by_type
+else:
+    from mne.io.pick import _picks_by_type
 
 from .._typing import CHData
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
