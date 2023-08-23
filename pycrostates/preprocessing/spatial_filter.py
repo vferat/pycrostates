@@ -6,8 +6,8 @@ from mne.bem import _check_origin
 from mne.channels import find_ch_adjacency
 from mne.channels.interpolation import _make_interpolation_matrix
 from mne.io import BaseRaw
-from mne.utils import check_version
 from mne.parallel import parallel_func
+from mne.utils import check_version
 from mne.utils.check import _check_preload
 from numpy.typing import NDArray
 from scipy.sparse import csr_matrix
