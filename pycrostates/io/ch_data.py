@@ -3,8 +3,8 @@ from copy import copy, deepcopy
 from typing import Any, Union
 
 import numpy as np
-from mne.io import Info
-from mne.io.pick import _picks_to_idx, pick_info
+from mne import Info, pick_info
+from mne.io.pick import _picks_to_idx
 from numpy.typing import NDArray
 
 from .._typing import CHData, CHInfo
