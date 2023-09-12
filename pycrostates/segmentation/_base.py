@@ -287,7 +287,6 @@ class _BaseSegmentation(Segmentation):
         return entropy(
             self,
             ignore_self=ignore_self,
-            state_to_ignore=-1,
             log_base=log_base,
         )
 
