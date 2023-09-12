@@ -29,7 +29,7 @@ class Cluster(ABC):
     pass
 
 
-class Segmentation(ABC):
+class Segmentation(_BaseSegmentation):
     """Typing for a clustering class."""
 
     pass
