@@ -520,7 +520,7 @@ def partial_auto_information_function(
     r"""Compute the Partial auto-information function.
 
     Compute the Partial auto-information function
-    as described in \ :footcite:p:`von2018partial`.
+    as described in\ :footcite:p:`von2018partial`.
 
     .. math::
 
