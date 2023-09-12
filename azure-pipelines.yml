@@ -124,8 +124,8 @@ stages:
         python -m pip install --progress-bar off --upgrade .[test]
       displayName: 'Install package'
     - script: |
-        python -m pip install --progress-bar off --pre --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple numpy scipy
-        python -m pip install --progress-bar off git+https://github.com/mne-tools/mne-python
+        python -m pip install --progress-bar off --force-reinstall git+https://github.com/mne-tools/mne-python
+        python -m pip install --progress-bar off --force-reinstall --pre --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple numpy scipy
       condition: eq(variables.PRE, 'true')
       displayName: 'Install pre-release dependencies'
     - script: mne sys_info -pd
