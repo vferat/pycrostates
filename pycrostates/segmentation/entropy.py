@@ -299,7 +299,7 @@ def excess_entropy_rate(
         H(X_{n}^{(k)}) = a \cdot k + b
 
     where ``a`` is the entropy rate and ``b`` the excess entropy
-    as described in\ :footcite:p:`von2018partial`.
+    as described in :footcite:t:`von2018partial`.
 
     Parameters
     ----------
@@ -405,7 +405,7 @@ def auto_information_function(
     log_base: Union[float, str] = 2,
     n_jobs: int = 1,
 ):
-    r"""Compute the Auto-information function (aif) as described in\ :footcite:p:`von2018partial`.
+    """Compute the Auto-information function (aif) as described in :footcite:t:`von2018partial`.
 
     .. math::
 
@@ -519,8 +519,8 @@ def partial_auto_information_function(
 ):
     r"""Compute the Partial auto-information function.
 
-    Compute the Partial auto-information function
-    as described in\ :footcite:p:`von2018partial`.
+    Compute the Partial auto-information function as described in
+    :footcite:t:`von2018partial`.
 
     .. math::
 
