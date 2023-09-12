@@ -324,7 +324,7 @@ def test_compute_expected_transition_matrix_stat(ModK, inst):
 
 
 @pytest.mark.parametrize("ModK, inst", [(ModK_raw, raw), (ModK_epochs, epochs)])
-def test_compute_expected_transition_matrix_stat(ModK, inst):
+def test_entropy(ModK, inst):
     segmentation = ModK.predict(inst)
     h = segmentation.entropy(ignore_self=True)
     assert isinstance(h, float)
