@@ -536,7 +536,6 @@ def partial_auto_information_function(
     lags : int | list, tuple, array of shape ``(n_lags,)``
         The lags at which to compute the auto-information function.
         If int, will use lags = np.arange(lags).
-    %(state_to_ignore)s
     %(ignore_self)s
     %(log_base)s
     %(n_jobs)s
