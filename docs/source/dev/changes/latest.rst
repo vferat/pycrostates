@@ -25,7 +25,7 @@ Current 0.4.0
 Enhancements
 ~~~~~~~~~~~~
 
-- Add :meth:`~pycrostates.segmentation.entropy` and  :meth:`~pycrostates.segmentation.excess_entropy_rate` (:pr:`112` by `Victor Férat`_ and `Frederic von Wegner`_)
+- Add :func:`~pycrostates.segmentation.entropy`,  :func:`~pycrostates.segmentation.excess_entropy_rate`, :func:`~pycrostates.segmentation.auto_information_function` and :func:`~pycrostates.segmentation.partial_auto_information_function` (:pr:`112` by `Victor Férat`_ and `Frederic von Wegner`_)
 
 Bugs
 ~~~~
