@@ -266,7 +266,7 @@ class _BaseSegmentation(ABC):
     ):
         """Compute the Shannon entropy of the segmentation.
 
-        Compute the Shannon entropy :footcite:t:`shannon1948mathematical`
+        Compute the Shannon entropy\ :footcite:p:`shannon1948mathematical`
         of the microstate symbolic sequence.
 
         Parameters
