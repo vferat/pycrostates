@@ -10,6 +10,7 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 from numpy.typing import NDArray
 
+from .._typing import Segmentation
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
@@ -20,7 +21,7 @@ from .transitions import _compute_expected_transition_matrix, _compute_transitio
 
 
 @fill_doc
-class _BaseSegmentation(ABC):
+class _BaseSegmentation(Segmentation):
     """Base class for a Microstates segmentation.
 
     Parameters

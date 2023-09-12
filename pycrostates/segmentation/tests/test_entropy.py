@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from mne import Epochs, make_fixed_length_epochs
+from mne import make_fixed_length_epochs
 from mne.datasets import testing
 from mne.io import read_raw_fif
 
@@ -9,8 +9,11 @@ from pycrostates.utils._logs import logger, set_log_level
 
 from ..entropy import (
     _auto_information,
+    _check_labels,
     _check_lags,
     _check_segmentation,
+    _entropy,
+    _excess_entropy_rate,
     _joint_entropy,
     _joint_entropy_history,
     _partial_auto_information,
@@ -41,20 +44,20 @@ raw_segmentation = ModK_raw.predict(raw)
 epochs_segmentation = ModK_epochs.predict(epochs)
 
 
-def test__check_segmentation():
+def test__check_labels():
     labels = np.random.randint(-1, 4, 100)
-    r = _check_segmentation(labels)
-    assert isinstance(r, np.ndarray)
-    assert r.ndim == 1
+    _check_labels(labels)
 
     labels = np.random.randint(-1, 4, (100, 10))
     with pytest.raises(ValueError, match="must be a 1D array"):
-        _check_segmentation(labels)
+        _check_labels(labels)
 
     labels = np.random.uniform(0, 1, 100)
     with pytest.raises(ValueError, match="must be an array of integers"):
-        _check_segmentation(labels)
+        _check_labels(labels)
 
+
+def test__check_segmentation():
     r = _check_segmentation(raw_segmentation)
     assert isinstance(r, np.ndarray)
     assert r.ndim == 1
@@ -95,71 +98,79 @@ def test__joint_entropy_history():
     assert isinstance(r, float)
 
 
-def test_entropy():
-    r = entropy(raw_segmentation, state_to_ignore=-1, ignore_self=False, log_base=2)
-    assert isinstance(r, float)
-    r_ = entropy(
-        raw_segmentation._labels,
+def test__entropy():
+    labels = np.random.randint(-1, 4, 100)
+    r_ = _entropy(
+        labels,
         state_to_ignore=-1,
-        ignore_self=False,
         log_base=2,
     )
-    assert np.allclose(r, r_)
+    assert isinstance(r_, float)
 
-    r = entropy(epochs_segmentation, state_to_ignore=-1, ignore_self=False, log_base=2)
-    assert isinstance(r, float)
-
-    r = entropy(
-        epochs_segmentation,
+    r_ = _entropy(
+        labels,
         state_to_ignore=None,
-        ignore_self=False,
         log_base=2,
     )
+    assert isinstance(r_, float)
+
+
+def test_entropy():
+    r = entropy(raw_segmentation, ignore_self=False, log_base=2)
     assert isinstance(r, float)
 
-    r = entropy(epochs_segmentation, state_to_ignore=-1, ignore_self=True, log_base=2)
+    r = entropy(epochs_segmentation, ignore_self=False, log_base=2)
     assert isinstance(r, float)
+
+    r = entropy(raw_segmentation, ignore_self=True, log_base=2)
+    assert isinstance(r, float)
+
+    r = entropy(epochs_segmentation, ignore_self=False, log_base=10)
+    assert isinstance(r, float)
+
+
+def test__excess_entropy_rate():
+    labels = np.random.randint(-1, 4, 100)
+    a_, b_, residuals_, lags_, runs_ = _excess_entropy_rate(
+        labels,
+        history_length=10,
+        state_to_ignore=-1,
+        log_base=2,
+    )
+    assert isinstance(a_, float)
+    assert isinstance(b_, float)
+    assert isinstance(residuals_, float)
+
+    # _excess_entropy_rate: state_to_ignore
+    _excess_entropy_rate(
+        labels,
+        history_length=10,
+        state_to_ignore=None,
+        log_base=2,
+    )
 
 
 def test_excess_entropy_rate():
-    # Array
-    labels = np.random.randint(-1, 4, 100)
-    a, b, residuals, lags, runs = excess_entropy_rate(
-        labels,
-        history_length=10,
-        state_to_ignore=-1,
-        ignore_self=False,
-        log_base=2,
-    )
-    # Raw
+    # excess_entropy_rate: Raw
     excess_entropy_rate(
         raw_segmentation,
         history_length=10,
-        state_to_ignore=-1,
         ignore_self=False,
         log_base=2,
     )
-    # Epochs
+
+    # excess_entropy_rate: Epochs
     excess_entropy_rate(
         epochs_segmentation,
         history_length=10,
-        state_to_ignore=-1,
         ignore_self=False,
         log_base=2,
     )
-    # state_to_ignore
+
+    # excess_entropy_rate: ignore_self
     excess_entropy_rate(
-        labels,
+        raw_segmentation,
         history_length=10,
-        state_to_ignore=None,
-        ignore_self=False,
-        log_base=2,
-    )
-    # ignore_self
-    excess_entropy_rate(
-        labels,
-        history_length=10,
-        state_to_ignore=None,
         ignore_self=True,
         log_base=2,
     )
@@ -174,22 +185,10 @@ def test__auto_information():
 
 
 def test_auto_information_function():
-    # Array
-    labels = np.random.randint(-1, 4, 100)
-    lags, runs = auto_information_function(
-        labels,
-        lags=10,
-        state_to_ignore=-1,
-        ignore_self=False,
-        log_base=2,
-    )
-    assert np.all(lags == np.arange(10))
-    assert isinstance(runs, np.ndarray)
     # Raw
     auto_information_function(
         raw_segmentation,
         lags=10,
-        state_to_ignore=-1,
         ignore_self=False,
         log_base=2,
     )
@@ -197,31 +196,20 @@ def test_auto_information_function():
     auto_information_function(
         epochs_segmentation,
         lags=10,
-        state_to_ignore=-1,
-        ignore_self=False,
-        log_base=2,
-    )
-    # state_to_ignore
-    auto_information_function(
-        labels,
-        lags=10,
-        state_to_ignore=None,
         ignore_self=False,
         log_base=2,
     )
     # ignore_self
     auto_information_function(
-        labels,
+        raw_segmentation,
         lags=10,
-        state_to_ignore=None,
         ignore_self=True,
         log_base=2,
     )
     # lags
     auto_information_function(
-        labels,
+        raw_segmentation,
         lags=[1, 3, 10],
-        state_to_ignore=None,
         ignore_self=True,
         log_base=2,
     )
@@ -236,22 +224,10 @@ def test__partial_auto_information():
 
 
 def test_partial_auto_information_function():
-    # Array
-    labels = np.random.randint(-1, 4, 100)
-    lags, runs = partial_auto_information_function(
-        labels,
-        lags=10,
-        state_to_ignore=-1,
-        ignore_self=False,
-        log_base=2,
-    )
-    assert np.all(lags == np.arange(10))
-    assert isinstance(runs, np.ndarray)
     # Raw
     partial_auto_information_function(
         raw_segmentation,
         lags=10,
-        state_to_ignore=-1,
         ignore_self=False,
         log_base=2,
     )
@@ -259,31 +235,20 @@ def test_partial_auto_information_function():
     partial_auto_information_function(
         epochs_segmentation,
         lags=10,
-        state_to_ignore=-1,
-        ignore_self=False,
-        log_base=2,
-    )
-    # state_to_ignore
-    partial_auto_information_function(
-        labels,
-        lags=10,
-        state_to_ignore=None,
         ignore_self=False,
         log_base=2,
     )
     # ignore_self
     auto_information_function(
-        labels,
+        raw_segmentation,
         lags=10,
-        state_to_ignore=None,
         ignore_self=True,
         log_base=2,
     )
     # lags
     auto_information_function(
-        labels,
+        raw_segmentation,
         lags=[1, 3, 10],
-        state_to_ignore=None,
         ignore_self=True,
         log_base=2,
     )

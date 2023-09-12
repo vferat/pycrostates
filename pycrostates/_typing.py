@@ -10,7 +10,6 @@ from typing import Optional, Union
 from numpy.random import Generator, RandomState
 from numpy.typing import NDArray
 
-from .segmentation._base import _BaseSegmentation
 
 class CHData(ABC):
     """Typing for CHData."""
@@ -30,7 +29,7 @@ class Cluster(ABC):
     pass
 
 
-class Segmentation(_BaseSegmentation):
+class Segmentation(ABC):
     """Typing for a clustering class."""
 
     pass

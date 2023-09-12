@@ -82,7 +82,7 @@ h = segmentation.entropy(ignore_self=True)
 from pycrostates.segmentation import excess_entropy_rate
 import matplotlib.pyplot as plt
 
-a, b, residuals, lags, joint_entropies = excess_entropy_rate(segmentation, history_length=12, state_to_ignore=-1, ignore_self=False)
+a, b, residuals, lags, joint_entropies = excess_entropy_rate(segmentation, history_length=12, ignore_self=False)
 
 plt.figure()
 plt.plot(lags, joint_entropies, '-sk')
@@ -96,7 +96,7 @@ plt.show()
 from pycrostates.segmentation import auto_information_function
 import numpy as np
 
-lags, ai = auto_information_function(segmentation, lags=np.arange(1, 20), ignore_self=False, state_to_ignore=-1, n_jobs=2)
+lags, ai = auto_information_function(segmentation, lags=np.arange(1, 20), ignore_self=False, n_jobs=2)
 
 plt.figure()
 plt.plot(lags, ai, '-sk')
@@ -109,7 +109,7 @@ plt.show()
 from pycrostates.segmentation import partial_auto_information_function
 import numpy as np
 
-lags, pai = partial_auto_information_function(segmentation, lags=np.arange(1, 5), ignore_self=False, state_to_ignore=-1, n_jobs=1)
+lags, pai = partial_auto_information_function(segmentation, lags=np.arange(1, 5), ignore_self=False, n_jobs=1)
 
 plt.figure()
 plt.plot(lags, pai, '-sk')

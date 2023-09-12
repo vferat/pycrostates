@@ -76,6 +76,11 @@ fname : str | Path
 
 # -- Segmentation --
 docdict[
+    "segmentation"
+] = """
+segmentation : RawSegmentation | EpochsSegmentation
+    Segmentation object containing the microstate symbolic sequence."""
+docdict[
     "cluster_centers_seg"
 ] = """
 cluster_centers : array (n_clusters, n_channels)
@@ -136,18 +141,11 @@ T : array of shape ``(n_cluster, n_cluster)``
     First axis indicates state ``"from"``. Second axis indicates state ``"to"``."""
 
 # ------ autoinformation -------
-docdict["segmentation_or_labels"] = (
-    """
-segmentation : RawSegmentation | EpochsSegmentation"""
-    """ | array of shape ``(n_samples,)``
-    Either a Segmentation object or an array of integers
-    representing the microstate symbolic sequence."""
-)
 docdict[
     "labels_info"
 ] = """
 labels : array (n_symbols, )
-    Symbolic sequence."""
+    Microstate symbolic sequence."""
 docdict[
     "state_to_ignore"
 ] = """
