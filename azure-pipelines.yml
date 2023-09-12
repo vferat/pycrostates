@@ -121,15 +121,13 @@ stages:
       displayName: 'Setup Python $(PYTHON_VERSION)'
     - script: |
         python -m pip install --progress-bar off --upgrade pip setuptools wheel
-      displayName: 'Install common dependencies'
+        python -m pip install --progress-bar off --upgrade .[test]
+      displayName: 'Install package'
     - script: |
         python -m pip install --progress-bar off --pre --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple numpy scipy
         python -m pip install --progress-bar off git+https://github.com/mne-tools/mne-python
       condition: eq(variables.PRE, 'true')
       displayName: 'Install pre-release dependencies'
-    - script: |
-        python -m pip install --progress-bar off --upgrade .[test]
-      displayName: 'Install package'
     - script: mne sys_info -pd
       displayName: 'Display MNE config'
     - script: |
