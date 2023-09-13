@@ -119,7 +119,7 @@ class _BaseSegmentation(Segmentation):
               durations of each segments assigned to a given state. Each value is
               expressed in seconds (s).
 
-        Warnings
+        warnings
         --------
         When working with `~mne.Epochs`, this method will put together segments of all
         epochs. This could lead to wrong interpretation especially on state durations.
@@ -222,7 +222,7 @@ class _BaseSegmentation(Segmentation):
         -------
         %(transition_matrix)s
 
-        Warnings
+        warnings
         --------
         When working with `~mne.Epochs`, this method will take into account transitions
         that occur between epochs. This could lead to wrong interpretation when working
@@ -239,9 +239,9 @@ class _BaseSegmentation(Segmentation):
         )
         _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
         if ignore_self is not None:
-            logger.warn(
-                "The ignore_self parameter is deprecated and will be removed in \
-                future versions. Please use the ignore_repetitions parameter instead."
+            logger.warning(
+                "The 'ignore_self' parameter is deprecated and will be removed in \
+                future versions. Please use the 'ignore_repetitions' parameter instead."
             )
             ignore_repetitions = ignore_self
         return _compute_transition_matrix(
@@ -284,9 +284,9 @@ class _BaseSegmentation(Segmentation):
         )
         _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
         if ignore_self is not None:
-            logger.warn(
-                "The ignore_self parameter is deprecated and will be removed in \
-                future versions. Please use the ignore_repetitions parameter instead."
+            logger.warning(
+                "The 'ignore_self' parameter is deprecated and will be removed in \
+                future versions. Please use the 'ignore_repetitions' parameter instead."
             )
             ignore_repetitions = ignore_self
         return _compute_expected_transition_matrix(
@@ -389,7 +389,7 @@ class _BaseSegmentation(Segmentation):
             "reject_by_annotation",
         )
         # Let the door open for custom prediction with different keys, so log
-        # a warning instead of raising.
+        # a warninginstead of raising.
         for key in predict_parameters.keys():
             if key not in valid_keys:
                 logger.warning(

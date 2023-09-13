@@ -45,9 +45,9 @@ def compute_transition_matrix(
     )
     _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
     if ignore_self is not None:
-        logger.warn(
-            "The ignore_self parameter is deprecated and will be removed in \
-            future versions. Please use the ignore_repetitions parameter instead."
+        logger.warning(
+            "The 'ignore_self' parameter is deprecated and will be removed in \
+            future versions. Please use the 'ignore_repetitions' parameter instead."
         )
         ignore_repetitions = ignore_self
     return _compute_transition_matrix(
@@ -132,9 +132,9 @@ def compute_expected_transition_matrix(
     )
     _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
     if ignore_self is not None:
-        logger.warn(
-            "The ignore_self parameter is deprecated and will be removed in \
-            future versions. Please use the ignore_repetitions parameter instead."
+        logger.warning(
+            "The 'ignore_self' parameter is deprecated and will be removed in \
+            future versions. Please use the 'ignore_repetitions' parameter instead."
         )
         ignore_repetitions = ignore_self
     return _compute_expected_transition_matrix(
