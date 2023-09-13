@@ -544,13 +544,13 @@ def _read_meas_info(fid, tree):
         pos = meas_info["directory"][k].pos
         if kind == FIFF.FIFF_NCHAN:
             tag = read_tag(fid, pos)
-            nchan = int(tag.data)
+            nchan = int(tag.data.item())
         elif kind == FIFF.FIFF_CH_INFO:
             tag = read_tag(fid, pos)
             chs.append(tag.data)
         elif kind == FIFF.FIFF_MNE_CUSTOM_REF:
             tag = read_tag(fid, pos)
-            custom_ref_applied = int(tag.data)
+            custom_ref_applied = int(tag.data.item())
         elif kind == FIFF.FIFF_COORD_TRANS:
             tag = read_tag(fid, pos)
             cand = tag.data
