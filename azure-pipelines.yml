@@ -142,7 +142,7 @@ stages:
     - script: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
       displayName: 'Get MNE testing datataset'
       condition: ne(variables.CACHE_MNE_RESTORED, 'true')
-    - script: pytest pycrostates --junitxml=junit/test-results.xml --cov=pycrostates --cov-report=xml
+    - script: pytest pycrostates --cov=pycrostates --cov-report=xml --cov-config=pyproject.toml
       displayName: 'Run unit tests'
     - task: PublishCodeCoverageResults@1
       inputs:
