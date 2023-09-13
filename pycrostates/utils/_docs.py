@@ -134,6 +134,12 @@ ignore_self : bool
     If True, ignores the transition from one state to itself. This is equivalent to
     setting the duration of all states to 1 sample."""
 docdict[
+    "ignore_repetitions"
+] = """
+ignore_self : bool
+    If True, ignores the transition from one state to itself. This is equivalent to
+    setting the duration of all states to 1 sample."""
+docdict[
     "transition_matrix"
 ] = """
 T : array of shape ``(n_cluster, n_cluster)``
