@@ -125,7 +125,7 @@ stages:
       displayName: 'Install package'
     - script: |
         python -m pip install --progress-bar off --force-reinstall git+https://github.com/mne-tools/mne-python
-        python -m pip install --progress-bar off --force-reinstall --pre --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple numpy scipy scikit-learn
+        python -m pip install --progress-bar off --upgrade --pre --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple --timeout=180 numpy scipy scikit-learn matplotlib
       condition: eq(variables.PRE, 'true')
       displayName: 'Install pre-release dependencies'
     - script: mne sys_info -pd
