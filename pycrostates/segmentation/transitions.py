@@ -1,10 +1,12 @@
 from itertools import groupby
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
 
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
+from ..utils._logs import logger
 
 
 @fill_doc
@@ -12,7 +14,8 @@ def compute_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: bool = True,
+    ignore_self: Union[bool, None] = None,
+    ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute the observed transition matrix.
 
@@ -25,17 +28,33 @@ def compute_transition_matrix(
     %(n_clusters)s
     %(stat_transition)s
     %(ignore_self)s
+    %(ignore_repetitions)s
 
     Returns
     -------
     %(transition_matrix)s
     """
     _check_labels_n_clusters(labels, n_clusters)
+    _check_type(
+        ignore_self,
+        (
+            bool,
+            None,
+        ),
+        "ignore_self",
+    )
+    _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
+    if ignore_self is not None:
+        logger.warn(
+            "The ignore_self parameter is deprecated and will be removed in \
+            future versions. Please use the ignore_repetitions parameter instead."
+        )
+        ignore_repetitions = ignore_self
     return _compute_transition_matrix(
         labels,
         n_clusters,
         stat,
-        ignore_self,
+        ignore_repetitions,
     )
 
 
@@ -43,17 +62,17 @@ def _compute_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: bool = True,
+    ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute observed transition."""
     # common error checking
     _check_value(stat, ("count", "probability", "proportion", "percent"), "stat")
-    _check_type(ignore_self, (bool,), "ignore_self")
+    _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
 
     # reshape if epochs (returns a view)
     labels = labels.reshape(-1)
     # ignore transition to itself (i.e. 1 -> 1)
-    if ignore_self:
+    if ignore_repetitions:
         labels = [s for s, _ in groupby(labels)]
 
     T = np.zeros(shape=(n_clusters, n_clusters))
@@ -79,7 +98,8 @@ def compute_expected_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: bool = True,
+    ignore_self: Union[bool, None] = None,
+    ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute the expected transition matrix.
 
@@ -102,11 +122,26 @@ def compute_expected_transition_matrix(
     %(transition_matrix)s
     """
     _check_labels_n_clusters(labels, n_clusters)
+    _check_type(
+        ignore_self,
+        (
+            bool,
+            None,
+        ),
+        "ignore_self",
+    )
+    _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
+    if ignore_self is not None:
+        logger.warn(
+            "The ignore_self parameter is deprecated and will be removed in \
+            future versions. Please use the ignore_repetitions parameter instead."
+        )
+        ignore_repetitions = ignore_self
     return _compute_expected_transition_matrix(
         labels,
         n_clusters,
         stat,
-        ignore_self,
+        ignore_repetitions=ignore_repetitions,
     )
 
 
@@ -114,7 +149,7 @@ def _compute_expected_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: bool = True,
+    ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute theoretical transition matrix.
 
@@ -122,7 +157,6 @@ def _compute_expected_transition_matrix(
     """
     # common error checking
     _check_value(stat, ("probability", "proportion", "percent"), "stat")
-    _check_type(ignore_self, (bool,), "ignore_self")
 
     # reshape if epochs (returns a view)
     labels = labels.reshape(-1)
@@ -143,7 +177,7 @@ def _compute_expected_transition_matrix(
 
     # ignore unlabeled
     T_expected = T_expected[:-1, :-1]
-    if ignore_self:
+    if ignore_repetitions:
         np.fill_diagonal(T_expected, 0)
     # transform to probability
     with np.errstate(divide="ignore", invalid="ignore"):

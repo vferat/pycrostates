@@ -204,7 +204,9 @@ class _BaseSegmentation(Segmentation):
         params["unlabeled"] = len(np.argwhere(labels == -1)) / len(gfp)
         return params
 
-    def compute_transition_matrix(self, stat="probability", ignore_self=True):
+    def compute_transition_matrix(
+        self, stat="probability", ignore_self=None, ignore_repetitions=True
+    ):
         """Compute the observed transition matrix.
 
         Count the number of transitions from one state to another and aggregate the
@@ -227,12 +229,32 @@ class _BaseSegmentation(Segmentation):
         with discontinuous data. To avoid this behaviour, make sure to set the
         ``reject_edges`` parameter to ``True`` when predicting the segmentation.
         """
+        _check_type(
+            ignore_self,
+            (
+                bool,
+                None,
+            ),
+            "ignore_self",
+        )
+        _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
+        if ignore_self is not None:
+            logger.warn(
+                "The ignore_self parameter is deprecated and will be removed in \
+                future versions. Please use the ignore_repetitions parameter instead."
+            )
+            ignore_repetitions = ignore_self
         return _compute_transition_matrix(
-            self._labels, self._cluster_centers_.shape[0], stat, ignore_self
+            self._labels,
+            self._cluster_centers_.shape[0],
+            stat,
+            ignore_repetitions=ignore_repetitions,
         )
 
     @fill_doc
-    def compute_expected_transition_matrix(self, stat="probability", ignore_self=True):
+    def compute_expected_transition_matrix(
+        self, stat="probability", ignore_self=None, ignore_repetitions=True
+    ):
         """Compute the expected transition matrix.
 
         Compute the theoretical transition matrix as if time course was ignored, but
@@ -246,16 +268,32 @@ class _BaseSegmentation(Segmentation):
         ----------
         %(stat_expected_transitions)s
         %(ignore_self)s
+        %(ignore_repetitions)s
 
         Returns
         -------
         %(transition_matrix)s
         """  # noqa: E501
+        _check_type(
+            ignore_self,
+            (
+                bool,
+                None,
+            ),
+            "ignore_self",
+        )
+        _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
+        if ignore_self is not None:
+            logger.warn(
+                "The ignore_self parameter is deprecated and will be removed in \
+                future versions. Please use the ignore_repetitions parameter instead."
+            )
+            ignore_repetitions = ignore_self
         return _compute_expected_transition_matrix(
             self._labels,
             n_clusters=self._cluster_centers_.shape[0],
             stat=stat,
-            ignore_self=ignore_self,
+            ignore_repetitions=ignore_repetitions,
         )
 
     # Information ------------------------------------------------------------

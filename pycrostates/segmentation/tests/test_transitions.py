@@ -14,7 +14,7 @@ from pycrostates.segmentation.transitions import (
 
 
 @pytest.mark.parametrize(
-    "labels, ignore_self, T",
+    "labels, ignore_repetitions, T",
     [
         # Raw
         (
@@ -72,12 +72,12 @@ from pycrostates.segmentation.transitions import (
         ),
     ],
 )
-def test_compute_transition_matrix(labels, ignore_self, T):
+def test_compute_transition_matrix(labels, ignore_repetitions, T):
     n_clusters = (
         np.unique(labels).size - 1 if np.any(labels == -1) else np.unique(labels).size
     )
     t = _compute_transition_matrix(
-        labels, n_clusters=n_clusters, ignore_self=ignore_self
+        labels, n_clusters=n_clusters, ignore_repetitions=ignore_repetitions
     )
     assert isinstance(T, np.ndarray)
     assert t.shape == (n_clusters, n_clusters)
@@ -93,12 +93,12 @@ def test_compute_expected_transition_matrix():
         labels_ = labels.copy()
         np.random.shuffle(labels_)
         T = _compute_transition_matrix(
-            labels_, n_clusters, ignore_self=True, stat="probability"
+            labels_, n_clusters, ignore_repetitions=True, stat="probability"
         )
         Ts.append(T)
     boostrap_T = np.array(Ts).mean(axis=0)
     expected_T = _compute_expected_transition_matrix(
-        labels, n_clusters, ignore_self=True, stat="probability"
+        labels, n_clusters, ignore_repetitions=True, stat="probability"
     )
     assert_allclose(boostrap_T, expected_T, atol=1e-2)
 
@@ -110,12 +110,12 @@ def test_compute_expected_transition_matrix():
         labels_ = labels.copy()
         np.random.shuffle(labels_)
         T = _compute_transition_matrix(
-            labels_, n_clusters, ignore_self=True, stat="probability"
+            labels_, n_clusters, ignore_repetitions=True, stat="probability"
         )
         Ts.append(T)
     boostrap_T = np.array(Ts).mean(axis=0)
     expected_T = _compute_expected_transition_matrix(
-        labels, n_clusters, ignore_self=True, stat="probability"
+        labels, n_clusters, ignore_repetitions=True, stat="probability"
     )
     assert_allclose(boostrap_T, expected_T, atol=1e-2)
 
