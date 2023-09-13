@@ -405,8 +405,10 @@ def auto_information_function(
     log_base: Union[float, str] = 2,
     n_jobs: int = 1,
 ):
-    r"""Compute the Auto-information function (aif) as described in\ :footcite:p:`von2018partial`.
+    r"""Compute the Auto-information function (aif).
 
+    Compute the Auto-information function (aif) as described in\ :footcite:p:`von2018partial`:
+    
     .. math::
 
         I(X_{n+k} ; X_{n})
