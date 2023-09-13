@@ -217,6 +217,7 @@ class _BaseSegmentation(Segmentation):
         ----------
         %(stat_transition)s
         %(ignore_self)s
+        %(ignore_repetitions)s
 
         Returns
         -------

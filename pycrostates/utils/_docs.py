@@ -131,6 +131,8 @@ docdict[
     "ignore_self"
 ] = """
 ignore_self : bool
+    See ``ignore_repetitions`` instead.
+
     .. deprecated:: 0.3.0
         This parameter is deprecated and will be removed in future versions.
         Please use the ``ignore_repetitions`` parameter instead."""

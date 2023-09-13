@@ -116,6 +116,7 @@ def compute_expected_transition_matrix(
     %(n_clusters)s
     %(stat_expected_transitions)s
     %(ignore_self)s
+    %(ignore_repetitions)s
 
     Returns
     -------
