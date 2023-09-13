@@ -148,13 +148,13 @@ def test_check_labels_n_clusters():
 def test_deprecated_ignore_self(caplog):
     labels = np.random.randint(0, 5, size=100)
     log = "The 'ignore_self' parameter is deprecated"
-    
+
     caplog.clear()
     M = compute_transition_matrix(labels, 5, ignore_self=True)
     assert log in caplog.text
     M_ = compute_transition_matrix(labels, 5, ignore_repetitions=True)
     assert_allclose(M, M_)
-    
+
     caplog.clear()
     M = compute_expected_transition_matrix(labels, 5, ignore_self=True)
     assert log in caplog.text
