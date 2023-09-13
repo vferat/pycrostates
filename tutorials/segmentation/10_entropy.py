@@ -69,12 +69,12 @@ segmentation = ModK.predict(
 #%%
 # Entropy
 # TODO: explain the concept of entropy and its application to MS analysis
-h = segmentation.entropy(ignore_self=False)
+h = segmentation.entropy(ignore_repetitions=False)
 
 #%%
-# We can also ignore state repetitions (i.e. self-transitions) by setting the ignore_self to True.
+# We can also ignore state repetitions (i.e. self-transitions) by setting the ignore_repetitions to True.
 # This is useful when you don't want to take state duration into account.
-h = segmentation.entropy(ignore_self=True)
+h = segmentation.entropy(ignore_repetitions=True)
 
 #%%
 # Excess entropy
@@ -82,7 +82,7 @@ h = segmentation.entropy(ignore_self=True)
 from pycrostates.segmentation import excess_entropy_rate
 import matplotlib.pyplot as plt
 
-a, b, residuals, lags, joint_entropies = excess_entropy_rate(segmentation, history_length=12, ignore_self=False)
+a, b, residuals, lags, joint_entropies = excess_entropy_rate(segmentation, history_length=12, ignore_repetitions=False)
 
 plt.figure()
 plt.plot(lags, joint_entropies, '-sk')
@@ -96,7 +96,7 @@ plt.show()
 from pycrostates.segmentation import auto_information_function
 import numpy as np
 
-lags, ai = auto_information_function(segmentation, lags=np.arange(1, 20), ignore_self=False, n_jobs=2)
+lags, ai = auto_information_function(segmentation, lags=np.arange(1, 20), ignore_repetitions=False, n_jobs=2)
 
 plt.figure()
 plt.plot(lags, ai, '-sk')
@@ -109,7 +109,7 @@ plt.show()
 from pycrostates.segmentation import partial_auto_information_function
 import numpy as np
 
-lags, pai = partial_auto_information_function(segmentation, lags=np.arange(1, 5), ignore_self=False, n_jobs=1)
+lags, pai = partial_auto_information_function(segmentation, lags=np.arange(1, 5), ignore_repetitions=False, n_jobs=1)
 
 plt.figure()
 plt.plot(lags, pai, '-sk')

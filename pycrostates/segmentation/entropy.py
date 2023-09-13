@@ -179,7 +179,7 @@ def _entropy(
     ----------
     %(labels_info)s
     %(state_to_ignore)s
-    %(ignore_self)s
+    %(ignore_repetitions)s
     %(log_base)s
 
     Returns
@@ -201,7 +201,7 @@ def _entropy(
 @fill_doc
 def entropy(
     segmentation: Segmentation,
-    ignore_self: bool = False,
+    ignore_repetitions: bool = False,
     log_base: Union[float, str] = 2,
 ):
     r"""Compute the Shannon entropy of a symbolic sequence.
@@ -212,7 +212,7 @@ def entropy(
     Parameters
     ----------
     %(segmentation)s
-    %(ignore_self)s
+    %(ignore_repetitions)s
     %(log_base)s
 
     Returns
@@ -225,10 +225,10 @@ def entropy(
     .. footbibliography::
     """
     labels = _check_segmentation(segmentation)
-    _check_type(ignore_self, (bool,), "ignore_self")
+    _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
     log_base = _check_log_base(log_base)
     # ignore transition to itself (i.e. AAABBBBC -> ABC)
-    if ignore_self:
+    if ignore_repetitions:
         labels = np.array([s for s, _ in itertools.groupby(labels)])
 
     h = _entropy(labels, state_to_ignore=-1, log_base=log_base)
@@ -286,7 +286,7 @@ def _excess_entropy_rate(
 def excess_entropy_rate(
     segmentation: Segmentation,
     history_length: int,
-    ignore_self: bool = False,
+    ignore_repetitions: bool = False,
     log_base: Union[float, str] = 2,
     n_jobs: int = 1,
 ):
@@ -306,7 +306,7 @@ def excess_entropy_rate(
     %(segmentation)s
     history_length : int
         Maximum history length in sample to estimate the excess entropy rate.
-    %(ignore_self)s
+    %(ignore_repetitions)s
     %(log_base)s
     %(n_jobs)s
 
@@ -329,12 +329,12 @@ def excess_entropy_rate(
     """
     labels = _check_segmentation(segmentation)
     _check_type(history_length, (int,), "history_length")
-    _check_type(ignore_self, (bool,), "ignore_self")
+    _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
     log_base = _check_log_base(log_base)
     n_jobs = _check_n_jobs(n_jobs)
 
     # ignore transition to itself (i.e. 1 -> 1)
-    if ignore_self:
+    if ignore_repetitions:
         labels = np.array([s for s, _ in itertools.groupby(labels)])
 
     return _excess_entropy_rate(
@@ -401,7 +401,7 @@ def auto_information_function(
         Tuple[int, ...],
         NDArray[int],
     ],
-    ignore_self: bool = False,
+    ignore_repetitions: bool = False,
     log_base: Union[float, str] = 2,
     n_jobs: int = 1,
 ):
@@ -422,7 +422,7 @@ def auto_information_function(
     lags : int | list | tuple | array of shape ``(n_lags,)``
         Lags at which to compute the auto-information function.
         If int, will use lags = np.arange(lags).
-    %(ignore_self)s
+    %(ignore_repetitions)s
     %(log_base)s
     %(n_jobs)s
 
@@ -443,7 +443,7 @@ def auto_information_function(
     n_jobs = _check_n_jobs(n_jobs)
 
     # ignore transition to itself (i.e. AAABBBBC -> ABC)
-    if ignore_self:
+    if ignore_repetitions:
         labels = np.array([s for s, _ in itertools.groupby(labels)])
 
     parallel, p_fun, _ = parallel_func(_auto_information, n_jobs, total=len(lags))
@@ -515,7 +515,7 @@ def partial_auto_information_function(
         Tuple[int, ...],
         NDArray[int],
     ],
-    ignore_self: bool = False,
+    ignore_repetitions: bool = False,
     log_base: Union[float, str] = 2,
     n_jobs: Optional[int] = 1,
 ):
@@ -538,7 +538,7 @@ def partial_auto_information_function(
     lags : int | list, tuple, array of shape ``(n_lags,)``
         The lags at which to compute the auto-information function.
         If int, will use lags = np.arange(lags).
-    %(ignore_self)s
+    %(ignore_repetitions)s
     %(log_base)s
     %(n_jobs)s
 
@@ -555,12 +555,12 @@ def partial_auto_information_function(
     """  # noqa: E501
     labels = _check_segmentation(segmentation)
     lags = _check_lags(lags)
-    _check_type(ignore_self, (bool,), "ignore_self")
+    _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
     log_base = _check_log_base(log_base)
     n_jobs = _check_n_jobs(n_jobs)
 
     # ignore transition to itself (i.e. 1 -> 1)
-    if ignore_self:
+    if ignore_repetitions:
         labels = np.array([s for s, _ in itertools.groupby(labels)])
 
     parallel, p_fun, _ = parallel_func(

@@ -262,7 +262,7 @@ class _BaseSegmentation(Segmentation):
     @fill_doc
     def entropy(
         self,
-        ignore_self: bool = False,
+        ignore_repetitions: bool = False,
         log_base: Union[float, str] = 2,
     ):
         """Compute the Shannon entropy of the segmentation.
@@ -272,7 +272,7 @@ class _BaseSegmentation(Segmentation):
 
         Parameters
         ----------
-        %(ignore_self)s
+        %(ignore_repetitions)s
         %(log_base)s
 
         Returns
@@ -286,7 +286,7 @@ class _BaseSegmentation(Segmentation):
         """
         return entropy(
             self,
-            ignore_self=ignore_self,
+            ignore_repetitions=ignore_repetitions,
             log_base=log_base,
         )
 

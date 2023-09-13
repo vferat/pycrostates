@@ -116,16 +116,16 @@ def test__entropy():
 
 
 def test_entropy():
-    r = entropy(raw_segmentation, ignore_self=False, log_base=2)
+    r = entropy(raw_segmentation, ignore_repetitions=False, log_base=2)
     assert isinstance(r, float)
 
-    r = entropy(epochs_segmentation, ignore_self=False, log_base=2)
+    r = entropy(epochs_segmentation, ignore_repetitions=False, log_base=2)
     assert isinstance(r, float)
 
-    r = entropy(raw_segmentation, ignore_self=True, log_base=2)
+    r = entropy(raw_segmentation, ignore_repetitions=True, log_base=2)
     assert isinstance(r, float)
 
-    r = entropy(epochs_segmentation, ignore_self=False, log_base=10)
+    r = entropy(epochs_segmentation, ignore_repetitions=False, log_base=10)
     assert isinstance(r, float)
 
 
@@ -155,7 +155,7 @@ def test_excess_entropy_rate():
     excess_entropy_rate(
         raw_segmentation,
         history_length=10,
-        ignore_self=False,
+        ignore_repetitions=False,
         log_base=2,
     )
 
@@ -163,15 +163,15 @@ def test_excess_entropy_rate():
     excess_entropy_rate(
         epochs_segmentation,
         history_length=10,
-        ignore_self=False,
+        ignore_repetitions=False,
         log_base=2,
     )
 
-    # excess_entropy_rate: ignore_self
+    # excess_entropy_rate: ignore_repetitions
     excess_entropy_rate(
         raw_segmentation,
         history_length=10,
-        ignore_self=True,
+        ignore_repetitions=True,
         log_base=2,
     )
 
@@ -189,28 +189,28 @@ def test_auto_information_function():
     auto_information_function(
         raw_segmentation,
         lags=10,
-        ignore_self=False,
+        ignore_repetitions=False,
         log_base=2,
     )
     # Epochs
     auto_information_function(
         epochs_segmentation,
         lags=10,
-        ignore_self=False,
+        ignore_repetitions=False,
         log_base=2,
     )
-    # ignore_self
+    # ignore_repetitions
     auto_information_function(
         raw_segmentation,
         lags=10,
-        ignore_self=True,
+        ignore_repetitions=True,
         log_base=2,
     )
     # lags
     auto_information_function(
         raw_segmentation,
         lags=[1, 3, 10],
-        ignore_self=True,
+        ignore_repetitions=True,
         log_base=2,
     )
 
@@ -228,27 +228,27 @@ def test_partial_auto_information_function():
     partial_auto_information_function(
         raw_segmentation,
         lags=10,
-        ignore_self=False,
+        ignore_repetitions=False,
         log_base=2,
     )
     # Epochs
     partial_auto_information_function(
         epochs_segmentation,
         lags=10,
-        ignore_self=False,
+        ignore_repetitions=False,
         log_base=2,
     )
-    # ignore_self
+    # ignore_repetitions
     auto_information_function(
         raw_segmentation,
         lags=10,
-        ignore_self=True,
+        ignore_repetitions=True,
         log_base=2,
     )
     # lags
     auto_information_function(
         raw_segmentation,
         lags=[1, 3, 10],
-        ignore_self=True,
+        ignore_repetitions=True,
         log_base=2,
     )
