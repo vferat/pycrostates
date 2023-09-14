@@ -7,7 +7,7 @@ from typing import IO, Callable, List, Optional
 import psutil
 from packaging.requirements import Requirement
 
-from ._checks import check_type
+from ._checks import _check_type
 
 
 def sys_info(fid: Optional[IO] = None, developer: bool = False):
@@ -21,7 +21,7 @@ def sys_info(fid: Optional[IO] = None, developer: bool = False):
     developer : bool
         If True, display information about optional dependencies.
     """
-    check_type(developer, (bool,), "developer")
+    _check_type(developer, (bool,), "developer")
 
     ljust = 26
     out = partial(print, end="", file=fid)
