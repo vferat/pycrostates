@@ -9,9 +9,14 @@ import pytest
 from matplotlib import pyplot as plt
 from mne import EpochsArray, create_info
 from mne.io import RawArray
-from mne.io.pick import _picks_to_idx
+from mne.utils import check_version
 from numpy.random import PCG64, Generator
 from numpy.random.mtrand import RandomState
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_to_idx
+else:
+    from mne.io.pick import _picks_to_idx
 
 from pycrostates.utils._checks import (
     _check_axes,

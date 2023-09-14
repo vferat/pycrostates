@@ -3,9 +3,14 @@ from copy import copy, deepcopy
 from typing import Any, Union
 
 import numpy as np
-from mne.io import Info
-from mne.io.pick import _picks_to_idx, pick_info
+from mne import Info, pick_info
+from mne.utils import check_version
 from numpy.typing import NDArray
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_to_idx
+else:
+    from mne.io.pick import _picks_to_idx
 
 from .._typing import CHData, CHInfo
 from ..utils._checks import _check_type

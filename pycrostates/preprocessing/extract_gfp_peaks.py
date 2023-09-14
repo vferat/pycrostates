@@ -4,9 +4,14 @@ from typing import Optional, Union
 import numpy as np
 from mne import BaseEpochs, pick_info
 from mne.io import BaseRaw
-from mne.io.pick import _picks_to_idx
+from mne.utils import check_version
 from numpy.typing import NDArray
 from scipy.signal import find_peaks
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_to_idx
+else:
+    from mne.io.pick import _picks_to_idx
 
 from .._typing import CHData, Picks
 from ..utils._checks import (

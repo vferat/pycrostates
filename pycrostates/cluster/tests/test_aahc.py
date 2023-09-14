@@ -13,8 +13,13 @@ from mne import Annotations, Epochs, create_info, make_fixed_length_events
 from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import RawArray, read_raw_fif
-from mne.io.pick import _picks_to_idx
+from mne.utils import check_version
 from numpy.testing import assert_allclose
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_to_idx
+else:
+    from mne.io.pick import _picks_to_idx
 
 from pycrostates import __version__
 from pycrostates.cluster import AAHCluster
