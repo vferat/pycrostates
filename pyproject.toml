@@ -47,7 +47,9 @@ dependencies = [
     'matplotlib',
     'mne>=1.2',
     'numpy>=1.21',
+    'packaging',
     'pooch',
+    'psutil',
     'scikit-learn',
     'scipy',
 ]
@@ -94,6 +96,9 @@ homepage = 'https://pycrostates.readthedocs.io/en/master/'
 documentation = 'https://pycrostates.readthedocs.io/en/master/'
 source = 'https://github.com/vferat/pycrostates'
 tracker = 'https://github.com/vferat/pycrostates/issues'
+
+[project.scripts]
+pycrostates-sys_info = 'pycrostates.commands.sys_info:run'
 
 [tool.setuptools]
 include-package-data = false
