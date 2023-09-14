@@ -37,7 +37,7 @@ jobs:
           python -m pip install --progress-bar off --upgrade pip setuptools wheel
           python -m pip install --progress-bar off .[build]
       - name: Test package install
-        run: python -c "import pycrostates; print(pycrostates.__version__)"
+        run: pycrostates-sys_info
       - name: Remove package install
         run: python -m pip uninstall -y pycrostates
       - name: Build package
@@ -45,12 +45,12 @@ jobs:
       - name: Install sdist
         run: pip install ./dist/*.tar.gz
       - name: Test sdist install
-        run: python -c "import pycrostates; print(pycrostates.__version__)"
+        run: pycrostates-sys_info
       - name: Remove sdist install
         run: python -m pip uninstall -y pycrostates
       - name: Install wheel
         run: pip install ./dist/*.whl
       - name: Test wheel install
-        run: python -c "import pycrostates; print(pycrostates.__version__)"
+        run: pycrostates-sys_info
       - name: Remove wheel install
         run: python -m pip uninstall -y pycrostates
