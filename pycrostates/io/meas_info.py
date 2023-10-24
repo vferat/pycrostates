@@ -8,21 +8,18 @@ import numpy as np
 from mne import Info, Projection, Transform
 from mne.io.constants import FIFF
 from mne.utils import check_version
+from numpy.typing import NDArray
 
 if check_version("mne", "1.6"):
     from mne._fiff.meas_info import (
-        _check_bads,
         _check_ch_keys,
-        _check_dev_head_t,
         _unique_channel_names,
     )
     from mne._fiff.pick import get_channel_type_constants
     from mne._fiff.tag import _ch_coord_dict
 else:
     from mne.io.meas_info import (
-        _check_bads,
         _check_ch_keys,
-        _check_dev_head_t,
         _unique_channel_names,
     )
     from mne.io.pick import get_channel_type_constants
@@ -31,6 +28,30 @@ else:
 from .._typing import CHInfo
 from ..utils._checks import _check_type, _IntLike
 from ..utils._logs import logger
+
+
+def _check_bads(bads: List[str], *, info: Optional[Info] = None):
+    """Compatibility for MNE 1.6."""
+    if check_version("mne", "1.6"):
+        from mne._fiff.meas_info import _check_bads as _check_bads_mne
+
+        return _check_bads_mne(bads, info=info)
+    else:
+        from mne.io.meas_info import _check_bads as _check_bads_mne
+
+        return _check_bads_mne(bads)
+
+
+def _check_dev_head_t(dev_head_t: NDArray[float], *, info: Optional[Info]):
+    """Compatibility for MNE 1.6."""
+    if check_version("mne", "1.6"):
+        from mne._fiff.meas_info import _check_dev_head_t as _check_dev_head_t_mne
+
+        return _check_dev_head_t_mne(dev_head_t, info=info)
+    else:
+        from mne.io.meas_info import _check_dev_head_t as _check_dev_head_t_mne
+
+        return _check_dev_head_t_mne(dev_head_t)
 
 
 class ChInfo(CHInfo, Info):
@@ -393,7 +414,7 @@ class ChInfo(CHInfo, Info):
                 if not unlocked:
                     raise RuntimeError(self._attributes[key])
             else:
-                val = self._attributes[key](val)  # attribute checker function
+                val = self._attributes[key](val, info=self)  # checker function
         else:
             raise RuntimeError(
                 f"Info does not support setting the key {repr(key)}. Supported keys "
