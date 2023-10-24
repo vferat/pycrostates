@@ -171,7 +171,7 @@ numpydoc_xref_aliases = {
     # Matplotlib
     "Axes": "matplotlib.axes.Axes",
     "Axes3D": "mpl_toolkits.mplot3d.axes3d.Axes3D",
-    "colormap": ":doc:`colormap <matplotlib:tutorials/colors/colormaps>`",
+    "colormap": ":ref:`colormap <matplotlib:colormaps>`",
     "Figure": "matplotlib.figure.Figure",
     # Scipy
     "csr_matrix": "scipy.sparse.csr_matrix",
