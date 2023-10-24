@@ -37,9 +37,13 @@ jobs:
         with:
           check_filenames: true
           check_hidden: true
-          skip: ./.git,./build,./.github,*.bib
+          skip: ./.git,./build,./.github,*.bib,./.mypy_cache,./.pytest_cache
           ignore_words_file: ./.codespellignore
       - name: Run pydocstyle
         run: pydocstyle .
       - name: Run bibclean
         run: bibclean-check docs/references.bib
+      - name: Run toml-sort
+        run: toml-sort pyproject.toml --check
+      - name: Run yamllint
+        run: yamllint . -c .yamllint.yaml --strict
