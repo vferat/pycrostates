@@ -365,10 +365,9 @@ class ChInfo(CHInfo, Info):
             # compare projs, compatible with mne 1.2 and above
             if len(self["projs"]) != len(other["projs"]):
                 return False
-            if check_version("mne", "1.2"):
-                for proj1, proj2 in zip(self["projs"], other["projs"]):
-                    if proj1 != proj2:
-                        return False
+            for proj1, proj2 in zip(self["projs"], other["projs"]):
+                if proj1 != proj2:
+                    return False
 
             # TODO: compare compensation grades
 

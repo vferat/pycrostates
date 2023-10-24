@@ -377,7 +377,4 @@ def test_comparison(caplog):
     assert chinfo1 == chinfo2
     with chinfo1._unlock():
         chinfo1["projs"] = []
-    if check_version("mne", "1.2"):
-        assert chinfo1 != chinfo2
-    else:
-        assert chinfo1 == chinfo2
+    assert chinfo1 != chinfo2
