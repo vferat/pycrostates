@@ -1,28 +1,10 @@
 [build-system]
-requires = ['setuptools >= 61.0.0']
 build-backend = 'setuptools.build_meta'
+requires = ['setuptools >= 61.0.0']
 
 [project]
-name = 'pycrostates'
-version = '0.4.0.dev'
-description = 'A simple open source Python package for EEG microstate segmentation.'
-readme = 'README.md'
-license = {file = 'LICENSE'}
-requires-python = '>=3.8'
 authors = [
-  {name = 'Victor Férat', email = 'victor.ferat@unige.ch'}
-]
-maintainers = [
-  {name = 'Victor Férat', email = 'victor.ferat@unige.ch'},
-  {name = 'Mathieu Scheltienne', email = 'mathieu.scheltienne@fcbg.ch'}
-]
-keywords = [
-  'python',
-  'neuroscience',
-  'neuroimaging',
-  'eeg',
-  'microstates',
-  'brain'
+  {email = 'victor.ferat@unige.ch', name = 'Victor Férat'},
 ]
 classifiers = [
   'Intended Audience :: Developers',
@@ -33,11 +15,11 @@ classifiers = [
   'Operating System :: Microsoft :: Windows',
   'Operating System :: Unix',
   'Programming Language :: Python :: 3 :: Only',
-  'Programming Language :: Python :: 3.8',
-  'Programming Language :: Python :: 3.9',
   'Programming Language :: Python :: 3.10',
   'Programming Language :: Python :: 3.11',
-  'Topic :: Scientific/Engineering'
+  'Programming Language :: Python :: 3.12',
+  'Programming Language :: Python :: 3.9',
+  'Topic :: Scientific/Engineering',
 ]
 dependencies = [
   'decorator',
@@ -51,10 +33,34 @@ dependencies = [
   'pooch',
   'psutil',
   'scikit-learn',
-  'scipy'
+  'scipy',
 ]
+description = 'A simple open source Python package for EEG microstate segmentation.'
+keywords = [
+  'brain',
+  'eeg',
+  'microstates',
+  'neuroimaging',
+  'neuroscience',
+  'python',
+]
+license = {file = 'LICENSE'}
+maintainers = [
+  {email = 'mathieu.scheltienne@fcbg.ch', name = 'Mathieu Scheltienne'},
+  {email = 'victor.ferat@unige.ch', name = 'Victor Férat'},
+]
+name = 'pycrostates'
+readme = 'README.md'
+requires-python = '>=3.9'
+version = '0.4.0.dev'
 
 [project.optional-dependencies]
+all = [
+  'pycrostates[build]',
+  'pycrostates[docs]',
+  'pycrostates[style]',
+  'pycrostates[test]',
+]
 build = ['build', 'twine']
 docs = [
   'memory-profiler',
@@ -62,13 +68,13 @@ docs = [
   'pandas',
   'pydata-sphinx-theme',
   'pymatreader',
+  'seaborn',
   'sphinx',
-  'sphinxcontrib-bibtex',
   'sphinx-copybutton',
   'sphinx-design',
-  'sphinx_gallery',
   'sphinx-issues',
-  'seaborn'
+  'sphinx_gallery',
+  'sphinxcontrib-bibtex',
 ]
 style = [
   'bibclean',
@@ -78,34 +84,25 @@ style = [
   'pydocstyle[toml]',
   'ruff',
   'toml-sort',
-  'yamllint'
+  'yamllint',
 ]
 test = [
   'pymatreader',
-  'pytest==7.0.1',
   'pytest-azurepipelines',
-  'pytest-cov'
-]
-all = [
-  'pycrostates[build]',
-  'pycrostates[docs]',
-  'pycrostates[style]',
-  'pycrostates[test]'
+  'pytest-cov',
+  'pytest==7.0.1',
 ]
 
 [project.scripts]
 pycrostates-sys_info = 'pycrostates.commands.sys_info:run'
 
 [project.urls]
-homepage = 'https://pycrostates.readthedocs.io/en/master/'
 documentation = 'https://pycrostates.readthedocs.io/en/master/'
+homepage = 'https://pycrostates.readthedocs.io/en/master/'
 source = 'https://github.com/vferat/pycrostates'
 tracker = 'https://github.com/vferat/pycrostates/issues'
 
 [tool.black]
-line-length = 88
-target-version = ['py39']
-include = '\.pyi?$'
 extend-exclude = '''
 (
       __pycache__
@@ -117,12 +114,15 @@ extend-exclude = '''
     | tutorials/
 )
 '''
+include = '\.pyi?$'
+line-length = 88
+target-version = ['py39']
 
 [tool.coverage.report]
 exclude_lines = [
-  'pragma: no cover',
   'if __name__ == .__main__.:',
-  'if TYPE_CHECKING:'
+  'if TYPE_CHECKING:',
+  'pragma: no cover',
 ]
 precision = 2
 
@@ -133,43 +133,43 @@ omit = [
   '**/__init__.py',
   '**/pycrostates/_version.py',
   '**/pycrostates/utils/_fixes.py',
-  '**/tests/**'
+  '**/tests/**',
 ]
 
 [tool.isort]
-profile = 'black'
-multi_line_output = 3
-line_length = 88
-py_version = 39
 extend_skip_glob = [
   'docs/*',
   'paper/',
   'pycrostates/html_templates/repr/*',
   'setup.py',
-  'tutorials/*'
+  'tutorials/*',
 ]
+line_length = 88
+multi_line_output = 3
+profile = 'black'
+py_version = 39
 
 [tool.pydocstyle]
+add_ignore = 'D100,D104,D107'
 convention = 'numpy'
 ignore-decorators = '(copy_doc|property|.*setter|.*getter|pyqtSlot|Slot)'
 match = '^(?!setup|__init__|test_).*\.py'
 match-dir = '^pycrostates.*'
-add_ignore = 'D100,D104,D107'
 
 [tool.pytest.ini_options]
-minversion = '6.0'
 addopts = '--durations 20 --junit-xml=junit-results.xml -v --color=yes'
-junit_family = 'xunit2'
 filterwarnings = [
-  'ignore:Matplotlib is currently using agg:UserWarning'
+  'ignore:Matplotlib is currently using agg:UserWarning',
 ]
+junit_family = 'xunit2'
+minversion = '6.0'
 
 [tool.ruff]
-line-length = 88
 extend-exclude = [
   'doc',
-  'setup.py'
+  'setup.py',
 ]
+line-length = 88
 
 [tool.ruff.per-file-ignores]
 '__init__.py' = ['F401']
@@ -182,5 +182,10 @@ include-package-data = false
 'pycrostates.html_templates' = ['repr/*.jinja']
 
 [tool.setuptools.packages.find]
-include = ['pycrostates*']
 exclude = ['pycrostates*tests']
+include = ['pycrostates*']
+
+[tool.tomlsort]
+all = true
+ignore_case = true
+trailing_comma_inline_array = true
