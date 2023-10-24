@@ -10,10 +10,7 @@ from mne.io.constants import FIFF
 from mne.utils import check_version
 
 if check_version("mne", "1.6"):
-    from mne._fiff.meas_info import (
-        _check_ch_keys,
-        _unique_channel_names,
-    )
+    from mne._fiff.meas_info import _check_ch_keys, _unique_channel_names
     from mne._fiff.pick import get_channel_type_constants
     from mne._fiff.tag import _ch_coord_dict
 else:
