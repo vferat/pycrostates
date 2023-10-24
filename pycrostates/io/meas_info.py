@@ -29,30 +29,6 @@ from ..utils._checks import _check_type, _IntLike
 from ..utils._logs import logger
 
 
-def _check_bads(bads: List[str], *, info: Optional[Info] = None):
-    """Compatibility for MNE 1.6."""
-    if check_version("mne", "1.6"):
-        from mne._fiff.meas_info import _check_bads as _check_bads_mne
-
-        return _check_bads_mne(bads, info=info)
-    else:
-        from mne.io.meas_info import _check_bads as _check_bads_mne
-
-        return _check_bads_mne(bads)
-
-
-def _check_dev_head_t(dev_head_t: Transform, *, info: Optional[Info]):
-    """Compatibility for MNE 1.6."""
-    if check_version("mne", "1.6"):
-        from mne._fiff.meas_info import _check_dev_head_t as _check_dev_head_t_mne
-
-        return _check_dev_head_t_mne(dev_head_t, info=info)
-    else:
-        from mne.io.meas_info import _check_dev_head_t as _check_dev_head_t_mne
-
-        return _check_dev_head_t_mne(dev_head_t)
-
-
 class ChInfo(CHInfo, Info):
     """Atemporal measurement information.
 
@@ -175,34 +151,6 @@ class ChInfo(CHInfo, Info):
         coord_frame : int
             The coordinate frame used, e.g. ``FIFFV_COORD_HEAD``.
     """
-
-    # valid items
-    # fmt: off
-    _attributes = {
-        "bads": _check_bads,
-        "ch_names": "ch_names cannot be set directly. Please use methods "
-                    "inst.add_channels(), inst.drop_channels(), inst.pick_channels(), "
-                    "inst.rename_channels(), inst.reorder_channels() and "
-                    "inst.set_channel_types() instead.",
-        "chs": "chs cannot be set directly. Please use methods inst.add_channels(), "
-               "inst.drop_channels(), inst.pick_channels(), inst.rename_channels(), "
-               "inst.reorder_channels() and inst.set_channel_types() instead.",
-        "comps": "comps cannot be set directly. "
-                 "Please use method Raw.apply_gradient_compensation() instead.",
-        "ctf_head_t": "ctf_head_t cannot be set directly.",
-        "custom_ref_applied": "custom_ref_applied cannot be set directly. "
-                              "Please use method inst.set_eeg_reference() instead.",
-        "dev_ctf_t": "dev_ctf_t cannot be set directly.",
-        "dev_head_t": _check_dev_head_t,
-        "dig": "dig cannot be set directly. Please use method inst.set_montage() "
-               "instead.",
-        "nchan": "nchan cannot be set directly. Please use methods "
-                 "inst.add_channels(), inst.drop_channels(), and inst.pick_channels() "
-                 "instead.",
-        "projs": "projs cannot be set directly. Please use methods inst.add_proj() and "
-                 "inst.del_proj() instead.",
-    }
-    # fmt: on
 
     def __init__(
         self,
@@ -403,24 +351,6 @@ class ChInfo(CHInfo, Info):
         return not self.__eq__(other)
 
     # ------------------------------------------------------------------------
-    def __setitem__(self, key, val):
-        """Setter for Dictionary item."""
-        # During unpickling, the _unlocked attribute has not been set, so
-        # let __setstate__ do it later and act unlocked now
-        unlocked = getattr(self, "_unlocked", True)
-        if key in self._attributes:
-            if isinstance(self._attributes[key], str):
-                if not unlocked:
-                    raise RuntimeError(self._attributes[key])
-            else:
-                val = self._attributes[key](val, info=self)  # checker function
-        else:
-            raise RuntimeError(
-                f"Info does not support setting the key {repr(key)}. Supported keys "
-                f"are {', '.join(repr(k) for k in self._attributes)}"
-            )
-        super().__setitem__(key, val)  # calls the dict __setitem__
-
     def __deepcopy__(self, memodict):
         """Make a deepcopy."""
         result = ChInfo.__new__(ChInfo)

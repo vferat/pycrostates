@@ -9,7 +9,6 @@ from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import read_raw_fif
 from mne.io.constants import FIFF
-from mne.utils import check_version
 from numpy.testing import assert_allclose
 
 from pycrostates.io import ChInfo
@@ -317,7 +316,7 @@ def test_setting_invalid_keys():
     chinfo = ChInfo(info=info)
 
     with pytest.raises(
-        RuntimeError, match="Supported keys are 'bads', 'ch_names', 'chs'"
+        RuntimeError, match="Info does not support directly setting the key 'test'"
     ):
         chinfo["test"] = 5
 
