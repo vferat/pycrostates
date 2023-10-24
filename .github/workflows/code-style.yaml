@@ -24,14 +24,14 @@ jobs:
         run: |
           python -m pip install --progress-bar off --upgrade pip setuptools
           python -m pip install --progress-bar off .[style]
-      - name: Run Ruff
-        run: ruff check pycrostates
       - name: Run isort
         uses: isort/isort-action@master
       - name: Run black
         uses: psf/black@stable
         with:
           options: "--check --verbose"
+      - name: Run Ruff
+        run: ruff check pycrostates
       - name: Run codespell
         uses: codespell-project/actions-codespell@master
         with:
