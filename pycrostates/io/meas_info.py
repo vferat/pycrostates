@@ -8,7 +8,6 @@ import numpy as np
 from mne import Info, Projection, Transform
 from mne.io.constants import FIFF
 from mne.utils import check_version
-from numpy.typing import NDArray
 
 if check_version("mne", "1.6"):
     from mne._fiff.meas_info import (
@@ -42,7 +41,7 @@ def _check_bads(bads: List[str], *, info: Optional[Info] = None):
         return _check_bads_mne(bads)
 
 
-def _check_dev_head_t(dev_head_t: NDArray[float], *, info: Optional[Info]):
+def _check_dev_head_t(dev_head_t: Transform, *, info: Optional[Info]):
     """Compatibility for MNE 1.6."""
     if check_version("mne", "1.6"):
         from mne._fiff.meas_info import _check_dev_head_t as _check_dev_head_t_mne
