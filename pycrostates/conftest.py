@@ -16,6 +16,8 @@ def pytest_configure(config):
     ignore:Matplotlib is currently using agg:UserWarning
     # Pytest internal
     ignore:datetime\.datetime\.utcfromtimestamp.*is deprecated.*:DeprecationWarning
+    ignore:datetime\.datetime\.utcnow.*is deprecated.*:DeprecationWarning
+    ignore:Use setlocale.*instead:DeprecationWarning
     """
     for warning_line in warnings_lines.split("\n"):
         warning_line = warning_line.strip()
