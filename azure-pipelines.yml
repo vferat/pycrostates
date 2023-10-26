@@ -40,7 +40,6 @@ stages:
           CACHE_PATH_MNE_LINUX: /home/vsts/mne_data
           CACHE_PATH_MNE_MACOS: /Users/runner/mne_data
           CACHE_PATH_MNE_WINDOWS: C:\Users\VssAdministrator\mne_data
-          MPLBACKEND: agg
         strategy:
           matrix:
             linux 3.9:

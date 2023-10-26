@@ -158,9 +158,6 @@ match-dir = '^pycrostates.*'
 
 [tool.pytest.ini_options]
 addopts = '--durations 20 --junit-xml=junit-results.xml -v --color=yes'
-filterwarnings = [
-  'ignore:Matplotlib is currently using agg:UserWarning',
-]
 junit_family = 'xunit2'
 minversion = '6.0'
 
