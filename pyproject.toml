@@ -132,6 +132,7 @@ cover_pylib = false
 omit = [
   '**/__init__.py',
   '**/pycrostates/_version.py',
+  '**/pycrostates/conftest.py',
   '**/pycrostates/utils/_fixes.py',
   '**/tests/**',
 ]
