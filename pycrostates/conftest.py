@@ -15,7 +15,7 @@ def pytest_configure(config):
     # We use matplotlib agg backend to avoid any window to pop up during tests.
     ignore:Matplotlib is currently using agg:UserWarning
     # Pytest internal
-    ignore:datetime\.utcfromtimestamp.*is deprecated:DeprecationWarning
+    ignore:datetime\.datetime\.utcfromtimestamp.*is deprecated.*:DeprecationWarning
     """
     for warning_line in warnings_lines.split("\n"):
         warning_line = warning_line.strip()
