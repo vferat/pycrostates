@@ -24,6 +24,7 @@ def pytest_configure(config):
         if warning_line and not warning_line.startswith("#"):
             config.addinivalue_line("filterwarnings", warning_line)
 
+    logger.propagate = True
     set_log_level_mne("WARNING")
     set_log_level("WARNING")
 
