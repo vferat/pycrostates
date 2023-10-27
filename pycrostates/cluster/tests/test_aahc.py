@@ -7,7 +7,6 @@ from itertools import groupby
 
 import numpy as np
 import pytest
-from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 from mne import Annotations, Epochs, create_info, make_fixed_length_events
 from mne.channels import DigMontage
