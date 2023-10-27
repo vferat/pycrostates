@@ -4,7 +4,8 @@ import warnings
 import pytest
 from mne import set_log_level as set_log_level_mne
 
-from pycrostates import logger, set_log_level
+from pycrostates import set_log_level
+from pycrostates.utils._logs import logger
 
 
 def pytest_configure(config):
