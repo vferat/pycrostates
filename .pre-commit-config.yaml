@@ -52,4 +52,4 @@ repos:
       hooks:
           - id: yamllint
             args: [--strict, -c, .yamllint.yaml]
-            files: (.github/|.codecov.yaml|.pre-commit-config.yaml|.prospector.yaml|.readthedocs.yaml|azure-pipelines.yml)
+            files: (.github/|.codecov.yaml|.pre-commit-config.yaml|.prospector.yaml|.readthedocs.yaml)
