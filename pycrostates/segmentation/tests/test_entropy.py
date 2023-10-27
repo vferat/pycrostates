@@ -32,14 +32,11 @@ fname_raw_testing = dir_ / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname_raw_testing, preload=False)
 raw = raw.pick("eeg").crop(0, 10)
 raw = raw.load_data().filter(1, 40).apply_proj()
-
 epochs = make_fixed_length_epochs(raw, 1, preload=True)
-
 ModK_raw = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4, random_state=1)
 ModK_epochs = ModKMeans(n_clusters=4, n_init=10, max_iter=100, tol=1e-4, random_state=1)
 ModK_raw.fit(raw, n_jobs=1)
 ModK_epochs.fit(epochs, n_jobs=1)
-
 raw_segmentation = ModK_raw.predict(raw)
 epochs_segmentation = ModK_epochs.predict(epochs)
 
