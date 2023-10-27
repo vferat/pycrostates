@@ -90,7 +90,7 @@ test = [
   'pymatreader',
   'pytest-azurepipelines',
   'pytest-cov',
-  'pytest==7.0.1',
+  'pytest',
 ]
 
 [project.scripts]
