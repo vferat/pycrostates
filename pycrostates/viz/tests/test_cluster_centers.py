@@ -22,29 +22,22 @@ def test_plot_cluster_centers(caplog):
 
     # plot with info
     plot_cluster_centers(cluster_centers, info)
-    plt.close("all")
 
     # plot with chinfo
     plot_cluster_centers(cluster_centers, chinfo)
-    plt.close("all")
 
     # provide cluster_names
     plot_cluster_centers(cluster_centers, info, ["A", "B"])
-    plt.close("all")
 
     # provide ax
     f, ax = plt.subplots(1, 2)
     plot_cluster_centers(cluster_centers, chinfo, axes=ax)
-    plt.close("all")
     f, ax = plt.subplots(2, 1)
     plot_cluster_centers(cluster_centers, info, axes=ax)
-    plt.close("all")
 
     # provide show
     plot_cluster_centers(cluster_centers, info, show=True)
-    plt.close("all")
     plot_cluster_centers(cluster_centers, info, show=False)
-    plt.close("all")
 
     # invalid arguments
     cluster_centers_ = [[1.1, 1, 1.2], [0.4, 0.8, 0.7]]
@@ -76,7 +69,6 @@ def test_plot_cluster_centers(caplog):
     f, ax = plt.subplots(1, 1)
     with pytest.raises(ValueError, match="Argument 'cluster_centers' and 'axes' must "):
         plot_cluster_centers(cluster_centers, info=chinfo, axes=ax)
-    plt.close("all")
 
     # invalid show
     with pytest.raises(TypeError, match="'show' must be an "):
@@ -84,7 +76,6 @@ def test_plot_cluster_centers(caplog):
 
     # gradient
     plot_cluster_centers(cluster_centers, info, show_gradient=True)
-    plt.close("all")
 
     # gradient_kwargs
     plot_cluster_centers(
@@ -93,7 +84,6 @@ def test_plot_cluster_centers(caplog):
         show_gradient=True,
         gradient_kwargs={"color": "red"},
     )
-    plt.close("all")
 
     caplog.clear()
     plot_cluster_centers(
@@ -102,7 +92,6 @@ def test_plot_cluster_centers(caplog):
         show_gradient=False,
         gradient_kwargs={"color": "red"},
     )
-    plt.close("all")
     assert "argument 'gradient_kwargs' has not effect when" in caplog.text
 
 
@@ -121,4 +110,3 @@ def test_with_grid_layout():
 
     f, ax = plt.subplots(2, 2)
     plot_cluster_centers(cluster_centers, info, axes=ax)
-    plt.close("all")

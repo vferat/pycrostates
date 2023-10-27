@@ -122,12 +122,10 @@ def test_plot_cluster_centers(ModK, inst):
     # with raw
     segmentation = ModK.predict(inst)
     segmentation.plot_cluster_centers()
-    plt.close("all")
 
     # with axes provided
     f, ax = plt.subplots(2, 2)
     segmentation.plot_cluster_centers(axes=ax)
-    plt.close("all")
 
 
 @pytest.mark.parametrize(
@@ -187,20 +185,15 @@ def test_plot_segmentation(ModK, inst):
     segmentation = ModK.predict(inst)
 
     segmentation.plot()
-    plt.close("all")
     segmentation.plot(cmap="plasma")
-    plt.close("all")
     f, ax = plt.subplots(1, 1)
     segmentation.plot(axes=ax)
-    plt.close("all")
     f, ax = plt.subplots(1, 1)
     segmentation.plot(cbar_axes=ax)
-    plt.close("all")
 
     # specific to raw
     if isinstance(inst, BaseRaw):
         segmentation.plot(tmin=0, tmax=5)
-        plt.close("all")
 
 
 @pytest.mark.parametrize(

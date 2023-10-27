@@ -127,7 +127,7 @@ def plot_cluster_centers(
         _check_type(show, (bool,), "show")
         del kwargs["show"]
     else:
-        show = True
+        show = plt.isinteractive()
 
     # plot cluster centers
     for k, (center, name) in enumerate(zip(cluster_centers, cluster_names)):

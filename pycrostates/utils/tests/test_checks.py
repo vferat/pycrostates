@@ -122,24 +122,19 @@ def test_check_axes():
     # test valid inputs
     _, ax = plt.subplots(1, 1)
     _check_axes(ax)
-    plt.close("all")
     _, ax = plt.subplots(1, 2)
     _check_axes(ax)
-    plt.close("all")
     _, ax = plt.subplots(2, 1)
     _check_axes(ax)
-    plt.close("all")
 
     # test invalid inputs
     f, ax = plt.subplots(1, 1)
     with pytest.raises(TypeError, match="must be an instance of"):
         _check_axes(f)
-    plt.close("all")
     _, ax = plt.subplots(10, 10)
     ax = ax.reshape((2, 5, 10))
     with pytest.raises(ValueError, match="Argument 'axes' should be a"):
         _check_axes(ax)
-    plt.close("all")
 
 
 def test_check_reject_by_annotation():

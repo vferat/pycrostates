@@ -193,7 +193,6 @@ def test_ModKMeans():
     assert isinstance(f, Figure)
     with pytest.raises(RuntimeError, match="must be fitted before"):
         ModK2.plot(block=False)
-    plt.close("all")
 
 
 def test_invert_polarity():

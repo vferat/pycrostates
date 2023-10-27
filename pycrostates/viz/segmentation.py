@@ -242,7 +242,7 @@ def _plot_segmentation(
         _check_type(show, (bool,), "show")
         del kwargs["show"]
     else:
-        show = True
+        show = plt.isinteractive()
 
     # add color and linewidth if absent from kwargs
     if "color" not in kwargs:
