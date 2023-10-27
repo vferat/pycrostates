@@ -232,7 +232,7 @@ def _plot_segmentation(
         )
 
     if axes is None:
-        fig, axes = plt.subplots(1, 1)
+        fig, axes = plt.subplots(1, 1, layout="constrained")
     else:
         fig = axes.get_figure()
 

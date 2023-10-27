@@ -92,7 +92,7 @@ def plot_cluster_centers(
     # create axes if needed, and retrieve figure
     n_clusters = cluster_centers.shape[0]
     if axes is None:
-        f, axes = plt.subplots(1, n_clusters)
+        f, axes = plt.subplots(1, n_clusters, layout="constrained")
         if isinstance(axes, Axes):
             axes = np.array([axes])  # wrap in an array-like
         # sanity-check
