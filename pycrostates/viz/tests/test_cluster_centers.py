@@ -36,8 +36,12 @@ def test_plot_cluster_centers(caplog):
     plot_cluster_centers(cluster_centers, info, axes=ax)
 
     # provide show
-    plot_cluster_centers(cluster_centers, info, show=True)
-    plot_cluster_centers(cluster_centers, info, show=False)
+    # do not provide show=True for CIs with non-interactive backend
+    if plt.isinteractive():
+        plot_cluster_centers(cluster_centers, info, show=True)
+        plot_cluster_centers(cluster_centers, info, show=False)
+    else:
+        plot_cluster_centers(cluster_centers, info, show=False)
 
     # invalid arguments
     cluster_centers_ = [[1.1, 1, 1.2], [0.4, 0.8, 0.7]]
