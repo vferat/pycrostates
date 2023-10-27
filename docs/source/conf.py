@@ -94,9 +94,8 @@ html_theme_options = {
             "icon": "fab fa-slack",
         },
     ],
-    "external_links": [
-        {"name": "MNE", "url": "https://mne.tools/stable/index.html"}
-    ],
+    "external_links": [{"name": "MNE", "url": "https://mne.tools/stable/index.html"}],
+    "navigation_with_keys": False,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -260,6 +259,7 @@ sphinx_gallery_conf = {
     ),
     "within_subsection_order": FileNameSortKey,
 }
+
 
 def append_attr_meth_examples(app, what, name, obj, options, lines):
     """Append SG examples backreferences to method and attr docstrings."""
