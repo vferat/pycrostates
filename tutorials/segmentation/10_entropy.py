@@ -2,35 +2,34 @@
 Microstate Segmentation
 =======================
 
-This tutorial introduces .
+This tutorial introduces measures of entropy and excess entropy for microstate.
+
+We start by fitting a modified K-means
+(:class:`~pycrostates.cluster.ModKMeans`) with a sample dataset. For more
+details about fitting a clustering algorithm, please refer to
+:ref:`this tutorial <sphx_glr_generated_auto_tutorials_cluster_00_modK.py>`.
+
+.. note::
+
+    The lemon datasets used in this tutorial is composed of EEGLAB files. To
+    use the MNE reader :func:`mne.io.read_raw_eeglab`, the ``pymatreader``
+    optional dependency is required. Use the following installation method
+    appropriate for your environment:
+
+    - ``pip install pymatreader``
+    - ``conda install -c conda-forge pymatreader``
+
+    Note that an environment created via the `MNE installers`_ includes
+    ``pymatreader`` by default.
+
+.. include:: ../../../../links.inc
 """
 
-#%%
-# .. include:: ../../../../links.inc
-
-#%%
-# Entropy
-# ------------
-#
-# We start by fitting a modified K-means
-# (:class:`~pycrostates.cluster.ModKMeans`) with a sample dataset. For more
-# details about fitting a clustering algorithm, please refer to
-# :ref:`this tutorial <sphx_glr_generated_auto_tutorials_cluster_00_modK.py>`.
-#
-# .. note::
-#
-#     The lemon datasets used in this tutorial is composed of EEGLAB files. To
-#     use the MNE reader :func:`mne.io.read_raw_eeglab`, the ``pymatreader``
-#     optional dependency is required. Use the following installation method
-#     appropriate for your environment:
-#
-#     - ``pip install pymatreader``
-#     - ``conda install -c conda-forge pymatreader``
-#
-#     Note that an environment created via the `MNE installers`_ includes
-#     ``pymatreader`` by default.
+# %%
 
 # sphinx_gallery_thumbnail_number = 2
+
+import numpy as np
 from matplotlib import pyplot as plt
 from mne.io import read_raw_eeglab
 
@@ -49,8 +48,8 @@ ModK.reorder_clusters(order=[4, 1, 3, 2, 0])
 ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
 ModK.plot()
 
-#%%
-# Once a set of cluster centers has been fitted, It can be used to predict the
+# %%
+# Once a set of cluster centers has been fitted, it can be used to predict the
 # microstate segmentation with the method
 # :meth:`pycrostates.cluster.ModKMeans.predict`. It returns either a
 # `~pycrostates.segmentation.RawSegmentation` or an
@@ -66,58 +65,71 @@ segmentation = ModK.predict(
     reject_edges=True,
 )
 
-#%%
+# %%
 # Entropy
+# -------
 # TODO: explain the concept of entropy and its application to MS analysis
+
 h = segmentation.entropy(ignore_repetitions=False)
 
-#%%
-# We can also ignore state repetitions (i.e. self-transitions) by setting the ignore_repetitions to True.
-# This is useful when you don't want to take state duration into account.
+# %%
+# We can also ignore state repetitions (i.e. self-transitions) by setting the
+# ``ignore_repetitions`` to True. This is useful when you don't want to take state
+# duration into account.
+
 h = segmentation.entropy(ignore_repetitions=True)
 
-#%%
+# %%
 # Excess entropy
+# --------------
 # TODO: explain the concept of excess entropy and its application to MS analysis and parameters.
+
 from pycrostates.segmentation import excess_entropy_rate
-import matplotlib.pyplot as plt
 
-a, b, residuals, lags, joint_entropies = excess_entropy_rate(segmentation, history_length=12, ignore_repetitions=False)
+a, b, residuals, lags, joint_entropies = excess_entropy_rate(
+    segmentation, history_length=12, ignore_repetitions=False
+)
 
-plt.figure()
-plt.plot(lags, joint_entropies, '-sk')
-plt.plot(lags, a*lags+b, '-b')
+plt.figure(layout="constrained")
+plt.plot(lags, joint_entropies, "-sk")
+plt.plot(lags, a * lags + b, "-b")
 plt.title("Entropy rate & excess entropy")
 plt.show()
 
-#%%
-# auto_information_function
+# %%
+# Auto information function (AIF)
+# -------------------------------
 # TODO: explain the auto_information_function and parameters.
+
 from pycrostates.segmentation import auto_information_function
-import numpy as np
 
-lags, ai = auto_information_function(segmentation, lags=np.arange(1, 20), ignore_repetitions=False, n_jobs=2)
+lags, ai = auto_information_function(
+    segmentation, lags=np.arange(1, 20), ignore_repetitions=False, n_jobs=2
+)
 
-plt.figure()
-plt.plot(lags, ai, '-sk')
+plt.figure(layout="constrained")
+plt.plot(lags, ai, "-sk")
 plt.title("Auto information function")
 plt.show()
 
-#%%
-# partial_auto_information_function
+# %%
+# Partial Auto information function (pAIF)
+# ----------------------------------------
 # TODO: explain the partial_auto_information_function and parameters.
-from pycrostates.segmentation import partial_auto_information_function
-import numpy as np
 
-lags, pai = partial_auto_information_function(segmentation, lags=np.arange(1, 5), ignore_repetitions=False, n_jobs=1)
+from pycrostates.segmentation import partial_auto_information_function
+
+lags, pai = partial_auto_information_function(
+    segmentation, lags=np.arange(1, 5), ignore_repetitions=False, n_jobs=1
+)
 
 plt.figure()
-plt.plot(lags, pai, '-sk')
+plt.plot(lags, pai, "-sk")
 plt.title("Partial Auto information function")
 plt.show()
 
 
-#%%
+# %%
 # References
 # ----------
 # .. footbibliography::
