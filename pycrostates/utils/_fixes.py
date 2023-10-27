@@ -1,6 +1,7 @@
 """Temporary bug-fixes awaiting an upstream fix."""
 
 import sys
+from warnings import warn
 
 
 # https://github.com/sphinx-gallery/sphinx-gallery/issues/1112
@@ -18,3 +19,13 @@ class _WrapStdOut(object):
             return getattr(sys.stdout, name)
         else:
             raise AttributeError(f"'file' object has not attribute '{name}'")
+
+
+def deprecate(old: str, new: str) -> None:
+    """Warn about deprecation of an argument."""
+    warn(
+        f"The '{old}' argument is deprecated and will be removed in future "
+        f"versions. Please use '{new}' instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )

@@ -1,12 +1,12 @@
 from itertools import groupby
-from typing import Union
+from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
 
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
-from ..utils._logs import logger
+from ..utils._fixes import deprecate
 
 
 @fill_doc
@@ -14,7 +14,7 @@ def compute_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: Union[bool, None] = None,
+    ignore_self: Optional[bool] = None,
     ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute the observed transition matrix.
@@ -37,18 +37,12 @@ def compute_transition_matrix(
     _check_labels_n_clusters(labels, n_clusters)
     _check_type(
         ignore_self,
-        (
-            bool,
-            None,
-        ),
+        (bool, None),
         "ignore_self",
     )
     _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
     if ignore_self is not None:
-        logger.warning(
-            "The 'ignore_self' parameter is deprecated and will be removed in \
-            future versions. Please use the 'ignore_repetitions' parameter instead."
-        )
+        deprecate("ignore_self", "ignore_repetitions")
         ignore_repetitions = ignore_self
     return _compute_transition_matrix(
         labels,
@@ -98,7 +92,7 @@ def compute_expected_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: Union[bool, None] = None,
+    ignore_self: Optional[bool] = None,
     ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute the expected transition matrix.
@@ -133,10 +127,7 @@ def compute_expected_transition_matrix(
     )
     _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
     if ignore_self is not None:
-        logger.warning(
-            "The 'ignore_self' parameter is deprecated and will be removed in \
-            future versions. Please use the 'ignore_repetitions' parameter instead."
-        )
+        deprecate("ignore_self", "ignore_repetitions")
         ignore_repetitions = ignore_self
     return _compute_expected_transition_matrix(
         labels,
@@ -158,6 +149,7 @@ def _compute_expected_transition_matrix(
     """
     # common error checking
     _check_value(stat, ("probability", "proportion", "percent"), "stat")
+    _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
 
     # reshape if epochs (returns a view)
     labels = labels.reshape(-1)
