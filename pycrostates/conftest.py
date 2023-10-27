@@ -9,8 +9,7 @@ from pycrostates import set_log_level
 
 def pytest_configure(config):
     """Configure pytest options."""
-    for fixture in ("matplotlib_config", "close_all"):
-        config.addinivalue_line("usefixtures", fixture)
+    config.addinivalue_line("usefixtures", "matplotlib_config")
 
     warnings_lines = r"""
     error::
