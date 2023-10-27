@@ -1,6 +1,6 @@
 """
-Microstate Segmentation
-=======================
+Segmentation metrics
+====================
 
 This tutorial introduces measures of entropy and excess entropy for microstate.
 
