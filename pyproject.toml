@@ -88,9 +88,9 @@ style = [
 ]
 test = [
   'pymatreader',
+  'pytest',
   'pytest-azurepipelines',
   'pytest-cov',
-  'pytest',
 ]
 
 [project.scripts]
