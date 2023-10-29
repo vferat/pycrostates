@@ -19,6 +19,7 @@ def pytest_configure(config):
     # Pytest internals
     ignore:Use setlocale.*instead:DeprecationWarning
     ignore:datetime\.datetime\.utcnow.*is deprecated.*:DeprecationWarning
+    ignore:datetime\.datetime\.utcfromtimestamp.*is deprecated.*:DeprecationWarning
     """
     for warning_line in warnings_lines.split("\n"):
         warning_line = warning_line.strip()
