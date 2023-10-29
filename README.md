@@ -38,7 +38,7 @@ To cite specific version numbers of the software, you can use the DOIs provided
 by [Zenodo](https://zenodo.org/record/7129852).
 
 ## Contributing
-
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/vferat/pycrostates/main.svg)](https://results.pre-commit.ci/latest/github/vferat/pycrostates/main)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
