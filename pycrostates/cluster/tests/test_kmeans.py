@@ -7,7 +7,6 @@ from itertools import groupby
 
 import numpy as np
 import pytest
-from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 from mne import Annotations, Epochs, create_info, make_fixed_length_events
 from mne.channels import DigMontage
@@ -193,7 +192,6 @@ def test_ModKMeans():
     assert isinstance(f, Figure)
     with pytest.raises(RuntimeError, match="must be fitted before"):
         ModK2.plot(block=False)
-    plt.close("all")
 
 
 def test_invert_polarity():
