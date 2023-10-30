@@ -2,7 +2,7 @@
 [![PyPI version](https://badge.fury.io/py/pycrostates.svg)](https://badge.fury.io/py/pycrostates)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/pycrostates.svg)](https://anaconda.org/conda-forge/pycrostates)
 [![Documentation Status](https://readthedocs.org/projects/pycrostates/badge/?version=latest)](https://pycrostates.readthedocs.io/en/latest/?badge=latest)
-[![Build Status](https://dev.azure.com/vferat/pycrostates/_apis/build/status/vferat.pycrostates?branchName=main)](https://dev.azure.com/vferat/pycrostates/_build/latest?definitionId=1&branchName=main)
+[![tests](https://github.com/vferat/pycrostates/actions/workflows/pytest.yaml/badge.svg?branch=main)](https://github.com/vferat/pycrostates/actions/workflows/pytest.yaml)
 [![codecov](https://codecov.io/gh/vferat/pycrostates/branch/master/graph/badge.svg?token=47COGGCGX8)](https://codecov.io/gh/vferat/pycrostates)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/029e425f90614943b0a944e03922b637)](https://www.codacy.com/gh/vferat/pycrostates/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vferat/pycrostates&amp;utm_campaign=Badge_Grade)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.04564/status.svg)](https://doi.org/10.21105/joss.04564)
@@ -38,7 +38,7 @@ To cite specific version numbers of the software, you can use the DOIs provided
 by [Zenodo](https://zenodo.org/record/7129852).
 
 ## Contributing
-
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/vferat/pycrostates/main.svg)](https://results.pre-commit.ci/latest/github/vferat/pycrostates/main)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->

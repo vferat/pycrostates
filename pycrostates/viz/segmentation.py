@@ -232,7 +232,7 @@ def _plot_segmentation(
         )
 
     if axes is None:
-        fig, axes = plt.subplots(1, 1)
+        fig, axes = plt.subplots(1, 1, layout="constrained")
     else:
         fig = axes.get_figure()
 
@@ -242,7 +242,7 @@ def _plot_segmentation(
         _check_type(show, (bool,), "show")
         del kwargs["show"]
     else:
-        show = True
+        show = plt.isinteractive()
 
     # add color and linewidth if absent from kwargs
     if "color" not in kwargs:

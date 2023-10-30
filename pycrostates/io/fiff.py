@@ -8,29 +8,52 @@ from pathlib import Path
 from typing import List, Union
 
 import numpy as np
-from mne.io import Info
-from mne.io._digitization import _format_dig_points, _read_dig_fif
+from mne import Info, Transform
 from mne.io.constants import FIFF
-from mne.io.ctf_comp import _read_ctf_comp, write_ctf_comp
-from mne.io.meas_info import _read_bad_channels, _write_ch_infos
-from mne.io.open import fiff_open
-from mne.io.proj import _read_proj, _write_proj
-from mne.io.tag import read_tag
-from mne.io.tree import dir_tree_find
-from mne.io.write import (
-    end_block,
-    start_and_end_file,
-    start_block,
-    write_coord_trans,
-    write_dig_points,
-    write_double_matrix,
-    write_id,
-    write_int,
-    write_name_list,
-    write_string,
-)
-from mne.transforms import Transform, invert_transform
+from mne.transforms import invert_transform
+from mne.utils import check_version
 from numpy.typing import NDArray
+
+if check_version("mne", "1.6"):
+    from mne._fiff._digitization import _format_dig_points, _read_dig_fif
+    from mne._fiff.ctf_comp import _read_ctf_comp, write_ctf_comp
+    from mne._fiff.meas_info import _read_bad_channels, _write_ch_infos
+    from mne._fiff.open import fiff_open
+    from mne._fiff.proj import _read_proj, _write_proj
+    from mne._fiff.tag import read_tag
+    from mne._fiff.tree import dir_tree_find
+    from mne._fiff.write import (
+        end_block,
+        start_and_end_file,
+        start_block,
+        write_coord_trans,
+        write_dig_points,
+        write_double_matrix,
+        write_id,
+        write_int,
+        write_name_list,
+        write_string,
+    )
+else:
+    from mne.io._digitization import _format_dig_points, _read_dig_fif
+    from mne.io.ctf_comp import _read_ctf_comp, write_ctf_comp
+    from mne.io.meas_info import _read_bad_channels, _write_ch_infos
+    from mne.io.open import fiff_open
+    from mne.io.proj import _read_proj, _write_proj
+    from mne.io.tag import read_tag
+    from mne.io.tree import dir_tree_find
+    from mne.io.write import (
+        end_block,
+        start_and_end_file,
+        start_block,
+        write_coord_trans,
+        write_dig_points,
+        write_double_matrix,
+        write_id,
+        write_int,
+        write_name_list,
+        write_string,
+    )
 
 from .. import __version__
 from .._typing import CHInfo
@@ -521,13 +544,13 @@ def _read_meas_info(fid, tree):
         pos = meas_info["directory"][k].pos
         if kind == FIFF.FIFF_NCHAN:
             tag = read_tag(fid, pos)
-            nchan = int(tag.data)
+            nchan = int(tag.data.item())
         elif kind == FIFF.FIFF_CH_INFO:
             tag = read_tag(fid, pos)
             chs.append(tag.data)
         elif kind == FIFF.FIFF_MNE_CUSTOM_REF:
             tag = read_tag(fid, pos)
-            custom_ref_applied = int(tag.data)
+            custom_ref_applied = int(tag.data.item())
         elif kind == FIFF.FIFF_COORD_TRANS:
             tag = read_tag(fid, pos)
             cand = tag.data

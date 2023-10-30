@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Optional, Union
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
+from mne import Info
 from mne.channels.layout import _find_topomap_coords
-from mne.io import Info
 from mne.viz import plot_topomap
 from numpy.typing import NDArray
 
@@ -92,7 +92,7 @@ def plot_cluster_centers(
     # create axes if needed, and retrieve figure
     n_clusters = cluster_centers.shape[0]
     if axes is None:
-        f, axes = plt.subplots(1, n_clusters)
+        f, axes = plt.subplots(1, n_clusters, layout="constrained")
         if isinstance(axes, Axes):
             axes = np.array([axes])  # wrap in an array-like
         # sanity-check
@@ -127,7 +127,7 @@ def plot_cluster_centers(
         _check_type(show, (bool,), "show")
         del kwargs["show"]
     else:
-        show = True
+        show = plt.isinteractive()
 
     # plot cluster centers
     for k, (center, name) in enumerate(zip(cluster_centers, cluster_names)):

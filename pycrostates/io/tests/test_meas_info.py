@@ -4,13 +4,11 @@ from collections import OrderedDict
 
 import numpy as np
 import pytest
-from mne import create_info
+from mne import Transform, create_info
 from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import read_raw_fif
 from mne.io.constants import FIFF
-from mne.transforms import Transform
-from mne.utils import check_version
 from numpy.testing import assert_allclose
 
 from pycrostates.io import ChInfo
@@ -318,7 +316,7 @@ def test_setting_invalid_keys():
     chinfo = ChInfo(info=info)
 
     with pytest.raises(
-        RuntimeError, match="Supported keys are 'bads', 'ch_names', 'chs'"
+        RuntimeError, match="Info does not support directly setting the key 'test'"
     ):
         chinfo["test"] = 5
 
@@ -378,7 +376,4 @@ def test_comparison(caplog):
     assert chinfo1 == chinfo2
     with chinfo1._unlock():
         chinfo1["projs"] = []
-    if check_version("mne", "1.2"):
-        assert chinfo1 != chinfo2
-    else:
-        assert chinfo1 == chinfo2
+    assert chinfo1 != chinfo2

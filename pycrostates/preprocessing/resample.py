@@ -5,7 +5,12 @@ from typing import List, Optional, Union
 import numpy as np
 from mne import BaseEpochs, pick_info
 from mne.io import BaseRaw
-from mne.io.pick import _picks_to_idx
+from mne.utils import check_version
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_to_idx
+else:
+    from mne.io.pick import _picks_to_idx
 
 from .._typing import CHData, Picks, RANDomState
 from ..utils._checks import (

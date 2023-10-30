@@ -2,7 +2,12 @@ import mne
 import pytest
 from mne import pick_info
 from mne.datasets import testing
-from mne.io.pick import _picks_to_idx
+from mne.utils import check_version
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_to_idx
+else:
+    from mne.io.pick import _picks_to_idx
 
 from pycrostates.io import ChData
 from pycrostates.preprocessing import extract_gfp_peaks
