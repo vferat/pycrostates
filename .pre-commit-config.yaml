@@ -1,5 +1,5 @@
 ci:
-    skip: [codespell, pydocstyle, yamllint]
+    skip: [codespell, pydocstyle, bibclean-fix, yamllint]
 
 repos:
     - repo: https://github.com/pycqa/isort
