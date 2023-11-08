@@ -1,7 +1,7 @@
 """Segmentation module for segmented data."""
 
 import itertools
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import List, Optional, Union
 
 import numpy as np
@@ -10,16 +10,18 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 from numpy.typing import NDArray
 
+from .._typing import Segmentation
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
+from ..utils._fixes import deprecate
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
 from .transitions import _compute_expected_transition_matrix, _compute_transition_matrix
 
 
 @fill_doc
-class _BaseSegmentation(ABC):
+class _BaseSegmentation(Segmentation):
     """Base class for a Microstates segmentation.
 
     Parameters
@@ -82,6 +84,13 @@ class _BaseSegmentation(ABC):
     def compute_parameters(self, norm_gfp: bool = True, return_dist: bool = False):
         """Compute microstate parameters.
 
+        .. warning::
+
+            When working with `~mne.Epochs`, this method will put together segments of
+            all epochs. This could lead to wrong interpretation especially on state
+            durations. To avoid this behaviour, make sure to set the ``reject_edges``
+            parameter to ``True`` when creating the segmentation.
+
         Parameters
         ----------
         norm_gfp : bool
@@ -116,13 +125,6 @@ class _BaseSegmentation(ABC):
             * ``dist_durs`` (req. ``return_dist=True``): Distribution of
               durations of each segments assigned to a given state. Each value is
               expressed in seconds (s).
-
-        Warnings
-        --------
-        When working with `~mne.Epochs`, this method will put together segments of all
-        epochs. This could lead to wrong interpretation especially on state durations.
-        To avoid this behaviour, make sure to set the ``reject_edges`` parameter to
-        ``True`` when creating the segmentation.
         """
         _check_type(norm_gfp, (bool,), "norm_gfp")
         _check_type(return_dist, (bool,), "return_dist")
@@ -202,7 +204,9 @@ class _BaseSegmentation(ABC):
         params["unlabeled"] = len(np.argwhere(labels == -1)) / len(gfp)
         return params
 
-    def compute_transition_matrix(self, stat="probability", ignore_self=True):
+    def compute_transition_matrix(
+        self, stat="probability", ignore_self=None, ignore_repetitions=True
+    ):
         """Compute the observed transition matrix.
 
         Count the number of transitions from one state to another and aggregate the
@@ -213,6 +217,7 @@ class _BaseSegmentation(ABC):
         ----------
         %(stat_transition)s
         %(ignore_self)s
+        %(ignore_repetitions)s
 
         Returns
         -------
@@ -225,15 +230,29 @@ class _BaseSegmentation(ABC):
         with discontinuous data. To avoid this behaviour, make sure to set the
         ``reject_edges`` parameter to ``True`` when predicting the segmentation.
         """
+        _check_type(
+            ignore_self,
+            (
+                bool,
+                None,
+            ),
+            "ignore_self",
+        )
+        _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
+        if ignore_self is not None:
+            deprecate("ignore_self", "ignore_repetitions")
+            ignore_repetitions = ignore_self
         return _compute_transition_matrix(
             self._labels,
             self._cluster_centers_.shape[0],
             stat,
-            ignore_self,
+            ignore_repetitions,
         )
 
     @fill_doc
-    def compute_expected_transition_matrix(self, stat="probability", ignore_self=True):
+    def compute_expected_transition_matrix(
+        self, stat="probability", ignore_self=None, ignore_repetitions=True
+    ):
         """Compute the expected transition matrix.
 
         Compute the theoretical transition matrix as if time course was ignored, but
@@ -247,16 +266,30 @@ class _BaseSegmentation(ABC):
         ----------
         %(stat_expected_transitions)s
         %(ignore_self)s
+        %(ignore_repetitions)s
 
         Returns
         -------
         %(transition_matrix)s
-        """  # noqa: E501
+        """
+        _check_type(
+            ignore_self,
+            (
+                bool,
+                None,
+            ),
+            "ignore_self",
+        )
+        _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
+        if ignore_self is not None:
+            deprecate("ignore_self", "ignore_repetitions")
+            ignore_repetitions = ignore_self
+
         return _compute_expected_transition_matrix(
             self._labels,
             n_clusters=self._cluster_centers_.shape[0],
             stat=stat,
-            ignore_self=ignore_self,
+            ignore_repetitions=ignore_repetitions,
         )
 
     @fill_doc

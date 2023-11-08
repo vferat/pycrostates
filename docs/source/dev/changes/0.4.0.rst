@@ -22,11 +22,5 @@
 Current 0.4.0
 -------------
 
-Enhancements
-~~~~~~~~~~~~
-
-Bugs
-~~~~
-
-API changes
-~~~~~~~~~~~
+- Compatibility with ``MNE`` 1.6 and above (:pr:`120` and :pr:`124` by `Mathieu Scheltienne`_)
+. Add ``show_gradient`` argument (:pr:`111` by `Victor Férat`_)
