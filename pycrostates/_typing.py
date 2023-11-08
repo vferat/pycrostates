@@ -29,5 +29,11 @@ class Cluster(ABC):
     pass
 
 
+class Segmentation(ABC):
+    """Typing for a clustering class."""
+
+    pass
+
+
 RANDomState = Optional[Union[int, RandomState, Generator]]
 Picks = Optional[Union[str, NDArray[int]]]

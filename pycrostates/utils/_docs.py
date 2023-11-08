@@ -126,8 +126,20 @@ docdict[
     "ignore_self"
 ] = """
 ignore_self : bool
-    If True, ignores the transition from one state to itself. This is equivalent to
-    setting the duration of all states to 1 sample."""
+    See ``ignore_repetitions`` instead.
+
+    .. deprecated:: 0.4.0
+
+        This parameter is deprecated and will be removed in future versions.
+        Please use the ``ignore_repetitions`` parameter instead."""
+docdict[
+    "ignore_repetitions"
+] = """
+ignore_repetitions : bool
+    If ``True``, ignores state repetitions.
+    For example, the input sequence ``AAABBCCD``
+    will be transformed into ``ABCD`` before any calculation.
+    This is equivalent to setting the duration of all states to 1 sample."""
 docdict[
     "transition_matrix"
 ] = """
