@@ -266,13 +266,13 @@ def test_invalid_segmentation(Segmentation, inst, bad_inst, caplog):
 def test_compute_transition_matrix_Raw():
     segmentation = ModK_raw.predict(raw)
     segmentation.compute_transition_matrix()
-    segmentation.compute_transition_matrix(ignore_self=False)
+    segmentation.compute_transition_matrix(ignore_repetitions=False)
 
 
 def test_compute_transition_matrix_Epochs():
     segmentation = ModK_epochs.predict(epochs)
     segmentation.compute_transition_matrix()
-    segmentation.compute_transition_matrix(ignore_self=False)
+    segmentation.compute_transition_matrix(ignore_repetitions=False)
 
 
 @pytest.mark.parametrize("ModK, inst", [(ModK_raw, raw), (ModK_epochs, epochs)])
@@ -292,13 +292,13 @@ def test_compute_transition_matrix_stat(ModK, inst):
 def test_compute_expected_transition_matrix_Raw():
     segmentation = ModK_raw.predict(raw)
     segmentation.compute_expected_transition_matrix()
-    segmentation.compute_expected_transition_matrix(ignore_self=False)
+    segmentation.compute_expected_transition_matrix(ignore_repetitions=False)
 
 
 def test_compute_expected_transition_matrix_Epochs():
     segmentation = ModK_epochs.predict(epochs)
     segmentation.compute_expected_transition_matrix()
-    segmentation.compute_expected_transition_matrix(ignore_self=False)
+    segmentation.compute_expected_transition_matrix(ignore_repetitions=False)
 
 
 @pytest.mark.parametrize("ModK, inst", [(ModK_raw, raw), (ModK_epochs, epochs)])
