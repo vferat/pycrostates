@@ -1,12 +1,10 @@
 from itertools import groupby
-from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
 
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
-from ..utils._fixes import deprecate
 
 
 @fill_doc
@@ -14,7 +12,6 @@ def compute_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: Optional[bool] = None,
     ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute the observed transition matrix.
@@ -27,7 +24,6 @@ def compute_transition_matrix(
     %(labels_transition)s
     %(n_clusters)s
     %(stat_transition)s
-    %(ignore_self)s
     %(ignore_repetitions)s
 
     Returns
@@ -35,17 +31,6 @@ def compute_transition_matrix(
     %(transition_matrix)s
     """
     _check_labels_n_clusters(labels, n_clusters)
-
-    _check_type(
-        ignore_self,
-        (bool, None),
-        "ignore_self",
-    )
-    _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
-    if ignore_self is not None:
-        deprecate("ignore_self", "ignore_repetitions")
-        ignore_repetitions = ignore_self
-
     return _compute_transition_matrix(
         labels,
         n_clusters,
@@ -94,7 +79,6 @@ def compute_expected_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: Optional[bool] = None,
     ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute the expected transition matrix.
@@ -111,7 +95,6 @@ def compute_expected_transition_matrix(
     %(labels_transition)s
     %(n_clusters)s
     %(stat_expected_transitions)s
-    %(ignore_self)s
     %(ignore_repetitions)s
 
     Returns
@@ -119,20 +102,6 @@ def compute_expected_transition_matrix(
     %(transition_matrix)s
     """
     _check_labels_n_clusters(labels, n_clusters)
-
-    _check_type(
-        ignore_self,
-        (
-            bool,
-            None,
-        ),
-        "ignore_self",
-    )
-    _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
-    if ignore_self is not None:
-        deprecate("ignore_self", "ignore_repetitions")
-        ignore_repetitions = ignore_self
-
     return _compute_expected_transition_matrix(
         labels,
         n_clusters,

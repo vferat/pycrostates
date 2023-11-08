@@ -14,7 +14,6 @@ from .._typing import Segmentation
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
-from ..utils._fixes import deprecate
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
 from .transitions import _compute_expected_transition_matrix, _compute_transition_matrix
@@ -204,9 +203,7 @@ class _BaseSegmentation(Segmentation):
         params["unlabeled"] = len(np.argwhere(labels == -1)) / len(gfp)
         return params
 
-    def compute_transition_matrix(
-        self, stat="probability", ignore_self=None, ignore_repetitions=True
-    ):
+    def compute_transition_matrix(self, stat="probability", ignore_repetitions=True):
         """Compute the observed transition matrix.
 
         Count the number of transitions from one state to another and aggregate the
@@ -216,7 +213,6 @@ class _BaseSegmentation(Segmentation):
         Parameters
         ----------
         %(stat_transition)s
-        %(ignore_self)s
         %(ignore_repetitions)s
 
         Returns
@@ -230,18 +226,6 @@ class _BaseSegmentation(Segmentation):
         with discontinuous data. To avoid this behaviour, make sure to set the
         ``reject_edges`` parameter to ``True`` when predicting the segmentation.
         """
-        _check_type(
-            ignore_self,
-            (
-                bool,
-                None,
-            ),
-            "ignore_self",
-        )
-        _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
-        if ignore_self is not None:
-            deprecate("ignore_self", "ignore_repetitions")
-            ignore_repetitions = ignore_self
         return _compute_transition_matrix(
             self._labels,
             self._cluster_centers_.shape[0],
@@ -251,7 +235,7 @@ class _BaseSegmentation(Segmentation):
 
     @fill_doc
     def compute_expected_transition_matrix(
-        self, stat="probability", ignore_self=None, ignore_repetitions=True
+        self, stat="probability", ignore_repetitions=True
     ):
         """Compute the expected transition matrix.
 
@@ -265,26 +249,12 @@ class _BaseSegmentation(Segmentation):
         Parameters
         ----------
         %(stat_expected_transitions)s
-        %(ignore_self)s
         %(ignore_repetitions)s
 
         Returns
         -------
         %(transition_matrix)s
         """
-        _check_type(
-            ignore_self,
-            (
-                bool,
-                None,
-            ),
-            "ignore_self",
-        )
-        _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
-        if ignore_self is not None:
-            deprecate("ignore_self", "ignore_repetitions")
-            ignore_repetitions = ignore_self
-
         return _compute_expected_transition_matrix(
             self._labels,
             n_clusters=self._cluster_centers_.shape[0],
