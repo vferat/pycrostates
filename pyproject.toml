@@ -23,7 +23,6 @@ classifiers = [
 ]
 dependencies = [
   'decorator',
-  'importlib-resources; python_version < "3.9"',
   'jinja2',
   'joblib',
   'matplotlib>=3.5',
@@ -52,7 +51,7 @@ maintainers = [
 name = 'pycrostates'
 readme = 'README.md'
 requires-python = '>=3.9'
-version = '0.4.0.dev'
+version = '0.5.0.dev0'
 
 [project.optional-dependencies]
 all = [

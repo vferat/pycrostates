@@ -128,16 +128,6 @@ stat : str
     * ``percent``: normalize count such as the probabilities along the first axis is
       always equal to ``100``."""
 docdict[
-    "ignore_self"
-] = """
-ignore_self : bool
-    See ``ignore_repetitions`` instead.
-
-    .. deprecated:: 0.3.0
-
-        This parameter is deprecated and will be removed in future versions.
-        Please use the ``ignore_repetitions`` parameter instead."""
-docdict[
     "ignore_repetitions"
 ] = """
 ignore_repetitions : bool

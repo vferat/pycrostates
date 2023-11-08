@@ -1,10 +1,6 @@
 """Functions to use the LEMON dataset."""
 
-try:
-    from importlib.resources import files  # type: ignore
-except ImportError:
-    from importlib_resources import files  # type: ignore
-
+from importlib.resources import files
 from pathlib import Path
 
 import numpy as np

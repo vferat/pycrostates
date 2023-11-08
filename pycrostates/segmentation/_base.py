@@ -205,9 +205,7 @@ class _BaseSegmentation(Segmentation):
         params["unlabeled"] = len(np.argwhere(labels == -1)) / len(gfp)
         return params
 
-    def compute_transition_matrix(
-        self, stat="probability", ignore_self=None, ignore_repetitions=True
-    ):
+    def compute_transition_matrix(self, stat="probability", ignore_repetitions=True):
         """Compute the observed transition matrix.
 
         Count the number of transitions from one state to another and aggregate the
@@ -217,7 +215,6 @@ class _BaseSegmentation(Segmentation):
         Parameters
         ----------
         %(stat_transition)s
-        %(ignore_self)s
         %(ignore_repetitions)s
 
         Returns
@@ -247,12 +244,12 @@ class _BaseSegmentation(Segmentation):
             self._labels,
             self._cluster_centers_.shape[0],
             stat,
-            ignore_repetitions=ignore_repetitions,
+            ignore_repetitions,
         )
 
     @fill_doc
     def compute_expected_transition_matrix(
-        self, stat="probability", ignore_self=None, ignore_repetitions=True
+        self, stat="probability", ignore_repetitions=True
     ):
         """Compute the expected transition matrix.
 
@@ -266,25 +263,12 @@ class _BaseSegmentation(Segmentation):
         Parameters
         ----------
         %(stat_expected_transitions)s
-        %(ignore_self)s
         %(ignore_repetitions)s
 
         Returns
         -------
         %(transition_matrix)s
-        """  # noqa: E501
-        _check_type(
-            ignore_self,
-            (
-                bool,
-                None,
-            ),
-            "ignore_self",
-        )
-        _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
-        if ignore_self is not None:
-            deprecate("ignore_self", "ignore_repetitions")
-            ignore_repetitions = ignore_self
+        """
         return _compute_expected_transition_matrix(
             self._labels,
             n_clusters=self._cluster_centers_.shape[0],

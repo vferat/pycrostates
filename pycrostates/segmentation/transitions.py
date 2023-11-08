@@ -14,7 +14,6 @@ def compute_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: Optional[bool] = None,
     ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute the observed transition matrix.
@@ -27,7 +26,6 @@ def compute_transition_matrix(
     %(labels_transition)s
     %(n_clusters)s
     %(stat_transition)s
-    %(ignore_self)s
     %(ignore_repetitions)s
 
     Returns
@@ -92,7 +90,6 @@ def compute_expected_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: Optional[bool] = None,
     ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute the expected transition matrix.
@@ -109,7 +106,6 @@ def compute_expected_transition_matrix(
     %(labels_transition)s
     %(n_clusters)s
     %(stat_expected_transitions)s
-    %(ignore_self)s
     %(ignore_repetitions)s
 
     Returns
@@ -133,7 +129,7 @@ def compute_expected_transition_matrix(
         labels,
         n_clusters,
         stat,
-        ignore_repetitions=ignore_repetitions,
+        ignore_repetitions,
     )
 
 
