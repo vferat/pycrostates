@@ -11,7 +11,7 @@
 
 .. _latest:
 
-Version x.x
+Version 0.5
 -----------
 
 Enhancements
