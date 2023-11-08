@@ -228,18 +228,6 @@ class _BaseSegmentation(Segmentation):
         with discontinuous data. To avoid this behaviour, make sure to set the
         ``reject_edges`` parameter to ``True`` when predicting the segmentation.
         """
-        _check_type(
-            ignore_self,
-            (
-                bool,
-                None,
-            ),
-            "ignore_self",
-        )
-        _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
-        if ignore_self is not None:
-            deprecate("ignore_self", "ignore_repetitions")
-            ignore_repetitions = ignore_self
         return _compute_transition_matrix(
             self._labels,
             self._cluster_centers_.shape[0],
@@ -283,7 +271,7 @@ class _BaseSegmentation(Segmentation):
         ignore_repetitions: bool = False,
         log_base: Union[float, str] = 2,
     ):
-        """Compute the Shannon entropy of the segmentation.
+        r"""Compute the Shannon entropy of the segmentation.
 
         Compute the Shannon entropy\ :footcite:p:`shannon1948mathematical`
         of the microstate symbolic sequence.

@@ -1,5 +1,4 @@
 from itertools import groupby
-from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -33,15 +32,6 @@ def compute_transition_matrix(
     %(transition_matrix)s
     """
     _check_labels_n_clusters(labels, n_clusters)
-    _check_type(
-        ignore_self,
-        (bool, None),
-        "ignore_self",
-    )
-    _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
-    if ignore_self is not None:
-        deprecate("ignore_self", "ignore_repetitions")
-        ignore_repetitions = ignore_self
     return _compute_transition_matrix(
         labels,
         n_clusters,
@@ -113,18 +103,6 @@ def compute_expected_transition_matrix(
     %(transition_matrix)s
     """
     _check_labels_n_clusters(labels, n_clusters)
-    _check_type(
-        ignore_self,
-        (
-            bool,
-            None,
-        ),
-        "ignore_self",
-    )
-    _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
-    if ignore_self is not None:
-        deprecate("ignore_self", "ignore_repetitions")
-        ignore_repetitions = ignore_self
     return _compute_expected_transition_matrix(
         labels,
         n_clusters,
