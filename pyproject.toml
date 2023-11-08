@@ -23,7 +23,6 @@ classifiers = [
 ]
 dependencies = [
   'decorator',
-  'importlib-resources; python_version < "3.9"',
   'jinja2',
   'joblib',
   'matplotlib>=3.5',
