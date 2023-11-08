@@ -17,8 +17,6 @@
 
 .. include:: ./names.inc
 
-.. _latest:
-
 Current 0.4.0
 -------------
 
