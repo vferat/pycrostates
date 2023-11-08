@@ -5,7 +5,6 @@ from numpy.typing import NDArray
 
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
-from ..utils._fixes import deprecate
 
 
 @fill_doc

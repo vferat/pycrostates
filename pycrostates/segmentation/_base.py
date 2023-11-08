@@ -14,7 +14,6 @@ from .._typing import Segmentation
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
-from ..utils._fixes import deprecate
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
 from .entropy import entropy
