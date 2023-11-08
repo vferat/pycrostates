@@ -79,8 +79,8 @@ default_role = "py:obj"
 html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "logo": {
-        "image_light": "../_static/logos/Pycrostates_logo_black.png",
-        "image_dark": "../_static/logos/Pycrostates_logo_white.png",
+        "image_light": "./_static/logos/Pycrostates_logo_black.png",
+        "image_dark": "./_static/logos/Pycrostates_logo_white.png",
     },
     "icon_links": [
         {
