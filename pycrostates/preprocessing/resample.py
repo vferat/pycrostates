@@ -1,6 +1,6 @@
 """Preprocessing functions to create resamples from raw or epochs instances."""
 
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import numpy as np
 from mne import BaseEpochs, pick_info
@@ -37,7 +37,7 @@ def resample(
     replace: bool = True,
     random_state: RANDomState = None,
     verbose=None,
-) -> List[CHData]:
+) -> list[CHData]:
     """Resample a recording into epochs of random samples.
 
     Resample :class:`~mne.io.Raw`. :class:`~mne.Epochs` or

@@ -1,7 +1,7 @@
 """Atomize and Agglomerate Hierarchical Clustering (AAHC)."""
 
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 from mne import BaseEpochs
@@ -183,7 +183,7 @@ class AAHCluster(_BaseCluster):
         n_clusters: int,
         ignore_polarity: bool,
         normalize_input: bool,
-    ) -> Tuple[float, NDArray[float], NDArray[int]]:
+    ) -> tuple[float, NDArray[float], NDArray[int]]:
         """Run the AAHC algorithm."""
         gfp_sum_sq = np.sum(data**2)
         maps, segmentation = AAHCluster._compute_maps(
@@ -200,7 +200,7 @@ class AAHCluster(_BaseCluster):
         n_clusters: int,
         ignore_polarity: bool,
         normalize_input: bool,
-    ) -> Tuple[NDArray[float], NDArray[int]]:
+    ) -> tuple[NDArray[float], NDArray[int]]:
         """Compute microstates maps."""
         n_chan, n_frame = data.shape
 

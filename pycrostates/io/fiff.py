@@ -5,7 +5,7 @@ import operator
 from functools import reduce
 from numbers import Integral
 from pathlib import Path
-from typing import List, Union
+from typing import Union
 
 import numpy as np
 from mne import Info, Transform
@@ -98,7 +98,7 @@ def _write_cluster(
     cluster_centers_: NDArray[float],
     chinfo: Union[CHInfo, Info],
     algorithm: str,
-    cluster_names: List[str],
+    cluster_names: list[str],
     fitted_data: NDArray[float],
     labels_: NDArray[int],
     **kwargs,
@@ -398,7 +398,7 @@ def _check_fit_parameters_and_variables(
 def _create_ModKMeans(
     cluster_centers_: NDArray[float],
     info: CHInfo,
-    cluster_names: List[str],
+    cluster_names: list[str],
     fitted_data: NDArray[float],
     labels_: NDArray[int],
     n_init: int,
@@ -423,7 +423,7 @@ def _create_ModKMeans(
 def _create_AAHCluster(
     cluster_centers_: NDArray[float],
     info: CHInfo,
-    cluster_names: List[str],
+    cluster_names: list[str],
     fitted_data: NDArray[float],
     labels_: NDArray[int],
     ignore_polarity: bool,  # pylint: disable=unused-argument

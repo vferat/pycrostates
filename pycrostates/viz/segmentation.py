@@ -1,6 +1,6 @@
 """Visualisation module for plotting segmentations."""
 
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import numpy as np
 from matplotlib import colormaps, colors
@@ -21,7 +21,7 @@ def plot_raw_segmentation(
     labels: NDArray[int],
     raw: BaseRaw,
     n_clusters: int,
-    cluster_names: List[str] = None,
+    cluster_names: list[str] = None,
     tmin: Optional[Union[int, float]] = None,
     tmax: Optional[Union[int, float]] = None,
     cmap: Optional[str] = None,
@@ -107,7 +107,7 @@ def plot_epoch_segmentation(
     labels: NDArray[int],
     epochs: BaseEpochs,
     n_clusters: int,
-    cluster_names: List[str] = None,
+    cluster_names: list[str] = None,
     cmap: Optional[str] = None,
     axes: Optional[Axes] = None,
     cbar_axes: Optional[Axes] = None,
@@ -145,7 +145,8 @@ def plot_epoch_segmentation(
     _check_type(epochs, (BaseEpochs,), "epochs")
     _check_type(block, (bool,), "block")
 
-    data = epochs.get_data().swapaxes(0, 1)
+    kwargs_epochs = dict(copy=False) if check_version("mne", "1.6") else dict()
+    data = epochs.get_data(**kwargs_epochs).swapaxes(0, 1)
     data = data.reshape(data.shape[0], -1)
     gfp = np.std(data, axis=0)
     times = np.arange(0, data.shape[-1])
@@ -199,7 +200,7 @@ def _plot_segmentation(
     gfp: NDArray[float],
     times: NDArray[float],
     n_clusters: int,
-    cluster_names: List[str] = None,
+    cluster_names: list[str] = None,
     cmap: Optional[Union[str, colors.Colormap]] = None,
     axes: Optional[Axes] = None,
     cbar_axes: Optional[Axes] = None,

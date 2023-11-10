@@ -5,15 +5,15 @@ Inspired from mne: https://mne.tools/stable/index.html
 Inspired from mne.utils.docs.py by Eric Larson <larson.eric.d@gmail.com>
 """
 import sys
-from typing import Callable, Dict, List, Tuple
+from typing import Callable
 
 from mne.utils.docs import docdict as docdict_mne
 
 # ------------------------- Documentation dictionary -------------------------
-docdict: Dict[str, str] = {}
+docdict: dict[str, str] = {}
 
 # ---- Documentation to inc. from MNE ----
-keys: Tuple[str, ...] = (
+keys: tuple[str, ...] = (
     "n_jobs",
     "picks_all",
     "random_state",
@@ -169,7 +169,7 @@ cbar_axes : Axes | None
     axes."""
 
 # ------------------------- Documentation functions --------------------------
-docdict_indented: Dict[int, Dict[str, str]] = {}
+docdict_indented: dict[int, dict[str, str]] = {}
 
 
 def fill_doc(f: Callable) -> Callable:
@@ -215,7 +215,7 @@ def fill_doc(f: Callable) -> Callable:
     return f
 
 
-def _indentcount_lines(lines: List[str]) -> int:
+def _indentcount_lines(lines: list[str]) -> int:
     """Minimum indent for all lines in line list.
 
     >>> lines = [' one', '  two', '   three']
