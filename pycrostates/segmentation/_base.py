@@ -142,8 +142,8 @@ class _BaseSegmentation(Segmentation):
             assert data.ndim == 2
             assert labels.size == data.shape[1]
         elif isinstance(self._inst, BaseEpochs):
-            kwargs = dict(copy=False) if check_version("mne", "1.6") else dict()
-            data = self._inst.get_data(**kwargs)
+            kwargs_epochs = dict(copy=False) if check_version("mne", "1.6") else dict()
+            data = self._inst.get_data(**kwargs_epochs)
             # sanity-checks
             assert labels.ndim == 2
             assert data.ndim == 3

@@ -145,8 +145,8 @@ def plot_epoch_segmentation(
     _check_type(epochs, (BaseEpochs,), "epochs")
     _check_type(block, (bool,), "block")
 
-    kwargs = dict(copy=False) if check_version("mne", "1.6") else dict()
-    data = epochs.get_data(**kwargs).swapaxes(0, 1)
+    kwargs_epochs = dict(copy=False) if check_version("mne", "1.6") else dict()
+    data = epochs.get_data(**kwargs_epochs).swapaxes(0, 1)
     data = data.reshape(data.shape[0], -1)
     gfp = np.std(data, axis=0)
     times = np.arange(0, data.shape[-1])
