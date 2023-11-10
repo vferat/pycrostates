@@ -145,7 +145,7 @@ def plot_epoch_segmentation(
     _check_type(epochs, (BaseEpochs,), "epochs")
     _check_type(block, (bool,), "block")
 
-    data = epochs.get_data().swapaxes(0, 1)
+    data = epochs.get_data(copy=False).swapaxes(0, 1)
     data = data.reshape(data.shape[0], -1)
     gfp = np.std(data, axis=0)
     times = np.arange(0, data.shape[-1])
