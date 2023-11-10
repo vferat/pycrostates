@@ -8,6 +8,7 @@ import numpy as np
 from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
+from mne.utils import check_version
 from numpy.typing import NDArray
 
 from .._typing import Segmentation
@@ -141,7 +142,8 @@ class _BaseSegmentation(Segmentation):
             assert data.ndim == 2
             assert labels.size == data.shape[1]
         elif isinstance(self._inst, BaseEpochs):
-            data = self._inst.get_data(copy=False)
+            kwargs = dict(copy=False) if check_version("mne", "1.6") else dict()
+            data = self._inst.get_data(**kwargs)
             # sanity-checks
             assert labels.ndim == 2
             assert data.ndim == 3
