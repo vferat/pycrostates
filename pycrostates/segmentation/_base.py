@@ -2,12 +2,13 @@
 
 import itertools
 from abc import abstractmethod
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import numpy as np
 from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
+from mne.utils import check_version
 from numpy.typing import NDArray
 
 from .._typing import Segmentation
@@ -41,7 +42,7 @@ class _BaseSegmentation(Segmentation):
         labels: NDArray[int],
         inst: Union[BaseRaw, BaseEpochs],
         cluster_centers_: NDArray[float],
-        cluster_names: Optional[List[str]] = None,
+        cluster_names: Optional[list[str]] = None,
         predict_parameters: Optional[dict] = None,
     ):
         # check input
@@ -142,7 +143,8 @@ class _BaseSegmentation(Segmentation):
             assert data.ndim == 2
             assert labels.size == data.shape[1]
         elif isinstance(self._inst, BaseEpochs):
-            data = self._inst.get_data()
+            kwargs_epochs = dict(copy=False) if check_version("mne", "1.6") else dict()
+            data = self._inst.get_data(**kwargs_epochs)
             # sanity-checks
             assert labels.ndim == 2
             assert data.ndim == 3
@@ -324,7 +326,8 @@ class _BaseSegmentation(Segmentation):
     # --------------------------------------------------------------------
     @staticmethod
     def _check_cluster_names(
-        cluster_names: List[str], cluster_centers_: NDArray[float]
+        cluster_names: list[str],
+        cluster_centers_: NDArray[float],
     ):
         """Check that the argument 'cluster_names' is valid."""
         _check_type(cluster_names, (list, None), "cluster_names")
@@ -399,7 +402,7 @@ class _BaseSegmentation(Segmentation):
         return self._cluster_centers_.copy()
 
     @property
-    def cluster_names(self) -> List[str]:
+    def cluster_names(self) -> list[str]:
         """Name of the cluster centers.
 
         :type: `list`

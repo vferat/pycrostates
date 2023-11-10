@@ -1,7 +1,7 @@
 """Class and functions to use modified Kmeans."""
 
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 from mne import BaseEpochs
@@ -263,7 +263,7 @@ class ModKMeans(_BaseCluster):
         max_iter: int,
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
-    ) -> Tuple[float, NDArray[float], NDArray[int], bool]:
+    ) -> tuple[float, NDArray[float], NDArray[int], bool]:
         """Run the k-means algorithm."""
         gfp_sum_sq = np.sum(data**2)
         maps, converged = ModKMeans._compute_maps(
@@ -282,7 +282,7 @@ class ModKMeans(_BaseCluster):
         max_iter: int,
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
-    ) -> Tuple[NDArray[float], bool]:
+    ) -> tuple[NDArray[float], bool]:
         """Compute microstates maps.
 
         Based on mne_microstates by Marijn van Vliet <w.m.vanvliet@gmail.com>

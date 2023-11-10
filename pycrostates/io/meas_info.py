@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 from numbers import Number
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
 
 import numpy as np
 from mne import Info, Projection, Transform
@@ -155,11 +155,11 @@ class ChInfo(CHInfo, Info):
         ch_names: Optional[
             Union[
                 int,
-                List[str],
-                Tuple[str, ...],
+                list[str],
+                tuple[str, ...],
             ]
         ] = None,
-        ch_types: Optional[Union[str, List[str], Tuple[str, ...]]] = None,
+        ch_types: Optional[Union[str, list[str], tuple[str, ...]]] = None,
     ):
         if all(arg is None for arg in (info, ch_names, ch_types)):
             raise RuntimeError(
@@ -195,8 +195,8 @@ class ChInfo(CHInfo, Info):
 
     def _init_from_channels(
         self,
-        ch_names: Union[int, List[str], Tuple[str, ...]],
-        ch_types: Union[str, List[str], Tuple[str, ...]],
+        ch_names: Union[int, list[str], tuple[str, ...]],
+        ch_types: Union[str, list[str], tuple[str, ...]],
     ):
         """Init instance from channel names and types."""
         self._unlocked = True
