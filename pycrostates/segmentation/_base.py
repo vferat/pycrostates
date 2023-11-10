@@ -2,7 +2,7 @@
 
 import itertools
 from abc import abstractmethod
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import numpy as np
 from matplotlib.axes import Axes
@@ -40,7 +40,7 @@ class _BaseSegmentation(Segmentation):
         labels: NDArray[int],
         inst: Union[BaseRaw, BaseEpochs],
         cluster_centers_: NDArray[float],
-        cluster_names: Optional[List[str]] = None,
+        cluster_names: Optional[list[str]] = None,
         predict_parameters: Optional[dict] = None,
     ):
         # check input
@@ -291,7 +291,7 @@ class _BaseSegmentation(Segmentation):
     # --------------------------------------------------------------------
     @staticmethod
     def _check_cluster_names(
-        cluster_names: List[str],
+        cluster_names: list[str],
         cluster_centers_: NDArray[float],
     ):
         """Check that the argument 'cluster_names' is valid."""
@@ -367,7 +367,7 @@ class _BaseSegmentation(Segmentation):
         return self._cluster_centers_.copy()
 
     @property
-    def cluster_names(self) -> List[str]:
+    def cluster_names(self) -> list[str]:
         """Name of the cluster centers.
 
         :type: `list`
