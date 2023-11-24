@@ -7,14 +7,18 @@ from itertools import groupby
 
 import numpy as np
 import pytest
-from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 from mne import Annotations, Epochs, create_info, make_fixed_length_events
 from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import RawArray, read_raw_fif
-from mne.io.pick import _picks_to_idx
+from mne.utils import check_version
 from numpy.testing import assert_allclose
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_to_idx
+else:
+    from mne.io.pick import _picks_to_idx
 
 from pycrostates import __version__
 from pycrostates.cluster import AAHCluster
@@ -68,7 +72,7 @@ sim_n_chans = pos.shape[0]  # number of channels
 # compute forward model
 A = np.sum((pos[None, ...] - sources[:, None, :3]) * sources[:, None, 3:], axis=2)
 A /= np.linalg.norm(A, axis=1, keepdims=True)
-# simulate source actvities for 4 sources
+# simulate source activities for 4 sources
 # with positive and negative polarity
 mapping = np.arange(sim_n_frames) % (sim_n_ms * 2)
 s = np.sign(mapping - sim_n_ms + 0.01) * np.eye(sim_n_ms)[:, mapping % sim_n_ms]
@@ -277,7 +281,6 @@ def test_aahClusterMeans():
     assert isinstance(f, Figure)
     with pytest.raises(RuntimeError, match="must be fitted before"):
         aahCluster2.plot(block=False)
-    plt.close("all")
 
 
 def test_invert_polarity():

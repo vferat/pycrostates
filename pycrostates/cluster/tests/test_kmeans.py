@@ -7,14 +7,18 @@ from itertools import groupby
 
 import numpy as np
 import pytest
-from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 from mne import Annotations, Epochs, create_info, make_fixed_length_events
 from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import RawArray, read_raw_fif
-from mne.io.pick import _picks_to_idx
+from mne.utils import check_version
 from numpy.testing import assert_allclose
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_to_idx
+else:
+    from mne.io.pick import _picks_to_idx
 
 from pycrostates import __version__
 from pycrostates.cluster import ModKMeans
@@ -188,7 +192,6 @@ def test_ModKMeans():
     assert isinstance(f, Figure)
     with pytest.raises(RuntimeError, match="must be fitted before"):
         ModK2.plot(block=False)
-    plt.close("all")
 
 
 def test_invert_polarity():

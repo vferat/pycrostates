@@ -2,16 +2,21 @@ from abc import abstractmethod
 from copy import copy, deepcopy
 from itertools import groupby
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 from matplotlib.axes import Axes
 from mne import BaseEpochs, pick_info
 from mne.annotations import _annotations_starts_stops
 from mne.io import BaseRaw
-from mne.io.pick import _picks_to_idx
+from mne.utils import check_version
 from numpy.typing import NDArray
 from scipy.signal import convolve2d
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_to_idx
+else:
+    from mne.io.pick import _picks_to_idx
 
 from .._typing import CHData, Cluster, Picks
 from ..segmentation import EpochsSegmentation, RawSegmentation
@@ -272,11 +277,11 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     def rename_clusters(
         self,
-        mapping: Optional[Dict[str, str]] = None,
+        mapping: Optional[dict[str, str]] = None,
         new_names: Optional[
             Union[
-                List[str],
-                Tuple[str, ...],
+                list[str],
+                tuple[str, ...],
             ]
         ] = None,
     ) -> None:
@@ -336,11 +341,11 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     def reorder_clusters(
         self,
-        mapping: Optional[Dict[int, int]] = None,
+        mapping: Optional[dict[int, int]] = None,
         order: Optional[
             Union[
-                List[int],
-                Tuple[int, ...],
+                list[int],
+                tuple[int, ...],
                 NDArray[int],
             ]
         ] = None,
@@ -453,8 +458,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         invert: Union[
             bool,
-            List[bool],
-            Tuple[bool, ...],
+            list[bool],
+            tuple[bool, ...],
             NDArray[bool],
         ],
     ) -> None:
@@ -513,7 +518,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         axes: Optional[Union[Axes, NDArray[Axes]]] = None,
         show_gradient: Optional[bool] = False,
-        gradient_kwargs: Dict[str, Any] = {
+        gradient_kwargs: dict[str, Any] = {
             "color": "black",
             "linestyle": "-",
             "marker": "P",
@@ -1175,7 +1180,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         return self._labels_.copy()
 
     @property
-    def cluster_names(self) -> List[str]:
+    def cluster_names(self) -> list[str]:
         """Name of the clusters.
 
         :type: `list`

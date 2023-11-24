@@ -143,20 +143,3 @@ def test_check_labels_n_clusters():
         _check_labels_n_clusters(np.random.randint(0, 5, size=100).astype(float), 5)
     with pytest.raises(ValueError, match=re.escape("'[6 7]' are invalid")):
         _check_labels_n_clusters(np.random.randint(0, 8, size=100), 6)
-
-
-def test_deprecated_ignore_self(caplog):
-    labels = np.random.randint(0, 5, size=100)
-    log = "The 'ignore_self' parameter is deprecated"
-
-    caplog.clear()
-    M = compute_transition_matrix(labels, 5, ignore_self=True)
-    assert log in caplog.text
-    M_ = compute_transition_matrix(labels, 5, ignore_repetitions=True)
-    assert_allclose(M, M_)
-
-    caplog.clear()
-    M = compute_expected_transition_matrix(labels, 5, ignore_self=True)
-    assert log in caplog.text
-    M_ = compute_expected_transition_matrix(labels, 5, ignore_repetitions=True)
-    assert_allclose(M, M_)

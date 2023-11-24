@@ -9,9 +9,14 @@ import pytest
 from matplotlib import pyplot as plt
 from mne import EpochsArray, create_info
 from mne.io import RawArray
-from mne.io.pick import _picks_to_idx
+from mne.utils import check_version
 from numpy.random import PCG64, Generator
 from numpy.random.mtrand import RandomState
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_to_idx
+else:
+    from mne.io.pick import _picks_to_idx
 
 from pycrostates.utils._checks import (
     _check_axes,
@@ -117,24 +122,19 @@ def test_check_axes():
     # test valid inputs
     _, ax = plt.subplots(1, 1)
     _check_axes(ax)
-    plt.close("all")
     _, ax = plt.subplots(1, 2)
     _check_axes(ax)
-    plt.close("all")
     _, ax = plt.subplots(2, 1)
     _check_axes(ax)
-    plt.close("all")
 
     # test invalid inputs
     f, ax = plt.subplots(1, 1)
     with pytest.raises(TypeError, match="must be an instance of"):
         _check_axes(f)
-    plt.close("all")
     _, ax = plt.subplots(10, 10)
     ax = ax.reshape((2, 5, 10))
     with pytest.raises(ValueError, match="Argument 'axes' should be a"):
         _check_axes(ax)
-    plt.close("all")
 
 
 def test_check_reject_by_annotation():

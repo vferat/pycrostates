@@ -2,12 +2,13 @@
 
 import itertools
 from abc import abstractmethod
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import numpy as np
 from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
+from mne.utils import check_version
 from numpy.typing import NDArray
 
 from .._typing import Segmentation
@@ -41,7 +42,7 @@ class _BaseSegmentation(Segmentation):
         labels: NDArray[int],
         inst: Union[BaseRaw, BaseEpochs],
         cluster_centers_: NDArray[float],
-        cluster_names: Optional[List[str]] = None,
+        cluster_names: Optional[list[str]] = None,
         predict_parameters: Optional[dict] = None,
     ):
         # check input
@@ -84,6 +85,13 @@ class _BaseSegmentation(Segmentation):
     def compute_parameters(self, norm_gfp: bool = True, return_dist: bool = False):
         """Compute microstate parameters.
 
+        .. warning::
+
+            When working with `~mne.Epochs`, this method will put together segments of
+            all epochs. This could lead to wrong interpretation especially on state
+            durations. To avoid this behaviour, make sure to set the ``reject_edges``
+            parameter to ``True`` when creating the segmentation.
+
         Parameters
         ----------
         norm_gfp : bool
@@ -118,13 +126,6 @@ class _BaseSegmentation(Segmentation):
             * ``dist_durs`` (req. ``return_dist=True``): Distribution of
               durations of each segments assigned to a given state. Each value is
               expressed in seconds (s).
-
-        warnings
-        --------
-        When working with `~mne.Epochs`, this method will put together segments of all
-        epochs. This could lead to wrong interpretation especially on state durations.
-        To avoid this behaviour, make sure to set the ``reject_edges`` parameter to
-        ``True`` when creating the segmentation.
         """
         _check_type(norm_gfp, (bool,), "norm_gfp")
         _check_type(return_dist, (bool,), "return_dist")
@@ -142,7 +143,8 @@ class _BaseSegmentation(Segmentation):
             assert data.ndim == 2
             assert labels.size == data.shape[1]
         elif isinstance(self._inst, BaseEpochs):
-            data = self._inst.get_data()
+            kwargs_epochs = dict(copy=False) if check_version("mne", "1.6") else dict()
+            data = self._inst.get_data(**kwargs_epochs)
             # sanity-checks
             assert labels.ndim == 2
             assert data.ndim == 3
@@ -204,9 +206,7 @@ class _BaseSegmentation(Segmentation):
         params["unlabeled"] = len(np.argwhere(labels == -1)) / len(gfp)
         return params
 
-    def compute_transition_matrix(
-        self, stat="probability", ignore_self=None, ignore_repetitions=True
-    ):
+    def compute_transition_matrix(self, stat="probability", ignore_repetitions=True):
         """Compute the observed transition matrix.
 
         Count the number of transitions from one state to another and aggregate the
@@ -216,7 +216,6 @@ class _BaseSegmentation(Segmentation):
         Parameters
         ----------
         %(stat_transition)s
-        %(ignore_self)s
         %(ignore_repetitions)s
 
         Returns
@@ -230,31 +229,16 @@ class _BaseSegmentation(Segmentation):
         with discontinuous data. To avoid this behaviour, make sure to set the
         ``reject_edges`` parameter to ``True`` when predicting the segmentation.
         """
-        _check_type(
-            ignore_self,
-            (
-                bool,
-                None,
-            ),
-            "ignore_self",
-        )
-        _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
-        if ignore_self is not None:
-            logger.warning(
-                "The 'ignore_self' parameter is deprecated and will be removed in \
-                future versions. Please use the 'ignore_repetitions' parameter instead."
-            )
-            ignore_repetitions = ignore_self
         return _compute_transition_matrix(
             self._labels,
             self._cluster_centers_.shape[0],
             stat,
-            ignore_repetitions=ignore_repetitions,
+            ignore_repetitions,
         )
 
     @fill_doc
     def compute_expected_transition_matrix(
-        self, stat="probability", ignore_self=None, ignore_repetitions=True
+        self, stat="probability", ignore_repetitions=True
     ):
         """Compute the expected transition matrix.
 
@@ -268,28 +252,12 @@ class _BaseSegmentation(Segmentation):
         Parameters
         ----------
         %(stat_expected_transitions)s
-        %(ignore_self)s
         %(ignore_repetitions)s
 
         Returns
         -------
         %(transition_matrix)s
-        """  # noqa: E501
-        _check_type(
-            ignore_self,
-            (
-                bool,
-                None,
-            ),
-            "ignore_self",
-        )
-        _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
-        if ignore_self is not None:
-            logger.warning(
-                "The 'ignore_self' parameter is deprecated and will be removed in \
-                future versions. Please use the 'ignore_repetitions' parameter instead."
-            )
-            ignore_repetitions = ignore_self
+        """
         return _compute_expected_transition_matrix(
             self._labels,
             n_clusters=self._cluster_centers_.shape[0],
@@ -304,7 +272,7 @@ class _BaseSegmentation(Segmentation):
         ignore_repetitions: bool = False,
         log_base: Union[float, str] = 2,
     ):
-        """Compute the Shannon entropy of the segmentation.
+        r"""Compute the Shannon entropy of the segmentation.
 
         Compute the Shannon entropy\ :footcite:p:`shannon1948mathematical`
         of the microstate symbolic sequence.
@@ -358,7 +326,8 @@ class _BaseSegmentation(Segmentation):
     # --------------------------------------------------------------------
     @staticmethod
     def _check_cluster_names(
-        cluster_names: List[str], cluster_centers_: NDArray[float]
+        cluster_names: list[str],
+        cluster_centers_: NDArray[float],
     ):
         """Check that the argument 'cluster_names' is valid."""
         _check_type(cluster_names, (list, None), "cluster_names")
@@ -390,7 +359,7 @@ class _BaseSegmentation(Segmentation):
             "reject_by_annotation",
         )
         # Let the door open for custom prediction with different keys, so log
-        # a warninginstead of raising.
+        # a warning instead of raising.
         for key in predict_parameters.keys():
             if key not in valid_keys:
                 logger.warning(
@@ -433,7 +402,7 @@ class _BaseSegmentation(Segmentation):
         return self._cluster_centers_.copy()
 
     @property
-    def cluster_names(self) -> List[str]:
+    def cluster_names(self) -> list[str]:
         """Name of the cluster centers.
 
         :type: `list`

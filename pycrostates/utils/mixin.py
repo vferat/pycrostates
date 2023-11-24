@@ -1,7 +1,13 @@
 """Mixins for pycrostates data container with a .info attribute."""
 
-from mne.io.meas_info import ContainsMixin as MNEContainsMixin
-from mne.io.meas_info import MontageMixin as MNEMontageMixin
+from mne.utils import check_version
+
+if check_version("mne", "1.6"):
+    from mne._fiff.meas_info import ContainsMixin as MNEContainsMixin
+    from mne._fiff.meas_info import MontageMixin as MNEMontageMixin
+else:
+    from mne.io.meas_info import ContainsMixin as MNEContainsMixin
+    from mne.io.meas_info import MontageMixin as MNEMontageMixin
 
 from ._docs import copy_doc
 

@@ -2,22 +2,24 @@
 
 from copy import deepcopy
 from numbers import Number
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
 
 import numpy as np
-from mne.io import Info
+from mne import Info, Projection, Transform
 from mne.io.constants import FIFF
-from mne.io.meas_info import (
-    _check_bads,
-    _check_ch_keys,
-    _check_dev_head_t,
-    _unique_channel_names,
-)
-from mne.io.pick import get_channel_type_constants
-from mne.io.proj import Projection
-from mne.io.tag import _ch_coord_dict
-from mne.transforms import Transform
 from mne.utils import check_version
+
+if check_version("mne", "1.6"):
+    from mne._fiff.meas_info import _check_ch_keys, _unique_channel_names
+    from mne._fiff.pick import get_channel_type_constants
+    from mne._fiff.tag import _ch_coord_dict
+else:
+    from mne.io.meas_info import (
+        _check_ch_keys,
+        _unique_channel_names,
+    )
+    from mne.io.pick import get_channel_type_constants
+    from mne.io.tag import _ch_coord_dict
 
 from .._typing import CHInfo
 from ..utils._checks import _check_type, _IntLike
@@ -147,45 +149,17 @@ class ChInfo(CHInfo, Info):
             The coordinate frame used, e.g. ``FIFFV_COORD_HEAD``.
     """
 
-    # valid items
-    # fmt: off
-    _attributes = {
-        "bads": _check_bads,
-        "ch_names": "ch_names cannot be set directly. Please use methods "
-                    "inst.add_channels(), inst.drop_channels(), inst.pick_channels(), "
-                    "inst.rename_channels(), inst.reorder_channels() and "
-                    "inst.set_channel_types() instead.",
-        "chs": "chs cannot be set directly. Please use methods inst.add_channels(), "
-               "inst.drop_channels(), inst.pick_channels(), inst.rename_channels(), "
-               "inst.reorder_channels() and inst.set_channel_types() instead.",
-        "comps": "comps cannot be set directly. "
-                 "Please use method Raw.apply_gradient_compensation() instead.",
-        "ctf_head_t": "ctf_head_t cannot be set directly.",
-        "custom_ref_applied": "custom_ref_applied cannot be set directly. "
-                              "Please use method inst.set_eeg_reference() instead.",
-        "dev_ctf_t": "dev_ctf_t cannot be set directly.",
-        "dev_head_t": _check_dev_head_t,
-        "dig": "dig cannot be set directly. Please use method inst.set_montage() "
-               "instead.",
-        "nchan": "nchan cannot be set directly. Please use methods "
-                 "inst.add_channels(), inst.drop_channels(), and inst.pick_channels() "
-                 "instead.",
-        "projs": "projs cannot be set directly. Please use methods inst.add_proj() and "
-                 "inst.del_proj() instead.",
-    }
-    # fmt: on
-
     def __init__(
         self,
         info: Optional[Info] = None,
         ch_names: Optional[
             Union[
                 int,
-                List[str],
-                Tuple[str, ...],
+                list[str],
+                tuple[str, ...],
             ]
         ] = None,
-        ch_types: Optional[Union[str, List[str], Tuple[str, ...]]] = None,
+        ch_types: Optional[Union[str, list[str], tuple[str, ...]]] = None,
     ):
         if all(arg is None for arg in (info, ch_names, ch_types)):
             raise RuntimeError(
@@ -221,8 +195,8 @@ class ChInfo(CHInfo, Info):
 
     def _init_from_channels(
         self,
-        ch_names: Union[int, List[str], Tuple[str, ...]],
-        ch_types: Union[str, List[str], Tuple[str, ...]],
+        ch_names: Union[int, list[str], tuple[str, ...]],
+        ch_types: Union[str, list[str], tuple[str, ...]],
     ):
         """Init instance from channel names and types."""
         self._unlocked = True
@@ -356,10 +330,9 @@ class ChInfo(CHInfo, Info):
             # compare projs, compatible with mne 1.2 and above
             if len(self["projs"]) != len(other["projs"]):
                 return False
-            if check_version("mne", "1.2"):
-                for proj1, proj2 in zip(self["projs"], other["projs"]):
-                    if proj1 != proj2:
-                        return False
+            for proj1, proj2 in zip(self["projs"], other["projs"]):
+                if proj1 != proj2:
+                    return False
 
             # TODO: compare compensation grades
 
@@ -375,24 +348,6 @@ class ChInfo(CHInfo, Info):
         return not self.__eq__(other)
 
     # ------------------------------------------------------------------------
-    def __setitem__(self, key, val):
-        """Setter for Dictionary item."""
-        # During unpickling, the _unlocked attribute has not been set, so
-        # let __setstate__ do it later and act unlocked now
-        unlocked = getattr(self, "_unlocked", True)
-        if key in self._attributes:
-            if isinstance(self._attributes[key], str):
-                if not unlocked:
-                    raise RuntimeError(self._attributes[key])
-            else:
-                val = self._attributes[key](val)  # attribute checker function
-        else:
-            raise RuntimeError(
-                f"Info does not support setting the key {repr(key)}. Supported keys "
-                f"are {', '.join(repr(k) for k in self._attributes)}"
-            )
-        super().__setitem__(key, val)  # calls the dict __setitem__
-
     def __deepcopy__(self, memodict):
         """Make a deepcopy."""
         result = ChInfo.__new__(ChInfo)
