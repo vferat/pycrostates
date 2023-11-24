@@ -1,3 +1,4 @@
+# %%
 """
 Microstate Segmentation
 =======================
@@ -5,10 +6,10 @@ Microstate Segmentation
 This tutorial introduces .
 """
 
-#%%
+# %%
 # .. include:: ../../../../links.inc
 
-#%%
+# %%
 # Entropy
 # ------------
 #
@@ -49,7 +50,7 @@ ModK.reorder_clusters(order=[4, 1, 3, 2, 0])
 ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
 ModK.plot()
 
-#%%
+# %%
 # Once a set of cluster centers has been fitted, It can be used to predict the
 # microstate segmentation with the method
 # :meth:`pycrostates.cluster.ModKMeans.predict`. It returns either a
@@ -66,17 +67,17 @@ segmentation = ModK.predict(
     reject_edges=True,
 )
 
-#%%
+# %%
 # Entropy
 # TODO: explain the concept of entropy and its application to MS analysis
 h = segmentation.entropy(ignore_repetitions=False)
 
-#%%
+# %%
 # We can also ignore state repetitions (i.e. self-transitions) by setting the ignore_repetitions to True.
 # This is useful when you don't want to take state duration into account.
 h = segmentation.entropy(ignore_repetitions=True)
 
-#%%
+# %%
 # Excess entropy
 # TODO: explain the concept of excess entropy and its application to MS analysis and parameters.
 from pycrostates.segmentation import excess_entropy_rate
@@ -90,7 +91,7 @@ plt.plot(lags, a*lags+b, '-b')
 plt.title("Entropy rate & excess entropy")
 plt.show()
 
-#%%
+# %%
 # auto_information_function
 # TODO: explain the auto_information_function and parameters.
 from pycrostates.segmentation import auto_information_function
@@ -103,7 +104,7 @@ plt.plot(lags, ai, '-sk')
 plt.title("Auto information function")
 plt.show()
 
-#%%
+# %%
 # partial_auto_information_function
 # TODO: explain the partial_auto_information_function and parameters.
 from pycrostates.segmentation import partial_auto_information_function
@@ -117,7 +118,7 @@ plt.title("Partial Auto information function")
 plt.show()
 
 
-#%%
+# %%
 # References
 # ----------
 # .. footbibliography::
