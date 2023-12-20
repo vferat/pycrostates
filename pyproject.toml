@@ -108,7 +108,7 @@ tracker = 'https://github.com/vferat/pycrostates/issues'
 check-filenames = true
 check-hidden = true
 ignore-words = '.codespellignore'
-skip = 'build,.git,.mypy_cache,.pytest_cache,paper/paper.bib'
+skip = 'build,.git,.mypy_cache,.pytest_cache,paper/*'
 
 [tool.coverage.report]
 exclude_lines = [
