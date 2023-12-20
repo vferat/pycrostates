@@ -17,7 +17,7 @@ for file in directory.rglob("*.pyi"):
 files = [
     str(file.as_posix())
     for file in directory.rglob("*.py")
-    if file.parent.name not in ("commands", "tests")
+    if file.parent.name not in ("commands", "html_templates", "tests")
     and file.name not in ("conftest.py", "_tests.py", "_version.py")
 ]
 stubgen.main(
@@ -50,13 +50,19 @@ for stub in stubs:
         if not docstring and isinstance(node, ast.FunctionDef):
             continue
         elif docstring:
-            node.body[0].value.value = docstring
+            try:
+                node.body[0].value.value = docstring
+            except AttributeError:
+                continue
         for method in node.body:
             if not isinstance(method, ast.FunctionDef):
                 continue
             docstring = getattr(getattr(module, node.name), method.name).__doc__
             if docstring:
-                method.body[0].value.value = docstring
+                try:
+                    method.body[0].value.value = docstring
+                except AttributeError:
+                    continue
     unparsed = ast.unparse(module_ast)
     stub.write_text(unparsed, encoding="utf-8")
     # sort imports
