@@ -64,6 +64,11 @@ for stub in stubs:
                 except AttributeError:
                     continue
     unparsed = ast.unparse(module_ast)
+    # remove unused imports conflicting with arguments, kwargs, method names, ...
+    unparsed = unparsed.replace(", verbose as verbose", "")
+    unparsed = unparsed.replace(
+        "from ..viz import plot_cluster_centers as plot_cluster_centers", ""
+    )
     stub.write_text(unparsed, encoding="utf-8")
     # sort imports
     isort.file(stub, config=config_isort)
