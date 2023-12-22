@@ -2,6 +2,7 @@
 
 import itertools
 from abc import abstractmethod
+from copy import deepcopy
 from typing import Optional, Union
 
 import numpy as np
@@ -263,6 +264,10 @@ class _BaseSegmentation(Segmentation):
             stat=stat,
             ignore_repetitions=ignore_repetitions,
         )
+
+    def copy(self):
+        """Return copy of the segmentation instance."""
+        return deepcopy(self)
 
     @fill_doc
     def plot_cluster_centers(
