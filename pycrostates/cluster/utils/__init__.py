@@ -2,4 +2,4 @@
 
 from .utils import optimize_order  # noqa: F401
 
-__all__ = ("optimize_order",)
+__all__: tuple[str, ...] = ("optimize_order",)

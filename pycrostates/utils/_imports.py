@@ -9,7 +9,7 @@ from ._logs import logger
 
 # A mapping from import name to package name (on PyPI) when the package name
 # is different. {python: PyPI}
-INSTALL_MAPPING = {}
+_INSTALL_MAPPING: dict[str, str] = {}
 
 
 def import_optional_dependency(name: str, extra: str = "", raise_error: bool = True):
@@ -38,7 +38,7 @@ def import_optional_dependency(name: str, extra: str = "", raise_error: bool = T
         The imported module when found.
         None is returned when the package is not found and raise_error is False.
     """
-    package_name = INSTALL_MAPPING.get(name)
+    package_name = _INSTALL_MAPPING.get(name)
     install_name = package_name if package_name is not None else name
 
     try:
