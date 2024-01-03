@@ -83,7 +83,7 @@ jobs:
           python -m pip install --progress-bar off --upgrade pip setuptools
           python -m pip install --progress-bar off .[test]
           python -m pip install --progress-bar off --upgrade git+https://github.com/mne-tools/mne-python
-          python -m pip install --progress-bar off --upgrade --pre --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple --timeout=180 numpy scipy scikit-learn matplotlib
+          python -m pip install --progress-bar off --upgrade --pre --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple --timeout=180 "numpy>=2.0.0.dev0" "scipy>=1.13.0.dev0" "scikit-learn>=1.5.dev0" matplotlib
       - name: Display system information
         run: pycrostates-sys_info --developer
       - name: Display MNE info
