@@ -45,7 +45,7 @@ jobs:
       - name: Cache testing dataset
         uses: actions/cache@v3
         with:
-          key: mne-testing-${{ hashFiles('mne_testing_data_version.txt') }}
+          key: mne-testing-${{ runner.os }}-${{ hashFiles('mne_testing_data_version.txt') }}
           path: ~/mne_data
       - name: Download testing dataset
         run: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
@@ -96,7 +96,7 @@ jobs:
       - name: Cache testing dataset
         uses: actions/cache@v3
         with:
-          key: mne-testing-${{ hashFiles('mne_testing_data_version.txt') }}
+          key: mne-testing-${{ runner.os }}-${{ hashFiles('mne_testing_data_version.txt') }}
           path: ~/mne_data
       - name: Download testing dataset
         run: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
