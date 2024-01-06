@@ -4,8 +4,8 @@ from typing import Union
 from mne import Info
 from numpy.typing import NDArray
 
-from .. import __version__ as __version__
 from .._typing import CHInfo as CHInfo
+from .._version import __version__ as __version__
 from ..cluster import AAHCluster as AAHCluster
 from ..cluster import ModKMeans as ModKMeans
 from ..utils._checks import _check_type as _check_type

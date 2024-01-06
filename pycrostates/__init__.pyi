@@ -1,5 +1,6 @@
 from . import cluster as cluster
 from . import datasets as datasets
+from . import io as io
 from . import metrics as metrics
 from . import preprocessing as preprocessing
 from . import utils as utils
