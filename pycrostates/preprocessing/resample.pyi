@@ -14,19 +14,7 @@ from ..utils._checks import _check_type as _check_type
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 
-def resample(
-    inst: Union[BaseRaw, BaseEpochs, CHData],
-    picks: Picks = None,
-    tmin: Optional[float] = None,
-    tmax: Optional[float] = None,
-    reject_by_annotation: bool = True,
-    n_resamples: int = None,
-    n_samples: int = None,
-    coverage: float = None,
-    replace: bool = True,
-    random_state: RANDomState = None,
-    verbose: Incomplete | None = None,
-) -> list[CHData]:
+def resample(inst: Union[BaseRaw, BaseEpochs, CHData], picks: Picks=None, tmin: Optional[float]=None, tmax: Optional[float]=None, reject_by_annotation: bool=True, n_resamples: int=None, n_samples: int=None, coverage: float=None, replace: bool=True, random_state: RANDomState=None, verbose: Incomplete | None=None) -> list[CHData]:
     """Resample a recording into epochs of random samples.
 
     Resample :class:`~mne.io.Raw`. :class:`~mne.Epochs` or
@@ -38,13 +26,13 @@ def resample(
     inst : Raw | Epochs | ChData
         Instance to resample.
     picks : str | array-like | slice | None
-        Channels to include. Slices and lists of integers will be interpreted as
-        channel indices. In lists, channel *type* strings (e.g., ``['meg',
-        'eeg']``) will pick channels of those types, channel *name* strings (e.g.,
-        ``['MEG0111', 'MEG2623']`` will pick the given channels. Can also be the
-        string values "all" to pick all channels, or "data" to pick :term:`data
-        channels`. None (default) will pick all channels. Note that channels in
-        ``info['bads']`` *will be included* if their names or indices are
+        Channels to include. Slices and lists of integers will be interpreted as 
+        channel indices. In lists, channel *type* strings (e.g., ``['meg', 
+        'eeg']``) will pick channels of those types, channel *name* strings (e.g., 
+        ``['MEG0111', 'MEG2623']`` will pick the given channels. Can also be the 
+        string values "all" to pick all channels, or "data" to pick :term:`data 
+        channels`. None (default) will pick all channels. Note that channels in 
+        ``info['bads']`` *will be included* if their names or indices are 
         explicitly provided.
     tmin : float
         Start time of the raw data to use in seconds (must be >= 0).
@@ -54,7 +42,7 @@ def resample(
         Whether to omit bad segments from the data before fitting. If ``True``
         (default), annotated segments whose description begins with ``'bad'`` are
         omitted. If ``False``, no rejection based on annotations is performed.
-
+    
         Has no effect if ``inst`` is not a :class:`mne.io.Raw` object.
     n_resamples : int
         Number of resamples to draw. Each epoch can be used to fit a separate clustering

@@ -12,18 +12,7 @@ from ..utils._logs import logger as logger
 
 _GRADIENT_KWARGS_DEFAULTS: dict[str, str]
 
-def plot_cluster_centers(
-    cluster_centers: NDArray[float],
-    info: Union[Info, CHInfo],
-    cluster_names: list[str] = None,
-    axes: Optional[Union[Axes, NDArray[Axes]]] = None,
-    show_gradient: Optional[bool] = False,
-    gradient_kwargs: dict[str, Any] = ...,
-    *,
-    block: bool = False,
-    verbose: Optional[str] = None,
-    **kwargs,
-):
+def plot_cluster_centers(cluster_centers: NDArray[float], info: Union[Info, CHInfo], cluster_names: list[str]=None, axes: Optional[Union[Axes, NDArray[Axes]]]=None, show_gradient: Optional[bool]=False, gradient_kwargs: dict[str, Any]=..., *, block: bool=False, verbose: Optional[str]=None, **kwargs):
     """Create topographic maps for cluster centers.
 
     Parameters

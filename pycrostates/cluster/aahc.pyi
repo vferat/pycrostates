@@ -30,15 +30,18 @@ class AAHCluster(_BaseCluster):
     ----------
     .. footbibliography::
     """
-
     _n_clusters: Incomplete
     _cluster_names: Incomplete
     _ignore_polarity: bool
     _normalize_input: Incomplete
     _GEV_: Incomplete
 
-    def __init__(self, n_clusters: int, normalize_input: bool = False) -> None: ...
-    def _repr_html_(self, caption: Incomplete | None = None): ...
+    def __init__(self, n_clusters: int, normalize_input: bool=False) -> None:
+        ...
+
+    def _repr_html_(self, caption: Incomplete | None=None):
+        ...
+
     def __eq__(self, other: Any) -> bool:
         """Equality == method."""
 
@@ -51,16 +54,7 @@ class AAHCluster(_BaseCluster):
     _labels_: Incomplete
     _fitted: bool
 
-    def fit(
-        self,
-        inst: Union[BaseRaw, BaseEpochs],
-        picks: Picks = "eeg",
-        tmin: Optional[Union[int, float]] = None,
-        tmax: Optional[Union[int, float]] = None,
-        reject_by_annotation: bool = True,
-        *,
-        verbose: Optional[str] = None,
-    ) -> None:
+    def fit(self, inst: Union[BaseRaw, BaseEpochs], picks: Picks='eeg', tmin: Optional[Union[int, float]]=None, tmax: Optional[Union[int, float]]=None, reject_by_annotation: bool=True, *, verbose: Optional[str]=None) -> None:
         """Compute cluster centers.
 
         Parameters
@@ -84,7 +78,7 @@ class AAHCluster(_BaseCluster):
             Whether to omit bad segments from the data before fitting. If ``True``
             (default), annotated segments whose description begins with ``'bad'`` are
             omitted. If ``False``, no rejection based on annotations is performed.
-
+        
             Has no effect if ``inst`` is not a :class:`mne.io.Raw` object.
         verbose : int | str | bool | None
             Sets the verbosity level. The verbosity increases gradually between ``"CRITICAL"``,
@@ -103,21 +97,11 @@ class AAHCluster(_BaseCluster):
         """
 
     @staticmethod
-    def _aahc(
-        data: NDArray[float],
-        n_clusters: int,
-        ignore_polarity: bool,
-        normalize_input: bool,
-    ) -> tuple[float, NDArray[float], NDArray[int]]:
+    def _aahc(data: NDArray[float], n_clusters: int, ignore_polarity: bool, normalize_input: bool) -> tuple[float, NDArray[float], NDArray[int]]:
         """Run the AAHC algorithm."""
 
     @staticmethod
-    def _compute_maps(
-        data: NDArray[float],
-        n_clusters: int,
-        ignore_polarity: bool,
-        normalize_input: bool,
-    ) -> tuple[NDArray[float], NDArray[int]]:
+    def _compute_maps(data: NDArray[float], n_clusters: int, ignore_polarity: bool, normalize_input: bool) -> tuple[NDArray[float], NDArray[int]]:
         """Compute microstates maps."""
 
     @property

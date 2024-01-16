@@ -4,7 +4,7 @@ from _typeshed import Incomplete
 
 from ._docs import fill_doc as fill_doc
 
-def _ensure_int(item, item_name: Incomplete | None = None):
+def _ensure_int(item, item_name: Incomplete | None=None):
     """
     Ensure a variable is an integer.
 
@@ -22,16 +22,19 @@ def _ensure_int(item, item_name: Incomplete | None = None):
     """
 
 class _IntLike:
+
     @classmethod
-    def __instancecheck__(cls, other): ...
+    def __instancecheck__(cls, other):
+        ...
 
 class _Callable:
-    @classmethod
-    def __instancecheck__(cls, other): ...
 
+    @classmethod
+    def __instancecheck__(cls, other):
+        ...
 _types: Incomplete
 
-def _check_type(item, types, item_name: Incomplete | None = None):
+def _check_type(item, types, item_name: Incomplete | None=None):
     """
     Check that item is an instance of types.
 
@@ -52,12 +55,7 @@ def _check_type(item, types, item_name: Incomplete | None = None):
         When the type of the item is not one of the valid options.
     """
 
-def _check_value(
-    item,
-    allowed_values,
-    item_name: Incomplete | None = None,
-    extra: Incomplete | None = None,
-):
+def _check_value(item, allowed_values, item_name: Incomplete | None=None, extra: Incomplete | None=None):
     """
     Check the value of a parameter against a list of valid options.
 

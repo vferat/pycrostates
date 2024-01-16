@@ -49,7 +49,6 @@ class ModKMeans(_BaseCluster):
     ----------
     .. footbibliography::
     """
-
     _n_clusters: Incomplete
     _cluster_names: Incomplete
     _n_init: Incomplete
@@ -58,15 +57,12 @@ class ModKMeans(_BaseCluster):
     _random_state: Incomplete
     _GEV_: Incomplete
 
-    def __init__(
-        self,
-        n_clusters: int,
-        n_init: int = 100,
-        max_iter: int = 300,
-        tol: Union[int, float] = 1e-06,
-        random_state: RANDomState = None,
-    ) -> None: ...
-    def _repr_html_(self, caption: Incomplete | None = None): ...
+    def __init__(self, n_clusters: int, n_init: int=100, max_iter: int=300, tol: Union[int, float]=1e-06, random_state: RANDomState=None) -> None:
+        ...
+
+    def _repr_html_(self, caption: Incomplete | None=None):
+        ...
+
     def __eq__(self, other: Any) -> bool:
         """Equality == method."""
 
@@ -80,17 +76,7 @@ class ModKMeans(_BaseCluster):
     _fitted: bool
     _ignore_polarity: bool
 
-    def fit(
-        self,
-        inst: Union[BaseRaw, BaseEpochs, CHData],
-        picks: Picks = "eeg",
-        tmin: Optional[Union[int, float]] = None,
-        tmax: Optional[Union[int, float]] = None,
-        reject_by_annotation: bool = True,
-        n_jobs: int = 1,
-        *,
-        verbose: Optional[str] = None,
-    ) -> None:
+    def fit(self, inst: Union[BaseRaw, BaseEpochs, CHData], picks: Picks='eeg', tmin: Optional[Union[int, float]]=None, tmax: Optional[Union[int, float]]=None, reject_by_annotation: bool=True, n_jobs: int=1, *, verbose: Optional[str]=None) -> None:
         """Compute cluster centers.
 
         Parameters
@@ -114,7 +100,7 @@ class ModKMeans(_BaseCluster):
             Whether to omit bad segments from the data before fitting. If ``True``
             (default), annotated segments whose description begins with ``'bad'`` are
             omitted. If ``False``, no rejection based on annotations is performed.
-
+        
             Has no effect if ``inst`` is not a :class:`mne.io.Raw` object.
         n_jobs : int | None
             The number of jobs to run in parallel. If ``-1``, it is set
@@ -140,23 +126,11 @@ class ModKMeans(_BaseCluster):
         """
 
     @staticmethod
-    def _kmeans(
-        data: NDArray[float],
-        n_clusters: int,
-        max_iter: int,
-        random_state: Union[RandomState, Generator],
-        tol: Union[int, float],
-    ) -> tuple[float, NDArray[float], NDArray[int], bool]:
+    def _kmeans(data: NDArray[float], n_clusters: int, max_iter: int, random_state: Union[RandomState, Generator], tol: Union[int, float]) -> tuple[float, NDArray[float], NDArray[int], bool]:
         """Run the k-means algorithm."""
 
     @staticmethod
-    def _compute_maps(
-        data: NDArray[float],
-        n_clusters: int,
-        max_iter: int,
-        random_state: Union[RandomState, Generator],
-        tol: Union[int, float],
-    ) -> tuple[NDArray[float], bool]:
+    def _compute_maps(data: NDArray[float], n_clusters: int, max_iter: int, random_state: Union[RandomState, Generator], tol: Union[int, float]) -> tuple[NDArray[float], bool]:
         """Compute microstates maps.
 
         Based on mne_microstates by Marijn van Vliet <w.m.vanvliet@gmail.com>

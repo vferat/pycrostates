@@ -4,11 +4,9 @@ from ..._typing import Cluster as Cluster
 from ...utils._checks import _check_type as _check_type
 from ...utils._docs import fill_doc as fill_doc
 
-def _optimize_order(
-    centers: NDArray[float],
-    template_centers: NDArray[float],
-    ignore_polarity: bool = True,
-): ...
+def _optimize_order(centers: NDArray[float], template_centers: NDArray[float], ignore_polarity: bool=True):
+    ...
+
 def optimize_order(inst: Cluster, template_inst: Cluster):
     """Optimize the order of cluster centers between two cluster instances.
 

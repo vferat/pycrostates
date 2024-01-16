@@ -29,18 +29,10 @@ class RawSegmentation(_BaseSegmentation):
         The prediction parameters.
     """
 
-    def __init__(self, *args, **kwargs) -> None: ...
-    def plot(
-        self,
-        tmin: Optional[Union[int, float]] = None,
-        tmax: Optional[Union[int, float]] = None,
-        cmap: Optional[str] = None,
-        axes: Optional[Axes] = None,
-        cbar_axes: Optional[Axes] = None,
-        *,
-        block: bool = False,
-        verbose: Optional[str] = None,
-    ):
+    def __init__(self, *args, **kwargs) -> None:
+        ...
+
+    def plot(self, tmin: Optional[Union[int, float]]=None, tmax: Optional[Union[int, float]]=None, cmap: Optional[str]=None, axes: Optional[Axes]=None, cbar_axes: Optional[Axes]=None, *, block: bool=False, verbose: Optional[str]=None):
         """Plot the segmentation.
 
         Parameters
@@ -92,16 +84,10 @@ class EpochsSegmentation(_BaseSegmentation):
         The prediction parameters.
     """
 
-    def __init__(self, *args, **kwargs) -> None: ...
-    def plot(
-        self,
-        cmap: Optional[str] = None,
-        axes: Optional[Axes] = None,
-        cbar_axes: Optional[Axes] = None,
-        *,
-        block: bool = False,
-        verbose: Incomplete | None = None,
-    ):
+    def __init__(self, *args, **kwargs) -> None:
+        ...
+
+    def plot(self, cmap: Optional[str]=None, axes: Optional[Axes]=None, cbar_axes: Optional[Axes]=None, *, block: bool=False, verbose: Incomplete | None=None):
         """Plot segmentation.
 
         Parameters

@@ -16,15 +16,7 @@ from ..utils._logs import logger as logger
 def _check_adjacency(adjacency, info, ch_type):
     """Check adjacency matrix."""
 
-def apply_spatial_filter(
-    inst: Union[BaseRaw, BaseEpochs, CHData],
-    ch_type: str = "eeg",
-    exclude_bads: bool = True,
-    origin: Union[str, NDArray[float]] = "auto",
-    adjacency: Union[csr_matrix, str] = "auto",
-    n_jobs: int = 1,
-    verbose: Incomplete | None = None,
-):
+def apply_spatial_filter(inst: Union[BaseRaw, BaseEpochs, CHData], ch_type: str='eeg', exclude_bads: bool=True, origin: Union[str, NDArray[float]]='auto', adjacency: Union[csr_matrix, str]='auto', n_jobs: int=1, verbose: Incomplete | None=None):
     """Apply a spatial filter.
 
     Adapted from \\ :footcite:t:`michel2019eeg`. Apply an instantaneous filter which
@@ -90,4 +82,5 @@ def apply_spatial_filter(
     .. footbibliography::
     """
 
-def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix): ...
+def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix):
+    ...

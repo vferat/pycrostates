@@ -10,21 +10,7 @@ from ..utils._checks import _check_type as _check_type
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 
-def plot_raw_segmentation(
-    labels: NDArray[int],
-    raw: BaseRaw,
-    n_clusters: int,
-    cluster_names: list[str] = None,
-    tmin: Optional[Union[int, float]] = None,
-    tmax: Optional[Union[int, float]] = None,
-    cmap: Optional[str] = None,
-    axes: Optional[Axes] = None,
-    cbar_axes: Optional[Axes] = None,
-    *,
-    block: bool = False,
-    verbose: Optional[str] = None,
-    **kwargs,
-):
+def plot_raw_segmentation(labels: NDArray[int], raw: BaseRaw, n_clusters: int, cluster_names: list[str]=None, tmin: Optional[Union[int, float]]=None, tmax: Optional[Union[int, float]]=None, cmap: Optional[str]=None, axes: Optional[Axes]=None, cbar_axes: Optional[Axes]=None, *, block: bool=False, verbose: Optional[str]=None, **kwargs):
     """Plot raw segmentation.
 
     Parameters
@@ -65,19 +51,7 @@ def plot_raw_segmentation(
         Matplotlib figure(s) on which topographic maps are plotted.
     """
 
-def plot_epoch_segmentation(
-    labels: NDArray[int],
-    epochs: BaseEpochs,
-    n_clusters: int,
-    cluster_names: list[str] = None,
-    cmap: Optional[str] = None,
-    axes: Optional[Axes] = None,
-    cbar_axes: Optional[Axes] = None,
-    *,
-    block: bool = False,
-    verbose: Optional[str] = None,
-    **kwargs,
-):
+def plot_epoch_segmentation(labels: NDArray[int], epochs: BaseEpochs, n_clusters: int, cluster_names: list[str]=None, cmap: Optional[str]=None, axes: Optional[Axes]=None, cbar_axes: Optional[Axes]=None, *, block: bool=False, verbose: Optional[str]=None, **kwargs):
     """
     Plot epochs segmentation.
 
@@ -115,19 +89,7 @@ def plot_epoch_segmentation(
         Matplotlib figure on which topographic maps are plotted.
     """
 
-def _plot_segmentation(
-    labels: NDArray[int],
-    gfp: NDArray[float],
-    times: NDArray[float],
-    n_clusters: int,
-    cluster_names: list[str] = None,
-    cmap: Optional[Union[str, colors.Colormap]] = None,
-    axes: Optional[Axes] = None,
-    cbar_axes: Optional[Axes] = None,
-    *,
-    verbose: Optional[str] = None,
-    **kwargs,
-):
+def _plot_segmentation(labels: NDArray[int], gfp: NDArray[float], times: NDArray[float], n_clusters: int, cluster_names: list[str]=None, cmap: Optional[Union[str, colors.Colormap]]=None, axes: Optional[Axes]=None, cbar_axes: Optional[Axes]=None, *, verbose: Optional[str]=None, **kwargs):
     """Code snippet to plot segmentation for raw and epochs."""
 
 def _compatibility_cmap(cmap: Optional[Union[str, colors.Colormap]], n_colors: int):

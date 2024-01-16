@@ -4,12 +4,7 @@ from ..utils._checks import _check_type as _check_type
 from ..utils._checks import _check_value as _check_value
 from ..utils._docs import fill_doc as fill_doc
 
-def compute_transition_matrix(
-    labels: NDArray[int],
-    n_clusters: int,
-    stat: str = "probability",
-    ignore_repetitions: bool = True,
-) -> NDArray[float]:
+def compute_transition_matrix(labels: NDArray[int], n_clusters: int, stat: str='probability', ignore_repetitions: bool=True) -> NDArray[float]:
     """Compute the observed transition matrix.
 
     Count the number of transitions from one state to another and aggregate the result
@@ -23,7 +18,7 @@ def compute_transition_matrix(
         The number of clusters, i.e. the number of microstates.
     stat : str
         Aggregate statistic to compute transitions. Can be:
-
+    
         * ``count``: show the number of observations of each transition.
         * ``probability`` or ``proportion``: normalize count such as the probabilities along
           the first axis is always equal to ``1``.
@@ -42,20 +37,10 @@ def compute_transition_matrix(
         First axis indicates state ``"from"``. Second axis indicates state ``"to"``.
     """
 
-def _compute_transition_matrix(
-    labels: NDArray[int],
-    n_clusters: int,
-    stat: str = "probability",
-    ignore_repetitions: bool = True,
-) -> NDArray[float]:
+def _compute_transition_matrix(labels: NDArray[int], n_clusters: int, stat: str='probability', ignore_repetitions: bool=True) -> NDArray[float]:
     """Compute observed transition."""
 
-def compute_expected_transition_matrix(
-    labels: NDArray[int],
-    n_clusters: int,
-    stat: str = "probability",
-    ignore_repetitions: bool = True,
-) -> NDArray[float]:
+def compute_expected_transition_matrix(labels: NDArray[int], n_clusters: int, stat: str='probability', ignore_repetitions: bool=True) -> NDArray[float]:
     """Compute the expected transition matrix.
 
     Compute the theoretical transition matrix as if time course was ignored, but
@@ -73,7 +58,7 @@ def compute_expected_transition_matrix(
         The number of clusters, i.e. the number of microstates.
     stat : str
         Aggregate statistic to compute transitions. Can be:
-
+    
         * ``probability`` or ``proportion``: normalize count such as the probabilities along
           the first axis is always equal to ``1``.
         * ``percent``: normalize count such as the probabilities along the first axis is
@@ -91,12 +76,7 @@ def compute_expected_transition_matrix(
         First axis indicates state ``"from"``. Second axis indicates state ``"to"``.
     """
 
-def _compute_expected_transition_matrix(
-    labels: NDArray[int],
-    n_clusters: int,
-    stat: str = "probability",
-    ignore_repetitions: bool = True,
-) -> NDArray[float]:
+def _compute_expected_transition_matrix(labels: NDArray[int], n_clusters: int, stat: str='probability', ignore_repetitions: bool=True) -> NDArray[float]:
     """Compute theoretical transition matrix.
 
     The theoretical transition matrix takes into account the time coverage.
