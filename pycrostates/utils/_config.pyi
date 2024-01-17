@@ -11,6 +11,7 @@ def _get_config_path():
 
 def _get_data_path():
     """Get pycrostates data directory."""
+
 default_config: Incomplete
 
 def _save_config(config) -> None:

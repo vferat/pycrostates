@@ -13,7 +13,16 @@ from ..utils._checks import _check_value as _check_value
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 
-def _write_cluster(fname: Union[str, Path], cluster_centers_: NDArray[float], chinfo: Union[CHInfo, Info], algorithm: str, cluster_names: list[str], fitted_data: NDArray[float], labels_: NDArray[int], **kwargs):
+def _write_cluster(
+    fname: Union[str, Path],
+    cluster_centers_: NDArray[float],
+    chinfo: Union[CHInfo, Info],
+    algorithm: str,
+    cluster_names: list[str],
+    fitted_data: NDArray[float],
+    labels_: NDArray[int],
+    **kwargs,
+):
     """Save clustering solution to disk.
 
     Parameters
@@ -57,10 +66,29 @@ def _read_cluster(fname: Union[str, Path]):
 def _check_fit_parameters_and_variables(fit_parameters: dict, fit_variables: dict):
     """Check that we have all the keys we are looking for and return algo."""
 
-def _create_ModKMeans(cluster_centers_: NDArray[float], info: CHInfo, cluster_names: list[str], fitted_data: NDArray[float], labels_: NDArray[int], n_init: int, max_iter: int, tol: Union[int, float], GEV_: float):
+def _create_ModKMeans(
+    cluster_centers_: NDArray[float],
+    info: CHInfo,
+    cluster_names: list[str],
+    fitted_data: NDArray[float],
+    labels_: NDArray[int],
+    n_init: int,
+    max_iter: int,
+    tol: Union[int, float],
+    GEV_: float,
+):
     """Create a ModKMeans cluster."""
 
-def _create_AAHCluster(cluster_centers_: NDArray[float], info: CHInfo, cluster_names: list[str], fitted_data: NDArray[float], labels_: NDArray[int], ignore_polarity: bool, normalize_input: bool, GEV_: float):
+def _create_AAHCluster(
+    cluster_centers_: NDArray[float],
+    info: CHInfo,
+    cluster_names: list[str],
+    fitted_data: NDArray[float],
+    labels_: NDArray[int],
+    ignore_polarity: bool,
+    normalize_input: bool,
+    GEV_: float,
+):
     """Create a AAHCluster object."""
 
 def _write_meas_info(fid, info: CHInfo):
@@ -90,8 +118,8 @@ def _read_meas_info(fid, tree):
         Channel information instance.
     """
 
-def _serialize(dict_: dict, outer_sep: str=';', inner_sep: str=':'):
+def _serialize(dict_: dict, outer_sep: str = ";", inner_sep: str = ":"):
     """Aux function."""
 
-def _deserialize(str_: str, outer_sep: str=';', inner_sep: str=':'):
+def _deserialize(str_: str, outer_sep: str = ";", inner_sep: str = ":"):
     """Aux Function."""

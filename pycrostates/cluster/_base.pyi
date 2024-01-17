@@ -28,6 +28,7 @@ from .utils import optimize_order as optimize_order
 
 class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     """Base Class for Microstates Clustering algorithms."""
+
     _n_clusters: Incomplete
     _cluster_names: Incomplete
     _cluster_centers_: Incomplete
@@ -38,13 +39,11 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     _fitted: bool
 
     @abstractmethod
-    def __init__(self):
-        ...
-
+    def __init__(self): ...
     def __repr__(self) -> str:
         """String representation."""
 
-    def _repr_html_(self, caption: Incomplete | None=None):
+    def _repr_html_(self, caption: Incomplete | None = None):
         """HTML representation."""
 
     def __eq__(self, other: Any) -> bool:
@@ -53,7 +52,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     def __ne__(self, other: Any) -> bool:
         """Different != method."""
 
-    def copy(self, deep: bool=True):
+    def copy(self, deep: bool = True):
         """Return a copy of the instance.
 
         Parameters
@@ -69,7 +68,16 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         """Check if the cluster is unfitted."""
 
     @abstractmethod
-    def fit(self, inst: Union[BaseRaw, BaseEpochs, CHData], picks: Picks='eeg', tmin: Optional[Union[int, float]]=None, tmax: Optional[Union[int, float]]=None, reject_by_annotation: bool=True, *, verbose: Optional[str]=None) -> NDArray[float]:
+    def fit(
+        self,
+        inst: Union[BaseRaw, BaseEpochs, CHData],
+        picks: Picks = "eeg",
+        tmin: Optional[Union[int, float]] = None,
+        tmax: Optional[Union[int, float]] = None,
+        reject_by_annotation: bool = True,
+        *,
+        verbose: Optional[str] = None,
+    ) -> NDArray[float]:
         """Compute cluster centers.
 
         Parameters
@@ -93,7 +101,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             Whether to omit bad segments from the data before fitting. If ``True``
             (default), annotated segments whose description begins with ``'bad'`` are
             omitted. If ``False``, no rejection based on annotations is performed.
-        
+
             Has no effect if ``inst`` is not a :class:`mne.io.Raw` object.
         verbose : int | str | bool | None
             Sets the verbosity level. The verbosity increases gradually between ``"CRITICAL"``,
@@ -102,7 +110,11 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             ``"WARNING"`` for False and to ``"INFO"`` for True.
         """
 
-    def rename_clusters(self, mapping: Optional[dict[str, str]]=None, new_names: Optional[Union[list[str], tuple[str, ...]]]=None) -> None:
+    def rename_clusters(
+        self,
+        mapping: Optional[dict[str, str]] = None,
+        new_names: Optional[Union[list[str], tuple[str, ...]]] = None,
+    ) -> None:
         """Rename the clusters.
 
         Parameters
@@ -119,7 +131,12 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         Operates in-place.
         """
 
-    def reorder_clusters(self, mapping: Optional[dict[int, int]]=None, order: Optional[Union[list[int], tuple[int, ...], NDArray[int]]]=None, template: Optional[Cluster]=None) -> None:
+    def reorder_clusters(
+        self,
+        mapping: Optional[dict[int, int]] = None,
+        order: Optional[Union[list[int], tuple[int, ...], NDArray[int]]] = None,
+        template: Optional[Cluster] = None,
+    ) -> None:
         """
         Reorder the clusters of the fitted model.
 
@@ -149,7 +166,9 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         Operates in-place.
         """
 
-    def invert_polarity(self, invert: Union[bool, list[bool], tuple[bool, ...], NDArray[bool]]) -> None:
+    def invert_polarity(
+        self, invert: Union[bool, list[bool], tuple[bool, ...], NDArray[bool]]
+    ) -> None:
         """Invert map polarities.
 
         Parameters
@@ -169,7 +188,20 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         an article).
         """
 
-    def plot(self, axes: Optional[Union[Axes, NDArray[Axes]]]=None, show_gradient: Optional[bool]=False, gradient_kwargs: dict[str, Any]={'color': 'black', 'linestyle': '-', 'marker': 'P'}, *, block: bool=False, verbose: Optional[str]=None, **kwargs):
+    def plot(
+        self,
+        axes: Optional[Union[Axes, NDArray[Axes]]] = None,
+        show_gradient: Optional[bool] = False,
+        gradient_kwargs: dict[str, Any] = {
+            "color": "black",
+            "linestyle": "-",
+            "marker": "P",
+        },
+        *,
+        block: bool = False,
+        verbose: Optional[str] = None,
+        **kwargs,
+    ):
         """
         Plot cluster centers as topographic maps.
 
@@ -211,7 +243,19 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             Path to the ``.fif`` file where the clustering solution is saved.
         """
 
-    def predict(self, inst: Union[BaseRaw, BaseEpochs], picks: Picks=None, factor: int=0, half_window_size: int=1, tol: Union[int, float]=1e-05, min_segment_length: int=0, reject_edges: bool=True, reject_by_annotation: bool=True, *, verbose: Optional[str]=None):
+    def predict(
+        self,
+        inst: Union[BaseRaw, BaseEpochs],
+        picks: Picks = None,
+        factor: int = 0,
+        half_window_size: int = 1,
+        tol: Union[int, float] = 1e-05,
+        min_segment_length: int = 0,
+        reject_edges: bool = True,
+        reject_by_annotation: bool = True,
+        *,
+        verbose: Optional[str] = None,
+    ):
         """Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
 
         Segment instance into microstate sequence using the segmentation smoothing
@@ -249,7 +293,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             Whether to omit bad segments from the data before fitting. If ``True``
             (default), annotated segments whose description begins with ``'bad'`` are
             omitted. If ``False``, no rejection based on annotations is performed.
-        
+
             Has no effect if ``inst`` is not a :class:`mne.io.Raw` object.
         verbose : int | str | bool | None
             Sets the verbosity level. The verbosity increases gradually between ``"CRITICAL"``,
@@ -269,18 +313,50 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         .. footbibliography::
         """
 
-    def _predict_raw(self, raw: BaseRaw, picks_data: NDArray[int], factor: int, tol: Union[int, float], half_window_size: int, min_segment_length: int, reject_edges: bool, reject_by_annotation: bool) -> RawSegmentation:
+    def _predict_raw(
+        self,
+        raw: BaseRaw,
+        picks_data: NDArray[int],
+        factor: int,
+        tol: Union[int, float],
+        half_window_size: int,
+        min_segment_length: int,
+        reject_edges: bool,
+        reject_by_annotation: bool,
+    ) -> RawSegmentation:
         """Create segmentation for raw."""
 
-    def _predict_epochs(self, epochs: BaseEpochs, picks_data: NDArray[int], factor: int, tol: Union[int, float], half_window_size: int, min_segment_length: int, reject_edges: bool) -> EpochsSegmentation:
+    def _predict_epochs(
+        self,
+        epochs: BaseEpochs,
+        picks_data: NDArray[int],
+        factor: int,
+        tol: Union[int, float],
+        half_window_size: int,
+        min_segment_length: int,
+        reject_edges: bool,
+    ) -> EpochsSegmentation:
         """Create segmentation for epochs."""
 
     @staticmethod
-    def _segment(data: NDArray[float], states: NDArray[float], factor: int, tol: Union[int, float], half_window_size: int) -> NDArray[int]:
+    def _segment(
+        data: NDArray[float],
+        states: NDArray[float],
+        factor: int,
+        tol: Union[int, float],
+        half_window_size: int,
+    ) -> NDArray[int]:
         """Create segmentation. Must operate on a copy of states."""
 
     @staticmethod
-    def _smooth_segmentation(data: NDArray[float], states: NDArray[float], labels: NDArray[int], factor: int, tol: Union[int, float], half_window_size: int) -> NDArray[int]:
+    def _smooth_segmentation(
+        data: NDArray[float],
+        states: NDArray[float],
+        labels: NDArray[int],
+        factor: int,
+        tol: Union[int, float],
+        half_window_size: int,
+    ) -> NDArray[int]:
         """Apply smoothing.
 
         Adapted from [1].
@@ -296,7 +372,9 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         """
 
     @staticmethod
-    def _reject_short_segments(segmentation: NDArray[int], data: NDArray[float], min_segment_length: int) -> NDArray[int]:
+    def _reject_short_segments(
+        segmentation: NDArray[int], data: NDArray[float], min_segment_length: int
+    ) -> NDArray[int]:
         """Reject segments that are too short.
 
         Reject segments that are too short by replacing the labels with the adjacent

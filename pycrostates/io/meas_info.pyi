@@ -130,14 +130,21 @@ class ChInfo(CHInfo, Info):
             The coordinate frame used, e.g. ``FIFFV_COORD_HEAD``.
     """
 
-    def __init__(self, info: Optional[Info]=None, ch_names: Optional[Union[int, list[str], tuple[str, ...]]]=None, ch_types: Optional[Union[str, list[str], tuple[str, ...]]]=None) -> None:
-        ...
-
+    def __init__(
+        self,
+        info: Optional[Info] = None,
+        ch_names: Optional[Union[int, list[str], tuple[str, ...]]] = None,
+        ch_types: Optional[Union[str, list[str], tuple[str, ...]]] = None,
+    ) -> None: ...
     def _init_from_info(self, info: Info):
         """Init instance from mne Info."""
     _unlocked: bool
 
-    def _init_from_channels(self, ch_names: Union[int, list[str], tuple[str, ...]], ch_types: Union[str, list[str], tuple[str, ...]]):
+    def _init_from_channels(
+        self,
+        ch_names: Union[int, list[str], tuple[str, ...]],
+        ch_types: Union[str, list[str], tuple[str, ...]],
+    ):
         """Init instance from channel names and types."""
 
     def __getattribute__(self, name):
@@ -152,5 +159,5 @@ class ChInfo(CHInfo, Info):
     def __deepcopy__(self, memodict):
         """Make a deepcopy."""
 
-    def _check_consistency(self, prepend_error: str=''):
+    def _check_consistency(self, prepend_error: str = ""):
         """Do some self-consistency checks and datatype tweaks."""
