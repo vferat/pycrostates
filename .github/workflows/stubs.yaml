@@ -3,6 +3,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.number }}-${{ github.event.ref }}
   cancel-in-progress: true
 on:  # yamllint disable-line rule:truthy
+  pull_request:
+  push:
+    branches: [main]
   schedule:
     - cron: '0 3 * * *'
   workflow_dispatch:
@@ -31,6 +34,7 @@ jobs:
       - name: Generate stub files
         run: python tools/stubgen.py
       - name: Push stub files
+        if: github.event_name == 'push'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
