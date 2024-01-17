@@ -14,7 +14,16 @@ from ..utils._checks import _check_type as _check_type
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 
-def extract_gfp_peaks(inst: Union[BaseRaw, BaseEpochs], picks: Picks='eeg', return_all: bool=False, min_peak_distance: int=1, tmin: Optional[float]=None, tmax: Optional[float]=None, reject_by_annotation: bool=True, verbose: Incomplete | None=None) -> CHData:
+def extract_gfp_peaks(
+    inst: Union[BaseRaw, BaseEpochs],
+    picks: Picks = "eeg",
+    return_all: bool = False,
+    min_peak_distance: int = 1,
+    tmin: Optional[float] = None,
+    tmax: Optional[float] = None,
+    reject_by_annotation: bool = True,
+    verbose: Incomplete | None = None,
+) -> CHData:
     """:term:`Global Field Power` (:term:`GFP`) peaks extraction.
 
     Extract :term:`Global Field Power` (:term:`GFP`) peaks from :class:`~mne.Epochs` or
@@ -48,7 +57,7 @@ def extract_gfp_peaks(inst: Union[BaseRaw, BaseEpochs], picks: Picks='eeg', retu
         Whether to omit bad segments from the data before fitting. If ``True``
         (default), annotated segments whose description begins with ``'bad'`` are
         omitted. If ``False``, no rejection based on annotations is performed.
-    
+
         Has no effect if ``inst`` is not a :class:`mne.io.Raw` object.
     verbose : int | str | bool | None
         Sets the verbosity level. The verbosity increases gradually between ``"CRITICAL"``,
@@ -69,7 +78,9 @@ def extract_gfp_peaks(inst: Union[BaseRaw, BaseEpochs], picks: Picks='eeg', retu
     default values.
     """
 
-def _extract_gfp_peaks(data: NDArray[float], min_peak_distance: int=2) -> NDArray[float]:
+def _extract_gfp_peaks(
+    data: NDArray[float], min_peak_distance: int = 2
+) -> NDArray[float]:
     """Extract GFP peaks from input data.
 
     Parameters

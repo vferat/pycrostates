@@ -33,6 +33,7 @@ class _BaseSegmentation(Segmentation):
     predict_parameters : dict | None
         The prediction parameters.
     """
+
     _labels: Incomplete
     _inst: Incomplete
     _cluster_centers_: Incomplete
@@ -40,16 +41,17 @@ class _BaseSegmentation(Segmentation):
     _predict_parameters: Incomplete
 
     @abstractmethod
-    def __init__(self, labels: NDArray[int], inst: Union[BaseRaw, BaseEpochs], cluster_centers_: NDArray[float], cluster_names: Optional[list[str]]=None, predict_parameters: Optional[dict]=None):
-        ...
-
-    def __repr__(self) -> str:
-        ...
-
-    def _repr_html_(self, caption: Incomplete | None=None):
-        ...
-
-    def compute_parameters(self, norm_gfp: bool=True, return_dist: bool=False):
+    def __init__(
+        self,
+        labels: NDArray[int],
+        inst: Union[BaseRaw, BaseEpochs],
+        cluster_centers_: NDArray[float],
+        cluster_names: Optional[list[str]] = None,
+        predict_parameters: Optional[dict] = None,
+    ): ...
+    def __repr__(self) -> str: ...
+    def _repr_html_(self, caption: Incomplete | None = None): ...
+    def compute_parameters(self, norm_gfp: bool = True, return_dist: bool = False):
         """Compute microstate parameters.
 
         .. warning::
@@ -95,7 +97,9 @@ class _BaseSegmentation(Segmentation):
               expressed in seconds (s).
         """
 
-    def compute_transition_matrix(self, stat: str='probability', ignore_repetitions: bool=True):
+    def compute_transition_matrix(
+        self, stat: str = "probability", ignore_repetitions: bool = True
+    ):
         """Compute the observed transition matrix.
 
         Count the number of transitions from one state to another and aggregate the
@@ -119,7 +123,9 @@ class _BaseSegmentation(Segmentation):
         ``reject_edges`` parameter to ``True`` when predicting the segmentation.
         """
 
-    def compute_expected_transition_matrix(self, stat: str='probability', ignore_repetitions: bool=True):
+    def compute_expected_transition_matrix(
+        self, stat: str = "probability", ignore_repetitions: bool = True
+    ):
         """Compute the expected transition matrix.
 
         Compute the theoretical transition matrix as if time course was ignored, but
@@ -133,7 +139,7 @@ class _BaseSegmentation(Segmentation):
         ----------
         stat : str
             Aggregate statistic to compute transitions. Can be:
-        
+
             * ``probability`` or ``proportion``: normalize count such as the probabilities along
               the first axis is always equal to ``1``.
             * ``percent``: normalize count such as the probabilities along the first axis is
@@ -151,7 +157,9 @@ class _BaseSegmentation(Segmentation):
             First axis indicates state ``"from"``. Second axis indicates state ``"to"``.
         """
 
-    def plot_cluster_centers(self, axes: Optional[Union[Axes, NDArray[Axes]]]=None, block: bool=False):
+    def plot_cluster_centers(
+        self, axes: Optional[Union[Axes, NDArray[Axes]]] = None, block: bool = False
+    ):
         """Plot cluster centers as topographic maps.
 
         Parameters
@@ -170,7 +178,9 @@ class _BaseSegmentation(Segmentation):
         """
 
     @staticmethod
-    def _check_cluster_names(cluster_names: list[str], cluster_centers_: NDArray[float]):
+    def _check_cluster_names(
+        cluster_names: list[str], cluster_centers_: NDArray[float]
+    ):
         """Check that the argument 'cluster_names' is valid."""
 
     @staticmethod
