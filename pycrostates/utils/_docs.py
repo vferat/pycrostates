@@ -4,6 +4,7 @@ Fill docstrings to avoid redundant docstrings in multiple files.
 Inspired from mne: https://mne.tools/stable/index.html
 Inspired from mne.utils.docs.py by Eric Larson <larson.eric.d@gmail.com>
 """
+
 import sys
 from typing import Callable
 

@@ -275,8 +275,9 @@ def append_attr_meth_examples(app, what, name, obj, options, lines):
 .. _sphx_glr_backreferences_{1}:
 .. rubric:: Examples using ``{0}``:
 .. minigallery:: {1}
-""".format(
-                name.split(".")[-1], name
-            ).split(
-                "\n"
-            )
+""".format(name.split(".")[-1], name).split("\n")
+
+
+# -- sphinx_copybutton -----------------------------------------------------------------
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_is_regexp = True
