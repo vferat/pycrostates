@@ -21,7 +21,7 @@ Entropy and related measures
 #     ``pymatreader`` by default.
 
 # %%
-# sphinx_gallery_thumbnail_number = 2
+# sphinx_gallery_thumbnail_number = 4
 from matplotlib import pyplot as plt
 from mne.io import read_raw_eeglab
 from pycrostates.cluster import ModKMeans
@@ -105,7 +105,6 @@ plt.show()
 
 #%%
 # Entropy
-# TODO: explain the concept of entropy and its application to MS analysis
 h_pure = segm_pure.entropy(ignore_repetitions=False)
 h_smooth = segm_smooth.entropy(ignore_repetitions=False)
 print(f"Microstate sequence without smoothing, Shannon entropy h = {h_pure:.2f} bits")
