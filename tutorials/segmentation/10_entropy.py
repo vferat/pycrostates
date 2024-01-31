@@ -59,8 +59,10 @@ ModK.plot()
 # Segmentation
 # ------------
 # Perform two segmentations, i.e. back-fitting the maps obtained in the previous step, followed by:
+#
 # - 1. Minimal post-processing (``half_window_size=1``, ``min_segment_length=1``)
 # - 2. Smoothing  (``half_window_size=3``, ``min_segment_length=5``)
+#
 
 #%%
 # Once a set of cluster centers has been fitted, It can be used to predict the
@@ -102,8 +104,9 @@ plt.show()
 # Shannon entropy
 # ---------------
 # The Shannon entropy \ :footcite:t:`shannon1948mathematical` of the microstate sequence describes how flat the microstate class distribution is. The two extremes are:
-# #. A flat distribution. In this example, the maximum entropy would be observed if each microstate class (A, B, C, D, F) had probability :math:`p=1/5`. The resulting Shannon entropy would be :math:`h=log(5)=2.32 bits`.
-# #. A peaked distribution. If any microstate class occurs with probability :math:`p=1`, and all other classes with probability :math:`p=0`, the resulting Shannon entropy would achieve its minimum value of :math:`h=0` bits.  
+#
+# - A flat distribution. In this example, the maximum entropy would be observed if each microstate class (A, B, C, D, F) had probability :math:`p=1/5`. The resulting Shannon entropy would be :math:`h=log(5)=2.32 bits`.
+# - A peaked distribution. If any microstate class occurs with probability :math:`p=1`, and all other classes with probability :math:`p=0`, the resulting Shannon entropy would achieve its minimum value of :math:`h=0` bits.  
 # 
 # In the example below, we observe that smoothing leads to a slight entropy reduction. 
 
@@ -145,6 +148,7 @@ plt.show()
 
 #%% [markdown]
 # We can now test how microstate sequence (Kolmogorov) complexity changes with pre-processing:
+#
 # - no smoothing, full microstate sequence (duplicates not removed)
 # - smoothing, full microstate sequence (duplicates not removed)
 # - no smoothing, microstate jump sequence (duplicates removed)
@@ -153,7 +157,7 @@ plt.show()
 # Smoothing makes microstate sequences more predictable (less complex), removing duplicates makes sequences less predictable (more complex).
 
 #%%
-# We can also ignore state repetitions (i.e. self-transitions) by setting the ignore_repetitions to True.
+# We can also ignore state repetitions (i.e. self-transitions) by setting the ignore_repetitions to ``True``.
 # This is useful when you don't want to take state duration into account.
 er_pure, _, _, _, _ = excess_entropy_rate(segm_pure, history_length=h_length, ignore_repetitions=False)
 er_smooth, _, _, _, _ = excess_entropy_rate(segm_smooth, history_length=h_length, ignore_repetitions=False)
@@ -168,7 +172,7 @@ print(f"4. Microstate jump sequence with    smoothing, entropy rate: {er_smooth_
 # Autoinformation function
 # ------------------------
 # The autoinformation function (AIF) is the information-theoretic analogy to the autocorrelation function (ACF) for numerical time series.  
-# The autoinformation coefficient at time lag :math:`k` is the information shared between microstate labels :math:`k` time samples apart. Mathematically, it is computed as the mutual information between the microstate label :math:`X_t` at time :math:`t`, and the label :math:`X_{t+k} at :math:`t+k`, averaged across the whole sequence: :math:`H(X_{t+k}) - H(X_{t+k} \vert X_{t})`.
+# The autoinformation coefficient at time lag :math:`k` is the information shared between microstate labels :math:`k` time samples apart. Mathematically, it is computed as the mutual information between the microstate label :math:`X_t` at time :math:`t`, and the label :math:`X_{t+k}` at :math:`t+k`, averaged across the whole sequence: :math:`H(X_{t+k}) - H(X_{t+k} \vert X_{t})`.
 # 
 # Below, we compare the AIF of microstate sequences with and without smoothing. Smoothing increases overall temporal dependencies and removes microstate oscillations (AIF peaks at 50, 100, 150 ms) that are visible in the minimally pre-processed sequence.
 
