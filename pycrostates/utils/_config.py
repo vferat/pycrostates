@@ -61,7 +61,7 @@ def get_config():
     if not os.path.isfile(config_path):
         # create default config
         _save_config(default_config)
-    with open(config_path, "r", encoding="utf-8") as f:
+    with open(config_path, encoding="utf-8") as f:
         config = json.load(f)
     return config
 
