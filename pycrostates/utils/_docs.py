@@ -145,6 +145,10 @@ stat : str
     * ``percent``: normalize count such as the probabilities along the first axis is
       always equal to ``100``."""
 
+docdict["state_to_ignore"] = """
+state_to_ignore : int | None
+    Ignore state with symbol ``state_to_ignore`` from analysis."""
+
 # -- T ---------------------------------------------------------------------------------
 docdict["transition_matrix"] = """
 T : array of shape ``(n_cluster, n_cluster)``
