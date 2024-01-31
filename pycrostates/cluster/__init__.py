@@ -18,7 +18,7 @@ from . import utils  # noqa: F401
 from .aahc import AAHCluster  # noqa: F401
 from .kmeans import ModKMeans  # noqa: F401
 
-__all__ = (
+__all__: tuple[str, ...] = (
     "ModKMeans",
     "AAHCluster",
 )

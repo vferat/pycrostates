@@ -10,7 +10,7 @@ from .transitions import (  # noqa: F401
     compute_transition_matrix,
 )
 
-__all__ = (
+__all__: tuple[str, ...] = (
     "compute_expected_transition_matrix",
     "compute_transition_matrix",
     "entropy",

@@ -55,8 +55,8 @@ else:
         write_string,
     )
 
-from .. import __version__
 from .._typing import CHInfo
+from .._version import __version__
 from ..cluster import AAHCluster, ModKMeans
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc

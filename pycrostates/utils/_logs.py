@@ -158,7 +158,7 @@ class _use_log_level:
     %(verbose)s
     """
 
-    def __init__(self, verbose: Union[bool, str, int, None] = None):
+    def __init__(self, verbose: Optional[Union[bool, str, int]] = None):
         self._old_level = logger.level
         self._level = verbose
 

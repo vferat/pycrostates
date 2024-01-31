@@ -27,7 +27,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           architecture: 'x64'
@@ -43,12 +43,16 @@ jobs:
         run: |
           curl https://raw.githubusercontent.com/mne-tools/mne-testing-data/master/version.txt -o mne_testing_data_version.txt
       - name: Cache testing dataset
-        uses: actions/cache@v3
+        id: cache
+        uses: actions/cache@v4
         with:
-          key: mne-testing-${{ hashFiles('mne_testing_data_version.txt') }}
+          key: mne-testing-${{ runner.os }}-${{ hashFiles('mne_testing_data_version.txt') }}
           path: ~/mne_data
       - name: Download testing dataset
+        if: steps.cache.outputs.cache-hit != 'true'
         run: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
+      - name: Remove dataset version file
+        run: rm mne_testing_data_version.txt
       - name: Run pytest
         run: pytest pycrostates --cov=pycrostates --cov-report=xml --cov-config=pyproject.toml
       - name: Upload to codecov
@@ -74,7 +78,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           architecture: 'x64'
@@ -83,7 +87,9 @@ jobs:
           python -m pip install --progress-bar off --upgrade pip setuptools
           python -m pip install --progress-bar off .[test]
           python -m pip install --progress-bar off --upgrade git+https://github.com/mne-tools/mne-python
-          python -m pip install --progress-bar off --upgrade --pre --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple --timeout=180 numpy scipy scikit-learn matplotlib
+          python -m pip install matplotlib
+          python -m pip install --progress-bar off --upgrade --no-deps --pre --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple --timeout=180 matplotlib
+          python -m pip install --progress-bar off --upgrade --pre --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple --timeout=180 numpy scipy scikit-learn
       - name: Display system information
         run: pycrostates-sys_info --developer
       - name: Display MNE info
@@ -92,12 +98,16 @@ jobs:
         run: |
           curl https://raw.githubusercontent.com/mne-tools/mne-testing-data/master/version.txt -o mne_testing_data_version.txt
       - name: Cache testing dataset
-        uses: actions/cache@v3
+        id: cache
+        uses: actions/cache@v4
         with:
-          key: mne-testing-${{ hashFiles('mne_testing_data_version.txt') }}
+          key: mne-testing-${{ runner.os }}-${{ hashFiles('mne_testing_data_version.txt') }}
           path: ~/mne_data
       - name: Download testing dataset
+        if: steps.cache.outputs.cache-hit != 'true'
         run: python -c "import mne; mne.datasets.testing.data_path(verbose=True)"
+      - name: Remove dataset version file
+        run: rm mne_testing_data_version.txt
       - name: Run pytest
         run: pytest pycrostates --cov=pycrostates --cov-report=xml --cov-config=pyproject.toml
       - name: Upload to codecov

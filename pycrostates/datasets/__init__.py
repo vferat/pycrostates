@@ -7,4 +7,4 @@ dataset is already on your computer, and only download it if necessary."""
 
 from . import lemon
 
-__all__ = ("lemon",)
+__all__: tuple[str, ...] = ("lemon",)

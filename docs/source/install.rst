@@ -40,7 +40,7 @@ Methods
 
         .. code-block:: bash
 
-            pip install pycrostates
+            $ pip install pycrostates
 
     .. tab-item:: Conda
 
@@ -48,7 +48,7 @@ Methods
 
         .. code-block:: bash
 
-            conda install -c conda-forge pycrostates
+            $ conda install -c conda-forge pycrostates
 
     .. tab-item:: Snapshot of the current version
 

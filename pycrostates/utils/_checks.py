@@ -42,7 +42,7 @@ def _ensure_int(item, item_name=None):
         item = int(operator.index(item))
     except TypeError:
         item_name = "Item" if item_name is None else "'%s'" % item_name
-        raise TypeError("%s must be an int, got %s instead." % (item_name, type(item)))
+        raise TypeError(f"{item_name} must be an int, got {type(item)} instead.")
 
     return item
 
@@ -161,9 +161,9 @@ def _check_value(item, allowed_values, item_name=None, extra=None):
         if len(allowed_values) == 1:
             options = "The only allowed value is %s" % repr(allowed_values[0])
         elif len(allowed_values) == 2:
-            options = "Allowed values are %s and %s" % (
-                repr(allowed_values[0]),
-                repr(allowed_values[1]),
+            options = (
+                f"Allowed values are {repr(allowed_values[0])} "
+                f"and {repr(allowed_values[1])}"
             )
         else:
             options = "Allowed values are "
@@ -286,7 +286,8 @@ def _check_picks_uniqueness(info, picks):
         ch_types = info.get_channel_types(unique=False)
         ch_types, counts = np.unique(ch_types, return_counts=True)
         channels_msg = ", ".join(
-            "%s '%s' channel(s)" % t for t in zip(counts, ch_types)
+            "%s '%s' channel(s)" % t  # noqa: UP031
+            for t in zip(counts, ch_types)
         )
         raise ValueError(
             f"Only one datatype can be selected, but 'picks' results in {channels_msg}."

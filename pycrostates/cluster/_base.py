@@ -1086,7 +1086,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         segmentation[:n] = -1
 
         # set last segment to unlabeled
-        n = np.flip((segmentation != segmentation[-1])).argmax()
+        n = np.flip(segmentation != segmentation[-1]).argmax()
         segmentation[-n:] = -1
 
         return segmentation

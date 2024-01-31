@@ -205,7 +205,7 @@ def test_plot_segmentation(ModK, inst):
 )
 def test_invalid_segmentation(Segmentation, inst, bad_inst, caplog):
     """Test that we can not create an invalid segmentation."""
-    labels = np.zeros((inst.times.size))
+    labels = np.zeros(inst.times.size)
     cluster_centers = np.zeros((4, len(inst.ch_names) - len(inst.info["bads"])))
     cluster_names = ["a", "b", "c", "d"]
 
