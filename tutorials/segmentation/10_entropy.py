@@ -21,7 +21,7 @@ Entropy and related measures
 #     ``pymatreader`` by default.
 
 # %%
-# sphinx_gallery_thumbnail_number = 4
+# sphinx_gallery_thumbnail_number = 5
 from matplotlib import pyplot as plt
 from mne.io import read_raw_eeglab
 from pycrostates.cluster import ModKMeans
