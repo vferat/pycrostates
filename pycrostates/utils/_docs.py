@@ -139,6 +139,10 @@ predict_parameters : dict | None
 # -- Q ---------------------------------------------------------------------------------
 # -- R ---------------------------------------------------------------------------------
 # -- S ---------------------------------------------------------------------------------
+docdict["segmentation"] = """
+segmentation : RawSegmentation | EpochsSegmentation
+    Segmentation object containing the microstate symbolic sequence."""
+
 docdict["stat_expected_transitions"] = """
 stat : str
     Aggregate statistic to compute transitions. Can be:
