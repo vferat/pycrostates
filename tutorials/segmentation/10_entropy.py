@@ -20,15 +20,16 @@ Entropy and related measures
 #     Note that an environment created via the `MNE installers`_ includes
 #     ``pymatreader`` by default.
 
-# %%
 # sphinx_gallery_thumbnail_number = 5
+
 from matplotlib import pyplot as plt
 from mne.io import read_raw_eeglab
 from pycrostates.cluster import ModKMeans
 from pycrostates.datasets import lemon
 
 #%% [markdown]
-# ## Load example data
+# Load example data
+# ----------------
 # We load 60 seconds of eyes-closed (EC) resting state data from the \ :footcite:t:`babayan_mind-brain-body_2019`.
 
 #%%
@@ -43,7 +44,8 @@ raw.set_eeg_reference("average")  # Apply a common average reference
 _ = raw.plot(duration=10.0, start=10.0, n_channels=25)
 
 # %% [markdown]
-# ## Microstate clustering
+# Microstate clustering
+# ---------------------
 # Perform a clustering into K=5 microstate classes
 
 # %%
@@ -54,7 +56,8 @@ ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
 ModK.plot()
 
 #%% [markdown]
-# ## Segmentation
+# Segmentation
+# ------------
 # Perform two segmentations, i.e. back-fitting the maps obtained in the previous step, followed by:
 # 1. Minimal post-processing (``half_window_size=1``, ``min_segment_length=1``)
 # 2. Smoothing  (``half_window_size=3``, ``min_segment_length=5``)
@@ -96,7 +99,8 @@ _ = segm_smooth.plot(tmin=t0, tmax=t1)
 plt.show()
 
 #%% [markdown]
-# ## Shannon entropy
+# Shannon entropy
+# ---------------
 # The Shannon entropy \ :footcite:t:`shannon1948mathematical` of the microstate sequence describes how flat the microstate class distribution is. The two extremes are:
 # 1. A flat distribution. In this example, the maximum entropy would be observed if each microstate class (A, B, C, D, F) had probability $p=1/5$. The resulting Shannon entropy would be h=log(5)=2.32 bits.
 # 2. A peaked distribution. If any microstate class occurs with probability $p=1$, and all other classes with probability $p=0$, the resulting Shannon entropy would achieve its minimum value of h=0 bits.  
@@ -111,7 +115,8 @@ print(f"Microstate sequence without smoothing, Shannon entropy h = {h_pure:.2f} 
 print(f"Microstate sequence with    smoothing, Shannon entropy h = {h_smooth:.2f} bits")
 
 #%% [markdown]
-# ## Entropy rate and excess entropy
+# Entropy rate and excess entropy
+# -------------------------------
 # The entropy rate of the microstate sequence is a measure of its Kolmogorov complexity, excess entropy measures statistical complexity. High entropy rate (or high Kolmogorov complexity) means the next microstate label is less predictable, based on the sequence history.  
 # History length is provided as a free parameter ``history_length`` when calling the `~pycrostates.segmentation.excess_entropy_rate`, and is given in units of samples.  
 # The `~pycrostates.segmentation.excess_entropy_rate` function performs a linear fit to joint entropy values across different history lengths and returns two parameters; the slope parameter corresponds to the entropy rate, the y-axis intersection to excess entropy.  
@@ -160,7 +165,8 @@ print(f"3. Microstate jump sequence without smoothing, entropy rate: {er_pure_ju
 print(f"4. Microstate jump sequence with    smoothing, entropy rate: {er_smooth_jump:.2f} bits/sample")
 
 #%% [markdown]
-# ## Autoinformation function
+# Autoinformation function
+# ------------------------
 # The autoinformation function (AIF) is the information-theoretic analogy to the autocorrelation function (ACF) for numerical time series.  
 # The autoinformation coefficient at time lag $k$ is the information shared between microstate labels $k$ time samples apart. Mathematically, it is computed as the mutual information between the microstate label $X_t$ at time $t$, and the label $X_{t+k}$ at $t+k$, averaged across the whole sequence: $H(X_{t+k}) - H(X_{t+k} \vert X_{t})$.
 # 
@@ -190,7 +196,8 @@ plt.title("Auto information function", fontsize=fsize)
 plt.show()
 
 #%% [markdown]
-# ## Partial autoinformation
+# Partial autoinformation
+# -----------------------
 # Partial autoinformation (PAI) describes the dependence between microstate sequence labels $k$ samples apart, removing the influence of all intermediate labels. The autoinformation function does not account for the effect of intermediate time steps.  
 # PAI is computationally more expensive and it is recommended to start with a low number of lags (e.g. 5).  
 # PAI coefficients can identify (first-order) Markov processes as their PAI coefficients are zero for lags $k \ge 2$. 
