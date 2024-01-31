@@ -102,6 +102,10 @@ docdict["labels_epo"] = """
 labels : array of shape ``(n_epochs, n_samples)``
     Microstates labels attributed to each sample, i.e. the segmentation."""
 
+docdict["labels_info"] = """
+labels : array (n_symbols, )
+    Microstate symbolic sequence."""
+
 docdict["labels_raw"] = """
 labels : array of shape ``(n_samples,)``
     Microstates labels attributed to each sample, i.e. the segmentation."""
@@ -109,6 +113,15 @@ labels : array of shape ``(n_samples,)``
 docdict["labels_transition"] = """
 labels : array of shape ``(n_samples,)`` or ``(n_epochs, n_samples)``
     Microstates labels attributed to each sample, i.e. the segmentation."""
+
+docdict["log_base"] = """
+log_base : float | str
+    The log base to use.
+    If string:
+    * ``bits``: log_base = ``2``
+    * ``natural``: log_base = ``np.e``
+    * ``dits``: log_base = ``10``
+    Default to ``bits``."""
 
 # -- M ---------------------------------------------------------------------------------
 # -- N ---------------------------------------------------------------------------------
