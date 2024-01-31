@@ -56,8 +56,8 @@ ModK.plot()
 #%% [markdown]
 # ## Segmentation
 # Perform two segmentations, i.e. back-fitting the maps obtained in the previous step, followed by:
-# 1. Minimal post-processing (`half_window_size=1`, `min_segment_length=1`)
-# 2. Smoothing  (`half_window_size=3`, `min_segment_length=5`)
+# 1. Minimal post-processing (``half_window_size=1``, ``min_segment_length=1``)
+# 2. Smoothing  (``half_window_size=3``, ``min_segment_length=5``)
 
 #%%
 # Once a set of cluster centers has been fitted, It can be used to predict the
@@ -114,8 +114,8 @@ print(f"Microstate sequence with    smoothing, Shannon entropy h = {h_smooth:.2f
 #%% [markdown]
 # ## Entropy rate and excess entropy
 # The entropy rate of the microstate sequence is a measure of its Kolmogorov complexity, excess entropy measures statistical complexity. High entropy rate (or high Kolmogorov complexity) means the next microstate label is less predictable, based on the sequence history.  
-# History length is provided as a free parameter `history_length` when calling the function `excess_entropy_rate`, and is given in units of samples.  
-# The function `excess_entropy_rate` performs a linear fit to joint entropy values across different history lengths and returns two parameters; the slope parameter corresponds to the entropy rate, the y-axis intersection to excess entropy.  
+# History length is provided as a free parameter ``history_length`` when calling the `~pycrostates.segmentation.excess_entropy_rate`, and is given in units of samples.  
+# The `~pycrostates.segmentation.excess_entropy_rate` function performs a linear fit to joint entropy values across different history lengths and returns two parameters; the slope parameter corresponds to the entropy rate, the y-axis intersection to excess entropy.  
 # This procedure is illustrated below. Further details are given in \ :footcite:t:`vonWegner2023`.
 
 #%%
