@@ -168,7 +168,7 @@ print(f"4. Microstate jump sequence with    smoothing, entropy rate: {er_smooth_
 # Autoinformation function
 # ------------------------
 # The autoinformation function (AIF) is the information-theoretic analogy to the autocorrelation function (ACF) for numerical time series.  
-# The autoinformation coefficient at time lag `k` is the information shared between microstate labels ``k`` time samples apart. Mathematically, it is computed as the mutual information between the microstate label :math:`X_t` at time :math:`t``, and the label :math:`X_{t+k} at :math:`t+k`, averaged across the whole sequence: :math:`H(X_{t+k}) - H(X_{t+k} \vert X_{t})`.
+# The autoinformation coefficient at time lag :math:`k` is the information shared between microstate labels :math:`k` time samples apart. Mathematically, it is computed as the mutual information between the microstate label :math:`X_t` at time :math:`t``, and the label :math:`X_{t+k} at :math:`t+k`, averaged across the whole sequence: :math:`H(X_{t+k}) - H(X_{t+k} \vert X_{t})`.
 # 
 # Below, we compare the AIF of microstate sequences with and without smoothing. Smoothing increases overall temporal dependencies and removes microstate oscillations (AIF peaks at 50, 100, 150 ms) that are visible in the minimally pre-processed sequence.
 
