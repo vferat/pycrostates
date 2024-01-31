@@ -6,7 +6,7 @@ Front Physiol (2018) https://doi.org/10.3389/fphys.2018.01382
 """
 
 import itertools
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
 
 import numpy as np
 import scipy.stats
@@ -232,7 +232,7 @@ def _excess_entropy_rate(
     state_to_ignore: Optional[int] = -1,
     log_base: Union[float, str] = 2,
     n_jobs: int = 1,
-) -> Tuple[float, float, float, NDArray[int], NDArray[float]]:
+) -> tuple[float, float, float, NDArray[int], NDArray[float]]:
     """Estimate the entropy rate and the excess_entropy from a linear fit.
 
     Parameters
@@ -278,7 +278,7 @@ def excess_entropy_rate(
     ignore_repetitions: bool = False,
     log_base: Union[float, str] = 2,
     n_jobs: int = 1,
-) -> Tuple[float, float, float, NDArray[int], NDArray[float]]:
+) -> tuple[float, float, float, NDArray[int], NDArray[float]]:
     r"""Estimate the entropy rate and the ``excess_entropy`` of the segmentation.
 
     The entropy rate and the ``excess_entropy`` are estimated from a linear fit:
@@ -382,14 +382,14 @@ def auto_information_function(
     segmentation: Segmentation,
     lags: Union[
         int,
-        List[int],
-        Tuple[int, ...],
+        list[int],
+        tuple[int, ...],
         NDArray[int],
     ],
     ignore_repetitions: bool = False,
     log_base: Union[float, str] = 2,
     n_jobs: int = 1,
-) -> Tuple[NDArray[int], NDArray[float]]:
+) -> tuple[NDArray[int], NDArray[float]]:
     r"""Compute the Auto-information function (aif).
 
     Compute the Auto-information function (aif) as described
@@ -493,14 +493,14 @@ def partial_auto_information_function(
     segmentation: Segmentation,
     lags: Union[
         int,
-        List[int],
-        Tuple[int, ...],
+        list[int],
+        tuple[int, ...],
         NDArray[int],
     ],
     ignore_repetitions: bool = False,
     log_base: Union[float, str] = 2,
     n_jobs: Optional[int] = 1,
-) -> Tuple[NDArray[int], NDArray[float]]:
+) -> tuple[NDArray[int], NDArray[float]]:
     r"""Compute the Partial auto-information function.
 
     Compute the Partial auto-information function as described
