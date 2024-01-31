@@ -29,7 +29,7 @@ from pycrostates.datasets import lemon
 
 #%% [markdown]
 # Load example data
-# ----------------
+# -----------------
 # We load 60 seconds of eyes-closed (EC) resting state data from the \ :footcite:t:`babayan_mind-brain-body_2019`.
 
 #%%
