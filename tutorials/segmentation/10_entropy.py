@@ -30,7 +30,7 @@ from pycrostates.datasets import lemon
 #%% [markdown]
 # Load example data
 # -----------------
-# We load 60 seconds of eyes-closed (EC) resting state data from the \ :footcite:t:`babayan_mind-brain-body_2019`.
+# We load 60 seconds of eyes-closed (EC) resting state data from the \ :footcite:t:`babayan_mind-brain-body_2019` database.
 
 #%%
 raw_fname = lemon.data_path(subject_id="010021", condition="EC")
@@ -40,7 +40,7 @@ raw.load_data()
 raw.set_eeg_reference("average")  # Apply a common average reference
 
 #%%
-# this subject has a posterior dominant rhythm in the alpha frequency band
+# This subject has a posterior dominant rhythm in the alpha frequency band
 _ = raw.plot(duration=10.0, start=10.0, n_channels=25)
 
 # %% [markdown]
@@ -61,7 +61,7 @@ ModK.plot()
 # Perform two segmentations, i.e. back-fitting the maps obtained in the previous step, followed by:
 #
 # - 1. Minimal post-processing (``half_window_size=1``, ``min_segment_length=1``)
-# - 2. Smoothing  (``half_window_size=3``, ``min_segment_length=5``)
+# - 2. Temporal smoothing  (``half_window_size=3``, ``min_segment_length=5``)
 #
 
 #%%
@@ -120,7 +120,7 @@ print(f"Microstate sequence with    smoothing, Shannon entropy h = {h_smooth:.2f
 #%% [markdown]
 # Entropy rate and excess entropy
 # -------------------------------
-# The entropy rate of the microstate sequence is a measure of its Kolmogorov complexity, excess entropy measures statistical complexity. High entropy rate (or high Kolmogorov complexity) means the next microstate label is less predictable, based on the sequence history.  
+# The entropy rate of the microstate sequence is a measure of its Kolmogorov complexity while excess entropy measures statistical complexity. High entropy rate (or high Kolmogorov complexity) means the next microstate label is less predictable, based on the sequence history.  
 # History length is provided as a free parameter ``history_length`` when calling the `~pycrostates.segmentation.excess_entropy_rate`, and is given in units of samples.  
 # The `~pycrostates.segmentation.excess_entropy_rate` function performs a linear fit to joint entropy values across different history lengths and returns two parameters; the slope parameter corresponds to the entropy rate, the y-axis intersection to excess entropy.  
 # This procedure is illustrated below. Further details are given in \ :footcite:t:`vonWegner2023`.
@@ -157,7 +157,7 @@ plt.show()
 # Smoothing makes microstate sequences more predictable (less complex), removing duplicates makes sequences less predictable (more complex).
 
 #%%
-# We can also ignore state repetitions (i.e. self-transitions) by setting the ignore_repetitions to ``True``.
+# We can ignore state repetitions (i.e. self-transitions) by setting the ignore_repetitions to ``True``.
 # This is useful when you don't want to take state duration into account.
 er_pure, _, _, _, _ = excess_entropy_rate(segm_pure, history_length=h_length, ignore_repetitions=False)
 er_smooth, _, _, _, _ = excess_entropy_rate(segm_smooth, history_length=h_length, ignore_repetitions=False)
@@ -202,12 +202,12 @@ plt.show()
 #%% [markdown]
 # Partial autoinformation
 # -----------------------
-# Partial autoinformation (PAI) describes the dependence between microstate sequence labels $k$ samples apart, removing the influence of all intermediate labels. The autoinformation function does not account for the effect of intermediate time steps.  
+# Partial autoinformation (PAI) describes the dependence between microstate sequence labels :math:`k` samples apart, removing the influence of all intermediate labels. The autoinformation function does not account for the effect of intermediate time steps.  
 # PAI is computationally more expensive and it is recommended to start with a low number of lags (e.g. ``5``).  
 # PAI coefficients can identify (first-order) Markov processes as their PAI coefficients are zero for lags :math:`k \ge 2`. 
 # 
 # Below, we compare the PAI coefficients of microstate sequences with and without smoothing.
-# It is observed that smoothing shifts temporal dependencies from towards the first time lag, i.e. renders the sequences more Markovian.
+# It is observed that smoothing shifts temporal dependencies towards the first time lag, i.e. smoothing makes sequences more Markovian.
 
 #%%
 from pycrostates.segmentation import partial_auto_information_function
@@ -224,7 +224,7 @@ lags2, pai_smooth = partial_auto_information_function(segm_smooth,
                                                       n_jobs=1)
 
 #%%
-# plot PAIF
+# PAIF plot
 w = 0.4
 wh = w/2
 
