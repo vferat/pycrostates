@@ -142,7 +142,7 @@ intersphinx_mapping = {
 intersphinx_timeout = 5
 
 # -- sphinx-issues -----------------------------------------------------------
-issues_github_path = gh_url.split("http://github.com/")[-1]
+issues_github_path = gh_url.split("https://github.com/")[-1]
 
 # -- numpydoc ----------------------------------------------------------------
 numpydoc_class_members_toctree = False
