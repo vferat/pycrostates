@@ -23,7 +23,7 @@ html-noplot:
 	$(SPHINXBUILD) source build -b html $(SPHINXOPTS) -D plot_gallery=0
 
 clean:
-	rm -rf build source/generated
+	rm -rf build source/generated source/api/generated
 
 linkcheck:
 	$(SPHINXBUILD) source linkcheck -b linkcheck -D plot_gallery=0
@@ -32,4 +32,4 @@ linkcheck-grep:
 	@! grep -h "^.*:.*: \[\(\(local\)\|\(broken\)\)\]" linkcheck/output.txt
 
 view:
-	@python -c "import webbrowser; webbrowser.open_new_tab('file://$(PWD)/build/html/index.html')"
+	@python -c "import webbrowser; webbrowser.open_new_tab('file://$(PWD)/build/index.html')"

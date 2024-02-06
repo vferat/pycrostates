@@ -33,7 +33,7 @@ goto :eof
 goto :eof
 
 :clean
-rmdir /s /q build source\generated
+rmdir /s /q build source\generated source\api\generated
 goto :eof
 
 :linkcheck
@@ -51,5 +51,5 @@ if %errorlevel% equ 0 (
 goto :eof
 
 :view
-python -c "import webbrowser; webbrowser.open_new_tab(r'file:///%cd%\build\html\index.html')"
+python -c "import webbrowser; webbrowser.open_new_tab(r'file:///%cd%\build\index.html')"
 goto :eof
