@@ -33,7 +33,7 @@ goto :eof
 goto :eof
 
 :clean
-rmdir /s /q build source\generated source\api\generated
+rmdir /s /q build linkcheck source\generated source\api\generated
 goto :eof
 
 :linkcheck

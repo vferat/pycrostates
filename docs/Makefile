@@ -23,7 +23,7 @@ html-noplot:
 	$(SPHINXBUILD) source build -b html $(SPHINXOPTS) -D plot_gallery=0
 
 clean:
-	rm -rf build source/generated source/api/generated
+	rm -rf build linkcheck source/generated source/api/generated
 
 linkcheck:
 	$(SPHINXBUILD) source linkcheck -b linkcheck -D plot_gallery=0
