@@ -4,6 +4,10 @@ Entropy and related measures
 
 """
 #%%
+# Authors: Frederic von Wegner <fvwegner@gmail.com>
+#          Victor Férat <victor.ferat@live.fr>
+
+#%%
 # .. include:: ../../../../links.inc
 
 #%%
