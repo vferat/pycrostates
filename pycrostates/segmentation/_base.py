@@ -222,12 +222,15 @@ class _BaseSegmentation(Segmentation):
         -------
         %(transition_matrix)s
 
-        warnings
-        --------
-        When working with `~mne.Epochs`, this method will take into account transitions
-        that occur between epochs. This could lead to wrong interpretation when working
-        with discontinuous data. To avoid this behaviour, make sure to set the
-        ``reject_edges`` parameter to ``True`` when predicting the segmentation.
+        Notes
+        -----
+        .. warning::
+
+            When working with `~mne.Epochs`, this method will take into account
+            transitions that occur between epochs. This could lead to wrong
+            interpretation when working with discontinuous data. To avoid this
+            behaviour, make sure to set the ``reject_edges`` parameter to ``True`` when
+            predicting the segmentation.
         """
         return _compute_transition_matrix(
             self._labels,
