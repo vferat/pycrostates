@@ -21,7 +21,7 @@ author = "Victor Férat"
 copyright = f"{date.today().year}, {author}"
 release = pycrostates.__version__
 package = pycrostates.__name__
-gh_url = "https://github.com/vferat/pycrostates"
+gh_url = "https://github.com/vferat/pycrostates/"
 
 # -- general configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
