@@ -66,6 +66,7 @@ ModK.fit(raw, n_jobs=2)
 ModK.reorder_clusters(order=[4, 2, 0, 3, 1])
 ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
 ModK.plot()
+plt.show()
 
 # %%
 # Segmentation
@@ -115,7 +116,7 @@ plt.show()
 # Shannon entropy
 # ---------------
 #
-# The Shannon entropy :footcite:t:`shannon1948mathematical` of the microstate sequence
+# The Shannon entropy\ :footcite:p:`shannon1948mathematical` of the microstate sequence
 # describes how flat the microstate class distribution is. The two extremes are:
 #
 # - A flat distribution. In this example, the maximum entropy would be observed if each
