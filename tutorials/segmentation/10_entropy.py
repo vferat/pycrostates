@@ -5,6 +5,7 @@ Entropy and related measures
 """
 #%%
 # .. include:: ../../../../links.inc
+
 #%%
 # .. note::
 #
@@ -21,7 +22,8 @@ Entropy and related measures
 
 # sphinx_gallery_thumbnail_number = 5
 # Authors: Frederic von Wegner <fvwegner@gmail.com>
-#         Victor Férat <victor.ferat@live.fr>
+#          Victor Férat <victor.ferat@live.fr>
+
 from matplotlib import pyplot as plt
 from mne.io import read_raw_eeglab
 from pycrostates.cluster import ModKMeans
