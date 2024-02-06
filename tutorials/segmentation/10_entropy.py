@@ -5,8 +5,6 @@ Entropy and related measures
 """
 #%%
 # .. include:: ../../../../links.inc
-# Authors: Frederic von Wegner <fvwegner@gmail.com>
-#         Victor Férat <victor.ferat@live.fr>
 #%%
 # .. note::
 #
@@ -22,6 +20,8 @@ Entropy and related measures
 #     ``pymatreader`` by default.
 
 # sphinx_gallery_thumbnail_number = 5
+# Authors: Frederic von Wegner <fvwegner@gmail.com>
+#         Victor Férat <victor.ferat@live.fr>
 from matplotlib import pyplot as plt
 from mne.io import read_raw_eeglab
 from pycrostates.cluster import ModKMeans
