@@ -102,6 +102,10 @@ docdict["labels_epo"] = """
 labels : array of shape ``(n_epochs, n_samples)``
     Microstates labels attributed to each sample, i.e. the segmentation."""
 
+docdict["labels_info"] = """
+labels : array (n_symbols, )
+    Microstate symbolic sequence."""
+
 docdict["labels_raw"] = """
 labels : array of shape ``(n_samples,)``
     Microstates labels attributed to each sample, i.e. the segmentation."""
@@ -109,6 +113,15 @@ labels : array of shape ``(n_samples,)``
 docdict["labels_transition"] = """
 labels : array of shape ``(n_samples,)`` or ``(n_epochs, n_samples)``
     Microstates labels attributed to each sample, i.e. the segmentation."""
+
+docdict["log_base"] = """
+log_base : float | str
+    The log base to use.
+    If string:
+    * ``bits``: log_base = ``2``
+    * ``natural``: log_base = ``np.e``
+    * ``dits``: log_base = ``10``
+    Default to ``bits``."""
 
 # -- M ---------------------------------------------------------------------------------
 # -- N ---------------------------------------------------------------------------------
@@ -126,6 +139,10 @@ predict_parameters : dict | None
 # -- Q ---------------------------------------------------------------------------------
 # -- R ---------------------------------------------------------------------------------
 # -- S ---------------------------------------------------------------------------------
+docdict["segmentation"] = """
+segmentation : RawSegmentation | EpochsSegmentation
+    Segmentation object containing the microstate symbolic sequence."""
+
 docdict["stat_expected_transitions"] = """
 stat : str
     Aggregate statistic to compute transitions. Can be:
@@ -144,6 +161,10 @@ stat : str
       the first axis is always equal to ``1``.
     * ``percent``: normalize count such as the probabilities along the first axis is
       always equal to ``100``."""
+
+docdict["state_to_ignore"] = """
+state_to_ignore : int | None
+    Ignore state with symbol ``state_to_ignore`` from analysis."""
 
 # -- T ---------------------------------------------------------------------------------
 docdict["transition_matrix"] = """

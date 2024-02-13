@@ -4,7 +4,7 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-
+import subprocess
 import sys
 from datetime import date
 from pathlib import Path
@@ -21,7 +21,7 @@ author = "Victor Férat"
 copyright = f"{date.today().year}, {author}"
 release = pycrostates.__version__
 package = pycrostates.__name__
-gh_url = "https://github.com/vferat/pycrostates"
+gh_url = "https://github.com/vferat/pycrostates/"
 
 # -- general configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -142,7 +142,7 @@ intersphinx_mapping = {
 intersphinx_timeout = 5
 
 # -- sphinx-issues -----------------------------------------------------------
-issues_github_path = gh_url.split("http://github.com/")[-1]
+issues_github_path = gh_url.split("https://github.com/")[-1]
 
 # -- numpydoc ----------------------------------------------------------------
 numpydoc_class_members_toctree = False
@@ -233,8 +233,18 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
 bibtex_bibfiles = ["../references.bib"]
 
 # -- sphinx-gallery ----------------------------------------------------------
+if sys.platform.startswith("win"):
+    try:
+        subprocess.check_call(["optipng", "--version"])
+        compress_images = ("images", "thumbnails")
+    except Exception:
+        compress_images = ()
+else:
+    compress_images = ("images", "thumbnails")
+
 sphinx_gallery_conf = {
     "backreferences_dir": "generated/backreferences",
+    "compress_images": compress_images,
     "doc_module": ("pycrostates",),
     "examples_dirs": ["../../tutorials"],
     "exclude_implicit_doc": {
@@ -244,7 +254,7 @@ sphinx_gallery_conf = {
     "filename_pattern": r"\d{2}_",
     "gallery_dirs": ["generated/auto_tutorials"],
     "line_numbers": False,  # messes with style
-    "plot_gallery": True,
+    "plot_gallery": "True",  # str, to enable overwrite from CLI without warning
     "reference_url": dict(pycrostates=None),  # documented lib uses None
     "remove_config_comments": True,
     "show_memory": sys.platform == "linux",
@@ -281,3 +291,9 @@ def append_attr_meth_examples(app, what, name, obj, options, lines):
 # -- sphinx_copybutton -----------------------------------------------------------------
 copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
 copybutton_prompt_is_regexp = True
+
+# -- linkcheck -------------------------------------------------------------------------
+linkcheck_anchors = False  # saves a bit of time
+linkcheck_timeout = 15  # some can be quite slow
+linkcheck_retries = 3
+linkcheck_ignore = []  # will be compiled to regex

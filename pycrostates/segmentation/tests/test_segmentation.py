@@ -314,3 +314,14 @@ def test_compute_expected_transition_matrix_stat(ModK, inst):
     assert_allclose(np.sum(T, axis=1), 1)
     T = segmentation.compute_expected_transition_matrix(stat="percent")
     assert_allclose(np.sum(T, axis=1), 100)
+
+
+@pytest.mark.parametrize("ModK, inst", [(ModK_raw, raw), (ModK_epochs, epochs)])
+def test_entropy(ModK, inst):
+    segmentation = ModK.predict(inst)
+    h = segmentation.entropy(ignore_repetitions=True)
+    assert isinstance(h, float)
+    h = segmentation.entropy(ignore_repetitions=False)
+    assert isinstance(h, float)
+    h = segmentation.entropy(ignore_repetitions=True, log_base=10)
+    assert isinstance(h, float)

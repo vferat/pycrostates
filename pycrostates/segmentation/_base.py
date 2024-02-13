@@ -17,6 +17,7 @@ from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
+from .entropy import entropy
 from .transitions import _compute_expected_transition_matrix, _compute_transition_matrix
 
 
@@ -221,12 +222,15 @@ class _BaseSegmentation(Segmentation):
         -------
         %(transition_matrix)s
 
-        Warnings
-        --------
-        When working with `~mne.Epochs`, this method will take into account transitions
-        that occur between epochs. This could lead to wrong interpretation when working
-        with discontinuous data. To avoid this behaviour, make sure to set the
-        ``reject_edges`` parameter to ``True`` when predicting the segmentation.
+        Notes
+        -----
+        .. warning::
+
+            When working with `~mne.Epochs`, this method will take into account
+            transitions that occur between epochs. This could lead to wrong
+            interpretation when working with discontinuous data. To avoid this
+            behaviour, make sure to set the ``reject_edges`` parameter to ``True`` when
+            predicting the segmentation.
         """
         return _compute_transition_matrix(
             self._labels,
@@ -262,6 +266,38 @@ class _BaseSegmentation(Segmentation):
             n_clusters=self._cluster_centers_.shape[0],
             stat=stat,
             ignore_repetitions=ignore_repetitions,
+        )
+
+    # Information ------------------------------------------------------------
+    @fill_doc
+    def entropy(
+        self,
+        ignore_repetitions: bool = False,
+        log_base: Union[float, str] = 2,
+    ):
+        r"""Compute the Shannon entropy of the segmentation.
+
+        Compute the Shannon entropy\ :footcite:p:`shannon1948mathematical`
+        of the microstate symbolic sequence.
+
+        Parameters
+        ----------
+        %(ignore_repetitions)s
+        %(log_base)s
+
+        Returns
+        -------
+        h : float
+            The Shannon entropy.
+
+        References
+        ----------
+        .. footbibliography::
+        """
+        return entropy(
+            self,
+            ignore_repetitions=ignore_repetitions,
+            log_base=log_base,
         )
 
     @fill_doc
