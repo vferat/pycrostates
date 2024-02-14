@@ -1,6 +1,7 @@
 from typing import Optional, Union
 
 from matplotlib import colors
+from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
@@ -22,6 +23,7 @@ def plot_raw_segmentation(
     cbar_axes: Optional[Axes] = None,
     *,
     block: bool = False,
+    show: Optional[bool] = None,
     verbose: Optional[str] = None,
     **kwargs,
 ):
@@ -51,6 +53,9 @@ def plot_raw_segmentation(
         axes.
     block : bool
         Whether to halt program execution until the figure is closed.
+    show : bool | None
+        If True, the figure is shown. If None, the figure is shown if the matplotlib backend
+        is interactive.
     verbose : int | str | bool | None
         Sets the verbosity level. The verbosity increases gradually between ``"CRITICAL"``,
         ``"ERROR"``, ``"WARNING"``, ``"INFO"`` and ``"DEBUG"``. If None is provided, the
@@ -75,6 +80,7 @@ def plot_epoch_segmentation(
     cbar_axes: Optional[Axes] = None,
     *,
     block: bool = False,
+    show: Optional[bool] = None,
     verbose: Optional[str] = None,
     **kwargs,
 ):
@@ -101,6 +107,9 @@ def plot_epoch_segmentation(
         axes.
     block : bool
         Whether to halt program execution until the figure is closed.
+    show : bool | None
+        If True, the figure is shown. If None, the figure is shown if the matplotlib backend
+        is interactive.
     verbose : int | str | bool | None
         Sets the verbosity level. The verbosity increases gradually between ``"CRITICAL"``,
         ``"ERROR"``, ``"WARNING"``, ``"INFO"`` and ``"DEBUG"``. If None is provided, the
@@ -127,7 +136,7 @@ def _plot_segmentation(
     *,
     verbose: Optional[str] = None,
     **kwargs,
-):
+) -> tuple[plt.Figure, Axes]:
     """Code snippet to plot segmentation for raw and epochs."""
 
 def _compatibility_cmap(cmap: Optional[Union[str, colors.Colormap]], n_colors: int):

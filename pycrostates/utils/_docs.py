@@ -143,6 +143,11 @@ docdict["segmentation"] = """
 segmentation : RawSegmentation | EpochsSegmentation
     Segmentation object containing the microstate symbolic sequence."""
 
+docdict["show"] = """
+show : bool | None
+    If True, the figure is shown. If None, the figure is shown if the matplotlib backend
+    is interactive."""
+
 docdict["stat_expected_transitions"] = """
 stat : str
     Aggregate statistic to compute transitions. Can be:

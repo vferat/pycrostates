@@ -392,30 +392,30 @@ def test_properties(caplog):
         random_state=1,
     )
 
-    ModK_.cluster_centers_  # pylint: disable=pointless-statement
+    ModK_.cluster_centers_  # noqa: B018
     assert "Clustering algorithm has not been fitted." in caplog.text
     caplog.clear()
 
-    ModK_.info  # pylint: disable=pointless-statement
+    ModK_.info  # noqa: B018
     assert "Clustering algorithm has not been fitted." in caplog.text
     caplog.clear()
 
-    ModK_.fitted_data  # pylint: disable=pointless-statement
+    ModK_.fitted_data  # noqa: B018
     assert "Clustering algorithm has not been fitted." in caplog.text
     caplog.clear()
 
     # Fitted
     ModK_ = ModK.copy()
 
-    ModK_.cluster_centers_
+    ModK_.cluster_centers_  # noqa: B018
     assert "Clustering algorithm has not been fitted." not in caplog.text
     caplog.clear()
 
-    ModK_.info
+    ModK_.info  # noqa: B018
     assert "Clustering algorithm has not been fitted." not in caplog.text
     caplog.clear()
 
-    ModK_.fitted_data
+    ModK_.fitted_data  # noqa: B018
     assert "Clustering algorithm has not been fitted." not in caplog.text
     caplog.clear()
 
@@ -1100,7 +1100,7 @@ def test_contains_mixin():
     with pytest.raises(
         ValueError, match="Instance 'ModKMeans' attribute 'info' is None."
     ):
-        "eeg" in ModK_
+        "eeg" in ModK_  # noqa: B015
     with pytest.raises(
         ValueError, match="Instance 'ModKMeans' attribute 'info' is None."
     ):
@@ -1108,7 +1108,7 @@ def test_contains_mixin():
     with pytest.raises(
         ValueError, match="Instance 'ModKMeans' attribute 'info' is None."
     ):
-        ModK_.compensation_grade
+        ModK_.compensation_grade  # noqa: B018
 
 
 def test_montage_mixin():

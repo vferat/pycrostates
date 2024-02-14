@@ -304,7 +304,9 @@ class _BaseSegmentation(Segmentation):
     def plot_cluster_centers(
         self,
         axes: Optional[Union[Axes, NDArray[Axes]]] = None,
+        *,
         block: bool = False,
+        show: Optional[bool] = None,
     ):
         """Plot cluster centers as topographic maps.
 
@@ -312,6 +314,7 @@ class _BaseSegmentation(Segmentation):
         ----------
         %(axes_topo)s
         %(block)s
+        %(show)s
 
         Returns
         -------
@@ -324,6 +327,7 @@ class _BaseSegmentation(Segmentation):
             self._cluster_names,
             axes,
             block=block,
+            show=show,
         )
 
     # --------------------------------------------------------------------

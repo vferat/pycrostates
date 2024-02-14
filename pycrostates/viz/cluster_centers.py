@@ -11,7 +11,7 @@ from mne.viz import plot_topomap
 from numpy.typing import NDArray
 
 from .._typing import CHInfo
-from ..utils._checks import _check_axes, _check_type
+from ..utils._checks import _check_axes, _check_type, _ensure_valid_show
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
@@ -33,6 +33,7 @@ def plot_cluster_centers(
     gradient_kwargs: dict[str, Any] = _GRADIENT_KWARGS_DEFAULTS,
     *,
     block: bool = False,
+    show: Optional[bool] = None,
     verbose: Optional[str] = None,
     **kwargs,
 ):
@@ -51,6 +52,7 @@ def plot_cluster_centers(
         Additional keyword arguments passed to :meth:`matplotlib.axes.Axes.plot` to plot
         gradient line.
     %(block)s
+    %(show)s
     %(verbose)s
     **kwargs
         Additional keyword arguments are passed to :func:`mne.viz.plot_topomap`.
@@ -79,6 +81,7 @@ def plot_cluster_centers(
             "'show_gradient' is set to False."
         )
     _check_type(block, (bool,), "block")
+    show = _ensure_valid_show(show)
 
     # check cluster_names
     if cluster_names is None:
@@ -92,7 +95,9 @@ def plot_cluster_centers(
     # create axes if needed, and retrieve figure
     n_clusters = cluster_centers.shape[0]
     if axes is None:
-        f, axes = plt.subplots(1, n_clusters, layout="constrained")
+        f, axes = plt.subplots(
+            1, n_clusters, figsize=(3 * n_clusters, 3), layout="constrained"
+        )
         if isinstance(axes, Axes):
             axes = np.array([axes])  # wrap in an array-like
         # sanity-check
@@ -120,14 +125,6 @@ def plot_cluster_centers(
         else:
             f = figs
         del figs
-
-    # remove show from kwargs passed to topoplot
-    if "show" in kwargs:
-        show = kwargs["show"]
-        _check_type(show, (bool,), "show")
-        del kwargs["show"]
-    else:
-        show = plt.isinteractive()
 
     # plot cluster centers
     for k, (center, name) in enumerate(zip(cluster_centers, cluster_names)):

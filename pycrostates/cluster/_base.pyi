@@ -199,6 +199,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         },
         *,
         block: bool = False,
+        show: Optional[bool] = None,
         verbose: Optional[str] = None,
         **kwargs,
     ):
@@ -219,6 +220,9 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             plot gradient line.
         block : bool
             Whether to halt program execution until the figure is closed.
+        show : bool | None
+            If True, the figure is shown. If None, the figure is shown if the matplotlib backend
+            is interactive.
         verbose : int | str | bool | None
             Sets the verbosity level. The verbosity increases gradually between ``"CRITICAL"``,
             ``"ERROR"``, ``"WARNING"``, ``"INFO"`` and ``"DEBUG"``. If None is provided, the

@@ -518,13 +518,14 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         axes: Optional[Union[Axes, NDArray[Axes]]] = None,
         show_gradient: Optional[bool] = False,
-        gradient_kwargs: dict[str, Any] = {
+        gradient_kwargs: dict[str, Any] = {  # noqa: B006
             "color": "black",
             "linestyle": "-",
             "marker": "P",
         },
         *,
         block: bool = False,
+        show: Optional[bool] = None,
         verbose: Optional[str] = None,
         **kwargs,
     ):
@@ -541,6 +542,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             Additional keyword arguments passed to :meth:`matplotlib.axes.Axes.plot` to
             plot gradient line.
         %(block)s
+        %(show)s
         %(verbose)s
         **kwargs
             Additional keyword arguments are passed to :func:`mne.viz.plot_topomap`.
@@ -561,6 +563,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             show_gradient=show_gradient,
             gradient_kwargs=gradient_kwargs,
             block=block,
+            show=show,
             verbose=verbose,
             **kwargs,
         )
