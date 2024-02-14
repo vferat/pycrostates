@@ -53,6 +53,7 @@ class RawSegmentation(_BaseSegmentation):
         cbar_axes: Optional[Axes] = None,
         *,
         block: bool = False,
+        show: Optional[bool] = None,
         verbose: Optional[str] = None,
     ):
         """Plot the segmentation.
@@ -65,6 +66,7 @@ class RawSegmentation(_BaseSegmentation):
         %(axes_seg)s
         %(axes_cbar)s
         %(block)s
+        %(show)s
         %(verbose)s
 
         Returns
@@ -84,6 +86,7 @@ class RawSegmentation(_BaseSegmentation):
             axes=axes,
             cbar_axes=cbar_axes,
             block=block,
+            show=show,
             verbose=verbose,
         )
 
@@ -138,6 +141,7 @@ class EpochsSegmentation(_BaseSegmentation):
         cbar_axes: Optional[Axes] = None,
         *,
         block: bool = False,
+        show: Optional[bool] = None,
         verbose=None,
     ):
         """Plot segmentation.
@@ -148,6 +152,7 @@ class EpochsSegmentation(_BaseSegmentation):
         %(axes_seg)s
         %(axes_cbar)s
         %(block)s
+        %(show)s
         %(verbose)s
 
         Returns
@@ -165,6 +170,7 @@ class EpochsSegmentation(_BaseSegmentation):
             axes=axes,
             cbar_axes=cbar_axes,
             block=block,
+            show=show,
             verbose=verbose,
         )
 
