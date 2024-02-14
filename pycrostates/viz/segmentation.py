@@ -29,6 +29,7 @@ def plot_raw_segmentation(
     cbar_axes: Optional[Axes] = None,
     *,
     block: bool = False,
+    show: Optional[bool] = None,
     verbose: Optional[str] = None,
     **kwargs,
 ):
@@ -47,6 +48,7 @@ def plot_raw_segmentation(
     %(axes_seg)s
     %(axes_cbar)s
     %(block)s
+    %(show)s
     %(verbose)s
     **kwargs
         Kwargs are passed to ``axes.plot``.
@@ -61,6 +63,8 @@ def plot_raw_segmentation(
         raise ValueError("Argument 'labels' should be a 1D array.")
     _check_type(raw, (BaseRaw,), "raw")
     _check_type(block, (bool,), "block")
+    _check_type(show, (bool, None), "show")
+    show = plt.isinteractive() if show is None else show
 
     data = raw.get_data(tmin=tmin, tmax=tmax)
     gfp = np.std(data, axis=0)
@@ -81,7 +85,7 @@ def plot_raw_segmentation(
             "Argument 'labels' and 'raw' do not have the same number of samples."
         )
 
-    fig, axes, show = _plot_segmentation(
+    fig, axes = _plot_segmentation(
         labels,
         gfp,
         times,
@@ -113,6 +117,7 @@ def plot_epoch_segmentation(
     cbar_axes: Optional[Axes] = None,
     *,
     block: bool = False,
+    show: Optional[bool] = None,
     verbose: Optional[str] = None,
     **kwargs,
 ):
@@ -130,6 +135,7 @@ def plot_epoch_segmentation(
     %(axes_seg)s
     %(axes_cbar)s
     %(block)s
+    %(show)s
     %(verbose)s
     **kwargs
         Kwargs are passed to ``axes.plot``.
@@ -144,6 +150,8 @@ def plot_epoch_segmentation(
         raise ValueError("Argument labels should be a 2D array.")
     _check_type(epochs, (BaseEpochs,), "epochs")
     _check_type(block, (bool,), "block")
+    _check_type(show, (bool, None), "show")
+    show = plt.isinteractive() if show is None else show
 
     kwargs_epochs = dict(copy=False) if check_version("mne", "1.6") else dict()
     data = epochs.get_data(**kwargs_epochs).swapaxes(0, 1)
@@ -158,7 +166,7 @@ def plot_epoch_segmentation(
             "Argument 'labels' and 'epochs' do not have the same number of samples."
         )
 
-    fig, axes, show = _plot_segmentation(
+    fig, axes = _plot_segmentation(
         labels,
         gfp,
         times,
@@ -207,7 +215,7 @@ def _plot_segmentation(
     *,
     verbose: Optional[str] = None,
     **kwargs,
-):
+) -> tuple[plt.Figure, Axes]:
     """Code snippet to plot segmentation for raw and epochs."""
     _check_type(labels, (np.ndarray,), "labels")  # 1D array (n_times, )
     _check_type(gfp, (np.ndarray,), "gfp")  # 1D array (n_times, )
@@ -236,14 +244,6 @@ def _plot_segmentation(
         fig, axes = plt.subplots(1, 1, layout="constrained")
     else:
         fig = axes.get_figure()
-
-    # remove show from kwargs passed to plot
-    if "show" in kwargs:
-        show = kwargs["show"]
-        _check_type(show, (bool,), "show")
-        del kwargs["show"]
-    else:
-        show = plt.isinteractive()
 
     # add color and linewidth if absent from kwargs
     if "color" not in kwargs:
@@ -288,7 +288,7 @@ def _plot_segmentation(
     )
     colorbar.ax.set_yticklabels(cluster_names)
 
-    return fig, axes, show
+    return fig, axes
 
 
 def _compatibility_cmap(
