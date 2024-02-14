@@ -407,7 +407,7 @@ def test_properties(caplog):
     # Fitted
     ModK_ = ModK.copy()
 
-    ModK_.cluster_centers  # noqa: B018
+    ModK_.cluster_centers_  # noqa: B018
     assert "Clustering algorithm has not been fitted." not in caplog.text
     caplog.clear()
 
@@ -1100,7 +1100,7 @@ def test_contains_mixin():
     with pytest.raises(
         ValueError, match="Instance 'ModKMeans' attribute 'info' is None."
     ):
-        "eeg" in ModK  # noqa: B015
+        "eeg" in ModK_  # noqa: B015
     with pytest.raises(
         ValueError, match="Instance 'ModKMeans' attribute 'info' is None."
     ):
