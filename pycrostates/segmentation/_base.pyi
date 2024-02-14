@@ -195,7 +195,11 @@ class _BaseSegmentation(Segmentation):
         """
 
     def plot_cluster_centers(
-        self, axes: Optional[Union[Axes, NDArray[Axes]]] = None, block: bool = False
+        self,
+        axes: Optional[Union[Axes, NDArray[Axes]]] = None,
+        *,
+        block: bool = False,
+        show: Optional[bool] = None,
     ):
         """Plot cluster centers as topographic maps.
 
@@ -207,6 +211,9 @@ class _BaseSegmentation(Segmentation):
             ``≥ 1``, an array of axes of size ``n_clusters`` should be provided.
         block : bool
             Whether to halt program execution until the figure is closed.
+        show : bool | None
+            If True, the figure is shown. If None, the figure is shown if the matplotlib backend
+            is interactive.
 
         Returns
         -------

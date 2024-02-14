@@ -39,6 +39,7 @@ class RawSegmentation(_BaseSegmentation):
         cbar_axes: Optional[Axes] = None,
         *,
         block: bool = False,
+        show: Optional[bool] = None,
         verbose: Optional[str] = None,
     ):
         """Plot the segmentation.
@@ -59,6 +60,9 @@ class RawSegmentation(_BaseSegmentation):
             axes.
         block : bool
             Whether to halt program execution until the figure is closed.
+        show : bool | None
+            If True, the figure is shown. If None, the figure is shown if the matplotlib backend
+            is interactive.
         verbose : int | str | bool | None
             Sets the verbosity level. The verbosity increases gradually between ``"CRITICAL"``,
             ``"ERROR"``, ``"WARNING"``, ``"INFO"`` and ``"DEBUG"``. If None is provided, the
@@ -100,6 +104,7 @@ class EpochsSegmentation(_BaseSegmentation):
         cbar_axes: Optional[Axes] = None,
         *,
         block: bool = False,
+        show: Optional[bool] = None,
         verbose: Incomplete | None = None,
     ):
         """Plot segmentation.
@@ -116,6 +121,9 @@ class EpochsSegmentation(_BaseSegmentation):
             axes.
         block : bool
             Whether to halt program execution until the figure is closed.
+        show : bool | None
+            If True, the figure is shown. If None, the figure is shown if the matplotlib backend
+            is interactive.
         verbose : int | str | bool | None
             Sets the verbosity level. The verbosity increases gradually between ``"CRITICAL"``,
             ``"ERROR"``, ``"WARNING"``, ``"INFO"`` and ``"DEBUG"``. If None is provided, the
