@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from mne import pick_info
 from mne.utils import check_random_state
@@ -337,3 +338,10 @@ def _check_verbose(verbose: Any) -> int:
             )
 
     return verbose
+
+
+def _ensure_valid_show(show: Any) -> bool:
+    """Check show parameter."""
+    _check_type(show, (bool, None), "show")
+    show = plt.isinteractive() if show is None else show
+    return show

@@ -11,7 +11,7 @@ from mne.io import BaseRaw
 from mne.utils import check_version
 from numpy.typing import NDArray
 
-from ..utils._checks import _check_type
+from ..utils._checks import _check_type, _ensure_valid_show
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
@@ -63,8 +63,7 @@ def plot_raw_segmentation(
         raise ValueError("Argument 'labels' should be a 1D array.")
     _check_type(raw, (BaseRaw,), "raw")
     _check_type(block, (bool,), "block")
-    _check_type(show, (bool, None), "show")
-    show = plt.isinteractive() if show is None else show
+    show = _ensure_valid_show(show)
 
     data = raw.get_data(tmin=tmin, tmax=tmax)
     gfp = np.std(data, axis=0)
@@ -150,8 +149,7 @@ def plot_epoch_segmentation(
         raise ValueError("Argument labels should be a 2D array.")
     _check_type(epochs, (BaseEpochs,), "epochs")
     _check_type(block, (bool,), "block")
-    _check_type(show, (bool, None), "show")
-    show = plt.isinteractive() if show is None else show
+    show = _ensure_valid_show(show)
 
     kwargs_epochs = dict(copy=False) if check_version("mne", "1.6") else dict()
     data = epochs.get_data(**kwargs_epochs).swapaxes(0, 1)

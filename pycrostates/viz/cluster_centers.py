@@ -11,7 +11,7 @@ from mne.viz import plot_topomap
 from numpy.typing import NDArray
 
 from .._typing import CHInfo
-from ..utils._checks import _check_axes, _check_type
+from ..utils._checks import _check_axes, _check_type, _ensure_valid_show
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
@@ -81,8 +81,7 @@ def plot_cluster_centers(
             "'show_gradient' is set to False."
         )
     _check_type(block, (bool,), "block")
-    _check_type(show, (bool, None), "show")
-    show = plt.isinteractive() if show is None else show
+    show = _ensure_valid_show(show)
 
     # check cluster_names
     if cluster_names is None:
