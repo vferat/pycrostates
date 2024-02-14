@@ -12,6 +12,7 @@ from ..utils import _corr_vectors as _corr_vectors
 from ..utils._checks import _check_type as _check_type
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
+from .entropy import entropy as entropy
 from .transitions import (
     _compute_expected_transition_matrix as _compute_expected_transition_matrix,
 )
@@ -115,12 +116,15 @@ class _BaseSegmentation(Segmentation):
         -------
         %(transition_matrix)s
 
-        Warnings
-        --------
-        When working with `~mne.Epochs`, this method will take into account transitions
-        that occur between epochs. This could lead to wrong interpretation when working
-        with discontinuous data. To avoid this behaviour, make sure to set the
-        ``reject_edges`` parameter to ``True`` when predicting the segmentation.
+        Notes
+        -----
+        .. warning::
+
+            When working with `~mne.Epochs`, this method will take into account
+            transitions that occur between epochs. This could lead to wrong
+            interpretation when working with discontinuous data. To avoid this
+            behaviour, make sure to set the ``reject_edges`` parameter to ``True`` when
+            predicting the segmentation.
         """
 
     def compute_expected_transition_matrix(
@@ -155,6 +159,39 @@ class _BaseSegmentation(Segmentation):
         T : array of shape ``(n_cluster, n_cluster)``
             Array of transition probability values from one label to another.
             First axis indicates state ``"from"``. Second axis indicates state ``"to"``.
+        """
+
+    def entropy(
+        self, ignore_repetitions: bool = False, log_base: Union[float, str] = 2
+    ):
+        """Compute the Shannon entropy of the segmentation.
+
+        Compute the Shannon entropy\\ :footcite:p:`shannon1948mathematical`
+        of the microstate symbolic sequence.
+
+        Parameters
+        ----------
+        ignore_repetitions : bool
+            If ``True``, ignores state repetitions.
+            For example, the input sequence ``AAABBCCD``
+            will be transformed into ``ABCD`` before any calculation.
+            This is equivalent to setting the duration of all states to 1 sample.
+        log_base : float | str
+            The log base to use.
+            If string:
+            * ``bits``: log_base = ``2``
+            * ``natural``: log_base = ``np.e``
+            * ``dits``: log_base = ``10``
+            Default to ``bits``.
+
+        Returns
+        -------
+        h : float
+            The Shannon entropy.
+
+        References
+        ----------
+        .. footbibliography::
         """
 
     def plot_cluster_centers(
