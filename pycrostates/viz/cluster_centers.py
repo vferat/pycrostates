@@ -33,6 +33,7 @@ def plot_cluster_centers(
     gradient_kwargs: dict[str, Any] = _GRADIENT_KWARGS_DEFAULTS,
     *,
     block: bool = False,
+    show: Optional[bool] = None,
     verbose: Optional[str] = None,
     **kwargs,
 ):
@@ -51,6 +52,7 @@ def plot_cluster_centers(
         Additional keyword arguments passed to :meth:`matplotlib.axes.Axes.plot` to plot
         gradient line.
     %(block)s
+    %(show)s
     %(verbose)s
     **kwargs
         Additional keyword arguments are passed to :func:`mne.viz.plot_topomap`.
@@ -79,6 +81,8 @@ def plot_cluster_centers(
             "'show_gradient' is set to False."
         )
     _check_type(block, (bool,), "block")
+    _check_type(show, (bool, None), "show")
+    show = plt.isinteractive() if show is None else show
 
     # check cluster_names
     if cluster_names is None:
@@ -122,14 +126,6 @@ def plot_cluster_centers(
         else:
             f = figs
         del figs
-
-    # remove show from kwargs passed to topoplot
-    if "show" in kwargs:
-        show = kwargs["show"]
-        _check_type(show, (bool,), "show")
-        del kwargs["show"]
-    else:
-        show = plt.isinteractive()
 
     # plot cluster centers
     for k, (center, name) in enumerate(zip(cluster_centers, cluster_names)):
