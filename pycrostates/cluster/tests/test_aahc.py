@@ -480,15 +480,15 @@ def test_properties(caplog):
         normalize_input=False,
     )
 
-    aahCluster_.cluster_centers_  # pylint: disable=pointless-statement
+    aahCluster_.cluster_centers_  # noqa: B018
     assert "Clustering algorithm has not been fitted." in caplog.text
     caplog.clear()
 
-    aahCluster_.info  # pylint: disable=pointless-statement
+    aahCluster_.info  # noqa: B018
     assert "Clustering algorithm has not been fitted." in caplog.text
     caplog.clear()
 
-    aahCluster_.fitted_data  # pylint: disable=pointless-statement
+    aahCluster_.fitted_data  # noqa: B018
     assert "Clustering algorithm has not been fitted." in caplog.text
     caplog.clear()
 

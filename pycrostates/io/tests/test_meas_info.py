@@ -60,7 +60,7 @@ def test_create_from_info():
     info.set_montage("standard_1020")
     chinfo = ChInfo(info=info)
     assert chinfo["ch_names"] == ["Fp1", "Fp2", "Fpz"]
-    for k, ch in enumerate(info["chs"]):
+    for ch in info["chs"]:
         assert ch["coord_frame"] == FIFF.FIFFV_COORD_HEAD
         assert not all(np.isnan(elt) for elt in ch["loc"])
     assert chinfo["dig"] is not None
@@ -228,7 +228,7 @@ def test_montage():
     info.set_montage("standard_1020")
     chinfo = ChInfo(info=info)
     assert chinfo["ch_names"] == ["Fp1", "Fp2", "Fpz"]
-    for k, ch in enumerate(info["chs"]):
+    for ch in info["chs"]:
         assert ch["coord_frame"] == FIFF.FIFFV_COORD_HEAD
         assert not all(np.isnan(elt) for elt in ch["loc"])
     assert chinfo["dig"] is not None
@@ -261,7 +261,7 @@ def test_montage():
         elif isinstance(montage.get_positions()[key], np.ndarray):
             assert_allclose(montage.get_positions()[key], montage2.get_positions()[key])
         elif isinstance(montage.get_positions()[key], OrderedDict):
-            for k, v in montage.get_positions()[key].items():
+            for k in montage.get_positions()[key]:
                 assert_allclose(
                     montage.get_positions()[key][k],
                     montage2.get_positions()[key][k],
