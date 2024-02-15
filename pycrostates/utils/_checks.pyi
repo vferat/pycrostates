@@ -116,3 +116,6 @@ def _check_verbose(verbose: Any) -> int:
     verbose : int
         The verbosity level as an integer.
     """
+
+def _ensure_valid_show(show: Any) -> bool:
+    """Check show parameter."""

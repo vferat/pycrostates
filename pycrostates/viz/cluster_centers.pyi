@@ -7,6 +7,7 @@ from numpy.typing import NDArray
 from .._typing import CHInfo as CHInfo
 from ..utils._checks import _check_axes as _check_axes
 from ..utils._checks import _check_type as _check_type
+from ..utils._checks import _ensure_valid_show as _ensure_valid_show
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 
