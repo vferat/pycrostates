@@ -9,13 +9,8 @@
 
 .. include:: ./names.inc
 
-.. _latest:
-
 Version 0.5
 -----------
-
-Enhancements
-~~~~~~~~~~~~
 
 - Add :func:`~pycrostates.segmentation.entropy`, :func:`~pycrostates.segmentation.excess_entropy_rate`, :func:`~pycrostates.segmentation.auto_information_function` and :func:`~pycrostates.segmentation.partial_auto_information_function` (:pr:`112` by `Victor Férat`_ and `Frederic von Wegner`_)
 - Improve figure size in :func:`~pycrostates.viz.plot_cluster_centers` and add explicit ``show`` argument in visualization functions (:pr:`158` by `Mathieu Scheltienne`_)
