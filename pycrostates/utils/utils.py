@@ -8,7 +8,9 @@ from ._logs import logger
 
 
 def _cosine_similarity(vector1, vector2):
-    dot_product = np.dot(vector1, vector2) / (np.linalg.norm(vector1) * np.linalg.norm(vector2))
+    dot_product = np.dot(vector1, vector2) / (
+        np.linalg.norm(vector1) * np.linalg.norm(vector2)
+    )
     return dot_product
 
 
@@ -35,9 +37,9 @@ def _corr_vectors(A, B, axis=0):
         raise ValueError("All input arrays must have the same shape")
 
     corr = []
-    for a,b in zip(A,B):
+    for a, b in zip(A, B):
         # If maps is null, divide will not throw an error.
-        if np.all(a==0) or np.all(b==0):
+        if np.all(a == 0) or np.all(b == 0):
             cos = 0
         else:
             cos = _cosine_similarity(a, b)
