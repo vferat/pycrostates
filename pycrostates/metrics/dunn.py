@@ -67,9 +67,7 @@ def _dunn_score(X, labels):  # higher the better
         for j, ks_j in enumerate(ks):
             if i == j:
                 continue  # skip diagonal
-            deltas[i, j] = _delta_fast(
-                (labels == ks_i), (labels == ks_j), distances
-            )
+            deltas[i, j] = _delta_fast((labels == ks_i), (labels == ks_j), distances)
         big_deltas[i] = _big_delta_fast((labels == ks_i), distances)
 
     di = np.min(deltas) / np.max(big_deltas)

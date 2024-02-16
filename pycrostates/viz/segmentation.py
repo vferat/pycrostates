@@ -1,18 +1,19 @@
 """Visualisation module for plotting segmentations."""
 
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import numpy as np
-from matplotlib import colors
+from matplotlib import colormaps, colors
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
+from mne.utils import check_version
 from numpy.typing import NDArray
 
-from ..utils._checks import _check_type
+from ..utils._checks import _check_type, _ensure_valid_show
 from ..utils._docs import fill_doc
-from ..utils._logs import _set_verbose, logger
+from ..utils._logs import logger, verbose
 
 
 @fill_doc
@@ -20,7 +21,7 @@ def plot_raw_segmentation(
     labels: NDArray[int],
     raw: BaseRaw,
     n_clusters: int,
-    cluster_names: List[str] = None,
+    cluster_names: list[str] = None,
     tmin: Optional[Union[int, float]] = None,
     tmax: Optional[Union[int, float]] = None,
     cmap: Optional[str] = None,
@@ -28,6 +29,7 @@ def plot_raw_segmentation(
     cbar_axes: Optional[Axes] = None,
     *,
     block: bool = False,
+    show: Optional[bool] = None,
     verbose: Optional[str] = None,
     **kwargs,
 ):
@@ -46,6 +48,7 @@ def plot_raw_segmentation(
     %(axes_seg)s
     %(axes_cbar)s
     %(block)s
+    %(show)s
     %(verbose)s
     **kwargs
         Kwargs are passed to ``axes.plot``.
@@ -60,6 +63,7 @@ def plot_raw_segmentation(
         raise ValueError("Argument 'labels' should be a 1D array.")
     _check_type(raw, (BaseRaw,), "raw")
     _check_type(block, (bool,), "block")
+    show = _ensure_valid_show(show)
 
     data = raw.get_data(tmin=tmin, tmax=tmax)
     gfp = np.std(data, axis=0)
@@ -77,11 +81,10 @@ def plot_raw_segmentation(
     # make sure shapes are correct
     if data.shape[1] != labels.size:
         raise ValueError(
-            "Argument 'labels' and 'raw' do not have the same number of "
-            "samples."
+            "Argument 'labels' and 'raw' do not have the same number of samples."
         )
 
-    fig, axes, show = _plot_segmentation(
+    fig, axes = _plot_segmentation(
         labels,
         gfp,
         times,
@@ -107,12 +110,13 @@ def plot_epoch_segmentation(
     labels: NDArray[int],
     epochs: BaseEpochs,
     n_clusters: int,
-    cluster_names: List[str] = None,
+    cluster_names: list[str] = None,
     cmap: Optional[str] = None,
     axes: Optional[Axes] = None,
     cbar_axes: Optional[Axes] = None,
     *,
     block: bool = False,
+    show: Optional[bool] = None,
     verbose: Optional[str] = None,
     **kwargs,
 ):
@@ -130,6 +134,7 @@ def plot_epoch_segmentation(
     %(axes_seg)s
     %(axes_cbar)s
     %(block)s
+    %(show)s
     %(verbose)s
     **kwargs
         Kwargs are passed to ``axes.plot``.
@@ -144,8 +149,10 @@ def plot_epoch_segmentation(
         raise ValueError("Argument labels should be a 2D array.")
     _check_type(epochs, (BaseEpochs,), "epochs")
     _check_type(block, (bool,), "block")
+    show = _ensure_valid_show(show)
 
-    data = epochs.get_data().swapaxes(0, 1)
+    kwargs_epochs = dict(copy=False) if check_version("mne", "1.6") else dict()
+    data = epochs.get_data(**kwargs_epochs).swapaxes(0, 1)
     data = data.reshape(data.shape[0], -1)
     gfp = np.std(data, axis=0)
     times = np.arange(0, data.shape[-1])
@@ -154,11 +161,10 @@ def plot_epoch_segmentation(
     # make sure shapes are correct
     if data.shape[1] != labels.size:
         raise ValueError(
-            "Argument 'labels' and 'epochs' do not have the same number of "
-            "samples."
+            "Argument 'labels' and 'epochs' do not have the same number of samples."
         )
 
-    fig, axes, show = _plot_segmentation(
+    fig, axes = _plot_segmentation(
         labels,
         gfp,
         times,
@@ -194,32 +200,32 @@ def plot_epoch_segmentation(
     return fig
 
 
+@verbose
 def _plot_segmentation(
     labels: NDArray[int],
     gfp: NDArray[float],
     times: NDArray[float],
     n_clusters: int,
-    cluster_names: List[str] = None,
-    cmap: Optional[str] = None,
+    cluster_names: list[str] = None,
+    cmap: Optional[Union[str, colors.Colormap]] = None,
     axes: Optional[Axes] = None,
     cbar_axes: Optional[Axes] = None,
     *,
     verbose: Optional[str] = None,
     **kwargs,
-):
+) -> tuple[plt.Figure, Axes]:
     """Code snippet to plot segmentation for raw and epochs."""
-    _set_verbose(verbose)
     _check_type(labels, (np.ndarray,), "labels")  # 1D array (n_times, )
     _check_type(gfp, (np.ndarray,), "gfp")  # 1D array (n_times, )
     _check_type(times, (np.ndarray,), "times")  # 1D array (n_times, )
     _check_type(n_clusters, ("int",), "n_clusters")
     if n_clusters <= 0:
         raise ValueError(
-            f"Provided number of clusters {n_clusters} is invalid. The number "
-            "of clusters must be strictly positive."
+            f"Provided number of clusters {n_clusters} is invalid. The number of "
+            "clusters must be strictly positive."
         )
     _check_type(cluster_names, (None, list, tuple), "cluster_names")
-    _check_type(cmap, (None, str), "cmap")
+    _check_type(cmap, (None, str, colors.Colormap), "cmap")
     _check_type(axes, (None, Axes), "ax")
     _check_type(cbar_axes, (None, Axes), "cbar_ax")
 
@@ -233,17 +239,9 @@ def _plot_segmentation(
         )
 
     if axes is None:
-        fig, axes = plt.subplots(1, 1)
+        fig, axes = plt.subplots(1, 1, layout="constrained")
     else:
         fig = axes.get_figure()
-
-    # remove show from kwargs passed to plot
-    if "show" in kwargs:
-        show = kwargs["show"]
-        _check_type(show, (bool,), "show")
-        del kwargs["show"]
-    else:
-        show = True
 
     # add color and linewidth if absent from kwargs
     if "color" not in kwargs:
@@ -255,7 +253,7 @@ def _plot_segmentation(
     state_labels = [-1] + list(range(n_clusters))
     cluster_names = ["unlabeled"] + cluster_names
     n_colors = n_clusters + 1
-    cmap = plt.cm.get_cmap(cmap, n_colors)
+    cmap = _compatibility_cmap(cmap, n_colors)
 
     # plot
     axes.plot(times, gfp, **kwargs)
@@ -271,10 +269,8 @@ def _plot_segmentation(
                 times, gfp, color=color, where=x, step=None, interpolate=False
             )
     logger.info(
-        "For visualization purposes, "
-        "the last segment appears truncated by 1 sample. "
-        "In the case where the last segment is 1 sample long, "
-        "it does not appear."
+        "For visualization purposes, the last segment appears truncated by 1 sample. "
+        "In the case where the last segment is 1 sample long, it does not appear."
     )
 
     # commonm formatting
@@ -290,4 +286,31 @@ def _plot_segmentation(
     )
     colorbar.ax.set_yticklabels(cluster_names)
 
-    return fig, axes, show
+    return fig, axes
+
+
+def _compatibility_cmap(
+    cmap: Optional[Union[str, colors.Colormap]],
+    n_colors: int,
+):
+    """Convert the 'cmap' argument to a colormap.
+
+    Matplotlib 3.6 introduced a deprecation of plt.cm.get_cmap().
+    When support for the 3.6 version is dropped, this checker can be removed.
+    """
+    if check_version("matplotlib", "3.6"):
+        if cmap is None:
+            cmap = colormaps["viridis"]
+        elif isinstance(cmap, str):
+            cmap = colormaps[cmap]  # the cmap name is checked by matplotlib
+        cmap = cmap.resampled(n_colors)
+    else:
+        if isinstance(cmap, (str, type(None))):
+            cmap = plt.cm.get_cmap(cmap, n_colors)
+        else:
+            raise RuntimeError(
+                "User-defined colormaps are supported as of matplotlib 3.6 "
+                "and above. Please update matplotlib or provide a colormap "
+                "name as a string."
+            )
+    return cmap

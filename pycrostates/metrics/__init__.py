@@ -7,7 +7,7 @@ from .davies_bouldin import davies_bouldin_score
 from .dunn import dunn_score
 from .silhouette import silhouette_score
 
-__all__ = (
+__all__: tuple[str, ...] = (
     "calinski_harabasz_score",
     "davies_bouldin_score",
     "dunn_score",

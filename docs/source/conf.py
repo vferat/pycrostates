@@ -4,7 +4,7 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-
+import subprocess
 import sys
 from datetime import date
 from pathlib import Path
@@ -21,7 +21,7 @@ author = "Victor Férat"
 copyright = f"{date.today().year}, {author}"
 release = pycrostates.__version__
 package = pycrostates.__name__
-gh_url = "https://github.com/vferat/pycrostates"
+gh_url = "https://github.com/vferat/pycrostates/"
 
 # -- general configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -79,8 +79,8 @@ default_role = "py:obj"
 html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "logo": {
-        "image_light": "logos/Pycrostates_logo_black.png",
-        "image_dark": "logos/Pycrostates_logo_white.png",
+        "image_light": "../_static/logos/Pycrostates_logo_black.png",
+        "image_dark": "../_static/logos/Pycrostates_logo_white.png",
     },
     "icon_links": [
         {
@@ -94,9 +94,8 @@ html_theme_options = {
             "icon": "fab fa-slack",
         },
     ],
-    "external_links": [
-        {"name": "MNE", "url": "https://mne.tools/stable/index.html"}
-    ],
+    "external_links": [{"name": "MNE", "url": "https://mne.tools/stable/index.html"}],
+    "navigation_with_keys": False,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -132,8 +131,8 @@ autosectionlabel_prefix_document = True
 # -- intersphinx -------------------------------------------------------------
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "numpy": ("https://numpy.org/devdocs", None),
-    "scipy": ("https://scipy.github.io/devdocs", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy", None),
     "matplotlib": ("https://matplotlib.org", None),
     "mne": ("https://mne.tools/stable/", None),
     "joblib": ("https://joblib.readthedocs.io/en/latest", None),
@@ -143,7 +142,7 @@ intersphinx_mapping = {
 intersphinx_timeout = 5
 
 # -- sphinx-issues -----------------------------------------------------------
-issues_github_path = gh_url.split("http://github.com/")[-1]
+issues_github_path = gh_url.split("https://github.com/")[-1]
 
 # -- numpydoc ----------------------------------------------------------------
 numpydoc_class_members_toctree = False
@@ -156,6 +155,7 @@ numpydoc_xref_aliases = {
     "bool": ":class:`python:bool`",
     "Path": "pathlib.Path",
     # MNE
+    "ConductorModel": "mne.bem.ConductorModel",
     "DigMontage": "mne.channels.DigMontage",
     "Epochs": "mne.Epochs",
     "Evoked": "mne.Evoked",
@@ -169,15 +169,21 @@ numpydoc_xref_aliases = {
     "EpochsSegmentation": "pycrostates.segmentation.EpochsSegmentation",
     # Matplotlib
     "Axes": "matplotlib.axes.Axes",
+    "Axes3D": "mpl_toolkits.mplot3d.axes3d.Axes3D",
+    "colormap": ":ref:`colormap <matplotlib:colormaps>`",
     "Figure": "matplotlib.figure.Figure",
+    # Scipy
+    "csr_matrix": "scipy.sparse.csr_matrix",
 }
 numpydoc_xref_ignore = {
     "instance",
     "of",
     "shape",
+    "n_ch_groups",
     "n_channels",
     "n_clusters",
     "n_epochs",
+    "n_picks",
     "n_samples",
 }
 
@@ -227,30 +233,43 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
 bibtex_bibfiles = ["../references.bib"]
 
 # -- sphinx-gallery ----------------------------------------------------------
+if sys.platform.startswith("win"):
+    try:
+        subprocess.check_call(["optipng", "--version"])
+        compress_images = ("images", "thumbnails")
+    except Exception:
+        compress_images = ()
+else:
+    compress_images = ("images", "thumbnails")
+
 sphinx_gallery_conf = {
     "backreferences_dir": "generated/backreferences",
+    "compress_images": compress_images,
     "doc_module": ("pycrostates",),
-    "examples_dirs": [str(Path(__file__).parent.parent.parent / "tutorials")],
+    "examples_dirs": ["../../tutorials"],
     "exclude_implicit_doc": {
         r"pycrostates.CHData",
         r"pycrostates.ChData.get_data",
     },
+    "filename_pattern": r"\d{2}_",
     "gallery_dirs": ["generated/auto_tutorials"],
     "line_numbers": False,  # messes with style
-    "plot_gallery": True,
+    "plot_gallery": "True",  # str, to enable overwrite from CLI without warning
     "reference_url": dict(pycrostates=None),  # documented lib uses None
     "remove_config_comments": True,
     "show_memory": sys.platform == "linux",
     "subsection_order": ExplicitOrder(
         [
             "../../tutorials/preprocessing",
-            "../../tutorials/clustering",
+            "../../tutorials/cluster",
+            "../../tutorials/segmentation",
             "../../tutorials/group_level_analysis",
             "../../tutorials/metrics",
         ]
     ),
     "within_subsection_order": FileNameSortKey,
 }
+
 
 def append_attr_meth_examples(app, what, name, obj, options, lines):
     """Append SG examples backreferences to method and attr docstrings."""
@@ -266,8 +285,15 @@ def append_attr_meth_examples(app, what, name, obj, options, lines):
 .. _sphx_glr_backreferences_{1}:
 .. rubric:: Examples using ``{0}``:
 .. minigallery:: {1}
-""".format(
-                name.split(".")[-1], name
-            ).split(
-                "\n"
-            )
+""".format(name.split(".")[-1], name).split("\n")
+
+
+# -- sphinx_copybutton -----------------------------------------------------------------
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_is_regexp = True
+
+# -- linkcheck -------------------------------------------------------------------------
+linkcheck_anchors = False  # saves a bit of time
+linkcheck_timeout = 15  # some can be quite slow
+linkcheck_retries = 3
+linkcheck_ignore = []  # will be compiled to regex

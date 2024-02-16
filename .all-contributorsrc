@@ -45,6 +45,29 @@
       "contributions": [
         "design"
       ]
+    },
+    {
+      "login": "rkobler",
+      "name": "rkobler",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22491497?v=4",
+      "profile": "https://github.com/rkobler",
+      "contributions": [
+        "code",
+        "doc",
+        "ideas",
+        "test"
+      ]
+    },
+    {
+      "login": "Frederic-vW",
+      "name": "Frederic-vW",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20075705?v=4",
+      "profile": "https://github.com/Frederic-vW",
+      "contributions": [
+        "code",
+        "tutorial",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -52,5 +75,7 @@
   "projectOwner": "vferat",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular",
+  "commitType": "docs"
 }

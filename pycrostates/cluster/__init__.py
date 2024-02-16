@@ -14,6 +14,11 @@ same channels) using the ``predict`` method. This method will return either a
 :class:`~pycrostates.segmentation.EpochsSegmentation` depending on the dataset
 to segment."""
 
+from . import utils  # noqa: F401
+from .aahc import AAHCluster  # noqa: F401
 from .kmeans import ModKMeans  # noqa: F401
 
-__all__ = ("ModKMeans",)
+__all__: tuple[str, ...] = (
+    "ModKMeans",
+    "AAHCluster",
+)

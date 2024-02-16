@@ -5,36 +5,59 @@ import operator
 from functools import reduce
 from numbers import Integral
 from pathlib import Path
-from typing import List, Union
+from typing import Union
 
 import numpy as np
-from mne.io import Info
-from mne.io._digitization import _format_dig_points, _read_dig_fif
+from mne import Info, Transform
 from mne.io.constants import FIFF
-from mne.io.ctf_comp import _read_ctf_comp, write_ctf_comp
-from mne.io.meas_info import _read_bad_channels, _write_ch_infos
-from mne.io.open import fiff_open
-from mne.io.proj import _read_proj, _write_proj
-from mne.io.tag import read_tag
-from mne.io.tree import dir_tree_find
-from mne.io.write import (
-    end_block,
-    start_and_end_file,
-    start_block,
-    write_coord_trans,
-    write_dig_points,
-    write_double_matrix,
-    write_id,
-    write_int,
-    write_name_list,
-    write_string,
-)
-from mne.transforms import Transform, invert_transform
+from mne.transforms import invert_transform
+from mne.utils import check_version
 from numpy.typing import NDArray
 
-from .. import __version__
+if check_version("mne", "1.6"):
+    from mne._fiff._digitization import _format_dig_points, _read_dig_fif
+    from mne._fiff.ctf_comp import _read_ctf_comp, write_ctf_comp
+    from mne._fiff.meas_info import _read_bad_channels, _write_ch_infos
+    from mne._fiff.open import fiff_open
+    from mne._fiff.proj import _read_proj, _write_proj
+    from mne._fiff.tag import read_tag
+    from mne._fiff.tree import dir_tree_find
+    from mne._fiff.write import (
+        end_block,
+        start_and_end_file,
+        start_block,
+        write_coord_trans,
+        write_dig_points,
+        write_double_matrix,
+        write_id,
+        write_int,
+        write_name_list,
+        write_string,
+    )
+else:
+    from mne.io._digitization import _format_dig_points, _read_dig_fif
+    from mne.io.ctf_comp import _read_ctf_comp, write_ctf_comp
+    from mne.io.meas_info import _read_bad_channels, _write_ch_infos
+    from mne.io.open import fiff_open
+    from mne.io.proj import _read_proj, _write_proj
+    from mne.io.tag import read_tag
+    from mne.io.tree import dir_tree_find
+    from mne.io.write import (
+        end_block,
+        start_and_end_file,
+        start_block,
+        write_coord_trans,
+        write_dig_points,
+        write_double_matrix,
+        write_id,
+        write_int,
+        write_name_list,
+        write_string,
+    )
+
 from .._typing import CHInfo
-from ..cluster import ModKMeans
+from .._version import __version__
+from ..cluster import AAHCluster, ModKMeans
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
@@ -75,7 +98,7 @@ def _write_cluster(
     cluster_centers_: NDArray[float],
     chinfo: Union[CHInfo, Info],
     algorithm: str,
-    cluster_names: List[str],
+    cluster_names: list[str],
     fitted_data: NDArray[float],
     labels_: NDArray[int],
     **kwargs,
@@ -110,12 +133,11 @@ def _write_cluster(
     if isinstance(chinfo, Info):
         chinfo = ChInfo(chinfo)  # convert to ChInfo if a MNE Info is provided
     _check_type(algorithm, (str,), "algorithm")
-    _check_value(algorithm, ("ModKMeans",), "algorithm")
+    _check_value(algorithm, ("ModKMeans", "AAHCluster"), "algorithm")
     _check_type(cluster_names, (list,), "cluster_names")
     if len(cluster_names) != cluster_centers_.shape[0]:
         raise ValueError(
-            "Argument 'cluster_names' and 'cluster_centers_' shapes do not "
-            "match."
+            "Argument 'cluster_names' and 'cluster_centers_' shapes do not match."
         )
     _check_type(fitted_data, (np.ndarray,), "fitted_data")
     if fitted_data.ndim != 2:
@@ -162,9 +184,7 @@ def _write_cluster(
             fid, FIFF.FIFF_MNE_ICA_INTERFACE_PARAMS, _serialize(fit_parameters)
         )
         # write fit_variables
-        write_string(
-            fid, FIFF.FIFF_MNE_ICA_MISC_PARAMS, _serialize(fit_variables)
-        )
+        write_string(fid, FIFF.FIFF_MNE_ICA_MISC_PARAMS, _serialize(fit_variables))
         # ------------------------------------------------------------
 
         # close writing block
@@ -176,6 +196,10 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
     valids = {
         "ModKMeans": {
             "parameters": ["n_init", "max_iter", "tol"],
+            "variables": ["GEV_"],
+        },
+        "AAHCluster": {
+            "parameters": ["ignore_polarity", "normalize_input"],
             "variables": ["GEV_"],
         },
     }
@@ -202,13 +226,25 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
             continue
 
         # ModKMeans
-        if key == "n_init":
-            fit_parameters["n_init"] = ModKMeans._check_n_init(value)
-        elif key == "max_iter":
-            fit_parameters["max_iter"] = ModKMeans._check_max_iter(value)
-        elif key == "tol":
-            fit_parameters["tol"] = ModKMeans._check_tol(value)
-        elif key == "GEV_":
+        # pylint: disable=protected-access
+        if algorithm == "ModKMeans":
+            if key == "n_init":
+                fit_parameters["n_init"] = ModKMeans._check_n_init(value)
+            elif key == "max_iter":
+                fit_parameters["max_iter"] = ModKMeans._check_max_iter(value)
+            elif key == "tol":
+                fit_parameters["tol"] = ModKMeans._check_tol(value)
+        elif algorithm == "AAHCluster":
+            if key == "ignore_polarity":
+                fit_parameters["ignore_polarity"] = AAHCluster._check_ignore_polarity(
+                    value
+                )
+            elif key == "normalize_input":
+                fit_parameters["normalize_input"] = AAHCluster._check_normalize_input(
+                    value
+                )
+        # pylint: enable=protected-access
+        if key == "GEV_":
             _check_type(value, ("numeric",), "GEV_")
             if value < 0 or 1 < value:
                 raise ValueError(
@@ -302,15 +338,16 @@ def _read_cluster(fname: Union[str, Path]):
         fit_variables,
     )
     if any(elt is None for elt in data):
-        raise RuntimeError(
-            "One of the required tag was not found in .fif file."
-        )
+        raise RuntimeError("One of the required tag was not found in .fif file.")
     algorithm, version = _check_fit_parameters_and_variables(
         fit_parameters, fit_variables
     )
 
     # reconstruct cluster instance
-    function = {"ModKMeans": _create_ModKMeans}
+    function = {
+        "ModKMeans": _create_ModKMeans,
+        "AAHCluster": _create_AAHCluster,
+    }
 
     return (
         function[algorithm](
@@ -336,6 +373,10 @@ def _check_fit_parameters_and_variables(
             "parameters": ["n_init", "max_iter", "tol"],
             "variables": ["GEV_"],
         },
+        "AAHCluster": {
+            "parameters": ["ignore_polarity", "normalize_input"],
+            "variables": ["GEV_"],
+        },
     }
     if "algorithm" not in fit_parameters:
         raise ValueError("Key 'algorithm' is missing from .fif file.")
@@ -357,7 +398,7 @@ def _check_fit_parameters_and_variables(
 def _create_ModKMeans(
     cluster_centers_: NDArray[float],
     info: CHInfo,
-    cluster_names: List[str],
+    cluster_names: list[str],
     fitted_data: NDArray[float],
     labels_: NDArray[int],
     n_init: int,
@@ -368,6 +409,35 @@ def _create_ModKMeans(
     """Create a ModKMeans cluster."""
     cluster = ModKMeans(
         cluster_centers_.shape[0], n_init, max_iter, tol, random_state=None
+    )
+    cluster._cluster_centers_ = cluster_centers_
+    cluster._info = info
+    cluster._cluster_names = cluster_names
+    cluster._fitted_data = fitted_data
+    cluster._labels_ = labels_
+    cluster._GEV_ = GEV_
+    cluster._fitted = True
+    return cluster
+
+
+def _create_AAHCluster(
+    cluster_centers_: NDArray[float],
+    info: CHInfo,
+    cluster_names: list[str],
+    fitted_data: NDArray[float],
+    labels_: NDArray[int],
+    ignore_polarity: bool,  # pylint: disable=unused-argument
+    normalize_input: bool,
+    GEV_: float,
+):
+    """Create a AAHCluster object."""
+    cluster = AAHCluster(
+        cluster_centers_.shape[0],
+        # TODO : ignor_polarity=True for now.
+        # After _BaseCluster and Metric support ignore_polarity
+        # make the parameter an argument
+        # ignore_polarity,
+        normalize_input,
     )
     cluster._cluster_centers_ = cluster_centers_
     cluster._info = info
@@ -474,13 +544,13 @@ def _read_meas_info(fid, tree):
         pos = meas_info["directory"][k].pos
         if kind == FIFF.FIFF_NCHAN:
             tag = read_tag(fid, pos)
-            nchan = int(tag.data)
+            nchan = int(tag.data.item())
         elif kind == FIFF.FIFF_CH_INFO:
             tag = read_tag(fid, pos)
             chs.append(tag.data)
         elif kind == FIFF.FIFF_MNE_CUSTOM_REF:
             tag = read_tag(fid, pos)
-            custom_ref_applied = int(tag.data)
+            custom_ref_applied = int(tag.data.item())
         elif kind == FIFF.FIFF_COORD_TRANS:
             tag = read_tag(fid, pos)
             cand = tag.data
@@ -538,9 +608,7 @@ def _read_meas_info(fid, tree):
     info["custom_ref_applied"] = custom_ref_applied
 
     # add coordinate transformation
-    info["dev_head_t"] = (
-        Transform("meg", "head") if dev_head_t is None else dev_head_t
-    )
+    info["dev_head_t"] = Transform("meg", "head") if dev_head_t is None else dev_head_t
     info["ctf_head_t"] = ctf_head_t
     info["dev_ctf_t"] = dev_ctf_t
     if dev_head_t is not None and ctf_head_t is not None and dev_ctf_t is None:
@@ -560,6 +628,8 @@ def _serialize(dict_: dict, outer_sep: str = ";", inner_sep: str = ":"):
     for key, value in dict_.items():
         if callable(value):
             value = value.__name__
+        elif isinstance(value, bool):
+            pass
         elif isinstance(value, Integral):
             value = int(value)
         elif isinstance(value, dict):

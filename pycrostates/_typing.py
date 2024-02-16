@@ -11,14 +11,26 @@ from numpy.random import Generator, RandomState
 from numpy.typing import NDArray
 
 
-class CHData(ABC):
+class CHData(ABC):  # noqa: B024
     """Typing for CHData."""
 
     pass
 
 
-class CHInfo(ABC):
+class CHInfo(ABC):  # noqa: B024
     """Typing for CHInfo."""
+
+    pass
+
+
+class Cluster(ABC):  # noqa: B024
+    """Typing for a clustering class."""
+
+    pass
+
+
+class Segmentation(ABC):  # noqa: B024
+    """Typing for a clustering class."""
 
     pass
 

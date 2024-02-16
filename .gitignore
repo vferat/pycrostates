@@ -70,7 +70,8 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
+docs/build/
+docs/linkcheck/
 docs/source/generated
 docs/source/api/generated
 docs/source/auto_tutorials
@@ -137,3 +138,5 @@ dmypy.json
 
 # ----------------------------------------------------------------------------
 .DS_Store
+junit-results.xml
+docs/source/sg_execution_times.rst

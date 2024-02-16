@@ -1,7 +1,7 @@
 """Class and functions to use modified Kmeans."""
 
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 from mne import BaseEpochs
@@ -10,11 +10,11 @@ from mne.parallel import parallel_func
 from numpy.random import Generator, RandomState
 from numpy.typing import NDArray
 
-from .._typing import Picks, RANDomState
+from .._typing import CHData, Picks, RANDomState
 from ..utils import _corr_vectors
-from ..utils._checks import _check_random_state, _check_type
+from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc
-from ..utils._logs import _set_verbose, logger
+from ..utils._logs import logger
 from ._base import _BaseCluster
 
 
@@ -28,14 +28,13 @@ class ModKMeans(_BaseCluster):
     ----------
     %(n_clusters)s
     n_init : int
-        Number of time the k-means algorithm is run with different centroid
-        seeds. The final result will be the run with the highest Global
-        Explained Variance (GEV).
+        Number of time the k-means algorithm is run with different centroid seeds. The
+        final result will be the run with the highest Global Explained Variance (GEV).
     max_iter : int
         Maximum number of iterations of the K-means algorithm for a single run.
     tol : float
-        Relative tolerance with regards estimate residual noise in the cluster
-        centers of two consecutive iterations to declare convergence.
+        Relative tolerance with regards estimate residual noise in the cluster centers
+        of two consecutive iterations to declare convergence.
     %(random_state)s
 
     References
@@ -81,7 +80,7 @@ class ModKMeans(_BaseCluster):
                 f"{ch_count} {ch_type.upper()}"
                 for ch_type, ch_count in zip(ch_types, ch_counts)
             ]
-            GEV = int(self._GEV_ * 100)
+            GEV = f"{self._GEV_ * 100:.2f}"
         else:
             n_samples = None
             ch_repr = None
@@ -100,7 +99,6 @@ class ModKMeans(_BaseCluster):
 
     @copy_doc(_BaseCluster.__eq__)
     def __eq__(self, other: Any) -> bool:
-        """Equality == method."""
         if isinstance(other, ModKMeans):
             if not super().__eq__(other):
                 return False
@@ -127,7 +125,6 @@ class ModKMeans(_BaseCluster):
 
     @copy_doc(_BaseCluster.__ne__)
     def __ne__(self, other: Any) -> bool:
-        """Different != method."""
         return not self.__eq__(other)
 
     @copy_doc(_BaseCluster._check_fit)
@@ -136,11 +133,10 @@ class ModKMeans(_BaseCluster):
         # sanity-check
         assert self.GEV_ is not None
 
-    @copy_doc(_BaseCluster.fit)
     @fill_doc
     def fit(
         self,
-        inst: Union[BaseRaw, BaseEpochs],
+        inst: Union[BaseRaw, BaseEpochs, CHData],
         picks: Picks = "eeg",
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,
@@ -149,12 +145,35 @@ class ModKMeans(_BaseCluster):
         *,
         verbose: Optional[str] = None,
     ) -> None:
-        """
+        """Compute cluster centers.
+
+        Parameters
+        ----------
+        inst : Raw | Epochs | ChData
+            MNE `~mne.io.Raw`, `~mne.Epochs` or `~pycrostates.io.ChData` object from
+            which to extract :term:`cluster centers`.
+        picks : str | list | slice | None
+            Channels to include. Note that all channels selected must have the same
+            type. Slices and lists of integers will be interpreted as channel indices.
+            In lists, channel name strings (e.g. ``['Fp1', 'Fp2']``) will pick the given
+            channels. Can also be the string values ``“all”`` to pick all channels, or
+            ``“data”`` to pick data channels. ``"eeg"`` (default) will pick all eeg
+            channels. Note that channels in ``info['bads']`` will be included if their
+            names or indices are explicitly provided.
+        %(tmin_raw)s
+        %(tmax_raw)s
+        %(reject_by_annotation_raw)s
+        %(n_jobs)s
         %(verbose)s
         """
-        _set_verbose(verbose)  # TODO: decorator nesting is failing
+        n_jobs = _check_n_jobs(n_jobs)
         data = super().fit(
-            inst, picks, tmin, tmax, reject_by_annotation, n_jobs
+            inst,
+            picks=picks,
+            tmin=tmin,
+            tmax=tmax,
+            reject_by_annotation=reject_by_annotation,
+            verbose=verbose,
         )
 
         inits = self._random_state.randint(
@@ -186,9 +205,7 @@ class ModKMeans(_BaseCluster):
                 for init in inits
             )
             try:
-                best_run = np.nanargmax(
-                    [run[0] if run[3] else np.nan for run in runs]
-                )
+                best_run = np.nanargmax([run[0] if run[3] else np.nan for run in runs])
                 best_gev, best_maps, best_segmentation, _ = runs[best_run]
                 count_converged = sum(run[3] for run in runs)
             except ValueError:
@@ -205,8 +222,8 @@ class ModKMeans(_BaseCluster):
             )
         else:
             logger.error(
-                "All the K-means run failed to converge. Please adapt the "
-                "tolerance and the maximum number of iteration."
+                "All the K-means run failed to converge. Please adapt the tolerance "
+                "and the maximum number of iteration."
             )
             self.fitted = False  # reset variables related to fit
             return  # break early
@@ -215,6 +232,7 @@ class ModKMeans(_BaseCluster):
         self._cluster_centers_ = best_maps
         self._labels_ = best_segmentation
         self._fitted = True
+        self._ignore_polarity = True
 
     @copy_doc(_BaseCluster.save)
     def save(self, fname: Union[str, Path]):
@@ -245,7 +263,7 @@ class ModKMeans(_BaseCluster):
         max_iter: int,
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
-    ) -> Tuple[float, NDArray[float], NDArray[int], bool]:
+    ) -> tuple[float, NDArray[float], NDArray[int], bool]:
         """Run the k-means algorithm."""
         gfp_sum_sq = np.sum(data**2)
         maps, converged = ModKMeans._compute_maps(
@@ -264,7 +282,7 @@ class ModKMeans(_BaseCluster):
         max_iter: int,
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
-    ) -> Tuple[NDArray[float], bool]:
+    ) -> tuple[NDArray[float], bool]:
         """Compute microstates maps.
 
         Based on mne_microstates by Marijn van Vliet <w.m.vanvliet@gmail.com>
@@ -284,9 +302,7 @@ class ModKMeans(_BaseCluster):
         data_sum_sq = np.sum(data**2)
 
         # Select random time points for our initial topographic maps
-        init_times = random_state.choice(
-            n_samples, size=n_clusters, replace=False
-        )
+        init_times = random_state.choice(n_samples, size=n_clusters, replace=False)
         maps = data[:, init_times].T
         # Normalize the maps
         maps /= np.linalg.norm(maps, axis=1, keepdims=True)
@@ -310,9 +326,7 @@ class ModKMeans(_BaseCluster):
                 maps[state] /= np.linalg.norm(maps[state])
 
             # Estimate residual noise
-            act_sum_sq = np.sum(
-                np.sum(maps[segmentation].T * data, axis=0) ** 2
-            )
+            act_sum_sq = np.sum(np.sum(maps[segmentation].T * data, axis=0) ** 2)
             residual = abs(data_sum_sq - act_sum_sq)
             residual /= float(n_samples * (n_channels - 1))
 
@@ -411,7 +425,6 @@ class ModKMeans(_BaseCluster):
         _check_type(tol, ("numeric",), item_name="tol")
         if tol <= 0:
             raise ValueError(
-                "The tolerance must be a positive number. "
-                f"Provided: '{tol}'."
+                f"The tolerance must be a positive number. Provided: '{tol}'."
             )
         return tol
