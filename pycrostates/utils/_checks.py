@@ -6,7 +6,7 @@ import operator
 import os
 from itertools import product
 from pathlib import Path
-from typing import Any, Function
+from typing import Any, Callable
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -361,7 +361,7 @@ def _rms():
     return calculate_rms
 
 
-def _ensure_gfp_function(method: str, ch_type: str) -> Function:
+def _ensure_gfp_function(method: str, ch_type: str) -> Callable:
     """Check method parameter."""
     _check_type(method, (str,), "method")
     if method not in ("auto", "std", "rms"):

@@ -12,21 +12,15 @@ def _correlation(X, Y, pairwise=True, ignore_polarity=True):
     np.seterr(divide="ignore", invalid="ignore")
 
     if pairwise:
-        # Compute dot product of all pairs of vectors between A and B
-        dot_products = np.sum(X * Y, axis=1)
-        # Compute norms of vectors in A and B
-        norm_A = np.linalg.norm(X, axis=1)
-        norm_B = np.linalg.norm(Y, axis=1)
-        # Compute pairwise cosine similarity
-        corr = dot_products / (norm_A * norm_B)
+        dot_product = np.sum(X * Y, axis=0)
+        norm_X = np.linalg.norm(X, axis=0)
+        norm_Y = np.linalg.norm(Y, axis=0)
+        corr = dot_product / (norm_X * norm_Y)
     else:
-        # Compute dot product of all pairs of vectors between A and B
-        dot_products = np.dot(X, Y.T)
-        # Compute norms of vectors in A and B
-        norm_A = np.linalg.norm(X, axis=1, keepdims=True)
-        norm_B = np.linalg.norm(Y, axis=1, keepdims=True)
-        # Compute pairwise cosine similarity
-        corr = dot_products / (norm_A * norm_B.T)
+        dot_product = np.dot(X, Y)
+        norm_X = np.linalg.norm(X)
+        norm_Y = np.linalg.norm(Y)
+        corr = dot_product / (norm_X * norm_Y)
     # TODO: can we change A[:] == 0 to A
     corr = np.nan_to_num(corr, posinf=0, neginf=0)
     np.seterr(divide="warn", invalid="warn")
@@ -43,6 +37,12 @@ def _distance_matrix(X, Y=None, ignore_polarity=True):
         distances, copy=False, nan=10e300, posinf=1e300, neginf=-1e300
     )
     return distances
+
+
+def _gev(data, maps, segmentation):
+    map_corr = _correlation(data, maps[segmentation].T)
+    gev = np.sum((data * map_corr) ** 2) / np.sum(data**2)
+    return gev
 
 
 def _compare_infos(cluster_info, inst_info):
