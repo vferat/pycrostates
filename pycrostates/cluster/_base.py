@@ -20,7 +20,7 @@ else:
 
 from .._typing import CHData, Cluster, Picks
 from ..segmentation import EpochsSegmentation, RawSegmentation
-from ..utils import _corr_vectors
+from ..utils import _correlation
 from ..utils._checks import (
     _check_picks_uniqueness,
     _check_reject_by_annotation,
@@ -1041,13 +1041,15 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                 while len(new_segment) != 0:
                     # compute correlation left/right side
                     left_corr = np.abs(
-                        _corr_vectors(
+                        _correlation(
                             data[:, left - 1].T,
                             data[:, left].T,
+                            ignore_polarity=True
                         )
                     )
                     right_corr = np.abs(
-                        _corr_vectors(data[:, right].T, data[:, right + 1].T)
+                        _correlation(data[:, right].T, data[:, right + 1].T,
+                                     ignore_polarity=True)
                     )
 
                     if np.abs(right_corr - left_corr) <= 1e-8:

@@ -9,7 +9,7 @@ from mne.io import BaseRaw
 from numpy.typing import NDArray
 
 from .._typing import Picks
-from ..utils import _corr_vectors
+from ..utils import _correlation
 from ..utils._checks import _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
@@ -189,7 +189,7 @@ class AAHCluster(_BaseCluster):
         maps, segmentation = AAHCluster._compute_maps(
             data, n_clusters, ignore_polarity, normalize_input
         )
-        map_corr = _corr_vectors(data, maps[segmentation].T)
+        map_corr = _correlation(data, maps[segmentation].T, ignore_polarity=ignore_polarity)
         gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
         return gev, maps, segmentation
 

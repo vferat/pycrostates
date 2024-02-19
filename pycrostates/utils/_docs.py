@@ -86,6 +86,15 @@ fname : str | Path
     Path to the ``.fif`` file where the clustering solution is saved."""
 
 # -- G ---------------------------------------------------------------------------------
+docdict["gfp_method"] = """
+method : str
+    Method to use for the computation of the :term:`Global Field Power` (:term:`GFP`).
+    Can be:
+    * ``"std"``: use the standard deviation of the signal.
+    * ``"rms"``: use the root mean square of the signal.
+    * ``"auto"``: use ``std`` for eeg data and ``rms`` for meg data.
+    Default to ``"auto"``."""
+
 # -- H ---------------------------------------------------------------------------------
 # -- I ---------------------------------------------------------------------------------
 docdict["ignore_repetitions"] = """

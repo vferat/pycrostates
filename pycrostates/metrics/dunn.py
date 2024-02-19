@@ -57,7 +57,7 @@ def _dunn_score(X, labels):  # higher the better
     -----
     Based on https://github.com/jqmviegas/jqm_cvi
     """
-    distances = _distance_matrix(X)
+    distances = _distance_matrix(X, ignore_polarity=True)
     ks = np.sort(np.unique(labels))
 
     deltas = np.ones([len(ks), len(ks)]) * 1000000

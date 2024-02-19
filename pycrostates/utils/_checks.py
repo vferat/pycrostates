@@ -345,3 +345,40 @@ def _ensure_valid_show(show: Any) -> bool:
     _check_type(show, (bool, None), "show")
     show = plt.isinteractive() if show is None else show
     return show
+
+
+def _std():
+    def calculate_std(data):
+        return np.std(data)
+    return calculate_std
+
+
+def _rms():
+    def calculate_rms(data):
+        return np.sqrt(np.mean(data**2))
+    return calculate_rms
+
+
+def _ensure_gfp_function(method: str, ch_type: str) -> function:
+    """Check method parameter."""
+    _check_type(method, (str,), "method")
+    if method not in ("auto", "std", "rms"):
+        raise ValueError(
+        "Argument 'method' must be one of 'auto', 'std', or 'rms'. "
+        f"Provided: '{method}'."
+    )
+    if method == "std":
+        method = _std()
+    elif method == "rms":
+        method = _rms()
+    if method == "auto":
+        if ch_type == "eeg":
+            method = _std()
+        elif ch_type == "mag" or ch_type == "grad":
+            method = _rms()
+        else:
+            raise ValueError(
+                "The 'auto' method is not supported for ch_type "
+                f"'{ch_type}'. Please specify a method explicitly."
+            )
+    return method

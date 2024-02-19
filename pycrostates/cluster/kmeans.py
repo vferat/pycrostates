@@ -11,7 +11,7 @@ from numpy.random import Generator, RandomState
 from numpy.typing import NDArray
 
 from .._typing import CHData, Picks, RANDomState
-from ..utils import _corr_vectors
+from ..utils import _correlation
 from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
@@ -271,7 +271,7 @@ class ModKMeans(_BaseCluster):
         )
         activation = maps.dot(data)
         segmentation = np.argmax(np.abs(activation), axis=0)
-        map_corr = _corr_vectors(data, maps[segmentation].T)
+        map_corr = _correlation(data, maps[segmentation].T, ignore_polarity=True)
         gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
         return gev, maps, segmentation, converged
 

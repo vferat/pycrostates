@@ -7,50 +7,39 @@ import numpy as np
 from ._logs import logger
 
 
-def _cosine_similarity(vector1, vector2):
-    dot_product = np.dot(vector1, vector2) / (
-        np.linalg.norm(vector1) * np.linalg.norm(vector2)
-    )
-    return dot_product
 
+def _correlation(X, Y, pairwise=True, ignore_polarity=True):
+    """Compute pairwise correlation of multiple pairs of vectors."""
+    np.seterr(divide="ignore", invalid="ignore")
 
-# TODO: Add test for this. Also compare speed with latest version of numpy.
-# Also compared speed with a numba implementation.
-def _corr_vectors(A, B, axis=0):
-    """Compute correlation of multiple pairs of vectors.
+    if pairwise:
+        # Compute dot product of all pairs of vectors between A and B
+        dot_products = np.sum(X * Y, axis=1)
+        # Compute norms of vectors in A and B
+        norm_A = np.linalg.norm(X, axis=1)
+        norm_B = np.linalg.norm(Y, axis=1)
+        # Compute pairwise cosine similarity
+        corr = dot_products / (norm_A * norm_B)
+    else:
+         # Compute dot product of all pairs of vectors between A and B
+        dot_products = np.dot(X, Y.T)
+        # Compute norms of vectors in A and B
+        norm_A = np.linalg.norm(X, axis=1, keepdims=True)
+        norm_B = np.linalg.norm(Y, axis=1, keepdims=True)
+        # Compute pairwise cosine similarity
+        corr = dot_products / (norm_A * norm_B.T)
+    # TODO: can we change A[:] == 0 to A
+    corr = np.nan_to_num(corr, posinf=0, neginf=0)
+    np.seterr(divide="warn", invalid="warn")
 
-    Parameters
-    ----------
-    A : ndarray, shape (n, m)
-        The first collection of vectors
-    B : ndarray, shape (n, m)
-        The second collection of vectors
-    axis : int
-        The axis that contains the elements of each vector. Defaults to 0.
-
-    Returns
-    -------
-    corr : ndarray, shape (m, )
-        For each pair of vectors, the correlation between them.
-    """
-    if A.shape != B.shape:
-        raise ValueError("All input arrays must have the same shape")
-
-    corr = []
-    for a, b in zip(A, B):
-        # If maps is null, divide will not throw an error.
-        if np.all(a == 0) or np.all(b == 0):
-            cos = 0
-        else:
-            cos = _cosine_similarity(a, b)
-        corr.append(cos)
-    corr = np.array(corr)
+    if ignore_polarity:
+        corr = np.abs(corr)
     return corr
 
 
-def _distance_matrix(X, Y=None):
+def _distance_matrix(X, Y=None, ignore_polarity=True):
     """Distance matrix used in metrics."""
-    distances = np.abs(1 / np.corrcoef(X, Y)) - 1
+    distances = 1 / _correlation(X, Y, pairwise=False, ignore_polarity=ignore_polarity)
     distances = np.nan_to_num(
         distances, copy=False, nan=10e300, posinf=1e300, neginf=-1e300
     )
