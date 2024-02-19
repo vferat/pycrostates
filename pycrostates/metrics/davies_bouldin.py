@@ -80,14 +80,16 @@ def _davies_bouldin_score(X, labels):
         cluster_k = _safe_indexing(X, labels == k)
         centroid = cluster_k.mean(axis=0)
         centroids[k] = centroid
-        intra_dists[k] = np.average(_distance_matrix(cluster_k, [centroid]), ignore_polarity=True)
+        intra_dists[k] = np.average(
+            _distance_matrix(cluster_k, [centroid]), ignore_polarity=True
+        )
 
     centroid_distances = _distance_matrix(centroids, ignore_polarity=True)
 
     if np.allclose(intra_dists, 0) or np.allclose(centroid_distances, 0):
         return 0.0
 
-    centroid_distances[centroid_distances == 0] = np.inf #TODO: fix ?
+    centroid_distances[centroid_distances == 0] = np.inf  # TODO: fix ?
     combined_intra_dists = intra_dists[:, None] + intra_dists
     scores = np.max(combined_intra_dists / centroid_distances, axis=1)
     return np.mean(scores)
