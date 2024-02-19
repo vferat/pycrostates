@@ -9,7 +9,7 @@ from mne.io import BaseRaw
 from numpy.typing import NDArray
 
 from .._typing import Picks
-from ..utils import _correlation
+from ..utils import _correlation, _gev
 from ..utils._checks import _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
@@ -192,7 +192,7 @@ class AAHCluster(_BaseCluster):
         map_corr = _correlation(
             data, maps[segmentation].T, ignore_polarity=ignore_polarity
         )
-        gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
+        gev = _gev(data, maps, segmentation)
         return gev, maps, segmentation
 
     # pylint: disable=too-many-locals
