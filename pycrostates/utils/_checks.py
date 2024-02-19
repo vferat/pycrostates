@@ -350,12 +350,14 @@ def _ensure_valid_show(show: Any) -> bool:
 def _std():
     def calculate_std(data):
         return np.std(data)
+
     return calculate_std
 
 
 def _rms():
     def calculate_rms(data):
         return np.sqrt(np.mean(data**2))
+
     return calculate_rms
 
 
@@ -364,9 +366,9 @@ def _ensure_gfp_function(method: str, ch_type: str) -> function:
     _check_type(method, (str,), "method")
     if method not in ("auto", "std", "rms"):
         raise ValueError(
-        "Argument 'method' must be one of 'auto', 'std', or 'rms'. "
-        f"Provided: '{method}'."
-    )
+            "Argument 'method' must be one of 'auto', 'std', or 'rms'. "
+            f"Provided: '{method}'."
+        )
     if method == "std":
         method = _std()
     elif method == "rms":

@@ -7,7 +7,6 @@ import numpy as np
 from ._logs import logger
 
 
-
 def _correlation(X, Y, pairwise=True, ignore_polarity=True):
     """Compute pairwise correlation of multiple pairs of vectors."""
     np.seterr(divide="ignore", invalid="ignore")
@@ -21,7 +20,7 @@ def _correlation(X, Y, pairwise=True, ignore_polarity=True):
         # Compute pairwise cosine similarity
         corr = dot_products / (norm_A * norm_B)
     else:
-         # Compute dot product of all pairs of vectors between A and B
+        # Compute dot product of all pairs of vectors between A and B
         dot_products = np.dot(X, Y.T)
         # Compute norms of vectors in A and B
         norm_A = np.linalg.norm(X, axis=1, keepdims=True)

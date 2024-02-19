@@ -5,7 +5,6 @@ import numpy as np
 from mne import BaseEpochs, pick_info
 from mne.io import BaseRaw
 from mne.utils import check_version
-from numpy.typing import NDArray
 from scipy.signal import find_peaks
 
 if check_version("mne", "1.6"):
@@ -25,13 +24,12 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 
-
 @fill_doc
 @verbose
 def extract_gfp_peaks(
     inst: Union[BaseRaw, BaseEpochs],
     picks: Picks = "eeg",
-    method: str = "auto",  
+    method: str = "auto",
     return_all: bool = False,
     min_peak_distance: int = 1,
     tmin: Optional[float] = None,
@@ -101,7 +99,7 @@ def extract_gfp_peaks(
     _check_picks_uniqueness(inst.info, picks)
 
     # ensure gfp function
-    gfp_function = _ensure_gfp_function(method, ch_type=inst.info['ch_types'][picks[0]])
+    gfp_function = _ensure_gfp_function(method, ch_type=inst.info["ch_types"][picks[0]])
 
     # set kwargs for .get_data()
     kwargs = dict(tmin=tmin, tmax=tmax)

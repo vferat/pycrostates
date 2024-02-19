@@ -189,7 +189,9 @@ class AAHCluster(_BaseCluster):
         maps, segmentation = AAHCluster._compute_maps(
             data, n_clusters, ignore_polarity, normalize_input
         )
-        map_corr = _correlation(data, maps[segmentation].T, ignore_polarity=ignore_polarity)
+        map_corr = _correlation(
+            data, maps[segmentation].T, ignore_polarity=ignore_polarity
+        )
         gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
         return gev, maps, segmentation
 
