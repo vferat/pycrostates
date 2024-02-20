@@ -8,28 +8,34 @@ from sklearn.metrics.pairwise import pairwise_distances
 from ._logs import logger
 
 
-def _distance(X, Y=None, ignore_polarity=True):
-    """Compute pairwise distance of multiple pairs of vectors."""
-    if Y is None:
-        dist = pairwise_distances(X.T, metric="correlation")
-    else:
-        dist = pairwise_distances(X.T, Y.T, metric="correlation")
-    corr = 1 - dist
+def _correlation(A, B, ignore_polarity=True):
+    """Compute pairwise correlation of multiple pairs of vectors."""
+    if A.shape != B.shape:
+        raise ValueError("All input arrays must have the same shape")
+    # If maps is null, divide will not trhow an error.
+    np.seterr(divide="ignore", invalid="ignore")
+    An = A - np.mean(A, axis=0)
+    Bn = B - np.mean(B, axis=0)
+    An /= np.linalg.norm(An, axis=0)
+    Bn /= np.linalg.norm(Bn, axis=0)
+    corr = np.sum(An * Bn, axis=0)
+    corr = np.nan_to_num(corr, posinf=0, neginf=0)
+    np.seterr(divide="warn", invalid="warn")
+
     if ignore_polarity:
         corr = np.abs(corr)
-        dist = 1 - corr
-    return dist
-
-
-def _correlation(X, Y=None, ignore_polarity=True):
-    """Compute pairwise correlation of multiple pairs of vectors."""
-    dist = _distance(X, Y, ignore_polarity=ignore_polarity)
-    corr = 1 - dist
     return corr
 
 
+def _distance(X, Y=None, ignore_polarity=True):
+    """Compute pairwise distance of multiple pairs of vectors."""
+    corr = _correlation(X, Y=None, ignore_polarity=True)
+    dist = 1 - corr
+    return dist
+
+
 def _gev(data, maps, segmentation):
-    map_corr = np.diag(_correlation(data, maps[segmentation].T))
+    map_corr = _correlation(data, maps[segmentation].T)
     gev = np.sum((data * map_corr) ** 2) / np.sum(data**2)
     return gev
 
