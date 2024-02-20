@@ -92,4 +92,6 @@ def test_reject_short_segments():
     segmentation = _BaseCluster._reject_short_segments(segmentation, data, False, 3)
     # solo 1 should turn to 2; initial 0 should not change
     assert [0, 0, 1, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2] == segmentation
+
+
 # TODO: Add tests for _smooth_segmentation and _segment?
