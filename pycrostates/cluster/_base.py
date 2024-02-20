@@ -953,22 +953,15 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         half_window_size: int,
     ) -> NDArray[int]:
         """Create segmentation. Must operate on a copy of states."""
-        data -= np.mean(data, axis=0)
-        std = np.std(data, axis=0)
-        std[std == 0] = 1  # std == 0 -> null map
-        data /= std
-
-        states -= np.mean(states, axis=1)[:, np.newaxis]
-        states /= np.std(states, axis=1)[:, np.newaxis]
-
-        _correlation(data, states, ignore_polarity=ignore_polarity)
-        labels = np.argmax(np.abs(np.dot(states, data)), axis=0)
+        corr = _correlation(states, data, ignore_polarity=ignore_polarity)[:len(states), :]
+        if ignore_polarity:
+            corr = np.abs(corr)
+        labels = np.argmax(corr, axis=0)
 
         if factor != 0:
             labels = _BaseCluster._smooth_segmentation(
                 data, states, labels, ignore_polarity, factor, tol, half_window_size
             )
-
         return labels
 
     @staticmethod
@@ -1064,12 +1057,12 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                         _correlation(
                             data[:, left - 1].reshape(-1, 1),
                             data[:, left].reshape(-1, 1),
-                            ignore_polarity=True,
+                            ignore_polarity=ignore_polarity,
                         )[0, 0]
                     )
                     right_corr = np.abs(
                         _correlation(
-                            data[:, right], data[:, right + 1], ignore_polarity=True
+                            data[:, right], data[:, right + 1], ignore_polarity=ignore_polarity
                         )[0, 0]
                     )
 
