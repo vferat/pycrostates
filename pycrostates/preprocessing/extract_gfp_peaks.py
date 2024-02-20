@@ -99,7 +99,8 @@ def extract_gfp_peaks(
     _check_picks_uniqueness(inst.info, picks)
 
     # ensure gfp function
-    gfp_function = _ensure_gfp_function(method, ch_type=inst.info["ch_types"][picks[0]])
+    ch_type = inst.info.get_channel_types(picks)[0]
+    gfp_function = _ensure_gfp_function(method, ch_type=ch_type)
 
     # set kwargs for .get_data()
     kwargs = dict(tmin=tmin, tmax=tmax)
