@@ -11,7 +11,7 @@ from numpy.random import Generator, RandomState
 from numpy.typing import NDArray
 
 from .._typing import CHData, Picks, RANDomState
-from ..utils import _correlation, _gev
+from ..utils import _gev
 from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
@@ -185,7 +185,12 @@ class ModKMeans(_BaseCluster):
             count_converged = 0
             for init in inits:
                 gev, maps, segmentation, converged = ModKMeans._kmeans(
-                    data, self._n_clusters, self._ignore_polarity, self._max_iter, init, self._tol
+                    data,
+                    self._n_clusters,
+                    self._ignore_polarity,
+                    self._max_iter,
+                    init,
+                    self._tol,
                 )
                 if not converged:
                     continue
@@ -201,7 +206,14 @@ class ModKMeans(_BaseCluster):
                 ModKMeans._kmeans, n_jobs, total=self._n_init
             )
             runs = parallel(
-                p_fun(data, self._n_clusters, self._ignore_polarity, self._max_iter, init, self._tol)
+                p_fun(
+                    data,
+                    self._n_clusters,
+                    self._ignore_polarity,
+                    self._max_iter,
+                    init,
+                    self._tol,
+                )
                 for init in inits
             )
             try:
@@ -264,10 +276,9 @@ class ModKMeans(_BaseCluster):
         max_iter: int,
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
-
     ) -> tuple[float, NDArray[float], NDArray[int], bool]:
         """Run the k-means algorithm."""
-        maps, segmentation, converged  = ModKMeans._compute_maps(
+        maps, segmentation, converged = ModKMeans._compute_maps(
             data, n_clusters, ignore_polarity, max_iter, random_state, tol
         )
         gev = _gev(data, maps, segmentation)
@@ -342,7 +353,6 @@ class ModKMeans(_BaseCluster):
             converged = False
 
         return maps, segmentation, converged
-
 
     # --------------------------------------------------------------------
     @property
