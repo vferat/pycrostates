@@ -11,9 +11,9 @@ from ._logs import logger
 def _distance(X, Y=None, ignore_polarity=True):
     """Compute pairwise distance of multiple pairs of vectors."""
     if Y is None:
-        dist = pairwise_distances(X.T, metric="cosine")
+        dist = pairwise_distances(X.T, metric="correlation")
     else:
-        dist = pairwise_distances(X.T, Y.T, metric="cosine")
+        dist = pairwise_distances(X.T, Y.T, metric="correlation")
     corr = 1 - dist
     if ignore_polarity:
         corr = np.abs(corr)
