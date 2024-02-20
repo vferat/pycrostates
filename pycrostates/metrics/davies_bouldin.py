@@ -1,7 +1,6 @@
 """Davies Bouldin score."""
 
 import numpy as np
-from sklearn.metrics import pairwise_distances
 
 from ..cluster._base import _BaseCluster
 from ..utils import _distance
@@ -50,7 +49,9 @@ def davies_bouldin_score(cluster):  # lower the better
         x = cluster.cluster_centers_[labels].T
         sign = np.sign((x.T * data.T).sum(axis=1))
         data = data * sign
-    davies_bouldin_score = _davies_bouldin_score(data.T, labels, ignore_polarity=ignore_polarity)
+    davies_bouldin_score = _davies_bouldin_score(
+        data.T, labels, ignore_polarity=ignore_polarity
+    )
     return davies_bouldin_score
 
 
@@ -72,32 +73,36 @@ def _davies_bouldin_score(X, labels, ignore_polarity):
     """
     # Calculate the number of clusters
     num_clusters = len(set(labels))
-    
+
     # Calculate the centroids of the clusters
     centroids = np.array([np.mean(X[labels == i], axis=0) for i in range(num_clusters)])
-    
+
     # Calculate pairwise distances between centroids using custom distance function
     centroid_distances = _distance(centroids, ignore_polarity=ignore_polarity)
-    
+
     # Initialize array to hold scatter values for each cluster
     scatter_values = np.zeros(num_clusters)
-    
+
     # Calculate scatter for each cluster
     for i in range(num_clusters):
         cluster_points = X[labels == i]
         cluster_centroid = centroids[i]
-        scatter_values[i] = np.mean([_distance(point, cluster_centroid) for point in cluster_points])
-    
+        scatter_values[i] = np.mean(
+            [_distance(point, cluster_centroid) for point in cluster_points]
+        )
+
     # Initialize array to hold ratio values for each cluster pair
     ratio_values = np.zeros((num_clusters, num_clusters))
-    
+
     # Calculate ratio for each cluster pair
     for i in range(num_clusters):
         for j in range(num_clusters):
             if i != j:
-                ratio_values[i][j] = (scatter_values[i] + scatter_values[j]) / centroid_distances[i][j]
-    
+                ratio_values[i][j] = (
+                    scatter_values[i] + scatter_values[j]
+                ) / centroid_distances[i][j]
+
     # Compute Davies-Bouldin Index
     db_index = np.mean(np.max(ratio_values, axis=1))
-    
+
     return db_index
