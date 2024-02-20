@@ -77,7 +77,7 @@ def _davies_bouldin_score(X, labels, ignore_polarity):
     # Calculate the centroids of the clusters
     centroids = np.array([np.mean(X[labels == i], axis=0) for i in range(num_clusters)])
 
-    # Calculate pairwise distances between centroids using custom distance function
+    # Calculate pairwise distances between centroids
     centroid_distances = _distance(centroids, ignore_polarity=ignore_polarity)
 
     # Initialize array to hold scatter values for each cluster
