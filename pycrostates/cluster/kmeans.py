@@ -63,7 +63,7 @@ class ModKMeans(_BaseCluster):
         self._max_iter = ModKMeans._check_max_iter(max_iter)
         self._tol = ModKMeans._check_tol(tol)
         self._random_state = _check_random_state(random_state)
-
+        self._ignore_polarity = None
         # fit variables
         self._GEV_ = None
 

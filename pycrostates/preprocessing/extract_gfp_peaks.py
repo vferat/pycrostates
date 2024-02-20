@@ -2,7 +2,7 @@
 from typing import Optional, Union
 
 import numpy as np
-from mne import BaseEpochs, pick_info
+from mne import BaseEpochs, channel_type, pick_info
 from mne.io import BaseRaw
 from mne.utils import check_version
 from numpy.typing import NDArray
@@ -95,6 +95,7 @@ def extract_gfp_peaks(
     picks = _picks_to_idx(inst.info, picks, none="all", exclude="bads")
     picks_all = _picks_to_idx(inst.info, inst.ch_names, none="all", exclude="bads")
     _check_picks_uniqueness(inst.info, picks)
+    ch_type = channel_type(inst.info, picks[0])
 
     # set kwargs for .get_data()
     kwargs = dict(tmin=tmin, tmax=tmax)
@@ -106,7 +107,7 @@ def extract_gfp_peaks(
         # retrieve data array on which we look for GFP peaks
         data = inst.get_data(picks=picks, **kwargs)
         # retrieve indices of GFP peaks
-        ind_peaks = _extract_gfp_peaks(data, min_peak_distance)
+        ind_peaks = _extract_gfp_peaks(data, min_peak_distance, ch_type=ch_type)
         # retrieve the peaks data
         if return_all:
             del data  # free up memory
@@ -117,7 +118,7 @@ def extract_gfp_peaks(
         for k in range(len(inst)):  # pylint: disable=consider-using-enumerate
             data = inst[k].get_data(picks=picks, **kwargs)[0, :, :]
             # data is 2D, of shape (n_channels, n_samples)
-            ind_peaks = _extract_gfp_peaks(data, min_peak_distance)
+            ind_peaks = _extract_gfp_peaks(data, min_peak_distance, ch_type=ch_type)
             if return_all:
                 del data  # free up memory
                 data = inst[k].get_data(picks=picks_all, **kwargs)[0, :, :]
@@ -139,7 +140,7 @@ def extract_gfp_peaks(
 
 
 def _extract_gfp_peaks(
-    data: NDArray[float], min_peak_distance: int = 2
+    data: NDArray[float], min_peak_distance: int = 2, ch_type: str = "eeg"
 ) -> NDArray[float]:
     """Extract GFP peaks from input data.
 
@@ -151,12 +152,17 @@ def _extract_gfp_peaks(
         Required minimal horizontal distance (>= 1) in samples between neighboring
         peaks. Smaller peaks are removed first until the condition is fulfilled for all
         remaining peaks. Default to 2.
+    ch_type : str
+        The channel type of the channels in the data array.
 
     Returns
     -------
     peaks : array of shape (n_picks,)
         The indices when peaks occur.
     """
-    gfp = np.std(data, axis=0)
+    if ch_type == "eeg":
+        gfp = np.std(data, axis=0)
+    else:
+        gfp = np.sqrt(np.mean(data**2, axis=0))
     peaks, _ = find_peaks(gfp, distance=min_peak_distance)
     return peaks
