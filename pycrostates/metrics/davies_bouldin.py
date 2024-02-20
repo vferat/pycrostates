@@ -88,7 +88,7 @@ def _davies_bouldin_score(X, labels, ignore_polarity):
         cluster_points = X[labels == i]
         cluster_centroid = centroids[i]
         scatter_values[i] = np.mean(
-            [_distance(point, cluster_centroid) for point in cluster_points]
+            [_distance(point.reshape(-1, 1), cluster_centroid.reshape(-1, 1)) for point in cluster_points]
         )
 
     # Initialize array to hold ratio values for each cluster pair
