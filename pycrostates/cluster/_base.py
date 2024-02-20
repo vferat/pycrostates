@@ -852,7 +852,12 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
                 data_ = data[:, onset:end]
                 segment = _BaseCluster._segment(
-                    data_, cluster_centers_, self._ignore_polarity, factor, tol, half_window_size
+                    data_,
+                    cluster_centers_,
+                    self._ignore_polarity,
+                    factor,
+                    tol,
+                    half_window_size,
                 )
                 if reject_edges:
                     segment = _BaseCluster._reject_edge_segments(segment)
@@ -860,7 +865,12 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
         else:
             segmentation = _BaseCluster._segment(
-                data, cluster_centers_, self._ignore_polarity, factor, tol, half_window_size
+                data,
+                cluster_centers_,
+                self._ignore_polarity,
+                factor,
+                tol,
+                half_window_size,
             )
             if reject_edges:
                 segmentation = _BaseCluster._reject_edge_segments(segmentation)
@@ -906,7 +916,12 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         segments = []
         for epoch_data in data:
             segment = _BaseCluster._segment(
-                epoch_data, cluster_centers_, self._ignore_polarity, factor, tol, half_window_size
+                epoch_data,
+                cluster_centers_,
+                self._ignore_polarity,
+                factor,
+                tol,
+                half_window_size,
             )
 
             if 0 < min_segment_length:
@@ -1017,7 +1032,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         segmentation: NDArray[int],
         data: NDArray[float],
         min_segment_length: int,
-        ignore_polarity: bool
+        ignore_polarity: bool,
     ) -> NDArray[int]:
         """Reject segments that are too short.
 
@@ -1047,7 +1062,9 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                     # compute correlation left/right side
                     left_corr = np.abs(
                         _correlation(
-                            data[:, left - 1].reshape(-1, 1), data[:, left].reshape(-1, 1), ignore_polarity=True
+                            data[:, left - 1].reshape(-1, 1),
+                            data[:, left].reshape(-1, 1),
+                            ignore_polarity=True,
                         )[0, 0]
                     )
                     right_corr = np.abs(
