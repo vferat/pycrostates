@@ -1062,7 +1062,9 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                     )
                     right_corr = np.abs(
                         _correlation(
-                            data[:, right], data[:, right + 1], ignore_polarity=ignore_polarity
+                            data[:, right],
+                            data[:, right + 1],
+                            ignore_polarity=ignore_polarity,
                         )[0, 0]
                     )
 
