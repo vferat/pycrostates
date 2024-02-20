@@ -350,12 +350,14 @@ def _ensure_valid_show(show: Any) -> bool:
 def _std():
     def calculate_std(data):
         return np.std(data, axis=0)
+
     return calculate_std
 
 
 def _rms():
     def calculate_rms(data):
         return np.sqrt(np.mean(data**2, axis=0))
+
     return calculate_rms
 
 
