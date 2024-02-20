@@ -953,7 +953,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         half_window_size: int,
     ) -> NDArray[int]:
         """Create segmentation. Must operate on a copy of states."""
-        corr = _correlation(states, data, ignore_polarity=ignore_polarity)[:len(states), :]
+        corr = _correlation(states.T, data, ignore_polarity=ignore_polarity)[:len(states), :]
         if ignore_polarity:
             corr = np.abs(corr)
         labels = np.argmax(corr, axis=0)
