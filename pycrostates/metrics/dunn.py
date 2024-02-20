@@ -3,7 +3,6 @@
 import numpy as np
 
 from ..cluster._base import _BaseCluster
-from ..utils import _distance
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 
@@ -58,7 +57,7 @@ def _dunn_score(X, labels, ignore_polarity):  # higher the better
     -----
     Based on https://github.com/jqmviegas/jqm_cvi
     """
-    distances = np.corrcoef(X) #TODO
+    distances = np.corrcoef(X)  # TODO
     if ignore_polarity:
         distances = np.abs(distances)
     ks = np.sort(np.unique(labels))
