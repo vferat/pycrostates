@@ -21,7 +21,7 @@ def _distance(X, Y=None, ignore_polarity=True):
     return dist
 
 
-def _correlation(X, Y, ignore_polarity=True):
+def _correlation(X, Y=None, ignore_polarity=True):
     """Compute pairwise correlation of multiple pairs of vectors."""
     dist =  _distance(X, Y, ignore_polarity=ignore_polarity)
     corr = 1 - dist
@@ -29,7 +29,7 @@ def _correlation(X, Y, ignore_polarity=True):
 
 
 def _gev(data, maps, segmentation):
-    map_corr = _correlation(data, maps[segmentation].T)
+    map_corr = np.diag(_correlation(data, maps[segmentation].T))
     gev = np.sum((data * map_corr) ** 2) / np.sum(data**2)
     return gev
 

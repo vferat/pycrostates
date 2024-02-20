@@ -185,12 +185,8 @@ class AAHCluster(_BaseCluster):
         normalize_input: bool,
     ) -> tuple[float, NDArray[float], NDArray[int]]:
         """Run the AAHC algorithm."""
-        gfp_sum_sq = np.sum(data**2)
         maps, segmentation = AAHCluster._compute_maps(
             data, n_clusters, ignore_polarity, normalize_input
-        )
-        map_corr = _correlation(
-            data, maps[segmentation].T, ignore_polarity=ignore_polarity
         )
         gev = _gev(data, maps, segmentation)
         return gev, maps, segmentation
