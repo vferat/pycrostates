@@ -1,11 +1,10 @@
 """Davies Bouldin score."""
 
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
-from sklearn.utils import _safe_indexing, check_X_y
+from sklearn.metrics import pairwise_distances
 
 from ..cluster._base import _BaseCluster
-from ..utils import _distance_matrix
+from ..utils import _distance
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 
@@ -42,18 +41,20 @@ def davies_bouldin_score(cluster):  # lower the better
     cluster._check_fit()
     data = cluster._fitted_data
     labels = cluster._labels_
+    ignore_polarity = cluster._ignore_polarity
+
     keep = np.linalg.norm(data.T, axis=1) != 0
     data = data[:, keep]
     labels = labels[keep]
-    # TODO: if ignore polarity
-    x = cluster.cluster_centers_[labels].T
-    sign = np.sign((x.T * data.T).sum(axis=1))
-    data = data * sign
-    davies_bouldin_score = _davies_bouldin_score(data.T, labels)
+    if ignore_polarity:
+        x = cluster.cluster_centers_[labels].T
+        sign = np.sign((x.T * data.T).sum(axis=1))
+        data = data * sign
+    davies_bouldin_score = _davies_bouldin_score(data.T, labels, ignore_polarity=ignore_polarity)
     return davies_bouldin_score
 
 
-def _davies_bouldin_score(X, labels):
+def _davies_bouldin_score(X, labels, ignore_polarity):
     """Compute the Davies-Bouldin score.
 
     Parameters
@@ -69,27 +70,34 @@ def _davies_bouldin_score(X, labels):
     score: float
         The resulting Davies-Bouldin score.
     """
-    X, labels = check_X_y(X, labels)
-    le = LabelEncoder()
-    labels = le.fit_transform(labels)
-    n_labels = len(le.classes_)
-
-    intra_dists = np.zeros(n_labels)
-    centroids = np.zeros((n_labels, len(X[0])), dtype=float)
-    for k in range(n_labels):
-        cluster_k = _safe_indexing(X, labels == k)
-        centroid = cluster_k.mean(axis=0)
-        centroids[k] = centroid
-        intra_dists[k] = np.average(
-            _distance_matrix(cluster_k, [centroid]), ignore_polarity=True
-        )
-
-    centroid_distances = _distance_matrix(centroids, ignore_polarity=True)
-
-    if np.allclose(intra_dists, 0) or np.allclose(centroid_distances, 0):
-        return 0.0
-
-    centroid_distances[centroid_distances == 0] = np.inf  # TODO: fix ?
-    combined_intra_dists = intra_dists[:, None] + intra_dists
-    scores = np.max(combined_intra_dists / centroid_distances, axis=1)
-    return np.mean(scores)
+    # Calculate the number of clusters
+    num_clusters = len(set(labels))
+    
+    # Calculate the centroids of the clusters
+    centroids = np.array([np.mean(X[labels == i], axis=0) for i in range(num_clusters)])
+    
+    # Calculate pairwise distances between centroids using custom distance function
+    centroid_distances = _distance(centroids, ignore_polarity=ignore_polarity)
+    
+    # Initialize array to hold scatter values for each cluster
+    scatter_values = np.zeros(num_clusters)
+    
+    # Calculate scatter for each cluster
+    for i in range(num_clusters):
+        cluster_points = X[labels == i]
+        cluster_centroid = centroids[i]
+        scatter_values[i] = np.mean([_distance(point, cluster_centroid) for point in cluster_points])
+    
+    # Initialize array to hold ratio values for each cluster pair
+    ratio_values = np.zeros((num_clusters, num_clusters))
+    
+    # Calculate ratio for each cluster pair
+    for i in range(num_clusters):
+        for j in range(num_clusters):
+            if i != j:
+                ratio_values[i][j] = (scatter_values[i] + scatter_values[j]) / centroid_distances[i][j]
+    
+    # Compute Davies-Bouldin Index
+    db_index = np.mean(np.max(ratio_values, axis=1))
+    
+    return db_index

@@ -3,40 +3,29 @@
 from copy import deepcopy
 
 import numpy as np
+from sklearn.metrics.pairwise import pairwise_distances
 
 from ._logs import logger
 
 
-def _correlation(X, Y, pairwise=True, ignore_polarity=True):
-    """Compute pairwise correlation of multiple pairs of vectors."""
-    np.seterr(divide="ignore", invalid="ignore")
-
-    if pairwise:
-        dot_product = np.sum(X * Y, axis=0)
-        norm_X = np.linalg.norm(X, axis=0)
-        norm_Y = np.linalg.norm(Y, axis=0)
-        corr = dot_product / (norm_X * norm_Y)
+def _distance(X, Y=None, ignore_polarity=True):
+    """Compute pairwise distance of multiple pairs of vectors."""
+    if Y is None:
+        dist = pairwise_distances(X.T, metric='cosine')
     else:
-        dot_product = np.dot(X, Y)
-        norm_X = np.linalg.norm(X)
-        norm_Y = np.linalg.norm(Y)
-        corr = dot_product / (norm_X * norm_Y)
-    # TODO: can we change A[:] == 0 to A
-    corr = np.nan_to_num(corr, posinf=0, neginf=0)
-    np.seterr(divide="warn", invalid="warn")
-
+        dist = pairwise_distances(X.T, Y.T, metric='cosine')
+    corr = 1 - dist
     if ignore_polarity:
         corr = np.abs(corr)
+        dist = 1 - corr
+    return dist
+
+
+def _correlation(X, Y, ignore_polarity=True):
+    """Compute pairwise correlation of multiple pairs of vectors."""
+    dist =  _distance(X, Y, ignore_polarity=ignore_polarity)
+    corr = 1 - dist
     return corr
-
-
-def _distance_matrix(X, Y=None, ignore_polarity=True):
-    """Distance matrix used in metrics."""
-    distances = 1 / _correlation(X, Y, pairwise=False, ignore_polarity=ignore_polarity)
-    distances = np.nan_to_num(
-        distances, copy=False, nan=10e300, posinf=1e300, neginf=-1e300
-    )
-    return distances
 
 
 def _gev(data, maps, segmentation):
