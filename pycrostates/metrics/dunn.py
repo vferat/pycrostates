@@ -58,7 +58,9 @@ def _dunn_score(X, labels, ignore_polarity):  # higher the better
     -----
     Based on https://github.com/jqmviegas/jqm_cvi
     """
-    distances = _distance(X, ignore_polarity=ignore_polarity)
+    distances = np.corrcoef(X) #TODO
+    if ignore_polarity:
+        distances = np.abs(distances)
     ks = np.sort(np.unique(labels))
 
     deltas = np.ones([len(ks), len(ks)]) * 1000000

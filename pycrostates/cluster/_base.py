@@ -1057,17 +1057,17 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                     # compute correlation left/right side
                     left_corr = np.abs(
                         _correlation(
-                            data[:, left - 1].reshape(-1, 1),
-                            data[:, left].reshape(-1, 1),
+                            data[:, left - 1],
+                            data[:, left],
                             ignore_polarity=ignore_polarity,
-                        )[0, 0]
+                        )
                     )
                     right_corr = np.abs(
                         _correlation(
-                            data[:, right].reshape(-1, 1),
-                            data[:, right + 1].reshape(-1, 1),
+                            data[:, right],
+                            data[:, right + 1],
                             ignore_polarity=ignore_polarity,
-                        )[0, 0]
+                        )
                     )
 
                     if np.abs(right_corr - left_corr) <= 1e-8:

@@ -44,6 +44,8 @@ def silhouette_score(cluster):  # higher the better
     keep = np.linalg.norm(data.T, axis=1) != 0
     data = data[:, keep]
     labels = labels[keep]
-    distances = _distance(data, ignore_polarity=ignore_polarity)
+    distances = np.corrcoef(data) #TODO
+    if ignore_polarity:
+        distances = np.abs(distances)
     silhouette = sk_silhouette_score(distances, labels, metric="precomputed")
     return silhouette

@@ -3,7 +3,6 @@
 from copy import deepcopy
 
 import numpy as np
-from sklearn.metrics.pairwise import pairwise_distances
 
 from ._logs import logger
 
