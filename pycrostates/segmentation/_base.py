@@ -169,7 +169,8 @@ class _BaseSegmentation(Segmentation):
             if len(arg_where) != 0:
                 labeled_tp = data.T[arg_where][:, 0, :].T
                 labeled_gfp = gfp[arg_where][:, 0]
-                dist_corr = _correlation(labeled_tp, state, ignore_polarity=True
+                dist_corr = _correlation(
+                    labeled_tp, state, ignore_polarity=True
                 )  # TODO: ignore_polarity
                 params[f"{state_name}_mean_corr"] = np.mean(np.abs(dist_corr))
                 dist_gev = (labeled_gfp * dist_corr) ** 2 / np.sum(gfp**2)  # TODO: gev

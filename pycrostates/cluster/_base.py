@@ -955,7 +955,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         """Create segmentation. Must operate on a copy of states."""
         corr = np.zeros((states.shape[0], data.shape[1]))
         for k in range(0, states.shape[0]):
-            corr[k] = _correlation(data, states[k] , ignore_polarity=ignore_polarity)
+            corr[k] = _correlation(data, states[k], ignore_polarity=ignore_polarity)
         labels = np.argmax(corr, axis=0)
 
         if factor != 0:
