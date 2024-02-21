@@ -1059,9 +1059,10 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                         ignore_polarity=ignore_polarity,
                     )[0]
                     right_corr = _correlation(
-                            data[:, right],
-                            data[:, right + 1],
-                            ignore_polarity=ignore_polarity)[0]
+                        data[:, right],
+                        data[:, right + 1],
+                        ignore_polarity=ignore_polarity,
+                    )[0]
                     if np.abs(right_corr - left_corr) <= 1e-8:
                         # equal corr, try to do both sides
                         if len(new_segment) == 1:
