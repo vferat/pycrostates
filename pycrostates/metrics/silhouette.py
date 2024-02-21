@@ -4,7 +4,6 @@ import numpy as np
 from sklearn.metrics import silhouette_score as sk_silhouette_score
 
 from ..cluster._base import _BaseCluster
-from ..utils import _distance
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 
