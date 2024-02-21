@@ -20,7 +20,7 @@ else:
 
 from .._typing import CHData, Cluster, Picks
 from ..segmentation import EpochsSegmentation, RawSegmentation
-from ..utils import _corr_vectors
+from ..utils import _correlation
 from ..utils._checks import (
     _check_picks_uniqueness,
     _check_reject_by_annotation,
@@ -852,7 +852,12 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
                 data_ = data[:, onset:end]
                 segment = _BaseCluster._segment(
-                    data_, cluster_centers_, factor, tol, half_window_size
+                    data_,
+                    cluster_centers_,
+                    self._ignore_polarity,
+                    factor,
+                    tol,
+                    half_window_size,
                 )
                 if reject_edges:
                     segment = _BaseCluster._reject_edge_segments(segment)
@@ -860,14 +865,19 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
         else:
             segmentation = _BaseCluster._segment(
-                data, cluster_centers_, factor, tol, half_window_size
+                data,
+                cluster_centers_,
+                self._ignore_polarity,
+                factor,
+                tol,
+                half_window_size,
             )
             if reject_edges:
                 segmentation = _BaseCluster._reject_edge_segments(segmentation)
 
         if 0 < min_segment_length:
             segmentation = _BaseCluster._reject_short_segments(
-                segmentation, data, min_segment_length
+                segmentation, data, min_segment_length, self._ignore_polarity
             )
 
         # Provide properties to copy the arrays
@@ -906,12 +916,17 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         segments = []
         for epoch_data in data:
             segment = _BaseCluster._segment(
-                epoch_data, cluster_centers_, factor, tol, half_window_size
+                epoch_data,
+                cluster_centers_,
+                self._ignore_polarity,
+                factor,
+                tol,
+                half_window_size,
             )
 
             if 0 < min_segment_length:
                 segment = _BaseCluster._reject_short_segments(
-                    segment, epoch_data, min_segment_length
+                    segment, epoch_data, min_segment_length, self._ignore_polarity
                 )
             if reject_edges:
                 segment = _BaseCluster._reject_edge_segments(segment)
@@ -932,32 +947,28 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     def _segment(
         data: NDArray[float],
         states: NDArray[float],
+        ignore_polarity: bool,
         factor: int,
         tol: Union[int, float],
         half_window_size: int,
     ) -> NDArray[int]:
         """Create segmentation. Must operate on a copy of states."""
-        data -= np.mean(data, axis=0)
-        std = np.std(data, axis=0)
-        std[std == 0] = 1  # std == 0 -> null map
-        data /= std
-
-        states -= np.mean(states, axis=1)[:, np.newaxis]
-        states /= np.std(states, axis=1)[:, np.newaxis]
-
-        labels = np.argmax(np.abs(np.dot(states, data)), axis=0)
+        corr = np.zeros((states.shape[0], data.shape[1]))
+        for k in range(0, states.shape[0]):
+            corr[k] = _correlation(data, states[k], ignore_polarity=ignore_polarity)
+        labels = np.argmax(corr, axis=0)
 
         if factor != 0:
             labels = _BaseCluster._smooth_segmentation(
-                data, states, labels, factor, tol, half_window_size
+                data, states, ignore_polarity, labels, factor, tol, half_window_size
             )
-
         return labels
 
     @staticmethod
     def _smooth_segmentation(
         data: NDArray[float],
         states: NDArray[float],
+        ignore_polarity: bool,
         labels: NDArray[int],
         factor: int,
         tol: Union[int, float],
@@ -976,6 +987,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                vol. 42, no. 7, pp. 658-665, July 1995,
                https://doi.org/10.1109/10.391164.
         """
+        # TODO: ignore_polarity
         Ne, Nt = data.shape
         Nu = states.shape[0]
         Vvar = np.sum(data * data, axis=0)
@@ -1013,6 +1025,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         segmentation: NDArray[int],
         data: NDArray[float],
         min_segment_length: int,
+        ignore_polarity: bool,
     ) -> NDArray[int]:
         """Reject segments that are too short.
 
@@ -1040,16 +1053,16 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
                 while len(new_segment) != 0:
                     # compute correlation left/right side
-                    left_corr = np.abs(
-                        _corr_vectors(
-                            data[:, left - 1].T,
-                            data[:, left].T,
-                        )
-                    )
-                    right_corr = np.abs(
-                        _corr_vectors(data[:, right].T, data[:, right + 1].T)
-                    )
-
+                    left_corr = _correlation(
+                        data[:, left - 1],
+                        data[:, left],
+                        ignore_polarity=ignore_polarity,
+                    )[0]
+                    right_corr = _correlation(
+                        data[:, right],
+                        data[:, right + 1],
+                        ignore_polarity=ignore_polarity,
+                    )[0]
                     if np.abs(right_corr - left_corr) <= 1e-8:
                         # equal corr, try to do both sides
                         if len(new_segment) == 1:

@@ -5,7 +5,6 @@ import numpy as np
 from mne import BaseEpochs, pick_info
 from mne.io import BaseRaw
 from mne.utils import check_version
-from numpy.typing import NDArray
 from scipy.signal import find_peaks
 
 if check_version("mne", "1.6"):
@@ -19,6 +18,7 @@ from ..utils._checks import (
     _check_reject_by_annotation,
     _check_tmin_tmax,
     _check_type,
+    _ensure_gfp_function,
 )
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
@@ -29,6 +29,7 @@ from ..utils._logs import logger, verbose
 def extract_gfp_peaks(
     inst: Union[BaseRaw, BaseEpochs],
     picks: Picks = "eeg",
+    method: str = "auto",
     return_all: bool = False,
     min_peak_distance: int = 1,
     tmin: Optional[float] = None,
@@ -53,6 +54,7 @@ def extract_gfp_peaks(
         ``“data”`` to pick data channels. ``"eeg"`` (default) will pick all eeg
         channels. Note that channels in ``info['bads']`` will be included if their
         names or indices are explicitly provided.
+    %(gfp_method)s
     return_all : bool
         If True, the returned `~pycrostates.io.ChData` instance will include all
         channels. If False (default), the returned `~pycrostates.io.ChData` instance
@@ -96,6 +98,10 @@ def extract_gfp_peaks(
     picks_all = _picks_to_idx(inst.info, inst.ch_names, none="all", exclude="bads")
     _check_picks_uniqueness(inst.info, picks)
 
+    # ensure gfp function
+    ch_type = inst.info.get_channel_types(picks)[0]
+    gfp_function = _ensure_gfp_function(method, ch_type=ch_type)
+
     # set kwargs for .get_data()
     kwargs = dict(tmin=tmin, tmax=tmax)
     if isinstance(inst, BaseRaw):
@@ -106,7 +112,8 @@ def extract_gfp_peaks(
         # retrieve data array on which we look for GFP peaks
         data = inst.get_data(picks=picks, **kwargs)
         # retrieve indices of GFP peaks
-        ind_peaks = _extract_gfp_peaks(data, min_peak_distance)
+        gfp = gfp_function(data)
+        ind_peaks, _ = find_peaks(gfp, distance=min_peak_distance)
         # retrieve the peaks data
         if return_all:
             del data  # free up memory
@@ -117,7 +124,8 @@ def extract_gfp_peaks(
         for k in range(len(inst)):  # pylint: disable=consider-using-enumerate
             data = inst[k].get_data(picks=picks, **kwargs)[0, :, :]
             # data is 2D, of shape (n_channels, n_samples)
-            ind_peaks = _extract_gfp_peaks(data, min_peak_distance)
+            gfp = gfp_function(data)
+            ind_peaks, _ = find_peaks(gfp, distance=min_peak_distance)
             if return_all:
                 del data  # free up memory
                 data = inst[k].get_data(picks=picks_all, **kwargs)[0, :, :]
@@ -136,27 +144,3 @@ def extract_gfp_peaks(
 
     info = pick_info(inst.info, picks_all if return_all else picks)
     return ChData(peaks, info)
-
-
-def _extract_gfp_peaks(
-    data: NDArray[float], min_peak_distance: int = 2
-) -> NDArray[float]:
-    """Extract GFP peaks from input data.
-
-    Parameters
-    ----------
-    data : array of shape (n_channels, n_samples)
-        The data to extract GFP peaks from.
-    min_peak_distance : int
-        Required minimal horizontal distance (>= 1) in samples between neighboring
-        peaks. Smaller peaks are removed first until the condition is fulfilled for all
-        remaining peaks. Default to 2.
-
-    Returns
-    -------
-    peaks : array of shape (n_picks,)
-        The indices when peaks occur.
-    """
-    gfp = np.std(data, axis=0)
-    peaks, _ = find_peaks(gfp, distance=min_peak_distance)
-    return peaks

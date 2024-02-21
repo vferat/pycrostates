@@ -9,7 +9,7 @@ from mne.io import BaseRaw
 from numpy.typing import NDArray
 
 from .._typing import Picks
-from ..utils import _corr_vectors
+from ..utils import _gev
 from ..utils._checks import _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
@@ -185,12 +185,10 @@ class AAHCluster(_BaseCluster):
         normalize_input: bool,
     ) -> tuple[float, NDArray[float], NDArray[int]]:
         """Run the AAHC algorithm."""
-        gfp_sum_sq = np.sum(data**2)
         maps, segmentation = AAHCluster._compute_maps(
             data, n_clusters, ignore_polarity, normalize_input
         )
-        map_corr = _corr_vectors(data, maps[segmentation].T)
-        gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
+        gev = _gev(data, maps, segmentation)
         return gev, maps, segmentation
 
     # pylint: disable=too-many-locals
