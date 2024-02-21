@@ -9,26 +9,38 @@ from ._logs import logger
 
 def _correlation(A, B, ignore_polarity=True):
     """Compute pairwise correlation of multiple pairs of vectors."""
-    if A.shape != B.shape:
+    # correlation with a given vector
+    if A.ndim == 1 and B.ndim == 1:
+        A = np.tile(A.T, (1, 1)).T
+        B = np.tile(B.T, (1, 1)).T
+        print(A.shape)
+    else:
+        if B.ndim == 1:
+            B = np.tile(B.T, (A.shape[1], 1)).T
+        if A.ndim == 1:
+            A = np.tile(A.T, (B.shape[1], 1)).T
+    # correlation element-wise (A1,B1), (A2,B2), ...
+    if A.shape == B.shape:
+        # If maps is null, divide will not throw an error.
+        np.seterr(divide="ignore", invalid="ignore")
+        An = A - np.mean(A, axis=0)
+        Bn = B - np.mean(B, axis=0)
+        An /= np.linalg.norm(An, axis=0)
+        Bn /= np.linalg.norm(Bn, axis=0)
+        corr = np.sum(An * Bn, axis=0)
+        corr = np.nan_to_num(corr, posinf=0, neginf=0)
+        np.seterr(divide="warn", invalid="warn")
+    else:
         raise ValueError("All input arrays must have the same shape")
-    # If maps is null, divide will not trhow an error.
-    np.seterr(divide="ignore", invalid="ignore")
-    An = A - np.mean(A, axis=0)
-    Bn = B - np.mean(B, axis=0)
-    An /= np.linalg.norm(An, axis=0)
-    Bn /= np.linalg.norm(Bn, axis=0)
-    corr = np.sum(An * Bn, axis=0)
-    corr = np.nan_to_num(corr, posinf=0, neginf=0)
-    np.seterr(divide="warn", invalid="warn")
 
     if ignore_polarity:
         corr = np.abs(corr)
     return corr
 
 
-def _distance(X, Y=None, ignore_polarity=True):
+def _distance(X, Y, ignore_polarity=True):
     """Compute pairwise distance of multiple pairs of vectors."""
-    corr = _correlation(X, Y=None, ignore_polarity=True)
+    corr = _correlation(X, Y, ignore_polarity=True)
     dist = 1 - corr
     return dist
 
