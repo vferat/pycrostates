@@ -1054,9 +1054,10 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                 while len(new_segment) != 0:
                     # compute correlation left/right side
                     left_corr = _correlation(
-                            data[:, left - 1],
-                            data[:, left],
-                            ignore_polarity=ignore_polarity)[0]
+                        data[:, left - 1],
+                        data[:, left],
+                        ignore_polarity=ignore_polarity,
+                    )[0]
                     right_corr = _correlation(
                             data[:, right],
                             data[:, right + 1],

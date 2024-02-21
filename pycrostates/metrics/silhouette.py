@@ -4,9 +4,10 @@ import numpy as np
 from sklearn.metrics import silhouette_score as sk_silhouette_score
 
 from ..cluster._base import _BaseCluster
+from ..utils import _distance_matrix
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
-from ..utils import _distance_matrix
+
 
 @fill_doc
 def silhouette_score(cluster):  # higher the better
