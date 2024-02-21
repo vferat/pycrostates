@@ -36,13 +36,22 @@ def _correlation(A, B, ignore_polarity=True):
         corr = np.abs(corr)
     return corr
 
-
 def _distance(X, Y, ignore_polarity=True):
     """Compute pairwise distance of multiple pairs of vectors."""
     corr = _correlation(X, Y, ignore_polarity=True)
     dist = 1 - corr
     return dist
 
+def _correlation_matrix(X, ignore_polarity=True):
+    corr = np.corrcoef(X.T)
+    if ignore_polarity:
+        corr = np.abs(corr)
+    return corr
+
+def _distance_matrix(X, ignore_polarity=True):
+    corr = _correlation_matrix(X, ignore_polarity)
+    dist = 1 - corr
+    return dist
 
 def _gev(data, maps, segmentation):
     map_corr = _correlation(data, maps[segmentation].T)

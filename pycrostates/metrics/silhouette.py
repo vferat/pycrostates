@@ -6,7 +6,7 @@ from sklearn.metrics import silhouette_score as sk_silhouette_score
 from ..cluster._base import _BaseCluster
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
-
+from ..utils import _distance_matrix
 
 @fill_doc
 def silhouette_score(cluster):  # higher the better
@@ -43,8 +43,6 @@ def silhouette_score(cluster):  # higher the better
     keep = np.linalg.norm(data.T, axis=1) != 0
     data = data[:, keep]
     labels = labels[keep]
-    distances = np.corrcoef(data)  # TODO: memory error ?
-    if ignore_polarity:
-        distances = np.abs(distances)
+    distances = _distance_matrix(data, ignore_polarity)
     silhouette = sk_silhouette_score(distances, labels, metric="precomputed")
     return silhouette
