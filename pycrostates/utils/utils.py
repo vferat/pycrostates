@@ -13,7 +13,6 @@ def _correlation(A, B, ignore_polarity=True):
     if A.ndim == 1 and B.ndim == 1:
         A = np.tile(A.T, (1, 1)).T
         B = np.tile(B.T, (1, 1)).T
-        print(A.shape)
     else:
         if B.ndim == 1:
             B = np.tile(B.T, (A.shape[1], 1)).T
