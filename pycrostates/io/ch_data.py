@@ -1,4 +1,5 @@
 """Class to handle no temporal but spatial data."""
+
 from copy import copy, deepcopy
 from typing import Any, Union
 

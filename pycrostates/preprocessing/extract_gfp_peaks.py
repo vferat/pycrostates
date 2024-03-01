@@ -1,4 +1,5 @@
 """Preprocessing functions to extract gfp peaks."""
+
 from typing import Optional, Union
 
 import numpy as np
