@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 from matplotlib import colors
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
@@ -17,15 +15,15 @@ def plot_raw_segmentation(
     raw: BaseRaw,
     n_clusters: int,
     cluster_names: list[str] = None,
-    tmin: Optional[Union[int, float]] = None,
-    tmax: Optional[Union[int, float]] = None,
-    cmap: Optional[str] = None,
-    axes: Optional[Axes] = None,
-    cbar_axes: Optional[Axes] = None,
+    tmin: int | float | None = None,
+    tmax: int | float | None = None,
+    cmap: str | None = None,
+    axes: Axes | None = None,
+    cbar_axes: Axes | None = None,
     *,
     block: bool = False,
-    show: Optional[bool] = None,
-    verbose: Optional[str] = None,
+    show: bool | None = None,
+    verbose: str | None = None,
     **kwargs,
 ):
     """Plot raw segmentation.
@@ -76,13 +74,13 @@ def plot_epoch_segmentation(
     epochs: BaseEpochs,
     n_clusters: int,
     cluster_names: list[str] = None,
-    cmap: Optional[str] = None,
-    axes: Optional[Axes] = None,
-    cbar_axes: Optional[Axes] = None,
+    cmap: str | None = None,
+    axes: Axes | None = None,
+    cbar_axes: Axes | None = None,
     *,
     block: bool = False,
-    show: Optional[bool] = None,
-    verbose: Optional[str] = None,
+    show: bool | None = None,
+    verbose: str | None = None,
     **kwargs,
 ):
     """
@@ -131,16 +129,16 @@ def _plot_segmentation(
     times: NDArray[float],
     n_clusters: int,
     cluster_names: list[str] = None,
-    cmap: Optional[Union[str, colors.Colormap]] = None,
-    axes: Optional[Axes] = None,
-    cbar_axes: Optional[Axes] = None,
+    cmap: str | colors.Colormap | None = None,
+    axes: Axes | None = None,
+    cbar_axes: Axes | None = None,
     *,
-    verbose: Optional[str] = None,
+    verbose: str | None = None,
     **kwargs,
 ) -> tuple[plt.Figure, Axes]:
     """Code snippet to plot segmentation for raw and epochs."""
 
-def _compatibility_cmap(cmap: Optional[Union[str, colors.Colormap]], n_colors: int):
+def _compatibility_cmap(cmap: str | colors.Colormap | None, n_colors: int):
     """Convert the 'cmap' argument to a colormap.
 
     Matplotlib 3.6 introduced a deprecation of plt.cm.get_cmap().

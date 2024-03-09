@@ -1,5 +1,4 @@
 from pathlib import Path as Path
-from typing import Union
 
 from mne import Info
 from numpy.typing import NDArray
@@ -14,9 +13,9 @@ from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 
 def _write_cluster(
-    fname: Union[str, Path],
+    fname: str | Path,
     cluster_centers_: NDArray[float],
-    chinfo: Union[CHInfo, Info],
+    chinfo: CHInfo | Info,
     algorithm: str,
     cluster_names: list[str],
     fitted_data: NDArray[float],
@@ -47,7 +46,7 @@ def _write_cluster(
 def _prepare_kwargs(algorithm: str, kwargs: dict):
     """Prepare params to save from kwargs."""
 
-def _read_cluster(fname: Union[str, Path]):
+def _read_cluster(fname: str | Path):
     """Read clustering solution from disk.
 
     Parameters
@@ -74,7 +73,7 @@ def _create_ModKMeans(
     labels_: NDArray[int],
     n_init: int,
     max_iter: int,
-    tol: Union[int, float],
+    tol: int | float,
     GEV_: float,
 ):
     """Create a ModKMeans cluster."""

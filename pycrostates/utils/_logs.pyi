@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path as Path
-from typing import Callable, Optional, Union
+from typing import Callable
 
 from _typeshed import Incomplete
 
@@ -9,7 +9,7 @@ from ._checks import _check_verbose as _check_verbose
 from ._docs import fill_doc as fill_doc
 from ._fixes import _WrapStdOut as _WrapStdOut
 
-def _init_logger(*, verbose: Optional[Union[bool, str, int]] = None) -> logging.Logger:
+def _init_logger(*, verbose: bool | str | int | None = None) -> logging.Logger:
     """Initialize a logger.
 
     Assigns sys.stdout as the first handler of the logger.
@@ -29,11 +29,11 @@ def _init_logger(*, verbose: Optional[Union[bool, str, int]] = None) -> logging.
     """
 
 def add_file_handler(
-    fname: Union[str, Path],
+    fname: str | Path,
     mode: str = "a",
-    encoding: Optional[str] = None,
+    encoding: str | None = None,
     *,
-    verbose: Optional[Union[bool, str, int]] = None,
+    verbose: bool | str | int | None = None,
 ) -> None:
     """Add a file handler to the logger.
 
@@ -52,9 +52,7 @@ def add_file_handler(
         ``"WARNING"`` for False and to ``"INFO"`` for True.
     """
 
-def set_log_level(
-    verbose: Union[bool, str, int, None], apply_to_mne: bool = True
-) -> None:
+def set_log_level(verbose: bool | str | int | None, apply_to_mne: bool = True) -> None:
     """Set the log level for the logger and the first handler ``sys.stdout``.
 
     Parameters
@@ -112,7 +110,7 @@ class _use_log_level:
     _old_level: Incomplete
     _level: Incomplete
 
-    def __init__(self, verbose: Optional[Union[bool, str, int]] = None) -> None: ...
+    def __init__(self, verbose: bool | str | int | None = None) -> None: ...
     def __enter__(self) -> None: ...
     def __exit__(self, *args) -> None: ...
 

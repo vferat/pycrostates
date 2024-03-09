@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any
 
 from matplotlib.axes import Axes
 from mne import Info
@@ -15,15 +15,15 @@ _GRADIENT_KWARGS_DEFAULTS: dict[str, str]
 
 def plot_cluster_centers(
     cluster_centers: NDArray[float],
-    info: Union[Info, CHInfo],
+    info: Info | CHInfo,
     cluster_names: list[str] = None,
-    axes: Optional[Union[Axes, NDArray[Axes]]] = None,
-    show_gradient: Optional[bool] = False,
+    axes: Axes | NDArray[Axes] | None = None,
+    show_gradient: bool | None = False,
     gradient_kwargs: dict[str, Any] = ...,
     *,
     block: bool = False,
-    show: Optional[bool] = None,
-    verbose: Optional[str] = None,
+    show: bool | None = None,
+    verbose: str | None = None,
     **kwargs,
 ):
     """Create topographic maps for cluster centers.

@@ -1,5 +1,5 @@
 from pathlib import Path as Path
-from typing import Any, Optional, Union
+from typing import Any
 
 from _typeshed import Incomplete
 from mne import BaseEpochs as BaseEpochs
@@ -63,7 +63,7 @@ class ModKMeans(_BaseCluster):
         n_clusters: int,
         n_init: int = 100,
         max_iter: int = 300,
-        tol: Union[int, float] = 1e-06,
+        tol: int | float = 1e-06,
         random_state: RANDomState = None,
     ) -> None: ...
     def _repr_html_(self, caption: Incomplete | None = None): ...
@@ -82,14 +82,14 @@ class ModKMeans(_BaseCluster):
 
     def fit(
         self,
-        inst: Union[BaseRaw, BaseEpochs, CHData],
+        inst: BaseRaw | BaseEpochs | CHData,
         picks: Picks = "eeg",
-        tmin: Optional[Union[int, float]] = None,
-        tmax: Optional[Union[int, float]] = None,
+        tmin: int | float | None = None,
+        tmax: int | float | None = None,
         reject_by_annotation: bool = True,
         n_jobs: int = 1,
         *,
-        verbose: Optional[str] = None,
+        verbose: str | None = None,
     ) -> None:
         """Compute cluster centers.
 
@@ -130,7 +130,7 @@ class ModKMeans(_BaseCluster):
             ``"WARNING"`` for False and to ``"INFO"`` for True.
         """
 
-    def save(self, fname: Union[str, Path]):
+    def save(self, fname: str | Path):
         """Save clustering solution to disk.
 
         Parameters
@@ -144,8 +144,8 @@ class ModKMeans(_BaseCluster):
         data: NDArray[float],
         n_clusters: int,
         max_iter: int,
-        random_state: Union[RandomState, Generator],
-        tol: Union[int, float],
+        random_state: RandomState | Generator,
+        tol: int | float,
     ) -> tuple[float, NDArray[float], NDArray[int], bool]:
         """Run the k-means algorithm."""
 
@@ -154,8 +154,8 @@ class ModKMeans(_BaseCluster):
         data: NDArray[float],
         n_clusters: int,
         max_iter: int,
-        random_state: Union[RandomState, Generator],
-        tol: Union[int, float],
+        random_state: RandomState | Generator,
+        tol: int | float,
     ) -> tuple[NDArray[float], bool]:
         """Compute microstates maps.
 
@@ -178,14 +178,14 @@ class ModKMeans(_BaseCluster):
         """
 
     @property
-    def tol(self) -> Union[int, float]:
+    def tol(self) -> int | float:
         """Relative tolerance to reach convergence.
 
         :type: `float`
         """
 
     @property
-    def random_state(self) -> Union[RandomState, Generator]:
+    def random_state(self) -> RandomState | Generator:
         """Random state to fix seed generation.
 
         :type: `~numpy.random.RandomState` | `~numpy.random.Generator`
@@ -214,5 +214,5 @@ class ModKMeans(_BaseCluster):
         """Check that max_iter is a positive integer."""
 
     @staticmethod
-    def _check_tol(tol: Union[int, float]) -> Union[int, float]:
+    def _check_tol(tol: int | float) -> int | float:
         """Check that tol is a positive number."""

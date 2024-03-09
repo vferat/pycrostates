@@ -1,5 +1,3 @@
-from typing import Union
-
 from _typeshed import Incomplete
 from mne import BaseEpochs
 from mne.io import BaseRaw
@@ -17,11 +15,11 @@ def _check_adjacency(adjacency, info, ch_type):
     """Check adjacency matrix."""
 
 def apply_spatial_filter(
-    inst: Union[BaseRaw, BaseEpochs, CHData],
+    inst: BaseRaw | BaseEpochs | CHData,
     ch_type: str = "eeg",
     exclude_bads: bool = True,
-    origin: Union[str, NDArray[float]] = "auto",
-    adjacency: Union[csr_matrix, str] = "auto",
+    origin: str | NDArray[float] = "auto",
+    adjacency: csr_matrix | str = "auto",
     n_jobs: int = 1,
     verbose: Incomplete | None = None,
 ):

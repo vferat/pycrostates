@@ -1,5 +1,5 @@
 from pathlib import Path as Path
-from typing import Any, Optional, Union
+from typing import Any
 
 from _typeshed import Incomplete
 from mne import BaseEpochs as BaseEpochs
@@ -53,13 +53,13 @@ class AAHCluster(_BaseCluster):
 
     def fit(
         self,
-        inst: Union[BaseRaw, BaseEpochs],
+        inst: BaseRaw | BaseEpochs,
         picks: Picks = "eeg",
-        tmin: Optional[Union[int, float]] = None,
-        tmax: Optional[Union[int, float]] = None,
+        tmin: int | float | None = None,
+        tmax: int | float | None = None,
         reject_by_annotation: bool = True,
         *,
-        verbose: Optional[str] = None,
+        verbose: str | None = None,
     ) -> None:
         """Compute cluster centers.
 
@@ -93,7 +93,7 @@ class AAHCluster(_BaseCluster):
             ``"WARNING"`` for False and to ``"INFO"`` for True.
         """
 
-    def save(self, fname: Union[str, Path]):
+    def save(self, fname: str | Path):
         """Save clustering solution to disk.
 
         Parameters

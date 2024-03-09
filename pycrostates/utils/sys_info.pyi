@@ -1,10 +1,10 @@
-from typing import IO, Callable, Optional
+from typing import IO, Callable
 
 from packaging.requirements import Requirement
 
 from ._checks import _check_type as _check_type
 
-def sys_info(fid: Optional[IO] = None, developer: bool = False):
+def sys_info(fid: IO | None = None, developer: bool = False):
     """Print the system information for debugging.
 
     Parameters

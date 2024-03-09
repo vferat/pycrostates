@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import Optional, Union
 
 from _typeshed import Incomplete
 from matplotlib.axes import Axes as Axes
@@ -45,10 +44,10 @@ class _BaseSegmentation(Segmentation):
     def __init__(
         self,
         labels: NDArray[int],
-        inst: Union[BaseRaw, BaseEpochs],
+        inst: BaseRaw | BaseEpochs,
         cluster_centers_: NDArray[float],
-        cluster_names: Optional[list[str]] = None,
-        predict_parameters: Optional[dict] = None,
+        cluster_names: list[str] | None = None,
+        predict_parameters: dict | None = None,
     ): ...
     def __repr__(self) -> str: ...
     def _repr_html_(self, caption: Incomplete | None = None): ...
@@ -161,9 +160,7 @@ class _BaseSegmentation(Segmentation):
             First axis indicates state ``"from"``. Second axis indicates state ``"to"``.
         """
 
-    def entropy(
-        self, ignore_repetitions: bool = False, log_base: Union[float, str] = 2
-    ):
+    def entropy(self, ignore_repetitions: bool = False, log_base: float | str = 2):
         """Compute the Shannon entropy of the segmentation.
 
         Compute the Shannon entropy\\ :footcite:p:`shannon1948mathematical`
@@ -196,10 +193,10 @@ class _BaseSegmentation(Segmentation):
 
     def plot_cluster_centers(
         self,
-        axes: Optional[Union[Axes, NDArray[Axes]]] = None,
+        axes: Axes | NDArray[Axes] | None = None,
         *,
         block: bool = False,
-        show: Optional[bool] = None,
+        show: bool | None = None,
     ):
         """Plot cluster centers as topographic maps.
 

@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from pathlib import Path as Path
-from typing import Any, Optional, Union
+from typing import Any
 
 from _typeshed import Incomplete
 from matplotlib.axes import Axes as Axes
@@ -70,13 +70,13 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     @abstractmethod
     def fit(
         self,
-        inst: Union[BaseRaw, BaseEpochs, CHData],
+        inst: BaseRaw | BaseEpochs | CHData,
         picks: Picks = "eeg",
-        tmin: Optional[Union[int, float]] = None,
-        tmax: Optional[Union[int, float]] = None,
+        tmin: int | float | None = None,
+        tmax: int | float | None = None,
         reject_by_annotation: bool = True,
         *,
-        verbose: Optional[str] = None,
+        verbose: str | None = None,
     ) -> NDArray[float]:
         """Compute cluster centers.
 
@@ -112,8 +112,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     def rename_clusters(
         self,
-        mapping: Optional[dict[str, str]] = None,
-        new_names: Optional[Union[list[str], tuple[str, ...]]] = None,
+        mapping: dict[str, str] | None = None,
+        new_names: list[str] | tuple[str, ...] | None = None,
     ) -> None:
         """Rename the clusters.
 
@@ -133,9 +133,9 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     def reorder_clusters(
         self,
-        mapping: Optional[dict[int, int]] = None,
-        order: Optional[Union[list[int], tuple[int, ...], NDArray[int]]] = None,
-        template: Optional[Cluster] = None,
+        mapping: dict[int, int] | None = None,
+        order: list[int] | tuple[int, ...] | NDArray[int] | None = None,
+        template: Cluster | None = None,
     ) -> None:
         """
         Reorder the clusters of the fitted model.
@@ -167,7 +167,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         """
 
     def invert_polarity(
-        self, invert: Union[bool, list[bool], tuple[bool, ...], NDArray[bool]]
+        self, invert: bool | list[bool] | tuple[bool, ...] | NDArray[bool]
     ) -> None:
         """Invert map polarities.
 
@@ -190,8 +190,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     def plot(
         self,
-        axes: Optional[Union[Axes, NDArray[Axes]]] = None,
-        show_gradient: Optional[bool] = False,
+        axes: Axes | NDArray[Axes] | None = None,
+        show_gradient: bool | None = False,
         gradient_kwargs: dict[str, Any] = {
             "color": "black",
             "linestyle": "-",
@@ -199,8 +199,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         },
         *,
         block: bool = False,
-        show: Optional[bool] = None,
-        verbose: Optional[str] = None,
+        show: bool | None = None,
+        verbose: str | None = None,
         **kwargs,
     ):
         """
@@ -238,7 +238,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         """
 
     @abstractmethod
-    def save(self, fname: Union[str, Path]):
+    def save(self, fname: str | Path):
         """Save clustering solution to disk.
 
         Parameters
@@ -249,16 +249,16 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     def predict(
         self,
-        inst: Union[BaseRaw, BaseEpochs],
+        inst: BaseRaw | BaseEpochs,
         picks: Picks = None,
         factor: int = 0,
         half_window_size: int = 1,
-        tol: Union[int, float] = 1e-05,
+        tol: int | float = 1e-05,
         min_segment_length: int = 0,
         reject_edges: bool = True,
         reject_by_annotation: bool = True,
         *,
-        verbose: Optional[str] = None,
+        verbose: str | None = None,
     ):
         """Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
 
@@ -322,7 +322,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         raw: BaseRaw,
         picks_data: NDArray[int],
         factor: int,
-        tol: Union[int, float],
+        tol: int | float,
         half_window_size: int,
         min_segment_length: int,
         reject_edges: bool,
@@ -335,7 +335,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         epochs: BaseEpochs,
         picks_data: NDArray[int],
         factor: int,
-        tol: Union[int, float],
+        tol: int | float,
         half_window_size: int,
         min_segment_length: int,
         reject_edges: bool,
@@ -347,7 +347,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         data: NDArray[float],
         states: NDArray[float],
         factor: int,
-        tol: Union[int, float],
+        tol: int | float,
         half_window_size: int,
     ) -> NDArray[int]:
         """Create segmentation. Must operate on a copy of states."""
@@ -358,7 +358,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         states: NDArray[float],
         labels: NDArray[int],
         factor: int,
-        tol: Union[int, float],
+        tol: int | float,
         half_window_size: int,
     ) -> NDArray[int]:
         """Apply smoothing.

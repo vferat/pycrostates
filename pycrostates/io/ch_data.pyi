@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 from _typeshed import Incomplete
 from mne import Info
@@ -31,7 +31,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
     _data: Incomplete
     _info: Incomplete
 
-    def __init__(self, data: NDArray[float], info: Union[Info, CHInfo]) -> None: ...
+    def __init__(self, data: NDArray[float], info: Info | CHInfo) -> None: ...
     def __repr__(self) -> str:
         """String representation."""
 

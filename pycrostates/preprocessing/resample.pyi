@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 from _typeshed import Incomplete
 from mne import BaseEpochs
 from mne.io import BaseRaw
@@ -15,10 +13,10 @@ from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 
 def resample(
-    inst: Union[BaseRaw, BaseEpochs, CHData],
+    inst: BaseRaw | BaseEpochs | CHData,
     picks: Picks = None,
-    tmin: Optional[float] = None,
-    tmax: Optional[float] = None,
+    tmin: float | None = None,
+    tmax: float | None = None,
     reject_by_annotation: bool = True,
     n_resamples: int = None,
     n_samples: int = None,

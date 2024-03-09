@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 from mne import Info
 
 from .._typing import CHInfo as CHInfo
@@ -132,9 +130,9 @@ class ChInfo(CHInfo, Info):
 
     def __init__(
         self,
-        info: Optional[Info] = None,
-        ch_names: Optional[Union[int, list[str], tuple[str, ...]]] = None,
-        ch_types: Optional[Union[str, list[str], tuple[str, ...]]] = None,
+        info: Info | None = None,
+        ch_names: int | list[str] | tuple[str, ...] | None = None,
+        ch_types: str | list[str] | tuple[str, ...] | None = None,
     ) -> None: ...
     def _init_from_info(self, info: Info):
         """Init instance from mne Info."""
@@ -142,8 +140,8 @@ class ChInfo(CHInfo, Info):
 
     def _init_from_channels(
         self,
-        ch_names: Union[int, list[str], tuple[str, ...]],
-        ch_types: Union[str, list[str], tuple[str, ...]],
+        ch_names: int | list[str] | tuple[str, ...],
+        ch_types: str | list[str] | tuple[str, ...],
     ):
         """Init instance from channel names and types."""
 

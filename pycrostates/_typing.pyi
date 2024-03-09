@@ -1,5 +1,4 @@
 from abc import ABC
-from typing import Optional, Union
 
 from numpy.random import Generator, RandomState
 from numpy.typing import NDArray
@@ -16,5 +15,5 @@ class Cluster(ABC):
 class Segmentation(ABC):
     """Typing for a clustering class."""
 
-RANDomState = Optional[Union[int, RandomState, Generator]]
-Picks = Optional[Union[str, NDArray[int]]]
+RANDomState = int | RandomState | Generator | None
+Picks = str | NDArray[int] | None

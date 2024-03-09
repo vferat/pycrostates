@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 from numpy.typing import NDArray
 
 from .._typing import Segmentation as Segmentation
@@ -14,8 +12,8 @@ def _check_lags(lags) -> NDArray[int]: ...
 def _joint_entropy(
     x: NDArray[int],
     y: NDArray[int],
-    state_to_ignore: Optional[int] = -1,
-    log_base: Union[float, str] = 2,
+    state_to_ignore: int | None = -1,
+    log_base: float | str = 2,
 ) -> float:
     """Joint Shannon entropy of the symbolic sequences x, y.
 
@@ -48,8 +46,8 @@ def _check_segmentation(
 def _joint_entropy_history(
     labels: NDArray[int],
     k: int,
-    state_to_ignore: Optional[int] = -1,
-    log_base: Union[float, str] = 2,
+    state_to_ignore: int | None = -1,
+    log_base: float | str = 2,
 ) -> float:
     """Compute the joint Shannon of k-histories x[t:t+k].
 
@@ -76,9 +74,7 @@ def _joint_entropy_history(
     """
 
 def _entropy(
-    labels: NDArray[int],
-    state_to_ignore: Optional[int] = -1,
-    log_base: Union[float, str] = 2,
+    labels: NDArray[int], state_to_ignore: int | None = -1, log_base: float | str = 2
 ) -> float:
     """Compute the Shannon entropy of the a symbolic sequence.
 
@@ -110,7 +106,7 @@ def _entropy(
 def entropy(
     segmentation: Segmentation,
     ignore_repetitions: bool = False,
-    log_base: Union[float, str] = 2,
+    log_base: float | str = 2,
 ) -> float:
     """Compute the Shannon entropy of a symbolic sequence.
 
@@ -147,8 +143,8 @@ def entropy(
 def _excess_entropy_rate(
     labels: NDArray[int],
     history_length: int,
-    state_to_ignore: Optional[int] = -1,
-    log_base: Union[float, str] = 2,
+    state_to_ignore: int | None = -1,
+    log_base: float | str = 2,
     n_jobs: int = 1,
 ) -> tuple[float, float, float, NDArray[int], NDArray[float]]:
     """Estimate the entropy rate and the excess_entropy from a linear fit.
@@ -194,7 +190,7 @@ def excess_entropy_rate(
     segmentation: Segmentation,
     history_length: int,
     ignore_repetitions: bool = False,
-    log_base: Union[float, str] = 2,
+    log_base: float | str = 2,
     n_jobs: int = 1,
 ) -> tuple[float, float, float, NDArray[int], NDArray[float]]:
     """Estimate the entropy rate and the ``excess_entropy`` of the segmentation.
@@ -255,8 +251,8 @@ def excess_entropy_rate(
 def _auto_information(
     labels: NDArray[int],
     k: int,
-    state_to_ignore: Optional[int] = -1,
-    log_base: Union[float, str] = 2,
+    state_to_ignore: int | None = -1,
+    log_base: float | str = 2,
 ) -> float:
     """Compute the Auto-information for lag k.
 
@@ -284,9 +280,9 @@ def _auto_information(
 
 def auto_information_function(
     segmentation: Segmentation,
-    lags: Union[int, list[int], tuple[int, ...], NDArray[int]],
+    lags: int | list[int] | tuple[int, ...] | NDArray[int],
     ignore_repetitions: bool = False,
-    log_base: Union[float, str] = 2,
+    log_base: float | str = 2,
     n_jobs: int = 1,
 ) -> tuple[NDArray[int], NDArray[float]]:
     """Compute the Auto-information function (aif).
@@ -343,8 +339,8 @@ def auto_information_function(
 def _partial_auto_information(
     labels: NDArray[int],
     k: int,
-    state_to_ignore: Optional[int] = -1,
-    log_base: Union[float, str] = 2,
+    state_to_ignore: int | None = -1,
+    log_base: float | str = 2,
 ) -> float:
     """Compute the partial auto-information for lag k.
 
@@ -372,10 +368,10 @@ def _partial_auto_information(
 
 def partial_auto_information_function(
     segmentation: Segmentation,
-    lags: Union[int, list[int], tuple[int, ...], NDArray[int]],
+    lags: int | list[int] | tuple[int, ...] | NDArray[int],
     ignore_repetitions: bool = False,
-    log_base: Union[float, str] = 2,
-    n_jobs: Optional[int] = 1,
+    log_base: float | str = 2,
+    n_jobs: int | None = 1,
 ) -> tuple[NDArray[int], NDArray[float]]:
     """Compute the Partial auto-information function.
 

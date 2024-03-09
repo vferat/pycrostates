@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 from _typeshed import Incomplete
 from mne import BaseEpochs
 from mne.io import BaseRaw
@@ -15,12 +13,12 @@ from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 
 def extract_gfp_peaks(
-    inst: Union[BaseRaw, BaseEpochs],
+    inst: BaseRaw | BaseEpochs,
     picks: Picks = "eeg",
     return_all: bool = False,
     min_peak_distance: int = 1,
-    tmin: Optional[float] = None,
-    tmax: Optional[float] = None,
+    tmin: float | None = None,
+    tmax: float | None = None,
     reject_by_annotation: bool = True,
     verbose: Incomplete | None = None,
 ) -> CHData:
