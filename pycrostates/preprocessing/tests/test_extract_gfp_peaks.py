@@ -2,7 +2,12 @@ import mne
 import pytest
 from mne import pick_info
 from mne.datasets import testing
-from mne.io.pick import _picks_to_idx
+from mne.utils import check_version
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_to_idx
+else:
+    from mne.io.pick import _picks_to_idx
 
 from pycrostates.io import ChData
 from pycrostates.preprocessing import extract_gfp_peaks
@@ -56,11 +61,7 @@ def test_extract_gfp_invalid_arguments(inst):
     """Test errors raised when invalid arguments are provided."""
     with pytest.raises(TypeError, match="'inst' must be an instance of "):
         extract_gfp_peaks(101)
-    with pytest.raises(
-        TypeError, match="'min_peak_distance' must be an instance"
-    ):
+    with pytest.raises(TypeError, match="'min_peak_distance' must be an instance"):
         extract_gfp_peaks(inst, min_peak_distance=True)
-    with pytest.raises(
-        ValueError, match="Argument 'min_peak_distance' must be"
-    ):
+    with pytest.raises(ValueError, match="Argument 'min_peak_distance' must be"):
         extract_gfp_peaks(inst, min_peak_distance=-2)

@@ -19,7 +19,7 @@ from .aahc import AAHCluster  # noqa: F401
 from .kmeans import ModKMeans  # noqa: F401
 from ._custom import Custom
 
-__all__ = (
+__all__: tuple[str, ...] = (
     "ModKMeans",
     "AAHCluster",
     "Custom"

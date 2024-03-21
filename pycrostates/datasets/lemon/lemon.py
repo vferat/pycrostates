@@ -1,10 +1,6 @@
 """Functions to use the LEMON dataset."""
 
-try:
-    from importlib.resources import files  # type: ignore
-except ImportError:
-    from importlib_resources import files  # type: ignore
-
+from importlib.resources import files
 from pathlib import Path
 
 import numpy as np
@@ -19,22 +15,20 @@ from ...utils._config import get_config
 def data_path(subject_id: str, condition: str) -> Path:
     r"""Get path to a local copy of preprocessed EEG recording from the LEMON dataset.
 
-    Get path to a local copy of preprocessed EEG recording from the
-    mind-brain-body dataset of MRI, EEG, cognition, emotion, and peripheral
-    physiology in young and old adults\ :footcite:p:`babayan_mind-brain-body_2019`.
-    If there is no local copy of the recording, this function will fetch it
-    from the online repository and store it. The default location is
-    ``~/pycrostates_data``.
+    Get path to a local copy of preprocessed EEG recording from the mind-brain-body
+    dataset of MRI, EEG, cognition, emotion, and peripheral physiology in young and old
+    adults\ :footcite:p:`babayan_mind-brain-body_2019`. If there is no local copy of the
+    recording, this function will fetch it from the online repository and store it. The
+    default location is ``~/pycrostates_data``.
 
     Parameters
     ----------
     subject_id : str
         The subject id to use. For example ``'010276'``.
-        The list of available subjects can be found
-        on this `FTP server <https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Raw_BIDS_ID>`_.
+        The list of available subjects can be found on this
+        `FTP server <https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Raw_BIDS_ID>`_.
     condition : str
-        Can be ``'EO'`` for eyes open condition or ``'EC'`` for eyes closed
-        condition.
+        Can be ``'EO'`` for eyes open condition or ``'EC'`` for eyes closed condition.
 
     Returns
     -------
@@ -51,8 +45,8 @@ def data_path(subject_id: str, condition: str) -> Path:
     - ``pip install pymatreader``
     - ``conda install -c conda-forge pymatreader``
 
-    Note that an environment created via the MNE installers includes
-    ``pymatreader`` by default.
+    Note that an environment created via the MNE installers includes ``pymatreader`` by
+    default.
 
     References
     ----------
@@ -65,7 +59,7 @@ def data_path(subject_id: str, condition: str) -> Path:
     config = get_config()
     fetcher = pooch.create(
         path=config["PREPROCESSED_LEMON_DATASET_PATH"],
-        base_url="https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Preprocessed_BIDS_ID/EEG_Preprocessed/",  # noqa,
+        base_url="https://ftp.gwdg.de/pub/misc/MPI-Leipzig_Mind-Brain-Body-LEMON/EEG_MPILMBB_LEMON/EEG_Preprocessed_BIDS_ID/EEG_Preprocessed/",  # noqa: E501
         version=None,
         registry=None,
     )
@@ -86,8 +80,8 @@ def data_path(subject_id: str, condition: str) -> Path:
 def standardize(raw: BaseRaw):
     """Standardize :class:`~mne.io.Raw` from the lemon dataset.
 
-    This function will interpolate missing channels from the standard setup,
-    then reorder channels and finally reference to a common average.
+    This function will interpolate missing channels from the standard setup, then
+    reorder channels and finally reference to a common average.
 
     Parameters
     ----------
@@ -102,8 +96,8 @@ def standardize(raw: BaseRaw):
     Notes
     -----
     If you don't want to interpolate missing channels, you can use
-    :func:`mne.channels.equalize_channels` instead to have the same electrodes
-    across different recordings.
+    :func:`mne.channels.equalize_channels` instead to have the same electrodes across
+    different recordings.
     """
     raw = raw.copy()
     # fmt: off

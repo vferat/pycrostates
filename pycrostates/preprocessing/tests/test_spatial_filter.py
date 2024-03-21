@@ -3,7 +3,12 @@ import numpy as np
 import pytest
 from mne.channels import find_ch_adjacency
 from mne.datasets import testing
-from mne.io.pick import _picks_by_type
+from mne.utils import check_version
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_by_type
+else:
+    from mne.io.pick import _picks_by_type
 
 from pycrostates.io import ChData
 from pycrostates.preprocessing import apply_spatial_filter
@@ -115,24 +120,16 @@ def test_spatial_filter_eeg_and_meg():
     picks_non_eeg = [
         idx for idx in np.arange(len(raw_all.ch_names)) if idx not in picks_eeg
     ]
-    assert not np.all(
-        new_inst._data[picks_eeg, :] == raw_all._data[picks_eeg, :]
-    )
-    assert np.all(
-        new_inst._data[picks_non_eeg, :] == raw_all._data[picks_non_eeg, :]
-    )
+    assert not np.all(new_inst._data[picks_eeg, :] == raw_all._data[picks_eeg, :])
+    assert np.all(new_inst._data[picks_non_eeg, :] == raw_all._data[picks_non_eeg, :])
 
 
 def test_spatial_filter_custom_adjacency():
     """Test apply_spatial_filter with custom adjacency."""
     adjacency_matrix, ch_names = find_ch_adjacency(raw_all.info, "eeg")
     apply_spatial_filter(raw_all.copy(), "eeg", adjacency=adjacency_matrix)
-    with pytest.raises(
-        ValueError, match="Adjacency must have exactly 2 dimensions"
-    ):
-        apply_spatial_filter(
-            raw_all.copy(), "eeg", adjacency=np.ones((len(ch_names)))
-        )
+    with pytest.raises(ValueError, match="Adjacency must have exactly 2 dimensions"):
+        apply_spatial_filter(raw_all.copy(), "eeg", adjacency=np.ones(len(ch_names)))
     with pytest.raises(ValueError, match="Adjacency must be of shape"):
         apply_spatial_filter(
             raw_all.copy(), "eeg", adjacency=adjacency_matrix[:-2, :-2]

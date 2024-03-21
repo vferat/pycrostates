@@ -11,9 +11,7 @@ from ._fixes import _WrapStdOut
 
 
 @fill_doc
-def _init_logger(
-    *, verbose: Optional[Union[bool, str, int]] = None
-) -> logging.Logger:
+def _init_logger(*, verbose: Optional[Union[bool, str, int]] = None) -> logging.Logger:
     """Initialize a logger.
 
     Assigns sys.stdout as the first handler of the logger.
@@ -160,7 +158,7 @@ class _use_log_level:
     %(verbose)s
     """
 
-    def __init__(self, verbose: Union[bool, str, int, None] = None):
+    def __init__(self, verbose: Optional[Union[bool, str, int]] = None):
         self._old_level = logger.level
         self._level = verbose
 

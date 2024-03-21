@@ -1,11 +1,16 @@
 """Preprocessing functions to create resamples from raw or epochs instances."""
 
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import numpy as np
 from mne import BaseEpochs, pick_info
 from mne.io import BaseRaw
-from mne.io.pick import _picks_to_idx
+from mne.utils import check_version
+
+if check_version("mne", "1.6"):
+    from mne._fiff.pick import _picks_to_idx
+else:
+    from mne.io.pick import _picks_to_idx
 
 from .._typing import CHData, Picks, RANDomState
 from ..utils._checks import (
@@ -32,7 +37,7 @@ def resample(
     replace: bool = True,
     random_state: RANDomState = None,
     verbose=None,
-) -> List[CHData]:
+) -> list[CHData]:
     """Resample a recording into epochs of random samples.
 
     Resample :class:`~mne.io.Raw`. :class:`~mne.Epochs` or
@@ -48,14 +53,13 @@ def resample(
     %(tmax_raw)s
     %(reject_by_annotation_raw)s
     n_resamples : int
-        Number of resamples to draw. Each epoch can be used to fit a separate
-        clustering solution. See notes for additional information.
+        Number of resamples to draw. Each epoch can be used to fit a separate clustering
+        solution. See notes for additional information.
     n_samples : int
-        Length of each epoch (in samples). See notes for additional
-        information.
+        Length of each epoch (in samples). See notes for additional information.
     coverage : float
-        Strictly positive ratio between resampling data size and size of the
-        original recording. See notes for additional information.
+        Strictly positive ratio between resampling data size and size of the original
+        recording. See notes for additional information.
     replace : bool
         Whether or not to allow resampling with replacement.
     %(random_state)s
@@ -68,9 +72,8 @@ def resample(
 
     Notes
     -----
-    Only two of ``n_resamples``, ``n_samples`` and ``coverage``
-    parameters must be defined, the non-defined one will be
-    determine at runtime by the 2 other parameters.
+    Only two of ``n_resamples``, ``n_samples`` and ``coverage`` parameters must be
+    defined, the non-defined one will be determine at runtime by the 2 other parameters.
     """
     from ..io import ChData
 
@@ -78,9 +81,7 @@ def resample(
     if isinstance(inst, (BaseRaw, BaseEpochs)):
         tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)
     if isinstance(inst, BaseRaw):
-        reject_by_annotation = _check_reject_by_annotation(
-            reject_by_annotation
-        )
+        reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
     _check_type(n_resamples, (None, "int"), "n_resamples")
     _check_type(n_samples, (None, "int"), "n_samples")
     _check_type(coverage, (None, "numeric"), "coverage")

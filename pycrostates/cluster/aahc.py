@@ -1,7 +1,7 @@
 """Atomize and Agglomerate Hierarchical Clustering (AAHC)."""
 
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 from mne import BaseEpochs
@@ -48,9 +48,7 @@ class AAHCluster(_BaseCluster):
         # make the parameter an argument
         # https://github.com/vferat/pycrostates/pull/93#issue-1431122168
         self._ignore_polarity = True
-        self._normalize_input = AAHCluster._check_normalize_input(
-            normalize_input
-        )
+        self._normalize_input = AAHCluster._check_normalize_input(normalize_input)
 
         # fit variables
         self._GEV_ = None
@@ -158,8 +156,8 @@ class AAHCluster(_BaseCluster):
     @copy_doc(_BaseCluster.save)
     def save(self, fname: Union[str, Path]):
         super().save(fname)
-        # TODO: to be replaced by a general writer than infers the writer from
-        # the file extension.
+        # TODO: to be replaced by a general writer than infers the writer from the file
+        # extension.
         # pylint: disable=import-outside-toplevel
         from ..io.fiff import _write_cluster
 
@@ -185,7 +183,7 @@ class AAHCluster(_BaseCluster):
         n_clusters: int,
         ignore_polarity: bool,
         normalize_input: bool,
-    ) -> Tuple[float, NDArray[float], NDArray[int]]:
+    ) -> tuple[float, NDArray[float], NDArray[int]]:
         """Run the AAHC algorithm."""
         gfp_sum_sq = np.sum(data**2)
         maps, segmentation = AAHCluster._compute_maps(
@@ -202,7 +200,7 @@ class AAHCluster(_BaseCluster):
         n_clusters: int,
         ignore_polarity: bool,
         normalize_input: bool,
-    ) -> Tuple[NDArray[float], NDArray[int]]:
+    ) -> tuple[NDArray[float], NDArray[int]]:
         """Compute microstates maps."""
         n_chan, n_frame = data.shape
 
@@ -225,9 +223,7 @@ class AAHCluster(_BaseCluster):
 
             cluster = np.delete(cluster, to_remove, axis=1)
             GEV = np.delete(GEV, to_remove, axis=0)
-            assignment[assignment > to_remove] = (
-                assignment[assignment > to_remove] - 1
-            )
+            assignment[assignment > to_remove] = assignment[assignment > to_remove] - 1
 
             fit = data[:, orphans].T @ cluster
             if ignore_polarity:
@@ -239,9 +235,7 @@ class AAHCluster(_BaseCluster):
             for c in cluster_to_update:
                 members = assignment == c
                 if ignore_polarity:
-                    evecs, _, _ = np.linalg.svd(
-                        data[:, members], full_matrices=False
-                    )
+                    evecs, _, _ = np.linalg.svd(data[:, members], full_matrices=False)
                     cluster[:, c] = evecs[:, 0]
                 else:
                     cluster[:, c] = np.mean(data[:, members], axis=1)
@@ -256,7 +250,6 @@ class AAHCluster(_BaseCluster):
 
     # pylint: enable=too-many-locals
     # --------------------------------------------------------------------
-
     @property
     def normalize_input(self) -> bool:
         """If set, the input data is normalized along the channel dimension.

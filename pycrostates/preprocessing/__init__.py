@@ -7,4 +7,4 @@ from .extract_gfp_peaks import extract_gfp_peaks
 from .resample import resample
 from .spatial_filter import apply_spatial_filter
 
-__all__ = ("apply_spatial_filter", "extract_gfp_peaks", "resample")
+__all__: tuple[str, ...] = ("apply_spatial_filter", "extract_gfp_peaks", "resample")

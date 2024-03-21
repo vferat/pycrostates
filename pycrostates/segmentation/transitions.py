@@ -12,20 +12,19 @@ def compute_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: bool = True,
+    ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute the observed transition matrix.
 
-    Count the number of transitions from one state to another and aggregate the
-    result as statistic. Transitions "from" and "to" unlabeled segments ``-1``
-    are ignored.
+    Count the number of transitions from one state to another and aggregate the result
+    as statistic. Transitions "from" and "to" unlabeled segments ``-1`` are ignored.
 
     Parameters
     ----------
     %(labels_transition)s
     %(n_clusters)s
     %(stat_transition)s
-    %(ignore_self)s
+    %(ignore_repetitions)s
 
     Returns
     -------
@@ -36,7 +35,7 @@ def compute_transition_matrix(
         labels,
         n_clusters,
         stat,
-        ignore_self,
+        ignore_repetitions,
     )
 
 
@@ -44,19 +43,17 @@ def _compute_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: bool = True,
+    ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute observed transition."""
     # common error checking
-    _check_value(
-        stat, ("count", "probability", "proportion", "percent"), "stat"
-    )
-    _check_type(ignore_self, (bool,), "ignore_self")
+    _check_value(stat, ("count", "probability", "proportion", "percent"), "stat")
+    _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
 
     # reshape if epochs (returns a view)
     labels = labels.reshape(-1)
     # ignore transition to itself (i.e. 1 -> 1)
-    if ignore_self:
+    if ignore_repetitions:
         labels = [s for s, _ in groupby(labels)]
 
     T = np.zeros(shape=(n_clusters, n_clusters))
@@ -82,14 +79,14 @@ def compute_expected_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: bool = True,
+    ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute the expected transition matrix.
 
-    Compute the theoretical transition matrix as if time course was
-    ignored, but microstate proportions was kept (i.e. shuffled segmentation).
-    This matrix can be used to quantify/correct the effect of microstate
-    time coverage on the observed transition matrix obtained with the
+    Compute the theoretical transition matrix as if time course was ignored, but
+    microstate proportions was kept (i.e. shuffled segmentation). This matrix can be
+    used to quantify/correct the effect of microstate time coverage on the observed
+    transition matrix obtained with the
     :func:`pycrostates.segmentation.compute_transition_matrix`.
     Transition "from" and "to" unlabeled segments ``-1`` are ignored.
 
@@ -98,7 +95,7 @@ def compute_expected_transition_matrix(
     %(labels_transition)s
     %(n_clusters)s
     %(stat_expected_transitions)s
-    %(ignore_self)s
+    %(ignore_repetitions)s
 
     Returns
     -------
@@ -109,7 +106,7 @@ def compute_expected_transition_matrix(
         labels,
         n_clusters,
         stat,
-        ignore_self,
+        ignore_repetitions,
     )
 
 
@@ -117,7 +114,7 @@ def _compute_expected_transition_matrix(
     labels: NDArray[int],
     n_clusters: int,
     stat: str = "probability",
-    ignore_self: bool = True,
+    ignore_repetitions: bool = True,
 ) -> NDArray[float]:
     """Compute theoretical transition matrix.
 
@@ -125,7 +122,7 @@ def _compute_expected_transition_matrix(
     """
     # common error checking
     _check_value(stat, ("probability", "proportion", "percent"), "stat")
-    _check_type(ignore_self, (bool,), "ignore_self")
+    _check_type(ignore_repetitions, (bool,), "ignore_repetitions")
 
     # reshape if epochs (returns a view)
     labels = labels.reshape(-1)
@@ -146,7 +143,7 @@ def _compute_expected_transition_matrix(
 
     # ignore unlabeled
     T_expected = T_expected[:-1, :-1]
-    if ignore_self:
+    if ignore_repetitions:
         np.fill_diagonal(T_expected, 0)
     # transform to probability
     with np.errstate(divide="ignore", invalid="ignore"):
@@ -176,8 +173,7 @@ def _check_labels_n_clusters(
         raise ValueError(
             "The argument 'labels' must contain the labels of each timepoint "
             "encoded as consecutive positive integers (0-indexed). Make sure "
-            f"you are providing an integer array. '{labels.dtype}' is "
-            "invalid."
+            f"you are providing an integer array. '{labels.dtype}' is invalid."
         )
     # check for negative integers except -1
     if np.any(labels < -1):

@@ -1,165 +1,196 @@
 [build-system]
-requires = ['setuptools >= 61.0.0']
 build-backend = 'setuptools.build_meta'
+requires = ['setuptools >= 64.0.0']
 
 [project]
-name = 'pycrostates'
-version = '0.4.0.dev'
-description = 'A simple open source Python package for EEG microstate segmentation.'
-readme = 'README.md'
-license = {file = 'LICENSE'}
-requires-python = '>=3.8'
 authors = [
-    {name = 'Victor Férat', email = 'victor.ferat@unige.ch'},
-]
-maintainers = [
-    {name = 'Victor Férat', email = 'victor.ferat@unige.ch'},
-    {name = 'Mathieu Scheltienne', email = 'mathieu.scheltienne@fcbg.ch'},
-]
-keywords = [
-    'python',
-    'neuroscience',
-    'neuroimaging',
-    'eeg',
-    'microstates',
-    'brain',
+  {email = 'victor.ferat@unige.ch', name = 'Victor Férat'},
 ]
 classifiers = [
-    'Operating System :: Microsoft :: Windows',
-    'Operating System :: Unix',
-    'Operating System :: MacOS',
-    'Programming Language :: Python :: 3 :: Only',
-    'Programming Language :: Python :: 3.8',
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
-    'Programming Language :: Python :: 3.11',
-    'Natural Language :: English',
-    'License :: OSI Approved :: BSD License',
-    'Intended Audience :: Science/Research',
-    'Intended Audience :: Developers',
-    'Topic :: Scientific/Engineering',
+  'Intended Audience :: Developers',
+  'Intended Audience :: Science/Research',
+  'License :: OSI Approved :: BSD License',
+  'Natural Language :: English',
+  'Operating System :: MacOS',
+  'Operating System :: Microsoft :: Windows',
+  'Operating System :: Unix',
+  'Programming Language :: Python :: 3 :: Only',
+  'Programming Language :: Python :: 3.10',
+  'Programming Language :: Python :: 3.11',
+  'Programming Language :: Python :: 3.12',
+  'Programming Language :: Python :: 3.9',
+  'Topic :: Scientific/Engineering',
 ]
 dependencies = [
-    'numpy>=1.21',
-    'scipy',
-    'mne>=1.0.0',
-    'joblib',
-    'matplotlib',
-    'scikit-learn',
-    'pooch',
-    'decorator',
-    'jinja2',
-    'importlib-resources; python_version < "3.9"',
+  'decorator',
+  'jinja2',
+  'joblib',
+  'matplotlib>=3.5',
+  'mne>=1.2',
+  'numpy>=1.21',
+  'packaging',
+  'pooch',
+  'psutil',
+  'scikit-learn',
+  'scipy',
 ]
+description = 'A simple open source Python package for EEG microstate segmentation.'
+keywords = [
+  'brain',
+  'eeg',
+  'microstates',
+  'neuroimaging',
+  'neuroscience',
+  'python',
+]
+license = {file = 'LICENSE'}
+maintainers = [
+  {email = 'mathieu.scheltienne@fcbg.ch', name = 'Mathieu Scheltienne'},
+  {email = 'victor.ferat@unige.ch', name = 'Victor Férat'},
+]
+name = 'pycrostates'
+readme = 'README.md'
+requires-python = '>=3.9'
+version = '0.6.0.dev0'
 
 [project.optional-dependencies]
+all = [
+  'pycrostates[build]',
+  'pycrostates[docs]',
+  'pycrostates[style]',
+  'pycrostates[test]',
+]
 build = ['build', 'twine']
 docs = [
-    'memory-profiler',
-    'numpydoc',
-    'pandas',
-    'pydata-sphinx-theme',
-    'pymatreader',
-    'sphinx',
-    'sphinxcontrib-bibtex',
-    'sphinx-copybutton',
-    'sphinx-design',
-    'sphinx_gallery',
-    'sphinx-issues',
-    'seaborn',
+  'memory-profiler',
+  'numpydoc',
+  'pandas',
+  'pydata-sphinx-theme',
+  'pymatreader',
+  'seaborn',
+  'sphinx',
+  'sphinx-copybutton',
+  'sphinx-design',
+  'sphinx-issues',
+  'sphinx_gallery',
+  'sphinxcontrib-bibtex',
+]
+stubs = [
+  'isort',
+  'mypy',
+  'ruff>=0.1.8',
 ]
 style = [
-    'bibclean',
-    'black',
-    'codespell',
-    'isort',
-    'flake8',
-    'pydocstyle[toml]',
+  'bibclean',
+  'codespell[toml]>=2.2.4',
+  'isort',
+  'pydocstyle[toml]',
+  'ruff>=0.1.8',
+  'toml-sort',
+  'yamllint',
 ]
 test = [
-    'pymatreader',
-    'pytest==7.0.1',
-    'pytest-azurepipelines',
-    'pytest-cov',
-]
-all = [
-    'pycrostates[build]',
-    'pycrostates[docs]',
-    'pycrostates[style]',
-    'pycrostates[test]',
+  'pymatreader',
+  'pytest-cov',
+  'pytest>=8.0',
 ]
 
+[project.scripts]
+pycrostates-sys_info = 'pycrostates.commands.sys_info:run'
+
 [project.urls]
-homepage = 'https://pycrostates.readthedocs.io/en/master/'
 documentation = 'https://pycrostates.readthedocs.io/en/master/'
+homepage = 'https://pycrostates.readthedocs.io/en/master/'
 source = 'https://github.com/vferat/pycrostates'
 tracker = 'https://github.com/vferat/pycrostates/issues'
 
-[tool.setuptools]
-include-package-data = false
+[tool.codespell]
+check-filenames = true
+check-hidden = true
+ignore-words = '.codespellignore'
+skip = 'build,.git,.mypy_cache,.pytest_cache,paper/*'
 
-[tool.setuptools.packages.find]
-include = ['pycrostates*']
-exclude = ['pycrostates*tests']
-
-[tool.setuptools.package-data]
-"pycrostates.datasets" = ["**/*.txt"]
-"pycrostates.html_templates" = ["repr/*.jinja"]
-
-[tool.black]
-line-length = 79
-target-version = ['py37']
-include = '\.pyi?$'
-extend-exclude = '''
-(
-      __pycache__
-    | \.github
-    | setup.py
-    | docs/
-    | tutorials/
-    | pycrostates/html_templates/repr
-)
-'''
-
-[tool.isort]
-profile = 'black'
-multi_line_output = 3
-line_length = 79
-py_version = 37
-extend_skip_glob = [
-    'setup.py',
-    'docs/*',
-    'tutorials/*',
-    'pycrostates/html_templates/repr/*',
+[tool.coverage.report]
+exclude_lines = [
+  'if __name__ == .__main__.:',
+  'if TYPE_CHECKING:',
+  'pragma: no cover',
 ]
-
-[tool.pydocstyle]
-convention = 'numpy'
-ignore-decorators= '(copy_doc|property|.*setter|.*getter)'
-match = '^(?!setup|__init__|test_).*\.py'
-match-dir = '^(?!docs|tutorials|build|dist|\.).*'
-add_ignore = 'D100,D104,D107'
-
-[tool.pytest.ini_options]
-minversion = '6.0'
-addopts = '--durations 20 --junit-xml=junit-results.xml --verbose'
-filterwarnings = [
-    "ignore:Matplotlib is currently using agg:UserWarning",
-]
+precision = 2
 
 [tool.coverage.run]
 branch = true
 cover_pylib = false
 omit = [
-    '**/__init__.py',
-    '**/pycrostates/_version.py',
-    '**/pycrostates/utils/_fixes.py',
-    '**/tests/**',
+  '**/__init__.py',
+  '**/pycrostates/_version.py',
+  '**/pycrostates/conftest.py',
+  '**/pycrostates/utils/_fixes.py',
+  '**/tests/**',
 ]
 
-[tool.coverage.report]
-exclude_lines = [
-    'pragma: no cover',
-    'if __name__ == .__main__.:',
+[tool.isort]
+extend_skip_glob = [
+  'docs/*',
+  'paper/',
+  'pycrostates/html_templates/repr/*',
+  'setup.py',
+  'tutorials/*',
 ]
-precision = 2
+line_length = 88
+multi_line_output = 3
+profile = 'black'
+py_version = 39
+
+[tool.pydocstyle]
+add_ignore = 'D100,D104,D107'
+convention = 'numpy'
+ignore-decorators = '(copy_doc|property|.*setter|.*getter|pyqtSlot|Slot)'
+match = '^(?!setup|__init__|test_).*\.py'
+match-dir = '^pycrostates.*'
+
+[tool.pytest.ini_options]
+addopts = '--durations 20 --junit-xml=junit-results.xml -v --color=yes'
+junit_family = 'xunit2'
+minversion = '8.0'
+
+[tool.ruff]
+extend-exclude = [
+  'doc',
+  'setup.py',
+]
+line-length = 88
+target-version = 'py39'
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+ignore = []
+select = ['A', 'B', 'E', 'F', 'UP', 'W']
+
+[tool.ruff.lint.per-file-ignores]
+'*' = [
+  'B904', # 'Within an except clause, raise exceptions with raise ... from ...'
+  'UP007', # 'Use `X | Y` for type annotations', requires python 3.10
+]
+'*.pyi' = ['E501']
+'*/cluster/_base.pyi' = ['B006']
+'*/segmentation/_base.pyi' = ['F811']
+'__init__.py' = ['F401']
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.package-data]
+'pycrostates.datasets' = ['**/*.txt']
+'pycrostates.html_templates' = ['repr/*.jinja']
+
+[tool.setuptools.packages.find]
+exclude = ['pycrostates*tests']
+include = ['pycrostates*']
+
+[tool.tomlsort]
+all = true
+ignore_case = true
+trailing_comma_inline_array = true

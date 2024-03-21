@@ -4,13 +4,12 @@ from collections import OrderedDict
 
 import numpy as np
 import pytest
-from mne import create_info
+from mne import Transform, create_info
 from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import read_raw_fif
 from mne.io.constants import FIFF
-from mne.transforms import Transform
-from mne.utils import check_version
+from numpy.testing import assert_allclose
 
 from pycrostates.io import ChInfo
 from pycrostates.utils._logs import logger, set_log_level
@@ -61,7 +60,7 @@ def test_create_from_info():
     info.set_montage("standard_1020")
     chinfo = ChInfo(info=info)
     assert chinfo["ch_names"] == ["Fp1", "Fp2", "Fpz"]
-    for k, ch in enumerate(info["chs"]):
+    for ch in info["chs"]:
         assert ch["coord_frame"] == FIFF.FIFFV_COORD_HEAD
         assert not all(np.isnan(elt) for elt in ch["loc"])
     assert chinfo["dig"] is not None
@@ -119,9 +118,7 @@ def test_create_from_info_invalid_arguments():
         ChInfo(info, ch_names=ch_names)
     with pytest.raises(RuntimeError, match="If 'info' is provided"):
         ChInfo(info, ch_types=ch_types)
-    with pytest.raises(
-        TypeError, match="'info' must be an instance of None " "or Info"
-    ):
+    with pytest.raises(TypeError, match="'info' must be an instance of None or Info"):
         ChInfo(info=ch_names)
 
 
@@ -220,8 +217,7 @@ def test_create_without_arguments():
     """Test error raised if both arguments are None."""
     with pytest.raises(
         RuntimeError,
-        match="Either 'info' or 'ch_names' and "
-        "'ch_types' must not be None.",
+        match="Either 'info' or 'ch_names' and 'ch_types' must not be None.",
     ):
         ChInfo()
 
@@ -232,7 +228,7 @@ def test_montage():
     info.set_montage("standard_1020")
     chinfo = ChInfo(info=info)
     assert chinfo["ch_names"] == ["Fp1", "Fp2", "Fpz"]
-    for k, ch in enumerate(info["chs"]):
+    for ch in info["chs"]:
         assert ch["coord_frame"] == FIFF.FIFFV_COORD_HEAD
         assert not all(np.isnan(elt) for elt in ch["loc"])
     assert chinfo["dig"] is not None
@@ -261,16 +257,12 @@ def test_montage():
         if montage.get_positions()[key] is None:
             assert montage2.get_positions()[key] is None
         elif isinstance(montage.get_positions()[key], str):
-            assert (
-                montage.get_positions()[key] == montage2.get_positions()[key]
-            )
+            assert montage.get_positions()[key] == montage2.get_positions()[key]
         elif isinstance(montage.get_positions()[key], np.ndarray):
-            assert np.allclose(
-                montage.get_positions()[key], montage2.get_positions()[key]
-            )
+            assert_allclose(montage.get_positions()[key], montage2.get_positions()[key])
         elif isinstance(montage.get_positions()[key], OrderedDict):
-            for k, v in montage.get_positions()[key].items():
-                assert np.allclose(
+            for k in montage.get_positions()[key]:
+                assert_allclose(
                     montage.get_positions()[key][k],
                     montage2.get_positions()[key][k],
                 )
@@ -324,7 +316,7 @@ def test_setting_invalid_keys():
     chinfo = ChInfo(info=info)
 
     with pytest.raises(
-        RuntimeError, match="Supported keys are 'bads', 'ch_names', 'chs'"
+        RuntimeError, match="Info does not support directly setting the key 'test'"
     ):
         chinfo["test"] = 5
 
@@ -337,17 +329,6 @@ def test_setting_invalid_keys():
 
     with pytest.raises(RuntimeError, match="info channel name inconsistency"):
         chinfo._check_consistency()
-
-
-def test_invalid_attributes():
-    """Test that attribute error is raised when calling invalid attributes or
-    methods."""
-    info = create_info(ch_names=3, sfreq=1, ch_types="eeg")
-    chinfo = ChInfo(info=info)
-    with pytest.raises(
-        AttributeError, match="'ChInfo' has not attribute 'pick_channels'"
-    ):
-        chinfo.pick_channels(["1"])
 
 
 def test_comparison(caplog):
@@ -395,7 +376,4 @@ def test_comparison(caplog):
     assert chinfo1 == chinfo2
     with chinfo1._unlock():
         chinfo1["projs"] = []
-    if check_version("mne", "1.2"):
-        assert chinfo1 != chinfo2
-    else:
-        assert chinfo1 == chinfo2
+    assert chinfo1 != chinfo2

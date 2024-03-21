@@ -1,0 +1,16 @@
+.. NOTE: we use cross-references to highlight new functions and classes.
+   Please follow the examples below, so the changelog page will have a link to
+   the function/class documentation.
+
+.. NOTE: there are 3 separate sections for changes, based on type:
+   - "Enhancements" for new features
+   - "Bugs" for bug fixes
+   - "API changes" for backward-incompatible changes
+
+.. include:: ./names.inc
+
+Version 0.5
+-----------
+
+- Add :func:`~pycrostates.segmentation.entropy`, :func:`~pycrostates.segmentation.excess_entropy_rate`, :func:`~pycrostates.segmentation.auto_information_function` and :func:`~pycrostates.segmentation.partial_auto_information_function` (:pr:`112` by `Victor Férat`_ and `Frederic von Wegner`_)
+- Improve figure size in :func:`~pycrostates.viz.plot_cluster_centers` and add explicit ``show`` argument in visualization functions (:pr:`158` by `Mathieu Scheltienne`_)

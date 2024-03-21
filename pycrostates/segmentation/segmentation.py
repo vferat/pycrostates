@@ -32,9 +32,8 @@ class RawSegmentation(_BaseSegmentation):
         _check_type(self._inst, (BaseRaw,), item_name="raw")
         if self._labels.ndim != 1:
             raise ValueError(
-                "Argument 'labels' should be a 1D array. The provided array "
-                f"shape is {self._labels.shape} which has {self._labels.ndim} "
-                "dimensions."
+                "Argument 'labels' should be a 1D array. The provided array shape "
+                f"is {self._labels.shape} which has {self._labels.ndim} dimensions."
             )
 
         if self._inst.times.size != self._labels.shape[-1]:
@@ -54,6 +53,7 @@ class RawSegmentation(_BaseSegmentation):
         cbar_axes: Optional[Axes] = None,
         *,
         block: bool = False,
+        show: Optional[bool] = None,
         verbose: Optional[str] = None,
     ):
         """Plot the segmentation.
@@ -66,6 +66,7 @@ class RawSegmentation(_BaseSegmentation):
         %(axes_seg)s
         %(axes_cbar)s
         %(block)s
+        %(show)s
         %(verbose)s
 
         Returns
@@ -85,6 +86,7 @@ class RawSegmentation(_BaseSegmentation):
             axes=axes,
             cbar_axes=cbar_axes,
             block=block,
+            show=show,
             verbose=verbose,
         )
 
@@ -115,9 +117,8 @@ class EpochsSegmentation(_BaseSegmentation):
 
         if self._labels.ndim != 2:
             raise ValueError(
-                "Argument 'labels' should be a 2D array. The provided array "
-                f"shape is {self._labels.shape} which has {self._labels.ndim} "
-                "dimensions."
+                "Argument 'labels' should be a 2D array. The provided array shape "
+                f"is {self._labels.shape} which has {self._labels.ndim} dimensions."
             )
         if len(self._inst) != self._labels.shape[0]:
             raise ValueError(
@@ -129,8 +130,7 @@ class EpochsSegmentation(_BaseSegmentation):
             raise ValueError(
                 "Provided MNE epochs and labels do not have the same number "
                 f"of samples. The 'epochs' have {self._inst.times.size} "
-                f"samples, while the 'labels' has {self._labels.shape[-1]} "
-                "samples."
+                f"samples, while the 'labels' has {self._labels.shape[-1]} samples."
             )
 
     @fill_doc
@@ -141,6 +141,7 @@ class EpochsSegmentation(_BaseSegmentation):
         cbar_axes: Optional[Axes] = None,
         *,
         block: bool = False,
+        show: Optional[bool] = None,
         verbose=None,
     ):
         """Plot segmentation.
@@ -151,6 +152,7 @@ class EpochsSegmentation(_BaseSegmentation):
         %(axes_seg)s
         %(axes_cbar)s
         %(block)s
+        %(show)s
         %(verbose)s
 
         Returns
@@ -168,6 +170,7 @@ class EpochsSegmentation(_BaseSegmentation):
             axes=axes,
             cbar_axes=cbar_axes,
             block=block,
+            show=show,
             verbose=verbose,
         )
 

@@ -2,22 +2,24 @@
 
 from copy import deepcopy
 from numbers import Number
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
 
 import numpy as np
-from mne.io import Info
+from mne import Info, Projection, Transform
 from mne.io.constants import FIFF
-from mne.io.meas_info import (
-    _check_bads,
-    _check_ch_keys,
-    _check_dev_head_t,
-    _unique_channel_names,
-)
-from mne.io.pick import get_channel_type_constants
-from mne.io.proj import Projection
-from mne.io.tag import _ch_coord_dict
-from mne.transforms import Transform
 from mne.utils import check_version
+
+if check_version("mne", "1.6"):
+    from mne._fiff.meas_info import _check_ch_keys, _unique_channel_names
+    from mne._fiff.pick import get_channel_type_constants
+    from mne._fiff.tag import _ch_coord_dict
+else:
+    from mne.io.meas_info import (
+        _check_ch_keys,
+        _unique_channel_names,
+    )
+    from mne.io.pick import get_channel_type_constants
+    from mne.io.tag import _ch_coord_dict
 
 from .._typing import CHInfo
 from ..utils._checks import _check_type, _IntLike
@@ -28,66 +30,62 @@ class ChInfo(CHInfo, Info):
     """Atemporal measurement information.
 
     Similar to a :class:`mne.Info` class, but without any temporal information.
-    Only the channel-related information are present. A
-    :class:`~pycrostates.io.ChInfo` can be created either:
+    Only the channel-related information are present. A :class:`~pycrostates.io.ChInfo`
+    can be created either:
 
-    - by providing a :class:`~mne.Info` class from which information are
-      retrieved.
-    - by providing the ``ch_names`` and the ``ch_types`` to create a new
-      instance.
+    - by providing a :class:`~mne.Info` class from which information are retrieved.
+    - by providing the ``ch_names`` and the ``ch_types`` to create a new instance.
 
     Only one of those 2 methods should be used at once.
 
-    .. warning:: The only entry that should be manually changed by the user
-                 is ``info['bads']``. All other entries should be
-                 considered read-only, though they can be modified by various
-                 functions or methods (which have safeguards to ensure all
-                 fields remain in sync).
+    .. warning:: The only entry that should be manually changed by the user is
+                 ``info['bads']``. All other entries should be considered read-only,
+                 though they can be modified by various functions or methods (which have
+                 safeguards to ensure all fields remain in sync).
 
     Parameters
     ----------
     info : Info | None
-        MNE measurement information instance from which channel-related
-        variables are retrieved.
+        MNE measurement information instance from which channel-related variables are
+        retrieved.
     ch_names : list of str | int | None
-        Channel names. If an int, a list of channel names will be created
-        from ``range(ch_names)``.
+        Channel names. If an int, a list of channel names will be created from
+        ``range(ch_names)``.
     ch_types : list of str | str | None
         Channel types. If str, all channels are assumed to be of the same type.
 
     Attributes
     ----------
     bads : list of str
-        List of bad (noisy/broken) channels, by name. These channels will by
-        default be ignored by many processing steps.
+        List of bad (noisy/broken) channels, by name. These channels will by default be
+        ignored by many processing steps.
     ch_names : tuple of str
         The names of the channels.
     chs : tuple of dict
-        A list of channel information dictionaries, one per channel.
-        See Notes for more information.
+        A list of channel information dictionaries, one per channel. See Notes for more
+        information.
     comps : list of dict
-        CTF software gradient compensation data.
-        See Notes for more information.
+        CTF software gradient compensation data. See Notes for more information.
     ctf_head_t : dict | None
-        The transformation from 4D/CTF head coordinates to Neuromag head
-        coordinates. This is only present in 4D/CTF data.
-    custom_ref_applied : int
-        Whether a custom (=other than average) reference has been applied to
-        the EEG data. This flag is checked by some algorithms that require an
-        average reference to be set.
-    dev_ctf_t : dict | None
-        The transformation from device coordinates to 4D/CTF head coordinates.
+        The transformation from 4D/CTF head coordinates to Neuromag head coordinates.
         This is only present in 4D/CTF data.
+    custom_ref_applied : int
+        Whether a custom (=other than average) reference has been applied to the EEG
+        data. This flag is checked by some algorithms that require an average reference
+        to be set.
+    dev_ctf_t : dict | None
+        The transformation from device coordinates to 4D/CTF head coordinates. This is
+        only present in 4D/CTF data.
     dev_head_t : dict | None
         The device to head transformation.
     dig : tuple of dict | None
-        The Polhemus digitization data in head coordinates.
-        See Notes for more information.
+        The Polhemus digitization data in head coordinates. See Notes for more
+        information.
     nchan : int
         Number of channels.
     projs : list of Projection
-        List of SSP operators that operate on the data.
-        See :class:`mne.Projection` for details.
+        List of SSP operators that operate on the data. See :class:`mne.Projection` for
+        details.
 
     Notes
     -----
@@ -96,9 +94,8 @@ class ChInfo(CHInfo, Info):
     * ``chs`` list of dict:
 
         cal : float
-            The calibration factor to bring the channels to physical
-            units. Used in product with ``range`` to scale the data read
-            from disk.
+            The calibration factor to bring the channels to physical units. Used in
+            product with ``range`` to scale the data read from disk.
         ch_name : str
             The channel name.
         coil_type : int
@@ -108,18 +105,16 @@ class ChInfo(CHInfo, Info):
         kind : int
             The kind of channel, e.g. ``FIFFV_EEG_CH``.
         loc : array, shape (12,)
-            Channel location. For MEG this is the position plus the
-            normal given by a 3x3 rotation matrix. For EEG this is the
-            position followed by reference position (with 6 unused).
-            The values are specified in device coordinates for MEG and in
-            head coordinates for EEG channels, respectively.
+            Channel location. For MEG this is the position plus the normal given by a
+            3x3 rotation matrix. For EEG this is the position followed by reference
+            position (with 6 unused). The values are specified in device coordinates for
+            MEG and in head coordinates for EEG channels, respectively.
         logno : int
-            Logical channel number, conventions in the usage of this
-            number vary.
+            Logical channel number, conventions in the usage of this number vary.
         range : float
-            The hardware-oriented part of the calibration factor.
-            This should be only applied to the continuous raw data.
-            Used in product with ``cal`` to scale data read from disk.
+            The hardware-oriented part of the calibration factor. This should be only
+            applied to the continuous raw data. Used in product with ``cal`` to scale
+            data read from disk.
         scanno : int
             Scanning order number, starting from 1.
         unit : int
@@ -144,51 +139,15 @@ class ChInfo(CHInfo, Info):
     * ``dig`` list of dict:
 
         kind : int
-            The kind of channel,
-            e.g. ``FIFFV_POINT_EEG``, ``FIFFV_POINT_CARDINAL``.
+            The kind of channel, e.g. ``FIFFV_POINT_EEG``, ``FIFFV_POINT_CARDINAL``.
         r : array, shape (3,)
             3D position in m. and coord_frame.
         ident : int
-            Number specifying the identity of the point.
-            e.g. ``FIFFV_POINT_NASION`` if kind is ``FIFFV_POINT_CARDINAL``, or
-            42 if kind is ``FIFFV_POINT_EEG``.
+            Number specifying the identity of the point. e.g. ``FIFFV_POINT_NASION`` if
+            kind is ``FIFFV_POINT_CARDINAL``, or 42 if kind is ``FIFFV_POINT_EEG``.
         coord_frame : int
             The coordinate frame used, e.g. ``FIFFV_COORD_HEAD``.
     """
-
-    # valid items
-    # fmt: off
-    _attributes = {
-        "bads": _check_bads,
-        "ch_names": "ch_names cannot be set directly. "
-                    "Please use methods inst.add_channels(), "
-                    "inst.drop_channels(), inst.pick_channels(), "
-                    "inst.rename_channels(), inst.reorder_channels() "
-                    "and inst.set_channel_types() instead.",
-        "chs": "chs cannot be set directly. "
-               "Please use methods inst.add_channels(), "
-               "inst.drop_channels(), inst.pick_channels(), "
-               "inst.rename_channels(), inst.reorder_channels() "
-               "and inst.set_channel_types() instead.",
-        "comps": "comps cannot be set directly. "
-                 "Please use method Raw.apply_gradient_compensation() "
-                 "instead.",
-        "ctf_head_t": "ctf_head_t cannot be set directly.",
-        "custom_ref_applied": "custom_ref_applied cannot be set directly. "
-                              "Please use method inst.set_eeg_reference() "
-                              "instead.",
-        "dev_ctf_t": "dev_ctf_t cannot be set directly.",
-        "dev_head_t": _check_dev_head_t,
-        "dig": "dig cannot be set directly. "
-               "Please use method inst.set_montage() instead.",
-        "nchan": "nchan cannot be set directly. "
-                 "Please use methods inst.add_channels(), "
-                 "inst.drop_channels(), and inst.pick_channels() instead.",
-        "projs": "projs cannot be set directly. "
-                 "Please use methods inst.add_proj() and inst.del_proj() "
-                 "instead.",
-    }
-    # fmt: on
 
     def __init__(
         self,
@@ -196,32 +155,27 @@ class ChInfo(CHInfo, Info):
         ch_names: Optional[
             Union[
                 int,
-                List[str],
-                Tuple[str, ...],
+                list[str],
+                tuple[str, ...],
             ]
         ] = None,
-        ch_types: Optional[Union[str, List[str], Tuple[str, ...]]] = None,
+        ch_types: Optional[Union[str, list[str], tuple[str, ...]]] = None,
     ):
         if all(arg is None for arg in (info, ch_names, ch_types)):
             raise RuntimeError(
                 "Either 'info' or 'ch_names' and 'ch_types' must not be None."
             )
-        if info is None and all(
-            arg is not None for arg in (ch_names, ch_types)
-        ):
+        if info is None and all(arg is not None for arg in (ch_names, ch_types)):
             _check_type(ch_names, (None, "int", list, tuple), "ch_names")
             _check_type(ch_types, (None, str, list, tuple), "ch_types")
             self._init_from_channels(ch_names, ch_types)
-        elif info is not None and all(
-            arg is None for arg in (ch_names, ch_types)
-        ):
+        elif info is not None and all(arg is None for arg in (ch_names, ch_types)):
             _check_type(info, (None, Info), "info")
             self._init_from_info(info)
         else:
             raise RuntimeError(
                 "If 'info' is provided, 'ch_names' and 'ch_types' must be "
-                "None. If 'ch_names' and 'ch_types' are provided, 'info' "
-                "must be None."
+                "None. If 'ch_names' and 'ch_types' are provided, 'info' must be None."
             )
 
     def _init_from_info(self, info: Info):
@@ -241,8 +195,8 @@ class ChInfo(CHInfo, Info):
 
     def _init_from_channels(
         self,
-        ch_names: Union[int, List[str], Tuple[str, ...]],
-        ch_types: Union[str, List[str], Tuple[str, ...]],
+        ch_names: Union[int, list[str], tuple[str, ...]],
+        ch_types: Union[str, list[str], tuple[str, ...]],
     ):
         """Init instance from channel names and types."""
         self._unlocked = True
@@ -287,8 +241,7 @@ class ChInfo(CHInfo, Info):
             _check_type(ch_type, (str,))
             if ch_type not in ch_types_dict:
                 raise KeyError(
-                    f"kind must be one of {list(ch_types_dict)}, not "
-                    f"{ch_type}."
+                    f"kind must be one of {list(ch_types_dict)}, not {ch_type}."
                 )
             this_ch_dict = ch_types_dict[ch_type]
             kind = this_ch_dict["kind"]
@@ -333,9 +286,7 @@ class ChInfo(CHInfo, Info):
         # invalid attributes
         _inv_attributes = ()
         # invalid methods/properties
-        _inv_methods = (
-            "pick_channels"  # TODO: Can be removed when req. for MNE = 1.1.0
-        )
+        _inv_methods = ()
         if name in _inv_attributes or name in _inv_methods:
             raise AttributeError(
                 f"'{self.__class__.__name__}' has not attribute '{name}'"
@@ -379,10 +330,9 @@ class ChInfo(CHInfo, Info):
             # compare projs, compatible with mne 1.2 and above
             if len(self["projs"]) != len(other["projs"]):
                 return False
-            if check_version("mne", "1.2"):
-                for proj1, proj2 in zip(self["projs"], other["projs"]):
-                    if proj1 != proj2:
-                        return False
+            for proj1, proj2 in zip(self["projs"], other["projs"]):
+                if proj1 != proj2:
+                    return False
 
             # TODO: compare compensation grades
 
@@ -398,25 +348,6 @@ class ChInfo(CHInfo, Info):
         return not self.__eq__(other)
 
     # ------------------------------------------------------------------------
-    def __setitem__(self, key, val):
-        """Setter for Dictionary item."""
-        # During unpickling, the _unlocked attribute has not been set, so
-        # let __setstate__ do it later and act unlocked now
-        unlocked = getattr(self, "_unlocked", True)
-        if key in self._attributes:
-            if isinstance(self._attributes[key], str):
-                if not unlocked:
-                    raise RuntimeError(self._attributes[key])
-            else:
-                val = self._attributes[key](val)  # attribute checker function
-        else:
-            raise RuntimeError(
-                f"Info does not support setting the key {repr(key)}. "
-                "Supported keys are "
-                f"{', '.join(repr(k) for k in self._attributes)}"
-            )
-        super().__setitem__(key, val)  # calls the dict __setitem__
-
     def __deepcopy__(self, memodict):
         """Make a deepcopy."""
         result = ChInfo.__new__(ChInfo)
@@ -459,7 +390,7 @@ class ChInfo(CHInfo, Info):
         ):
             raise RuntimeError(
                 f"{prepend_error}info channel name inconsistency detected, "
-                "please notify developers."
+                "please notify the developers."
             )
 
         for pi, proj in enumerate(self.get("projs", [])):

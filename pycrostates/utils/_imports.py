@@ -1,25 +1,40 @@
-"""
-Optional dependency import.
+"""Handle optional dependency imports.
 
-Inspired from pandas: https://pandas.pydata.org/.
+Inspired from pandas: https://pandas.pydata.org/
 """
+
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
 import importlib
+from typing import TYPE_CHECKING
+from warnings import warn
 
-from ._logs import logger
+if TYPE_CHECKING:
+    from types import ModuleType
+    from typing import Optional
 
 # A mapping from import name to package name (on PyPI) when the package name
-# is different. {python: PyPI}
-INSTALL_MAPPING = {}
+# is different.
+_INSTALL_MAPPING: dict[str, str] = {
+    "codespell_lib": "codespell",
+    "cv2": "opencv-python",
+    "parallel": "pyparallel",
+    "pytest_cov": "pytest-cov",
+    "serial": "pyserial",
+    "sklearn": "scikit-learn",
+    "sksparse": "scikit-sparse",
+}
 
 
 def import_optional_dependency(
-    name: str, extra: str = "", raise_error: bool = True
-):
-    """
-    Import an optional dependency.
+    name: str,
+    extra: str = "",
+    raise_error: bool = True,
+) -> Optional[ModuleType]:
+    """Import an optional dependency.
 
-    By default, if a dependency is missing an ImportError with a nice message
-    will be raised.
+    By default, if a dependency is missing an ImportError with a nice message will be
+    raised.
 
     Parameters
     ----------
@@ -29,31 +44,29 @@ def import_optional_dependency(
         Additional text to include in the ImportError message.
     raise_error : bool
         What to do when a dependency is not found.
-        * True : If the module is not installed, raise an ImportError,
-                 otherwise, return the module.
-        * False: If the module is not installed, issue a warning and return
-                 None, otherwise, return the module.
+        * True : Raise an ImportError.
+        * False: Return None.
 
     Returns
     -------
-    maybe_module : Optional[ModuleType]
+    module : Module | None
         The imported module when found.
-        None is returned when the package is not found and raise_error is
-        False.
+        None is returned when the package is not found and raise_error is False.
     """
-    package_name = INSTALL_MAPPING.get(name)
+    package_name = _INSTALL_MAPPING.get(name)
     install_name = package_name if package_name is not None else name
 
     try:
         module = importlib.import_module(name)
     except ImportError:
         msg = (
-            f"Missing optional dependency '{install_name}'. {extra} "
-            + f"Use pip or conda to install '{install_name}'."
+            f"Missing optional dependency '{install_name}'. {extra} Use pip or "
+            f"conda to install {install_name}."
         )
         if raise_error:
             raise ImportError(msg)
-        logger.warning(msg)
-        return None
+        else:
+            warn(msg, RuntimeWarning, stacklevel=2)
+            return None
 
     return module
