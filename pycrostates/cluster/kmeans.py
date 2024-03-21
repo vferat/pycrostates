@@ -5,6 +5,7 @@ from __future__ import annotations  # c.f. PEP 563, PEP 649
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import numpy as np
 from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.parallel import parallel_func
