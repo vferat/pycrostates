@@ -1,6 +1,5 @@
 from __future__ import annotations  # c.f. PEP 563, PEP 649
 
-from abc import ABC
 from typing import Generic, Optional, TypeVar, Union
 
 import numpy as np
@@ -27,12 +26,6 @@ class ScalarArray(np.ndarray, Generic[ScalarType]):
 
 
 class AxesArray(np.ndarray, Generic[TypeVar("AxesType", bound=Axes)]):
-    pass
-
-
-class Segmentation(ABC):  # noqa: B024
-    """Typing for a clustering class."""
-
     pass
 
 

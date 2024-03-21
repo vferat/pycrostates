@@ -1,6 +1,6 @@
 from __future__ import annotations  # c.f. PEP 563, PEP 649
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from copy import copy, deepcopy
 from itertools import groupby
 from pathlib import Path
@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     from ..io import ChData
 
 
-class _BaseCluster(ChannelsMixin, ContainsMixin, MontageMixin):
+class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     """Base Class for Microstates Clustering algorithms."""
 
     @abstractmethod

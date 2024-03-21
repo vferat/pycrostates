@@ -1,8 +1,10 @@
 """Segmentation module for segmented data."""
 
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
 import itertools
-from abc import abstractmethod
-from typing import Optional, Union
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 import numpy as np
 from matplotlib.axes import Axes
@@ -10,7 +12,6 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.utils import check_version
 
-from .._typing import ScalarFloatArray, ScalarIntArray, Segmentation
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
@@ -19,9 +20,14 @@ from ..viz import plot_cluster_centers
 from .entropy import entropy
 from .transitions import _compute_expected_transition_matrix, _compute_transition_matrix
 
+if TYPE_CHECKING:
+    from typing import Optional, Union
+
+    from .._typing import ScalarFloatArray, ScalarIntArray
+
 
 @fill_doc
-class _BaseSegmentation(Segmentation):
+class _BaseSegmentation(ABC):
     """Base class for a Microstates segmentation.
 
     Parameters

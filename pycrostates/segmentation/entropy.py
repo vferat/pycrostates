@@ -5,16 +5,22 @@ F. von Wegner, Partial Autoinformation to Characterize Symbolic Sequences
 Front Physiol (2018) https://doi.org/10.3389/fphys.2018.01382
 """
 
-import itertools
-from typing import Optional, Union
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 import scipy.stats
 from mne.parallel import parallel_func
 
-from .._typing import ScalarFloatArray, ScalarIntArray, Segmentation
 from ..utils._checks import _check_n_jobs, _check_type, _check_value, _ensure_int
 from ..utils._docs import fill_doc
+from ._base import _BaseSegmentation
+
+if TYPE_CHECKING:
+    from typing import Optional, Union
+
+    from .._typing import ScalarFloatArray, ScalarIntArray
 
 
 def _check_log_base(log_base) -> float:
@@ -112,7 +118,7 @@ def _check_labels(labels, item_name: str = "labels") -> None:
 def _check_segmentation(
     segmentation, item_name: str = "segmentation"
 ) -> ScalarIntArray:
-    _check_type(segmentation, (Segmentation,), item_name)
+    _check_type(segmentation, (_BaseSegmentation,), item_name)
     return segmentation._labels.reshape(-1)  # reshape if epochs (returns a view)
 
 
@@ -193,7 +199,7 @@ def _entropy(
 
 @fill_doc
 def entropy(
-    segmentation: Segmentation,
+    segmentation: _BaseSegmentation,
     ignore_repetitions: bool = False,
     log_base: Union[float, str] = 2,
 ) -> float:
@@ -274,7 +280,7 @@ def _excess_entropy_rate(
 
 @fill_doc
 def excess_entropy_rate(
-    segmentation: Segmentation,
+    segmentation: _BaseSegmentation,
     history_length: int,
     ignore_repetitions: bool = False,
     log_base: Union[float, str] = 2,
@@ -380,7 +386,7 @@ def _auto_information(
 
 @fill_doc
 def auto_information_function(
-    segmentation: Segmentation,
+    segmentation: _BaseSegmentation,
     lags: Union[
         int,
         list[int],
@@ -491,7 +497,7 @@ def _partial_auto_information(
 
 @fill_doc
 def partial_auto_information_function(
-    segmentation: Segmentation,
+    segmentation: _BaseSegmentation,
     lags: Union[
         int,
         list[int],
