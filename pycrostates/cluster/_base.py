@@ -39,11 +39,11 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
 
-    from .._typing import AxesArray, Cluster, Picks, ScalarFloatArray, ScalarIntArray
+    from .._typing import AxesArray, Picks, ScalarFloatArray, ScalarIntArray
     from ..io import ChData
 
 
-class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
+class _BaseCluster(ChannelsMixin, ContainsMixin, MontageMixin):
     """Base Class for Microstates Clustering algorithms."""
 
     @abstractmethod
@@ -357,7 +357,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                 ScalarIntArray,
             ]
         ] = None,
-        template: Optional[Cluster] = None,
+        template: Optional[_BaseCluster] = None,
     ) -> None:
         """
         Reorder the clusters of the fitted model.

@@ -1,9 +1,16 @@
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 import scipy
 
-from ..._typing import Cluster, ScalarFloatArray
 from ...utils._checks import _check_type
 from ...utils._docs import fill_doc
+
+if TYPE_CHECKING:
+    from ..._typing import ScalarFloatArray
+    from .._base import _BaseCluster
 
 
 def _optimize_order(
@@ -20,7 +27,7 @@ def _optimize_order(
 
 
 @fill_doc
-def optimize_order(inst: Cluster, template_inst: Cluster):
+def optimize_order(inst: _BaseCluster, template_inst: _BaseCluster):
     """Optimize the order of cluster centers between two cluster instances.
 
     Optimize the order of cluster centers in an instance of a clustering algorithm to

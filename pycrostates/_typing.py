@@ -30,12 +30,6 @@ class AxesArray(np.ndarray, Generic[TypeVar("AxesType", bound=Axes)]):
     pass
 
 
-class Cluster(ABC):  # noqa: B024
-    """Typing for a clustering class."""
-
-    pass
-
-
 class Segmentation(ABC):  # noqa: B024
     """Typing for a clustering class."""
 
