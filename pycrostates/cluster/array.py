@@ -1,143 +1,115 @@
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
-from mne import BaseEpochs
-from mne.io import BaseRaw
-from numpy.typing import NDArray
+from mne import Info
 
-from .._typing import Picks
-from ..utils import _corr_vectors
+from ..io import ChInfo
+from ..utils._checks import _check_type
 from ..utils._docs import copy_doc
-from ..utils._logs import logger
 from ._base import _BaseCluster
 
+if TYPE_CHECKING:
+    from typing import Optional, Union
 
-class Custom(_BaseCluster):
-    def __init__(self, n_clusters: int):
-        super().__init__()
+    from numpy.typing import NDArray
 
-        # needed codes for custom
-        self._n_clusters = _BaseCluster._check_n_clusters(n_clusters)
-        self._cluster_names = [str(k) for k in range(self.n_clusters)]
 
-        # fit variables
-        self._GEV_ = None
-
-    # left for empty
-    def _repr_html_(self, caption=None):
-        return None
-
-    # left for empty
-    @copy_doc(_BaseCluster.__eq__)
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, Custom):
-            if not super().__eq__(other):
-                return False
-
-            attributes = ("_GEV_",)
-            for attribute in attributes:
-                try:
-                    attr1 = self.__getattribute__(attribute)
-                    attr2 = other.__getattribute__(attribute)
-                except AttributeError:
-                    return False
-                if attr1 != attr2:
-                    return False
-
-            return True
-        return None
-
-    # left for empty
-    @copy_doc(_BaseCluster.__ne__)
-    def __ne__(self, other: Any) -> bool:
-        return not self.__eq__(other)
-
-    def _check_fit(self):
-        super()._check_fit()
-        # sanity-check
-        assert self.GEV_ is not None
-
-    #
-    def fit(
+class ClusterArray(_BaseCluster):
+    def __init__(
         self,
-        inst: Union[BaseRaw, BaseEpochs],
-        maps: NDArray,
-        segmentation: NDArray,
-        picks: Picks = "eeg",
-        tmin: Optional[Union[int, float]] = None,
-        tmax: Optional[Union[int, float]] = None,
-        reject_by_annotation: bool = True,
-        *,
-        verbose: Optional[str] = None,
+        data: NDArray[float],
+        info: Union[Info, ChInfo],
+        cluster_names: Optional[Union[list[str], tuple[str]]] = None,
+        fitted_data: Optional[NDArray[float]] = None,
+        labels: Optional[NDArray[int]] = None,
+        ignore_polarity: bool = True,
     ) -> None:
-        data = super().fit(
-            inst,
-            picks=picks,
-            tmin=tmin,
-            tmax=tmax,
-            reject_by_annotation=reject_by_annotation,
-            verbose=verbose,
-        )
-
-        # set cluster_centers
-        self._cluster_centers_ = maps
-        # set sample_labels
-        self._labels_ = segmentation
-
-        # calculate gev
-        gfp_sum_sq = np.sum(data**2)
-        tmp_cluster_center = self.cluster_centers_
-        tmp_label = self.labels_
-        map_corr = _corr_vectors(data, tmp_cluster_center[tmp_label].T)
-        gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
-        self._GEV_ = gev
-
-        # set fitted
+        if not ignore_polarity:
+            raise NotImplementedError(
+                "pycrostates does not yet support 'ignore_polarity=False'."
+            )
+        super().__init__()
         self._fitted = True
-
-        return None
+        # validate data and info
+        _check_type(data, (np.ndarray,), "data")
+        if data.ndim != 2:
+            raise ValueError(
+                "'data', the cluster centers, must be a 2D array or shape (n_clusters, "
+                f"n_channels). Provided {data.ndim}D array is invalid."
+            )
+        _check_type(info, (Info, ChInfo), "info")
+        ch_types = info.get_channel_types(unique=True)
+        if len(ch_types):
+            raise ValueError(
+                "The 'info' object must not contain multiple channel types. "
+                "The provided info has the following channel types: "
+                f"{', '.join(ch_types)}"
+            )
+        if len(info["ch_names"]) != data.shape[1]:
+            raise ValueError(
+                f"The number of channels in 'data' ({data.shape[1]}) must match the "
+                f"number of channels in 'info' ({len(info["ch_names"])})."
+            )
+        self._n_clusters = data.shape[0]
+        self._info = ChInfo(info=info)  # no-op if a ChInfo is priovided
+        self._cluster_centers_ = data
+        # validate optional inputs
+        if cluster_names is not None:
+            _check_type(cluster_names, (list, tuple), "cluster_names")
+            if len(cluster_names) != self._n_clusters:
+                raise ValueError(
+                    f"The number of cluster names ({len(cluster_names)}) must match "
+                    f"the number of clusters ({self._n_clusters})."
+                )
+            self._cluster_names = cluster_names
+        else:
+            self._cluster_names = [str(k) for k in range(self._n_clusters)]
+        # validate fitted_data, which is either from a Raw ()
 
     # left for empty
     @copy_doc(_BaseCluster.save)
     def save(self, fname: Union[str, Path]):
         super().save(fname)
-        # TODO: to be replaced by a general writer than infers the writer from
-        # the file extension.
-        # pylint: disable=import-outside-toplevel
-        from ..io.fiff import _write_cluster
-
-        # pylint: enable=import-outside-toplevel
+        from ..io.fiff import _write_cluster  # pylint: disable=C0415
 
         _write_cluster(
             fname,
             self._cluster_centers_,
             self._info,
-            "Custom",
+            "array",
             self._cluster_names,
             self._fitted_data,
             self._labels_,
             GEV_=self._GEV_,
         )
 
-    # --------------------------------------------------------------------
-    # No static method
+    # # --------------------------------------------------------------------
+    # @property
+    # def GEV_(self) -> float:
+    #     """Global Explained Variance.
 
-    # --------------------------------------------------------------------
-    @property
-    def GEV_(self) -> float:
-        """Global Explained Variance.
+    #     :type: `float`
+    #     """
+    #     if self._GEV_ is None:
+    #         assert not self._fitted  # sanity-check
+    #         logger.warning("Clustering algorithm has not been fitted.")
+    #     return self._GEV_
 
-        :type: `float`
-        """
-        if self._GEV_ is None:
-            assert not self._fitted  # sanity-check
-            logger.warning("Clustering algorithm has not been fitted.")
-        return self._GEV_
+    #     # set cluster_centers
+    #     self._cluster_centers_ = maps
+    #     # set sample_labels
+    #     self._labels_ = segmentation
 
-    @_BaseCluster.fitted.setter
-    @copy_doc(_BaseCluster.fitted.setter)
-    def fitted(self, fitted):
-        super(self.__class__, self.__class__).fitted.__set__(self, fitted)
-        if not fitted:
-            self._GEV_ = None
+    #     # calculate gev
+    #     gfp_sum_sq = np.sum(data**2)
+    #     tmp_cluster_center = self.cluster_centers_
+    #     tmp_label = self.labels_
+    #     map_corr = _corr_vectors(data, tmp_cluster_center[tmp_label].T)
+    #     gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
+    #     self._GEV_ = gev
+
+    #     # set fitted
+    #     self._fitted = True
+
+    #     return None
