@@ -1,3 +1,5 @@
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
 from pathlib import Path
 from typing import TYPE_CHECKING
 from warnings import warn
@@ -5,7 +7,6 @@ from warnings import warn
 import numpy as np
 from mne import Info
 
-from ..io import ChInfo
 from ..utils._checks import _check_type
 from ..utils._docs import copy_doc
 from ._base import _BaseCluster
@@ -26,6 +27,8 @@ class ClusterArray(_BaseCluster):
         labels: Optional[NDArray[int]] = None,
         ignore_polarity: bool = True,
     ) -> None:
+        from ..io import ChInfo
+
         if not ignore_polarity:
             raise NotImplementedError(
                 "pycrostates does not yet support 'ignore_polarity=False'."
@@ -51,7 +54,7 @@ class ClusterArray(_BaseCluster):
         if len(info["ch_names"]) != data.shape[1]:
             raise ValueError(
                 f"The number of channels in 'data' ({data.shape[1]}) must match the "
-                f"number of channels in 'info' ({len(info["ch_names"])})."
+                f"number of channels in 'info' ({len(info['ch_names'])})."
             )
         self._n_clusters = data.shape[0]
         self._info = ChInfo(info=info)  # no-op if a ChInfo is priovided
