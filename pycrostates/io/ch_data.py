@@ -12,13 +12,13 @@ if check_version("mne", "1.6"):
 else:
     from mne.io.pick import _picks_to_idx
 
-from .._typing import CHData, CHInfo, ScalarFloatArray
+from .._typing import CHInfo, ScalarFloatArray
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 
 
-class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
+class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
     """ChData stores atemporal data with its spatial information.
 
     `~pycrostates.io.ChData` is similar to a raw instance where temporality has been

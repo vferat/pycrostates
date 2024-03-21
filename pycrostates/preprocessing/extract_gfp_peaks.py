@@ -1,6 +1,8 @@
 """Preprocessing functions to extract gfp peaks."""
 
-from typing import Optional, Union
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 from mne import BaseEpochs, pick_info
@@ -13,7 +15,6 @@ if check_version("mne", "1.6"):
 else:
     from mne.io.pick import _picks_to_idx
 
-from .._typing import CHData, Picks, ScalarFloatArray
 from ..utils._checks import (
     _check_picks_uniqueness,
     _check_reject_by_annotation,
@@ -22,6 +23,12 @@ from ..utils._checks import (
 )
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
+
+if TYPE_CHECKING:
+    from typing import Optional, Union
+
+    from .._typing import Picks, ScalarFloatArray
+    from ..io import ChData
 
 
 @fill_doc
@@ -35,7 +42,7 @@ def extract_gfp_peaks(
     tmax: Optional[float] = None,
     reject_by_annotation: bool = True,
     verbose=None,
-) -> CHData:
+) -> ChData:
     """:term:`Global Field Power` (:term:`GFP`) peaks extraction.
 
     Extract :term:`Global Field Power` (:term:`GFP`) peaks from :class:`~mne.Epochs` or

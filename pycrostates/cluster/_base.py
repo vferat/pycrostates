@@ -1,16 +1,16 @@
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
 from abc import abstractmethod
 from copy import copy, deepcopy
 from itertools import groupby
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
-from matplotlib.axes import Axes
 from mne import BaseEpochs, pick_info
 from mne.annotations import _annotations_starts_stops
 from mne.io import BaseRaw
 from mne.utils import check_version
-from numpy.typing import NDArray
 from scipy.signal import convolve2d
 
 if check_version("mne", "1.6"):
@@ -18,14 +18,6 @@ if check_version("mne", "1.6"):
 else:
     from mne.io.pick import _picks_to_idx
 
-from .._typing import (
-    AxesArray,
-    CHData,
-    Cluster,
-    Picks,
-    ScalarFloatArray,
-    ScalarIntArray,
-)
 from ..segmentation import EpochsSegmentation, RawSegmentation
 from ..utils import _corr_vectors
 from ..utils._checks import (
@@ -40,6 +32,15 @@ from ..utils._logs import logger, verbose
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 from ..viz import plot_cluster_centers
 from .utils import optimize_order
+
+if TYPE_CHECKING:
+    from typing import Any, Optional, Union
+
+    from matplotlib.axes import Axes
+    from numpy.typing import NDArray
+
+    from .._typing import AxesArray, Cluster, Picks, ScalarFloatArray, ScalarIntArray
+    from ..io import ChData
 
 
 class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
@@ -199,7 +200,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     @verbose
     def fit(
         self,
-        inst: Union[BaseRaw, BaseEpochs, CHData],
+        inst: Union[BaseRaw, BaseEpochs, ChData],
         picks: Picks = "eeg",
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,

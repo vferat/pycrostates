@@ -30,12 +30,6 @@ class AxesArray(np.ndarray, Generic[TypeVar("AxesType", Axes)]):
     pass
 
 
-class CHData(ABC):  # noqa: B024
-    """Typing for CHData."""
-
-    pass
-
-
 class CHInfo(ABC):  # noqa: B024
     """Typing for CHInfo."""
 
