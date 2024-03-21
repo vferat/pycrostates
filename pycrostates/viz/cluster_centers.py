@@ -1,6 +1,8 @@
 """Visualization module for plotting cluster centers."""
 
-from typing import Any, Optional, Union
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -9,10 +11,17 @@ from mne import Info
 from mne.channels.layout import _find_topomap_coords
 from mne.viz import plot_topomap
 
-from .._typing import AxesArray, CHInfo, ScalarFloatArray
+from .._typing import AxesArray, ScalarFloatArray
 from ..utils._checks import _check_axes, _check_type, _ensure_valid_show
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
+
+if TYPE_CHECKING:
+    from typing import Any, Optional, Union
+
+    from .._typing import AxesArray, ScalarFloatArray
+    from ..io import ChInfo
+
 
 _GRADIENT_KWARGS_DEFAULTS: dict[str, str] = {
     "color": "black",
@@ -25,7 +34,7 @@ _GRADIENT_KWARGS_DEFAULTS: dict[str, str] = {
 @verbose
 def plot_cluster_centers(
     cluster_centers: ScalarFloatArray,
-    info: Union[Info, CHInfo],
+    info: Union[Info, ChInfo],
     cluster_names: list[str] = None,
     axes: Optional[Union[Axes, AxesArray]] = None,
     show_gradient: Optional[bool] = False,

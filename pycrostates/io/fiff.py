@@ -1,11 +1,13 @@
 """Contains I/O operation from and towards .fif format (MEGIN / MNE)."""
 
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
 import json
 import operator
 from functools import reduce
 from numbers import Integral
 from pathlib import Path
-from typing import Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from mne import Info, Transform
@@ -54,12 +56,17 @@ else:
         write_string,
     )
 
-from .._typing import CHInfo, ScalarFloatArray, ScalarIntArray
+from .._typing import ScalarFloatArray, ScalarIntArray
 from .._version import __version__
 from ..cluster import AAHCluster, ModKMeans
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
+
+if TYPE_CHECKING:
+    from typing import Union
+
+    from . import ChInfo
 
 # ----------------------------------------------------------------------------
 """
@@ -95,7 +102,7 @@ FIFF_MNE_ICA_MISC_PARAMS -> fit variables (ending with '_')
 def _write_cluster(
     fname: Union[str, Path],
     cluster_centers_: ScalarFloatArray,
-    chinfo: Union[CHInfo, Info],
+    chinfo: Union[ChInfo, Info],
     algorithm: str,
     cluster_names: list[str],
     fitted_data: ScalarFloatArray,
@@ -396,7 +403,7 @@ def _check_fit_parameters_and_variables(
 
 def _create_ModKMeans(
     cluster_centers_: ScalarFloatArray,
-    info: CHInfo,
+    info: ChInfo,
     cluster_names: list[str],
     fitted_data: ScalarFloatArray,
     labels_: ScalarIntArray,
@@ -421,7 +428,7 @@ def _create_ModKMeans(
 
 def _create_AAHCluster(
     cluster_centers_: ScalarFloatArray,
-    info: CHInfo,
+    info: ChInfo,
     cluster_names: list[str],
     fitted_data: ScalarFloatArray,
     labels_: ScalarIntArray,
@@ -449,7 +456,7 @@ def _create_AAHCluster(
 
 
 # ----------------------------------------------------------------------------
-def _write_meas_info(fid, info: CHInfo):
+def _write_meas_info(fid, info: ChInfo):
     """Write measurement info into a file id (from a fif file).
 
     Parameters

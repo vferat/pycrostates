@@ -1,7 +1,9 @@
 """Class to handle no temporal but spatial data."""
 
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
 from copy import copy, deepcopy
-from typing import Any, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from mne import Info, pick_info
@@ -12,10 +14,16 @@ if check_version("mne", "1.6"):
 else:
     from mne.io.pick import _picks_to_idx
 
-from .._typing import CHInfo, ScalarFloatArray
+from .._typing import ScalarFloatArray
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
+
+if TYPE_CHECKING:
+    from typing import Any, Union
+
+    from .._typing import ScalarFloatArray
+    from . import ChInfo
 
 
 class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
@@ -34,8 +42,8 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
         to a `~pycrostates.io.ChInfo`.
     """
 
-    def __init__(self, data: ScalarFloatArray, info: Union[Info, CHInfo]):
-        from .meas_info import ChInfo
+    def __init__(self, data: ScalarFloatArray, info: Union[Info, ChInfo]):
+        from . import ChInfo
 
         _check_type(data, (np.ndarray,), "data")
         _check_type(info, (Info, ChInfo), "info")
@@ -162,7 +170,7 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
 
     # --------------------------------------------------------------------
     @property
-    def info(self) -> CHInfo:
+    def info(self) -> ChInfo:
         """Atemporal measurement information.
 
         :type: ChInfo

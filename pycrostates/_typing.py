@@ -26,13 +26,7 @@ class ScalarArray(np.ndarray, Generic[ScalarType]):
     pass
 
 
-class AxesArray(np.ndarray, Generic[TypeVar("AxesType", Axes)]):
-    pass
-
-
-class CHInfo(ABC):  # noqa: B024
-    """Typing for CHInfo."""
-
+class AxesArray(np.ndarray, Generic[TypeVar("AxesType", bound=Axes)]):
     pass
 
 
