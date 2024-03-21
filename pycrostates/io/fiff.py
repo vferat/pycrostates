@@ -56,7 +56,6 @@ else:
         write_string,
     )
 
-from .._typing import ScalarFloatArray, ScalarIntArray
 from .._version import __version__
 from ..cluster import AAHCluster, ModKMeans
 from ..utils._checks import _check_type, _check_value
@@ -66,6 +65,7 @@ from ..utils._logs import logger
 if TYPE_CHECKING:
     from typing import Union
 
+    from .._typing import ScalarFloatArray, ScalarIntArray
     from . import ChInfo
 
 # ----------------------------------------------------------------------------

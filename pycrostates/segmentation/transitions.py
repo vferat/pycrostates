@@ -1,10 +1,14 @@
-from itertools import groupby
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 
-from .._typing import ScalarFloatArray, ScalarIntArray
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
+
+if TYPE_CHECKING:
+    from .._typing import ScalarFloatArray, ScalarIntArray
 
 
 @fill_doc

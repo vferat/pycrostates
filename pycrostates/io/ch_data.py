@@ -14,7 +14,6 @@ if check_version("mne", "1.6"):
 else:
     from mne.io.pick import _picks_to_idx
 
-from .._typing import ScalarFloatArray
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin

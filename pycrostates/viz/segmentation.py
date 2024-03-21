@@ -1,6 +1,8 @@
 """Visualisation module for plotting segmentations."""
 
-from typing import Optional, Union
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 from matplotlib import colormaps, colors
@@ -10,10 +12,14 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.utils import check_version
 
-from .._typing import ScalarFloatArray, ScalarIntArray
 from ..utils._checks import _check_type, _ensure_valid_show
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
+
+if TYPE_CHECKING:
+    from typing import Optional, Union
+
+    from .._typing import ScalarFloatArray, ScalarIntArray
 
 
 @fill_doc

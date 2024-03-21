@@ -18,7 +18,6 @@ if check_version("mne", "1.6"):
 else:
     from mne.io.pick import _picks_by_type
 
-from .._typing import ScalarFloatArray
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
@@ -26,6 +25,7 @@ from ..utils._logs import logger, verbose
 if TYPE_CHECKING:
     from typing import Union
 
+    from .._typing import ScalarFloatArray
     from ..io import ChData
 
 
