@@ -1,20 +1,26 @@
 """Class and functions to use modified Kmeans."""
 
-from pathlib import Path
-from typing import Any, Optional, Union
+from __future__ import annotations  # c.f. PEP 563, PEP 649
 
-import numpy as np
+from pathlib import Path
+from typing import TYPE_CHECKING
+
 from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.parallel import parallel_func
 from numpy.random import Generator, RandomState
 
-from .._typing import CHData, Picks, RANDomState, ScalarFloatArray, ScalarIntArray
 from ..utils import _corr_vectors
 from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
 from ._base import _BaseCluster
+
+if TYPE_CHECKING:
+    from typing import Any, Optional, Union
+
+    from .._typing import Picks, RANDomState, ScalarFloatArray, ScalarIntArray
+    from ..io import ChData
 
 
 @fill_doc
@@ -135,7 +141,7 @@ class ModKMeans(_BaseCluster):
     @fill_doc
     def fit(
         self,
-        inst: Union[BaseRaw, BaseEpochs, CHData],
+        inst: Union[BaseRaw, BaseEpochs, ChData],
         picks: Picks = "eeg",
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,

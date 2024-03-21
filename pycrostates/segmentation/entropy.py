@@ -15,12 +15,12 @@ from mne.parallel import parallel_func
 
 from ..utils._checks import _check_n_jobs, _check_type, _check_value, _ensure_int
 from ..utils._docs import fill_doc
-from ._base import _BaseSegmentation
 
 if TYPE_CHECKING:
     from typing import Optional, Union
 
     from .._typing import ScalarFloatArray, ScalarIntArray
+    from ._base import _BaseSegmentation
 
 
 def _check_log_base(log_base) -> float:
@@ -118,6 +118,8 @@ def _check_labels(labels, item_name: str = "labels") -> None:
 def _check_segmentation(
     segmentation, item_name: str = "segmentation"
 ) -> ScalarIntArray:
+    from ._base import _BaseSegmentation
+
     _check_type(segmentation, (_BaseSegmentation,), item_name)
     return segmentation._labels.reshape(-1)  # reshape if epochs (returns a view)
 
