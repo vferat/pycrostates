@@ -7,6 +7,7 @@ Front Physiol (2018) https://doi.org/10.3389/fphys.2018.01382
 
 from __future__ import annotations  # c.f. PEP 563, PEP 649
 
+import itertools
 from typing import TYPE_CHECKING
 
 import numpy as np

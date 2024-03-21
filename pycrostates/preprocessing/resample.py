@@ -26,7 +26,7 @@ from ..utils._logs import logger, verbose
 if TYPE_CHECKING:
     from typing import Optional, Union
 
-    from .._typing import Picks, RANDomState
+    from .._typing import Picks, RandomState
     from ..io import ChData
 
 
@@ -42,7 +42,7 @@ def resample(
     n_samples: int = None,
     coverage: float = None,
     replace: bool = True,
-    random_state: RANDomState = None,
+    random_state: RandomState = None,
     verbose=None,
 ) -> list[ChData]:
     """Resample a recording into epochs of random samples.

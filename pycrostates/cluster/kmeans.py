@@ -20,7 +20,7 @@ from ._base import _BaseCluster
 if TYPE_CHECKING:
     from typing import Any, Optional, Union
 
-    from .._typing import Picks, RANDomState, ScalarFloatArray, ScalarIntArray
+    from .._typing import Picks, RandomState, ScalarFloatArray, ScalarIntArray
     from ..io import ChData
 
 
@@ -56,7 +56,7 @@ class ModKMeans(_BaseCluster):
         n_init: int = 100,
         max_iter: int = 300,
         tol: Union[int, float] = 1e-6,
-        random_state: RANDomState = None,
+        random_state: RandomState = None,
     ):
         super().__init__()
 

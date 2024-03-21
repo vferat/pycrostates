@@ -1,10 +1,11 @@
 from __future__ import annotations  # c.f. PEP 563, PEP 649
 
-from typing import Generic, Optional, TypeVar, Union
+from typing import Generic, TypeVar
 
 import numpy as np
 from matplotlib.axes import Axes
-from numpy.random import Generator, RandomState
+from numpy.random import Generator
+from numpy.random import RandomState as RandomState_np
 
 ScalarFloatType = TypeVar("ScalarFloatType", np.float32, np.float64)
 ScalarIntType = TypeVar("ScalarIntType", np.int8, np.int16, np.int32, np.int64)
@@ -29,5 +30,7 @@ class AxesArray(np.ndarray, Generic[TypeVar("AxesType", bound=Axes)]):
     pass
 
 
-RANDomState = Optional[Union[int, RandomState, Generator]]
-Picks = Optional[Union[str, ScalarIntArray]]
+RandomState = TypeVar("RandomState", int, RandomState_np, Generator)
+Picks = TypeVar(
+    "Picks", str, ScalarIntArray, list[str], list[int], tuple[str], tuple[int], None
+)
