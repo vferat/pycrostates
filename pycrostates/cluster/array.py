@@ -31,6 +31,7 @@ class ClusterArray(_BaseCluster):
                 "pycrostates does not yet support 'ignore_polarity=False'."
             )
         super().__init__()
+        self._ignore_polarity = ignore_polarity
         self._fitted = True
         # validate data and info
         _check_type(data, (np.ndarray,), "data")
@@ -130,35 +131,5 @@ class ClusterArray(_BaseCluster):
             self._cluster_names,
             self._fitted_data,
             self._labels_,
-            GEV_=self._GEV_,
+            ignore_polarity=self._ignore_polarity,
         )
-
-    # # --------------------------------------------------------------------
-    # @property
-    # def GEV_(self) -> float:
-    #     """Global Explained Variance.
-
-    #     :type: `float`
-    #     """
-    #     if self._GEV_ is None:
-    #         assert not self._fitted  # sanity-check
-    #         logger.warning("Clustering algorithm has not been fitted.")
-    #     return self._GEV_
-
-    #     # set cluster_centers
-    #     self._cluster_centers_ = maps
-    #     # set sample_labels
-    #     self._labels_ = segmentation
-
-    #     # calculate gev
-    #     gfp_sum_sq = np.sum(data**2)
-    #     tmp_cluster_center = self.cluster_centers_
-    #     tmp_label = self.labels_
-    #     map_corr = _corr_vectors(data, tmp_cluster_center[tmp_label].T)
-    #     gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
-    #     self._GEV_ = gev
-
-    #     # set fitted
-    #     self._fitted = True
-
-    #     return None

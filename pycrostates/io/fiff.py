@@ -5,7 +5,7 @@ import operator
 from functools import reduce
 from numbers import Integral
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 import numpy as np
 from mne import Info, Transform
@@ -99,8 +99,8 @@ def _write_cluster(
     chinfo: Union[CHInfo, Info],
     algorithm: str,
     cluster_names: list[str],
-    fitted_data: NDArray[float],
-    labels_: NDArray[int],
+    fitted_data: Optional[NDArray[float]],
+    labels_: Optional[NDArray[int]],
     **kwargs,
 ):
     """Save clustering solution to disk.
@@ -115,11 +115,13 @@ def _write_cluster(
     algorithm : str
         Clustering algorithm used. Valids are:
             'ModKMeans'
+            'AAHCluster'
+            'array'
     cluster_names : list
         List of names for each of the clusters.
-    fitted_data : array
+    fitted_data : array of shape (n_channels, n_samples) | None
         Data array used for fitting of shape (n_channels, n_samples)
-    labels_ : array
+    labels_ : array of shape (n_samples,) | None
         Array of labels for each sample of shape (n_samples, )
     """
     from . import ChInfo
@@ -133,17 +135,17 @@ def _write_cluster(
     if isinstance(chinfo, Info):
         chinfo = ChInfo(chinfo)  # convert to ChInfo if a MNE Info is provided
     _check_type(algorithm, (str,), "algorithm")
-    _check_value(algorithm, ("ModKMeans", "AAHCluster"), "algorithm")
+    _check_value(algorithm, ("ModKMeans", "AAHCluster", "array"), "algorithm")
     _check_type(cluster_names, (list,), "cluster_names")
     if len(cluster_names) != cluster_centers_.shape[0]:
         raise ValueError(
             "Argument 'cluster_names' and 'cluster_centers_' shapes do not match."
         )
-    _check_type(fitted_data, (np.ndarray,), "fitted_data")
-    if fitted_data.ndim != 2:
+    _check_type(fitted_data, (np.ndarray, None), "fitted_data")
+    if fitted_data is not None and fitted_data.ndim != 2:
         raise ValueError("Argument 'fitted_data' should be a 2D array.")
-    _check_type(labels_, (np.ndarray,), "labels_")
-    if labels_.ndim != 1:
+    _check_type(labels_, (np.ndarray, None), "labels_")
+    if labels_ is not None and labels_.ndim != 1:
         raise ValueError("Argument 'labels_' should be a 1D array.")
 
     # logging
@@ -170,15 +172,17 @@ def _write_cluster(
         # write cluster_names
         write_name_list(fid, FIFF.FIFF_MNE_ROW_NAMES, cluster_names)
         # write fitted_data
-        write_double_matrix(
-            fid, FIFF.FIFF_MNE_ICA_WHITENER, fitted_data.astype(np.float64)
-        )
+        if fitted_data is not None:
+            write_double_matrix(
+                fid, FIFF.FIFF_MNE_ICA_WHITENER, fitted_data.astype(np.float64)
+            )
         # write labels_
-        write_double_matrix(
-            fid,
-            FIFF.FIFF_MNE_ICA_PCA_MEAN,
-            labels_.reshape(-1, 1).astype(np.float64),
-        )
+        if labels_ is not None:
+            write_double_matrix(
+                fid,
+                FIFF.FIFF_MNE_ICA_PCA_MEAN,
+                labels_.reshape(-1, 1).astype(np.float64),
+            )
         # write fit_parameters
         write_string(
             fid, FIFF.FIFF_MNE_ICA_INTERFACE_PARAMS, _serialize(fit_parameters)
@@ -202,6 +206,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
             "parameters": ["ignore_polarity", "normalize_input"],
             "variables": ["GEV_"],
         },
+        "array": {"parameters": ["ignore_polarity"], "variables": []},
     }
 
     # retrieve list of expected kwargs for this algorithm
