@@ -1,28 +1,20 @@
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 from mne import BaseEpochs
 from mne.io import BaseRaw
-from mne.parallel import parallel_func
-from numpy.random import Generator, RandomState
 from numpy.typing import NDArray
 
-from .._typing import CHData, Picks, RANDomState
+from .._typing import Picks
 from ..utils import _corr_vectors
-from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
-from ..utils._docs import copy_doc, fill_doc
+from ..utils._docs import copy_doc
 from ..utils._logs import logger
 from ._base import _BaseCluster
 
-# The design philosophy is that users may develop their own algorithms for microstates analysis, and 
-# this class is designed for accecpting clustered centers and corresponding labels, in order to integrate 
-# the clustering results by other algorithms to the overall pycrostates pipeline.
+
 class Custom(_BaseCluster):
-    def __init__(
-            self,
-            n_clusters: int
-    ):
+    def __init__(self, n_clusters: int):
         super().__init__()
 
         # needed codes for custom
@@ -31,21 +23,19 @@ class Custom(_BaseCluster):
 
         # fit variables
         self._GEV_ = None
-    
+
     # left for empty
     def _repr_html_(self, caption=None):
         return None
-    
+
     # left for empty
     @copy_doc(_BaseCluster.__eq__)
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Custom):
             if not super().__eq__(other):
                 return False
-            
-            attributes = (
-                "_GEV_",
-            )
+
+            attributes = ("_GEV_",)
             for attribute in attributes:
                 try:
                     attr1 = self.__getattribute__(attribute)
@@ -56,24 +46,24 @@ class Custom(_BaseCluster):
                     return False
 
             return True
-        return None 
+        return None
 
     # left for empty
     @copy_doc(_BaseCluster.__ne__)
     def __ne__(self, other: Any) -> bool:
         return not self.__eq__(other)
-    
+
     def _check_fit(self):
         super()._check_fit()
         # sanity-check
         assert self.GEV_ is not None
 
-    # 
+    #
     def fit(
         self,
         inst: Union[BaseRaw, BaseEpochs],
-        maps: NDArray[float],
-        segmentation: NDArray[float],
+        maps: NDArray,
+        segmentation: NDArray,
         picks: Picks = "eeg",
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,
@@ -95,8 +85,8 @@ class Custom(_BaseCluster):
         # set sample_labels
         self._labels_ = segmentation
 
-        # calculate gev 
-        gfp_sum_sq = np.sum(data ** 2)
+        # calculate gev
+        gfp_sum_sq = np.sum(data**2)
         tmp_cluster_center = self.cluster_centers_
         tmp_label = self.labels_
         map_corr = _corr_vectors(data, tmp_cluster_center[tmp_label].T)
@@ -104,10 +94,10 @@ class Custom(_BaseCluster):
         self._GEV_ = gev
 
         # set fitted
-        self._fitted = True        
+        self._fitted = True
 
         return None
-    
+
     # left for empty
     @copy_doc(_BaseCluster.save)
     def save(self, fname: Union[str, Path]):
@@ -129,9 +119,10 @@ class Custom(_BaseCluster):
             self._labels_,
             GEV_=self._GEV_,
         )
+
     # --------------------------------------------------------------------
     # No static method
-    
+
     # --------------------------------------------------------------------
     @property
     def GEV_(self) -> float:
@@ -150,5 +141,3 @@ class Custom(_BaseCluster):
         super(self.__class__, self.__class__).fitted.__set__(self, fitted)
         if not fitted:
             self._GEV_ = None
-
-    
