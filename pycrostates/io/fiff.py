@@ -57,7 +57,7 @@ else:
 
 from .._typing import CHInfo
 from .._version import __version__
-from ..cluster import AAHCluster, ModKMeans
+from ..cluster import AAHCluster, ClusterArray, ModKMeans
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
@@ -337,8 +337,6 @@ def _read_cluster(fname: Union[str, Path]):
         cluster_centers_,
         info,
         cluster_names,
-        fitted_data,
-        labels_,
         fit_parameters,
         fit_variables,
     )
@@ -352,6 +350,7 @@ def _read_cluster(fname: Union[str, Path]):
     function = {
         "ModKMeans": _create_ModKMeans,
         "AAHCluster": _create_AAHCluster,
+        "array": _create_ClusterArray,
     }
 
     return (
@@ -382,6 +381,7 @@ def _check_fit_parameters_and_variables(
             "parameters": ["ignore_polarity", "normalize_input"],
             "variables": ["GEV_"],
         },
+        "array": {"parameters": ["ignore_polarity"], "variables": []},
     }
     if "algorithm" not in fit_parameters:
         raise ValueError("Key 'algorithm' is missing from .fif file.")
@@ -452,6 +452,20 @@ def _create_AAHCluster(
     cluster._GEV_ = GEV_
     cluster._fitted = True
     return cluster
+
+
+def _create_ClusterArray(
+    cluster_centers_: NDArray[float],
+    info: CHInfo,
+    cluster_names: list[str],
+    fitted_data: NDArray[float],
+    labels_: NDArray[int],
+    ignore_polarity: bool,  # pylint: disable=unused-argument
+):
+    """Create a ClusterArray object."""
+    return ClusterArray(
+        cluster_centers_, info, cluster_names, fitted_data, labels_, ignore_polarity
+    )
 
 
 # ----------------------------------------------------------------------------
