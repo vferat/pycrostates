@@ -1,15 +1,14 @@
 import numpy as np
 import scipy
-from numpy.typing import NDArray
 
-from ..._typing import Cluster
+from ..._typing import Cluster, ScalarFloatArray
 from ...utils._checks import _check_type
 from ...utils._docs import fill_doc
 
 
 def _optimize_order(
-    centers: NDArray[float],
-    template_centers: NDArray[float],
+    centers: ScalarFloatArray,
+    template_centers: ScalarFloatArray,
     ignore_polarity: bool = True,
 ):
     n_states = len(centers)

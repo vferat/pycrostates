@@ -8,9 +8,8 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.parallel import parallel_func
 from numpy.random import Generator, RandomState
-from numpy.typing import NDArray
 
-from .._typing import CHData, Picks, RANDomState
+from .._typing import CHData, Picks, RANDomState, ScalarFloatArray, ScalarIntArray
 from ..utils import _corr_vectors
 from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc
@@ -258,12 +257,12 @@ class ModKMeans(_BaseCluster):
     # --------------------------------------------------------------------
     @staticmethod
     def _kmeans(
-        data: NDArray[float],
+        data: ScalarFloatArray,
         n_clusters: int,
         max_iter: int,
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
-    ) -> tuple[float, NDArray[float], NDArray[int], bool]:
+    ) -> tuple[float, ScalarFloatArray, ScalarIntArray, bool]:
         """Run the k-means algorithm."""
         gfp_sum_sq = np.sum(data**2)
         maps, converged = ModKMeans._compute_maps(
@@ -277,12 +276,12 @@ class ModKMeans(_BaseCluster):
 
     @staticmethod
     def _compute_maps(
-        data: NDArray[float],
+        data: ScalarFloatArray,
         n_clusters: int,
         max_iter: int,
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
-    ) -> tuple[NDArray[float], bool]:
+    ) -> tuple[ScalarFloatArray, bool]:
         """Compute microstates maps.
 
         Based on mne_microstates by Marijn van Vliet <w.m.vanvliet@gmail.com>

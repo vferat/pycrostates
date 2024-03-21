@@ -8,9 +8,8 @@ from matplotlib.axes import Axes
 from mne import Info
 from mne.channels.layout import _find_topomap_coords
 from mne.viz import plot_topomap
-from numpy.typing import NDArray
 
-from .._typing import CHInfo
+from .._typing import AxesArray, CHInfo, ScalarFloatArray
 from ..utils._checks import _check_axes, _check_type, _ensure_valid_show
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
@@ -25,10 +24,10 @@ _GRADIENT_KWARGS_DEFAULTS: dict[str, str] = {
 @fill_doc
 @verbose
 def plot_cluster_centers(
-    cluster_centers: NDArray[float],
+    cluster_centers: ScalarFloatArray,
     info: Union[Info, CHInfo],
     cluster_names: list[str] = None,
-    axes: Optional[Union[Axes, NDArray[Axes]]] = None,
+    axes: Optional[Union[Axes, AxesArray]] = None,
     show_gradient: Optional[bool] = False,
     gradient_kwargs: dict[str, Any] = _GRADIENT_KWARGS_DEFAULTS,
     *,

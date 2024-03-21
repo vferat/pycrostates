@@ -9,7 +9,6 @@ from mne.io import BaseRaw
 from mne.parallel import parallel_func
 from mne.utils import check_version
 from mne.utils.check import _check_preload
-from numpy.typing import NDArray
 from scipy.sparse import csr_matrix
 
 if check_version("mne", "1.6"):
@@ -17,7 +16,7 @@ if check_version("mne", "1.6"):
 else:
     from mne.io.pick import _picks_by_type
 
-from .._typing import CHData
+from .._typing import CHData, ScalarFloatArray
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
@@ -63,7 +62,7 @@ def apply_spatial_filter(
     inst: Union[BaseRaw, BaseEpochs, CHData],
     ch_type: str = "eeg",
     exclude_bads: bool = True,
-    origin: Union[str, NDArray[float]] = "auto",
+    origin: Union[str, ScalarFloatArray] = "auto",
     adjacency: Union[csr_matrix, str] = "auto",
     n_jobs: int = 1,
     verbose=None,

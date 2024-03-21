@@ -18,7 +18,14 @@ if check_version("mne", "1.6"):
 else:
     from mne.io.pick import _picks_to_idx
 
-from .._typing import CHData, Cluster, Picks
+from .._typing import (
+    AxesArray,
+    CHData,
+    Cluster,
+    Picks,
+    ScalarFloatArray,
+    ScalarIntArray,
+)
 from ..segmentation import EpochsSegmentation, RawSegmentation
 from ..utils import _corr_vectors
 from ..utils._checks import (
@@ -199,7 +206,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         reject_by_annotation: bool = True,
         *,
         verbose: Optional[str] = None,
-    ) -> NDArray[float]:
+    ) -> ScalarFloatArray:
         """Compute cluster centers.
 
         Parameters
@@ -346,7 +353,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             Union[
                 list[int],
                 tuple[int, ...],
-                NDArray[int],
+                ScalarIntArray,
             ]
         ] = None,
         template: Optional[Cluster] = None,
@@ -460,7 +467,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             bool,
             list[bool],
             tuple[bool, ...],
-            NDArray[bool],
+            NDArray[np.bool],
         ],
     ) -> None:
         """Invert map polarities.
@@ -516,7 +523,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     @verbose
     def plot(
         self,
-        axes: Optional[Union[Axes, NDArray[Axes]]] = None,
+        axes: Optional[Union[Axes, AxesArray]] = None,
         show_gradient: Optional[bool] = False,
         gradient_kwargs: dict[str, Any] = {  # noqa: B006
             "color": "black",
@@ -817,7 +824,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     def _predict_raw(
         self,
         raw: BaseRaw,
-        picks_data: NDArray[int],
+        picks_data: ScalarIntArray,
         factor: int,
         tol: Union[int, float],
         half_window_size: int,
@@ -882,7 +889,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     def _predict_epochs(
         self,
         epochs: BaseEpochs,
-        picks_data: NDArray[int],
+        picks_data: ScalarIntArray,
         factor: int,
         tol: Union[int, float],
         half_window_size: int,
@@ -930,12 +937,12 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     # --------------------------------------------------------------------
     @staticmethod
     def _segment(
-        data: NDArray[float],
-        states: NDArray[float],
+        data: ScalarFloatArray,
+        states: ScalarFloatArray,
         factor: int,
         tol: Union[int, float],
         half_window_size: int,
-    ) -> NDArray[int]:
+    ) -> ScalarIntArray:
         """Create segmentation. Must operate on a copy of states."""
         data -= np.mean(data, axis=0)
         std = np.std(data, axis=0)
@@ -956,13 +963,13 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @staticmethod
     def _smooth_segmentation(
-        data: NDArray[float],
-        states: NDArray[float],
-        labels: NDArray[int],
+        data: ScalarFloatArray,
+        states: ScalarFloatArray,
+        labels: ScalarIntArray,
         factor: int,
         tol: Union[int, float],
         half_window_size: int,
-    ) -> NDArray[int]:
+    ) -> ScalarIntArray:
         """Apply smoothing.
 
         Adapted from [1].
@@ -1010,10 +1017,10 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @staticmethod
     def _reject_short_segments(
-        segmentation: NDArray[int],
-        data: NDArray[float],
+        segmentation: ScalarIntArray,
+        data: ScalarFloatArray,
         min_segment_length: int,
-    ) -> NDArray[int]:
+    ) -> ScalarIntArray:
         """Reject segments that are too short.
 
         Reject segments that are too short by replacing the labels with the adjacent
@@ -1082,7 +1089,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         return segmentation
 
     @staticmethod
-    def _reject_edge_segments(segmentation: NDArray[int]) -> NDArray[int]:
+    def _reject_edge_segments(segmentation: ScalarIntArray) -> ScalarIntArray:
         """Set the first and last segment as unlabeled (0)."""
         # set first segment to unlabeled
         n = (segmentation != segmentation[0]).argmax()
@@ -1145,7 +1152,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
             self._fitted = False
 
     @property
-    def cluster_centers_(self) -> NDArray[float]:
+    def cluster_centers_(self) -> ScalarFloatArray:
         """Fitted clusters (the microstates maps).
 
         Returns None if cluster algorithm has not been fitted.
@@ -1159,7 +1166,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         return self._cluster_centers_.copy()
 
     @property
-    def fitted_data(self) -> NDArray[float]:
+    def fitted_data(self) -> ScalarFloatArray:
         """Data array used to fit the clustering algorithm.
 
         :type: `~numpy.array` of shape (n_channels, n_samples) | None
@@ -1171,7 +1178,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         return self._fitted_data.copy()
 
     @property
-    def labels_(self) -> NDArray[int]:
+    def labels_(self) -> ScalarIntArray:
         """Microstate label attributed to each sample of the fitted data.
 
         :type: `~numpy.array` of shape (n_samples, ) | None

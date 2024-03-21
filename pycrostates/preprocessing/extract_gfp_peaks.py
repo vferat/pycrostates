@@ -6,7 +6,6 @@ import numpy as np
 from mne import BaseEpochs, pick_info
 from mne.io import BaseRaw
 from mne.utils import check_version
-from numpy.typing import NDArray
 from scipy.signal import find_peaks
 
 if check_version("mne", "1.6"):
@@ -14,7 +13,7 @@ if check_version("mne", "1.6"):
 else:
     from mne.io.pick import _picks_to_idx
 
-from .._typing import CHData, Picks
+from .._typing import CHData, Picks, ScalarFloatArray
 from ..utils._checks import (
     _check_picks_uniqueness,
     _check_reject_by_annotation,
@@ -140,8 +139,8 @@ def extract_gfp_peaks(
 
 
 def _extract_gfp_peaks(
-    data: NDArray[float], min_peak_distance: int = 2
-) -> NDArray[float]:
+    data: ScalarFloatArray, min_peak_distance: int = 2
+) -> ScalarFloatArray:
     """Extract GFP peaks from input data.
 
     Parameters

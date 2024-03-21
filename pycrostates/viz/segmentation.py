@@ -9,8 +9,8 @@ from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.utils import check_version
-from numpy.typing import NDArray
 
+from .._typing import ScalarFloatArray, ScalarIntArray
 from ..utils._checks import _check_type, _ensure_valid_show
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
@@ -18,7 +18,7 @@ from ..utils._logs import logger, verbose
 
 @fill_doc
 def plot_raw_segmentation(
-    labels: NDArray[int],
+    labels: ScalarIntArray,
     raw: BaseRaw,
     n_clusters: int,
     cluster_names: list[str] = None,
@@ -107,7 +107,7 @@ def plot_raw_segmentation(
 
 @fill_doc
 def plot_epoch_segmentation(
-    labels: NDArray[int],
+    labels: ScalarIntArray,
     epochs: BaseEpochs,
     n_clusters: int,
     cluster_names: list[str] = None,
@@ -202,9 +202,9 @@ def plot_epoch_segmentation(
 
 @verbose
 def _plot_segmentation(
-    labels: NDArray[int],
-    gfp: NDArray[float],
-    times: NDArray[float],
+    labels: ScalarIntArray,
+    gfp: ScalarFloatArray,
+    times: ScalarFloatArray,
     n_clusters: int,
     cluster_names: list[str] = None,
     cmap: Optional[Union[str, colors.Colormap]] = None,

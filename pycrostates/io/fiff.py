@@ -12,7 +12,6 @@ from mne import Info, Transform
 from mne.io.constants import FIFF
 from mne.transforms import invert_transform
 from mne.utils import check_version
-from numpy.typing import NDArray
 
 if check_version("mne", "1.6"):
     from mne._fiff._digitization import _format_dig_points, _read_dig_fif
@@ -55,7 +54,7 @@ else:
         write_string,
     )
 
-from .._typing import CHInfo
+from .._typing import CHInfo, ScalarFloatArray, ScalarIntArray
 from .._version import __version__
 from ..cluster import AAHCluster, ModKMeans
 from ..utils._checks import _check_type, _check_value
@@ -95,12 +94,12 @@ FIFF_MNE_ICA_MISC_PARAMS -> fit variables (ending with '_')
 @fill_doc
 def _write_cluster(
     fname: Union[str, Path],
-    cluster_centers_: NDArray[float],
+    cluster_centers_: ScalarFloatArray,
     chinfo: Union[CHInfo, Info],
     algorithm: str,
     cluster_names: list[str],
-    fitted_data: NDArray[float],
-    labels_: NDArray[int],
+    fitted_data: ScalarFloatArray,
+    labels_: ScalarIntArray,
     **kwargs,
 ):
     """Save clustering solution to disk.
@@ -396,11 +395,11 @@ def _check_fit_parameters_and_variables(
 
 
 def _create_ModKMeans(
-    cluster_centers_: NDArray[float],
+    cluster_centers_: ScalarFloatArray,
     info: CHInfo,
     cluster_names: list[str],
-    fitted_data: NDArray[float],
-    labels_: NDArray[int],
+    fitted_data: ScalarFloatArray,
+    labels_: ScalarIntArray,
     n_init: int,
     max_iter: int,
     tol: Union[int, float],
@@ -421,11 +420,11 @@ def _create_ModKMeans(
 
 
 def _create_AAHCluster(
-    cluster_centers_: NDArray[float],
+    cluster_centers_: ScalarFloatArray,
     info: CHInfo,
     cluster_names: list[str],
-    fitted_data: NDArray[float],
-    labels_: NDArray[int],
+    fitted_data: ScalarFloatArray,
+    labels_: ScalarIntArray,
     ignore_polarity: bool,  # pylint: disable=unused-argument
     normalize_input: bool,
     GEV_: float,
