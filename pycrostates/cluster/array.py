@@ -14,17 +14,18 @@ from ._base import _BaseCluster
 if TYPE_CHECKING:
     from typing import Optional, Union
 
-    from numpy.typing import NDArray
+    from .._typing import ScalarFloatArray, ScalarIntArray
+    from ..io import ChInfo
 
 
 class ClusterArray(_BaseCluster):
     def __init__(
         self,
-        data: NDArray[float],
+        data: ScalarFloatArray,
         info: Union[Info, ChInfo],
         cluster_names: Optional[Union[list[str], tuple[str]]] = None,
-        fitted_data: Optional[NDArray[float]] = None,
-        labels: Optional[NDArray[int]] = None,
+        fitted_data: Optional[ScalarFloatArray] = None,
+        labels: Optional[ScalarIntArray] = None,
         ignore_polarity: bool = True,
     ) -> None:
         from ..io import ChInfo
@@ -130,7 +131,7 @@ class ClusterArray(_BaseCluster):
             fname,
             self._cluster_centers_,
             self._info,
-            algorithm="Array",
+            "Array",
             self._cluster_names,
             self._fitted_data,
             self._labels_,

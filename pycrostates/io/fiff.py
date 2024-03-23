@@ -461,12 +461,12 @@ def _create_AAHCluster(
 
 
 def _create_ClusterArray(
-    cluster_centers_: NDArray[float],
-    info: CHInfo,
+    cluster_centers_: ScalarFloatArray,
+    info: ChInfo,
     cluster_names: list[str],
-    fitted_data: NDArray[float],
-    labels_: NDArray[int],
-    ignore_polarity: bool,  # pylint: disable=unused-argument
+    fitted_data: ScalarFloatArray,
+    labels_: ScalarIntArray,
+    ignore_polarity: bool,
 ):
     """Create a ClusterArray object."""
     return ClusterArray(
