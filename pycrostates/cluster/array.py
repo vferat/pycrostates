@@ -121,6 +121,9 @@ class ClusterArray(_BaseCluster):
                         f"({self._fitted_data.shape[1]})."
                     )
         self._labels_ = labels
+        # estimate GEV
+        if self._fitted_data is not None and self._labels_ is not None:
+            self._gev = ClusterArray._compute_gev(self._fitted_data, self._labels_)
 
     @copy_doc(_BaseCluster.save)
     def save(self, fname: Union[str, Path]):
@@ -137,3 +140,30 @@ class ClusterArray(_BaseCluster):
             self._labels_,
             ignore_polarity=self._ignore_polarity,
         )
+
+    @staticmethod
+    def _compute_gev(
+        data: ScalarFloatArray,
+        labels: ScalarIntArray,
+        cluster_centers: ScalarFloatArray,
+    ) -> float:
+        """Compute Global Explained Variance (GEV).
+
+        The GEV is the ratio of the variance explained by the clustering to the total
+        variance of the data.
+
+        Parameters
+        ----------
+        data : array of shape (n_channels, n_samples)
+            The data to cluster.
+        labels : array of shape (n_samples,)
+            The cluster labels.
+        cluster_centers : array of shape (n_clusters, n_channels)
+            The cluster centers.
+
+        Returns
+        -------
+        gev : float
+            The Global Explained Variance.
+        """
+        pass
