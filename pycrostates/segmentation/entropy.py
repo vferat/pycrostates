@@ -5,17 +5,23 @@ F. von Wegner, Partial Autoinformation to Characterize Symbolic Sequences
 Front Physiol (2018) https://doi.org/10.3389/fphys.2018.01382
 """
 
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
 import itertools
-from typing import Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 import scipy.stats
 from mne.parallel import parallel_func
-from numpy.typing import NDArray
 
-from .._typing import Segmentation
 from ..utils._checks import _check_n_jobs, _check_type, _check_value, _ensure_int
 from ..utils._docs import fill_doc
+
+if TYPE_CHECKING:
+    from typing import Optional, Union
+
+    from .._typing import ScalarFloatArray, ScalarIntArray
+    from ._base import _BaseSegmentation
 
 
 def _check_log_base(log_base) -> float:
@@ -37,7 +43,7 @@ def _check_log_base(log_base) -> float:
     return log_base
 
 
-def _check_lags(lags) -> NDArray[int]:
+def _check_lags(lags) -> ScalarIntArray:
     _check_type(lags, ("int", "array-like"), "lags")
     if isinstance(lags, int):
         if lags < 1:
@@ -56,8 +62,8 @@ def _check_lags(lags) -> NDArray[int]:
 
 @fill_doc
 def _joint_entropy(
-    x: NDArray[int],
-    y: NDArray[int],
+    x: ScalarIntArray,
+    y: ScalarIntArray,
     state_to_ignore: Optional[int] = -1,
     log_base: Union[float, str] = 2,
 ) -> float:
@@ -110,14 +116,18 @@ def _check_labels(labels, item_name: str = "labels") -> None:
         raise ValueError(f"{item_name} must be an array of integers.")
 
 
-def _check_segmentation(segmentation, item_name: str = "segmentation") -> NDArray[int]:
-    _check_type(segmentation, (Segmentation,), item_name)
+def _check_segmentation(
+    segmentation, item_name: str = "segmentation"
+) -> ScalarIntArray:
+    from ._base import _BaseSegmentation
+
+    _check_type(segmentation, (_BaseSegmentation,), item_name)
     return segmentation._labels.reshape(-1)  # reshape if epochs (returns a view)
 
 
 @fill_doc
 def _joint_entropy_history(
-    labels: NDArray[int],
+    labels: ScalarIntArray,
     k: int,
     state_to_ignore: Optional[int] = -1,
     log_base: Union[float, str] = 2,
@@ -163,7 +173,7 @@ def _joint_entropy_history(
 
 @fill_doc
 def _entropy(
-    labels: NDArray[int],
+    labels: ScalarIntArray,
     state_to_ignore: Optional[int] = -1,
     log_base: Union[float, str] = 2,
 ) -> float:
@@ -192,7 +202,7 @@ def _entropy(
 
 @fill_doc
 def entropy(
-    segmentation: Segmentation,
+    segmentation: _BaseSegmentation,
     ignore_repetitions: bool = False,
     log_base: Union[float, str] = 2,
 ) -> float:
@@ -227,12 +237,12 @@ def entropy(
 # -- excess entropy rate ---------------------------------------------------------------
 @fill_doc
 def _excess_entropy_rate(
-    labels: NDArray[int],
+    labels: ScalarIntArray,
     history_length: int,
     state_to_ignore: Optional[int] = -1,
     log_base: Union[float, str] = 2,
     n_jobs: int = 1,
-) -> tuple[float, float, float, NDArray[int], NDArray[float]]:
+) -> tuple[float, float, float, ScalarIntArray, ScalarFloatArray]:
     """Estimate the entropy rate and the excess_entropy from a linear fit.
 
     Parameters
@@ -273,12 +283,12 @@ def _excess_entropy_rate(
 
 @fill_doc
 def excess_entropy_rate(
-    segmentation: Segmentation,
+    segmentation: _BaseSegmentation,
     history_length: int,
     ignore_repetitions: bool = False,
     log_base: Union[float, str] = 2,
     n_jobs: int = 1,
-) -> tuple[float, float, float, NDArray[int], NDArray[float]]:
+) -> tuple[float, float, float, ScalarIntArray, ScalarFloatArray]:
     r"""Estimate the entropy rate and the ``excess_entropy`` of the segmentation.
 
     The entropy rate and the ``excess_entropy`` are estimated from a linear fit:
@@ -334,7 +344,7 @@ def excess_entropy_rate(
 
 @fill_doc
 def _auto_information(
-    labels: NDArray[int],
+    labels: ScalarIntArray,
     k: int,
     state_to_ignore: Optional[int] = -1,
     log_base: Union[float, str] = 2,
@@ -379,17 +389,17 @@ def _auto_information(
 
 @fill_doc
 def auto_information_function(
-    segmentation: Segmentation,
+    segmentation: _BaseSegmentation,
     lags: Union[
         int,
         list[int],
         tuple[int, ...],
-        NDArray[int],
+        ScalarIntArray,
     ],
     ignore_repetitions: bool = False,
     log_base: Union[float, str] = 2,
     n_jobs: int = 1,
-) -> tuple[NDArray[int], NDArray[float]]:
+) -> tuple[ScalarIntArray, ScalarFloatArray]:
     r"""Compute the Auto-information function (aif).
 
     Compute the Auto-information function (aif) as described
@@ -439,7 +449,7 @@ def auto_information_function(
 
 @fill_doc
 def _partial_auto_information(
-    labels: NDArray[int],
+    labels: ScalarIntArray,
     k: int,
     state_to_ignore: Optional[int] = -1,
     log_base: Union[float, str] = 2,
@@ -490,17 +500,17 @@ def _partial_auto_information(
 
 @fill_doc
 def partial_auto_information_function(
-    segmentation: Segmentation,
+    segmentation: _BaseSegmentation,
     lags: Union[
         int,
         list[int],
         tuple[int, ...],
-        NDArray[int],
+        ScalarIntArray,
     ],
     ignore_repetitions: bool = False,
     log_base: Union[float, str] = 2,
     n_jobs: Optional[int] = 1,
-) -> tuple[NDArray[int], NDArray[float]]:
+) -> tuple[ScalarIntArray, ScalarFloatArray]:
     r"""Compute the Partial auto-information function.
 
     Compute the Partial auto-information function as described

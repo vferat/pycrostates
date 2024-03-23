@@ -1,21 +1,27 @@
 """Class and functions to use modified Kmeans."""
 
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.parallel import parallel_func
 from numpy.random import Generator, RandomState
-from numpy.typing import NDArray
 
-from .._typing import CHData, Picks, RANDomState
 from ..utils import _corr_vectors
 from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
 from ._base import _BaseCluster
+
+if TYPE_CHECKING:
+    from typing import Any, Optional, Union
+
+    from .._typing import Picks, RandomState, ScalarFloatArray, ScalarIntArray
+    from ..io import ChData
 
 
 @fill_doc
@@ -50,7 +56,7 @@ class ModKMeans(_BaseCluster):
         n_init: int = 100,
         max_iter: int = 300,
         tol: Union[int, float] = 1e-6,
-        random_state: RANDomState = None,
+        random_state: RandomState = None,
     ):
         super().__init__()
 
@@ -136,7 +142,7 @@ class ModKMeans(_BaseCluster):
     @fill_doc
     def fit(
         self,
-        inst: Union[BaseRaw, BaseEpochs, CHData],
+        inst: Union[BaseRaw, BaseEpochs, ChData],
         picks: Picks = "eeg",
         tmin: Optional[Union[int, float]] = None,
         tmax: Optional[Union[int, float]] = None,
@@ -256,12 +262,12 @@ class ModKMeans(_BaseCluster):
     # --------------------------------------------------------------------
     @staticmethod
     def _kmeans(
-        data: NDArray[float],
+        data: ScalarFloatArray,
         n_clusters: int,
         max_iter: int,
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
-    ) -> tuple[float, NDArray[float], NDArray[int], bool]:
+    ) -> tuple[float, ScalarFloatArray, ScalarIntArray, bool]:
         """Run the k-means algorithm."""
         gfp_sum_sq = np.sum(data**2)
         maps, converged = ModKMeans._compute_maps(
@@ -275,12 +281,12 @@ class ModKMeans(_BaseCluster):
 
     @staticmethod
     def _compute_maps(
-        data: NDArray[float],
+        data: ScalarFloatArray,
         n_clusters: int,
         max_iter: int,
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
-    ) -> tuple[NDArray[float], bool]:
+    ) -> tuple[ScalarFloatArray, bool]:
         """Compute microstates maps.
 
         Based on mne_microstates by Marijn van Vliet <w.m.vanvliet@gmail.com>

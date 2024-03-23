@@ -1,18 +1,19 @@
 """Contains I/O operation from and towards .fif format (MEGIN / MNE)."""
 
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
 import json
 import operator
 from functools import reduce
 from numbers import Integral
 from pathlib import Path
-from typing import Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from mne import Info, Transform
 from mne.io.constants import FIFF
 from mne.transforms import invert_transform
 from mne.utils import check_version
-from numpy.typing import NDArray
 
 if check_version("mne", "1.6"):
     from mne._fiff._digitization import _format_dig_points, _read_dig_fif
@@ -55,12 +56,17 @@ else:
         write_string,
     )
 
-from .._typing import CHInfo
 from .._version import __version__
 from ..cluster import AAHCluster, ClusterArray, ModKMeans
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
+
+if TYPE_CHECKING:
+    from typing import Optional, Union
+
+    from .._typing import ScalarFloatArray, ScalarIntArray
+    from . import ChInfo
 
 # ----------------------------------------------------------------------------
 """
@@ -95,12 +101,12 @@ FIFF_MNE_ICA_MISC_PARAMS -> fit variables (ending with '_')
 @fill_doc
 def _write_cluster(
     fname: Union[str, Path],
-    cluster_centers_: NDArray[float],
-    chinfo: Union[CHInfo, Info],
+    cluster_centers_: ScalarFloatArray,
+    chinfo: Union[ChInfo, Info],
     algorithm: str,
     cluster_names: list[str],
-    fitted_data: Optional[NDArray[float]],
-    labels_: Optional[NDArray[int]],
+    fitted_data: Optional[ScalarFloatArray],
+    labels_: Optional[ScalarIntArray],
     **kwargs,
 ):
     """Save clustering solution to disk.
@@ -401,11 +407,11 @@ def _check_fit_parameters_and_variables(
 
 
 def _create_ModKMeans(
-    cluster_centers_: NDArray[float],
-    info: CHInfo,
+    cluster_centers_: ScalarFloatArray,
+    info: ChInfo,
     cluster_names: list[str],
-    fitted_data: NDArray[float],
-    labels_: NDArray[int],
+    fitted_data: ScalarFloatArray,
+    labels_: ScalarIntArray,
     n_init: int,
     max_iter: int,
     tol: Union[int, float],
@@ -426,11 +432,11 @@ def _create_ModKMeans(
 
 
 def _create_AAHCluster(
-    cluster_centers_: NDArray[float],
-    info: CHInfo,
+    cluster_centers_: ScalarFloatArray,
+    info: ChInfo,
     cluster_names: list[str],
-    fitted_data: NDArray[float],
-    labels_: NDArray[int],
+    fitted_data: ScalarFloatArray,
+    labels_: ScalarIntArray,
     ignore_polarity: bool,  # pylint: disable=unused-argument
     normalize_input: bool,
     GEV_: float,
@@ -469,7 +475,7 @@ def _create_ClusterArray(
 
 
 # ----------------------------------------------------------------------------
-def _write_meas_info(fid, info: CHInfo):
+def _write_meas_info(fid, info: ChInfo):
     """Write measurement info into a file id (from a fif file).
 
     Parameters
