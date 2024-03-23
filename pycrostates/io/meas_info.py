@@ -21,12 +21,11 @@ else:
     from mne.io.pick import get_channel_type_constants
     from mne.io.tag import _ch_coord_dict
 
-from .._typing import CHInfo
 from ..utils._checks import _check_type, _IntLike
 from ..utils._logs import logger
 
 
-class ChInfo(CHInfo, Info):
+class ChInfo(Info):
     """Atemporal measurement information.
 
     Similar to a :class:`mne.Info` class, but without any temporal information.

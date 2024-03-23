@@ -1,6 +1,8 @@
 """Preprocessing functions to create resamples from raw or epochs instances."""
 
-from typing import Optional, Union
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 from mne import BaseEpochs, pick_info
@@ -12,7 +14,6 @@ if check_version("mne", "1.6"):
 else:
     from mne.io.pick import _picks_to_idx
 
-from .._typing import CHData, Picks, RANDomState
 from ..utils._checks import (
     _check_random_state,
     _check_reject_by_annotation,
@@ -22,11 +23,17 @@ from ..utils._checks import (
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
+if TYPE_CHECKING:
+    from typing import Optional, Union
+
+    from .._typing import Picks, RandomState
+    from ..io import ChData
+
 
 @fill_doc
 @verbose
 def resample(
-    inst: Union[BaseRaw, BaseEpochs, CHData],
+    inst: Union[BaseRaw, BaseEpochs, ChData],
     picks: Picks = None,
     tmin: Optional[float] = None,
     tmax: Optional[float] = None,
@@ -35,9 +42,9 @@ def resample(
     n_samples: int = None,
     coverage: float = None,
     replace: bool = True,
-    random_state: RANDomState = None,
+    random_state: RandomState = None,
     verbose=None,
-) -> list[CHData]:
+) -> list[ChData]:
     """Resample a recording into epochs of random samples.
 
     Resample :class:`~mne.io.Raw`. :class:`~mne.Epochs` or

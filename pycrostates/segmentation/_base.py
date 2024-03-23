@@ -1,17 +1,17 @@
 """Segmentation module for segmented data."""
 
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
 import itertools
-from abc import abstractmethod
-from typing import Optional, Union
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 import numpy as np
 from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.utils import check_version
-from numpy.typing import NDArray
 
-from .._typing import Segmentation
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
@@ -20,9 +20,14 @@ from ..viz import plot_cluster_centers
 from .entropy import entropy
 from .transitions import _compute_expected_transition_matrix, _compute_transition_matrix
 
+if TYPE_CHECKING:
+    from typing import Optional, Union
+
+    from .._typing import ScalarFloatArray, ScalarIntArray
+
 
 @fill_doc
-class _BaseSegmentation(Segmentation):
+class _BaseSegmentation(ABC):
     """Base class for a Microstates segmentation.
 
     Parameters
@@ -39,9 +44,9 @@ class _BaseSegmentation(Segmentation):
     @abstractmethod
     def __init__(
         self,
-        labels: NDArray[int],
+        labels: ScalarIntArray,
         inst: Union[BaseRaw, BaseEpochs],
-        cluster_centers_: NDArray[float],
+        cluster_centers_: ScalarFloatArray,
         cluster_names: Optional[list[str]] = None,
         predict_parameters: Optional[dict] = None,
     ):
@@ -303,7 +308,7 @@ class _BaseSegmentation(Segmentation):
     @fill_doc
     def plot_cluster_centers(
         self,
-        axes: Optional[Union[Axes, NDArray[Axes]]] = None,
+        axes: Optional[Union[Axes,]] = None,
         *,
         block: bool = False,
         show: Optional[bool] = None,
@@ -334,7 +339,7 @@ class _BaseSegmentation(Segmentation):
     @staticmethod
     def _check_cluster_names(
         cluster_names: list[str],
-        cluster_centers_: NDArray[float],
+        cluster_centers_: ScalarFloatArray,
     ):
         """Check that the argument 'cluster_names' is valid."""
         _check_type(cluster_names, (list, None), "cluster_names")
@@ -392,7 +397,7 @@ class _BaseSegmentation(Segmentation):
         return self._predict_parameters.copy()
 
     @property
-    def labels(self) -> NDArray[int]:
+    def labels(self) -> ScalarIntArray:
         """Microstate label attributed to each sample (the segmentation).
 
         :type: `~numpy.array`
@@ -400,9 +405,8 @@ class _BaseSegmentation(Segmentation):
         return self._labels.copy()
 
     @property
-    def cluster_centers_(self) -> NDArray[float]:
-        """Cluster centers (i.e topographies)
-        used to compute the segmentation.
+    def cluster_centers_(self) -> ScalarFloatArray:
+        """Cluster centers (i.e topographies) used to compute the segmentation.
 
         :type: `~numpy.array`
         """
