@@ -130,7 +130,7 @@ class ClusterArray(_BaseCluster):
             fname,
             self._cluster_centers_,
             self._info,
-            "array",
+            algorithm="Array",
             self._cluster_names,
             self._fitted_data,
             self._labels_,

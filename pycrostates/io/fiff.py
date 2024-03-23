@@ -116,7 +116,7 @@ def _write_cluster(
         Clustering algorithm used. Valids are:
             'ModKMeans'
             'AAHCluster'
-            'array'
+            'Array'
     cluster_names : list
         List of names for each of the clusters.
     fitted_data : array of shape (n_channels, n_samples) | None
@@ -135,7 +135,7 @@ def _write_cluster(
     if isinstance(chinfo, Info):
         chinfo = ChInfo(chinfo)  # convert to ChInfo if a MNE Info is provided
     _check_type(algorithm, (str,), "algorithm")
-    _check_value(algorithm, ("ModKMeans", "AAHCluster", "array"), "algorithm")
+    _check_value(algorithm, ("ModKMeans", "AAHCluster", "Array"), "algorithm")
     _check_type(cluster_names, (list,), "cluster_names")
     if len(cluster_names) != cluster_centers_.shape[0]:
         raise ValueError(
@@ -206,7 +206,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
             "parameters": ["ignore_polarity", "normalize_input"],
             "variables": ["GEV_"],
         },
-        "array": {"parameters": ["ignore_polarity"], "variables": []},
+        "Array": {"parameters": ["ignore_polarity"], "variables": []},
     }
 
     # retrieve list of expected kwargs for this algorithm
@@ -350,7 +350,7 @@ def _read_cluster(fname: Union[str, Path]):
     function = {
         "ModKMeans": _create_ModKMeans,
         "AAHCluster": _create_AAHCluster,
-        "array": _create_ClusterArray,
+        "Array": _create_ClusterArray,
     }
 
     return (
@@ -381,7 +381,7 @@ def _check_fit_parameters_and_variables(
             "parameters": ["ignore_polarity", "normalize_input"],
             "variables": ["GEV_"],
         },
-        "array": {"parameters": ["ignore_polarity"], "variables": []},
+        "Array": {"parameters": ["ignore_polarity"], "variables": []},
     }
     if "algorithm" not in fit_parameters:
         raise ValueError("Key 'algorithm' is missing from .fif file.")
