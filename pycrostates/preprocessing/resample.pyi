@@ -2,9 +2,9 @@ from _typeshed import Incomplete
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
-from .._typing import CHData as CHData
 from .._typing import Picks as Picks
-from .._typing import RANDomState as RANDomState
+from .._typing import RandomState as RandomState
+from ..io import ChData as ChData
 from ..utils._checks import _check_random_state as _check_random_state
 from ..utils._checks import _check_reject_by_annotation as _check_reject_by_annotation
 from ..utils._checks import _check_tmin_tmax as _check_tmin_tmax
@@ -13,7 +13,7 @@ from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 
 def resample(
-    inst: BaseRaw | BaseEpochs | CHData,
+    inst: BaseRaw | BaseEpochs | ChData,
     picks: Picks = None,
     tmin: float | None = None,
     tmax: float | None = None,
@@ -22,9 +22,9 @@ def resample(
     n_samples: int = None,
     coverage: float = None,
     replace: bool = True,
-    random_state: RANDomState = None,
+    random_state: RandomState = None,
     verbose: Incomplete | None = None,
-) -> list[CHData]:
+) -> list[ChData]:
     """Resample a recording into epochs of random samples.
 
     Resample :class:`~mne.io.Raw`. :class:`~mne.Epochs` or

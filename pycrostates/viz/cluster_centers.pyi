@@ -2,9 +2,10 @@ from typing import Any
 
 from matplotlib.axes import Axes
 from mne import Info
-from numpy.typing import NDArray
 
-from .._typing import CHInfo as CHInfo
+from .._typing import AxesArray as AxesArray
+from .._typing import ScalarFloatArray as ScalarFloatArray
+from ..io import ChInfo as ChInfo
 from ..utils._checks import _check_axes as _check_axes
 from ..utils._checks import _check_type as _check_type
 from ..utils._checks import _ensure_valid_show as _ensure_valid_show
@@ -14,10 +15,10 @@ from ..utils._logs import logger as logger
 _GRADIENT_KWARGS_DEFAULTS: dict[str, str]
 
 def plot_cluster_centers(
-    cluster_centers: NDArray[float],
-    info: Info | CHInfo,
+    cluster_centers: ScalarFloatArray,
+    info: Info | ChInfo,
     cluster_names: list[str] = None,
-    axes: Axes | NDArray[Axes] | None = None,
+    axes: Axes | AxesArray | None = None,
     show_gradient: bool | None = False,
     gradient_kwargs: dict[str, Any] = ...,
     *,

@@ -1,10 +1,10 @@
 from _typeshed import Incomplete
 from mne import BaseEpochs
 from mne.io import BaseRaw
-from numpy.typing import NDArray as NDArray
 from scipy.sparse import csr_matrix
 
-from .._typing import CHData as CHData
+from .._typing import ScalarFloatArray as ScalarFloatArray
+from ..io import ChData as ChData
 from ..utils._checks import _check_n_jobs as _check_n_jobs
 from ..utils._checks import _check_type as _check_type
 from ..utils._checks import _check_value as _check_value
@@ -15,10 +15,10 @@ def _check_adjacency(adjacency, info, ch_type):
     """Check adjacency matrix."""
 
 def apply_spatial_filter(
-    inst: BaseRaw | BaseEpochs | CHData,
+    inst: BaseRaw | BaseEpochs | ChData,
     ch_type: str = "eeg",
     exclude_bads: bool = True,
-    origin: str | NDArray[float] = "auto",
+    origin: str | ScalarFloatArray = "auto",
     adjacency: csr_matrix | str = "auto",
     n_jobs: int = 1,
     verbose: Incomplete | None = None,

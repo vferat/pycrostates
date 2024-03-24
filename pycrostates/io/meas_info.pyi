@@ -1,11 +1,10 @@
 from mne import Info
 
-from .._typing import CHInfo as CHInfo
 from ..utils._checks import _check_type as _check_type
 from ..utils._checks import _IntLike as _IntLike
 from ..utils._logs import logger as logger
 
-class ChInfo(CHInfo, Info):
+class ChInfo(Info):
     """Atemporal measurement information.
 
     Similar to a :class:`mne.Info` class, but without any temporal information.

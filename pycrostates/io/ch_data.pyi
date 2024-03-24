@@ -2,17 +2,16 @@ from typing import Any
 
 from _typeshed import Incomplete
 from mne import Info
-from numpy.typing import NDArray
 
-from .._typing import CHData as CHData
-from .._typing import CHInfo as CHInfo
+from .._typing import ScalarFloatArray as ScalarFloatArray
 from ..utils._checks import _check_type as _check_type
 from ..utils._docs import fill_doc as fill_doc
 from ..utils.mixin import ChannelsMixin as ChannelsMixin
 from ..utils.mixin import ContainsMixin as ContainsMixin
 from ..utils.mixin import MontageMixin as MontageMixin
+from . import ChInfo as ChInfo
 
-class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
+class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
     """ChData stores atemporal data with its spatial information.
 
     `~pycrostates.io.ChData` is similar to a raw instance where temporality has been
@@ -31,7 +30,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
     _data: Incomplete
     _info: Incomplete
 
-    def __init__(self, data: NDArray[float], info: Info | CHInfo) -> None: ...
+    def __init__(self, data: ScalarFloatArray, info: Info | ChInfo) -> None: ...
     def __repr__(self) -> str:
         """String representation."""
 
@@ -53,7 +52,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
             If True, `~copy.deepcopy` is used instead of `~copy.copy`.
         """
 
-    def get_data(self, picks: Incomplete | None = None) -> NDArray[float]:
+    def get_data(self, picks: Incomplete | None = None) -> ScalarFloatArray:
         """Retrieve the data array.
 
         Parameters
@@ -113,7 +112,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         """
 
     @property
-    def info(self) -> CHInfo:
+    def info(self) -> ChInfo:
         """Atemporal measurement information.
 
         :type: ChInfo

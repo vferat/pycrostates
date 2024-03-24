@@ -5,12 +5,12 @@ from _typeshed import Incomplete
 from mne import BaseEpochs as BaseEpochs
 from mne.io import BaseRaw as BaseRaw
 from numpy.random import Generator as Generator
-from numpy.random import RandomState as RandomState
-from numpy.typing import NDArray
 
-from .._typing import CHData as CHData
 from .._typing import Picks as Picks
-from .._typing import RANDomState as RANDomState
+from .._typing import RandomState as RandomState
+from .._typing import ScalarFloatArray as ScalarFloatArray
+from .._typing import ScalarIntArray as ScalarIntArray
+from ..io import ChData as ChData
 from ..utils import _corr_vectors as _corr_vectors
 from ..utils._checks import _check_n_jobs as _check_n_jobs
 from ..utils._checks import _check_random_state as _check_random_state
@@ -64,7 +64,7 @@ class ModKMeans(_BaseCluster):
         n_init: int = 100,
         max_iter: int = 300,
         tol: int | float = 1e-06,
-        random_state: RANDomState = None,
+        random_state: RandomState = None,
     ) -> None: ...
     def _repr_html_(self, caption: Incomplete | None = None): ...
     def __eq__(self, other: Any) -> bool:
@@ -82,7 +82,7 @@ class ModKMeans(_BaseCluster):
 
     def fit(
         self,
-        inst: BaseRaw | BaseEpochs | CHData,
+        inst: BaseRaw | BaseEpochs | ChData,
         picks: Picks = "eeg",
         tmin: int | float | None = None,
         tmax: int | float | None = None,
@@ -141,22 +141,22 @@ class ModKMeans(_BaseCluster):
 
     @staticmethod
     def _kmeans(
-        data: NDArray[float],
+        data: ScalarFloatArray,
         n_clusters: int,
         max_iter: int,
         random_state: RandomState | Generator,
         tol: int | float,
-    ) -> tuple[float, NDArray[float], NDArray[int], bool]:
+    ) -> tuple[float, ScalarFloatArray, ScalarIntArray, bool]:
         """Run the k-means algorithm."""
 
     @staticmethod
     def _compute_maps(
-        data: NDArray[float],
+        data: ScalarFloatArray,
         n_clusters: int,
         max_iter: int,
         random_state: RandomState | Generator,
         tol: int | float,
-    ) -> tuple[NDArray[float], bool]:
+    ) -> tuple[ScalarFloatArray, bool]:
         """Compute microstates maps.
 
         Based on mne_microstates by Marijn van Vliet <w.m.vanvliet@gmail.com>

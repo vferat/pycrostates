@@ -1,10 +1,10 @@
 from _typeshed import Incomplete
 from mne import BaseEpochs
 from mne.io import BaseRaw
-from numpy.typing import NDArray
 
-from .._typing import CHData as CHData
 from .._typing import Picks as Picks
+from .._typing import ScalarFloatArray as ScalarFloatArray
+from ..io import ChData as ChData
 from ..utils._checks import _check_picks_uniqueness as _check_picks_uniqueness
 from ..utils._checks import _check_reject_by_annotation as _check_reject_by_annotation
 from ..utils._checks import _check_tmin_tmax as _check_tmin_tmax
@@ -21,7 +21,7 @@ def extract_gfp_peaks(
     tmax: float | None = None,
     reject_by_annotation: bool = True,
     verbose: Incomplete | None = None,
-) -> CHData:
+) -> ChData:
     """:term:`Global Field Power` (:term:`GFP`) peaks extraction.
 
     Extract :term:`Global Field Power` (:term:`GFP`) peaks from :class:`~mne.Epochs` or
@@ -77,8 +77,8 @@ def extract_gfp_peaks(
     """
 
 def _extract_gfp_peaks(
-    data: NDArray[float], min_peak_distance: int = 2
-) -> NDArray[float]:
+    data: ScalarFloatArray, min_peak_distance: int = 2
+) -> ScalarFloatArray:
     """Extract GFP peaks from input data.
 
     Parameters
