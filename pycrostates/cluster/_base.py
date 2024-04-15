@@ -960,7 +960,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
         if factor != 0:
             labels = _BaseCluster._smooth_segmentation(
-                data, states, labels, ignore_polarity, factor, tol, half_window_size
+                data, states, ignore_polarity, labels, factor, tol, half_window_size
             )
         return labels
 
@@ -1063,7 +1063,6 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
                         data[:, right + 1],
                         ignore_polarity=ignore_polarity,
                     )[0]
-                    print(left_corr, right_corr)
                     if np.abs(right_corr - left_corr) <= 1e-8:
                         # equal corr, try to do both sides
                         if len(new_segment) == 1:

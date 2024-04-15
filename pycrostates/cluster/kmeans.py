@@ -67,6 +67,9 @@ class ModKMeans(_BaseCluster):
         # fit variables
         self._GEV_ = None
 
+        # 
+        self._ignore_polarity = True
+
     def _repr_html_(self, caption=None):
         from ..html_templates import repr_templates_env
 
@@ -110,6 +113,7 @@ class ModKMeans(_BaseCluster):
                 # '_random_state',
                 # TODO: think about comparison and I/O for random states
                 "_GEV_",
+                "_ignore_polarity",
             )
             for attribute in attributes:
                 try:
@@ -244,7 +248,6 @@ class ModKMeans(_BaseCluster):
         self._cluster_centers_ = best_maps
         self._labels_ = best_segmentation
         self._fitted = True
-        self._ignore_polarity = True
 
     @copy_doc(_BaseCluster.save)
     def save(self, fname: Union[str, Path]):
