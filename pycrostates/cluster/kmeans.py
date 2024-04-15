@@ -11,7 +11,7 @@ from mne.io import BaseRaw
 from mne.parallel import parallel_func
 from numpy.random import Generator, RandomState
 
-from ..utils import _corr_vectors, _gev
+from ..utils import _gev
 from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
