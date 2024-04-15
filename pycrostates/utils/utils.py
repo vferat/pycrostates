@@ -39,7 +39,7 @@ def _correlation(A, B, ignore_polarity=True):
 
 def _distance(X, Y, ignore_polarity=True):
     """Compute pairwise distance of multiple pairs of vectors."""
-    corr = _correlation(X, Y, ignore_polarity=True)
+    corr = _correlation(X, Y, ignore_polarity=ignore_polarity)
     dist = 1 - corr
     return dist
 
