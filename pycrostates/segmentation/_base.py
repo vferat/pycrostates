@@ -12,7 +12,6 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.utils import check_version
 
-from .._typing import Segmentation
 from ..utils import _correlation
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
