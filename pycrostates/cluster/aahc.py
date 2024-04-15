@@ -8,7 +8,7 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 
 from .._typing import Picks, ScalarFloatArray, ScalarIntArray
-from ..utils import _corr_vectors
+from ..utils import _corr_vectors, _gev
 from ..utils._checks import _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
