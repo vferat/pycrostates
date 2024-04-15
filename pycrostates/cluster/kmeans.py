@@ -67,7 +67,7 @@ class ModKMeans(_BaseCluster):
         # fit variables
         self._GEV_ = None
 
-        # 
+        # ignore polarity
         self._ignore_polarity = True
 
     def _repr_html_(self, caption=None):
