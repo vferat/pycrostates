@@ -28,7 +28,7 @@ from ..utils._logs import logger, verbose
 if TYPE_CHECKING:
     from typing import Optional, Union
 
-    from .._typing import Picks, ScalarFloatArray
+    from .._typing import Picks
     from ..io import ChData
 
 
