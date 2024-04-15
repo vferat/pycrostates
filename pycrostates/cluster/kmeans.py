@@ -273,6 +273,7 @@ class ModKMeans(_BaseCluster):
             n_init=self._n_init,
             max_iter=self._max_iter,
             tol=self._tol,
+            ignore_polarity=self._ignore_polarity,
             GEV_=self._GEV_,
         )
 
