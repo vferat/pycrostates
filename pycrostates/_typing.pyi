@@ -1,20 +1,22 @@
-from abc import ABC
-from typing import Optional, Union
+from typing import Generic, TypeVar
 
-from numpy.random import Generator, RandomState
-from numpy.typing import NDArray
+import numpy as np
+from matplotlib.axes import Axes
+from numpy.random import Generator
+from numpy.random import RandomState as RandomState_np
 
-class CHData(ABC):
-    """Typing for CHData."""
+ScalarFloatType = TypeVar("ScalarFloatType", np.float32, np.float64)
+ScalarIntType = TypeVar("ScalarIntType", np.int8, np.int16, np.int32, np.int64)
+ScalarType = TypeVar(
+    "ScalarType", np.int8, np.int16, np.int32, np.int64, np.float32, np.float64
+)
 
-class CHInfo(ABC):
-    """Typing for CHInfo."""
+class ScalarFloatArray(np.ndarray, Generic[ScalarFloatType]): ...
+class ScalarIntArray(np.ndarray, Generic[ScalarIntType]): ...
+class ScalarArray(np.ndarray, Generic[ScalarType]): ...
+class AxesArray(np.ndarray, Generic[TypeVar("AxesType", bound=Axes)]): ...
 
-class Cluster(ABC):
-    """Typing for a clustering class."""
-
-class Segmentation(ABC):
-    """Typing for a clustering class."""
-
-RANDomState = Optional[Union[int, RandomState, Generator]]
-Picks = Optional[Union[str, NDArray[int]]]
+RandomState = TypeVar("RandomState", int, RandomState_np, Generator)
+Picks = TypeVar(
+    "Picks", str, ScalarIntArray, list[str], list[int], tuple[str], tuple[int], None
+)

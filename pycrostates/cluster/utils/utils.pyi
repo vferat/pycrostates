@@ -1,15 +1,14 @@
-from numpy.typing import NDArray
-
-from ..._typing import Cluster as Cluster
+from ..._typing import ScalarFloatArray as ScalarFloatArray
 from ...utils._checks import _check_type as _check_type
 from ...utils._docs import fill_doc as fill_doc
+from .._base import _BaseCluster as _BaseCluster
 
 def _optimize_order(
-    centers: NDArray[float],
-    template_centers: NDArray[float],
+    centers: ScalarFloatArray,
+    template_centers: ScalarFloatArray,
     ignore_polarity: bool = True,
 ): ...
-def optimize_order(inst: Cluster, template_inst: Cluster):
+def optimize_order(inst: _BaseCluster, template_inst: _BaseCluster):
     """Optimize the order of cluster centers between two cluster instances.
 
     Optimize the order of cluster centers in an instance of a clustering algorithm to

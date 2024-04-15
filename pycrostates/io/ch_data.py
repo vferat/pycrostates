@@ -1,24 +1,31 @@
 """Class to handle no temporal but spatial data."""
+
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
 from copy import copy, deepcopy
-from typing import Any, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from mne import Info, pick_info
 from mne.utils import check_version
-from numpy.typing import NDArray
 
 if check_version("mne", "1.6"):
     from mne._fiff.pick import _picks_to_idx
 else:
     from mne.io.pick import _picks_to_idx
 
-from .._typing import CHData, CHInfo
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils.mixin import ChannelsMixin, ContainsMixin, MontageMixin
 
+if TYPE_CHECKING:
+    from typing import Any, Union
 
-class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
+    from .._typing import ScalarFloatArray
+    from . import ChInfo
+
+
+class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
     """ChData stores atemporal data with its spatial information.
 
     `~pycrostates.io.ChData` is similar to a raw instance where temporality has been
@@ -34,8 +41,8 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         to a `~pycrostates.io.ChInfo`.
     """
 
-    def __init__(self, data: NDArray[float], info: Union[Info, CHInfo]):
-        from .meas_info import ChInfo
+    def __init__(self, data: ScalarFloatArray, info: Union[Info, ChInfo]):
+        from . import ChInfo
 
         _check_type(data, (np.ndarray,), "data")
         _check_type(info, (Info, ChInfo), "info")
@@ -98,7 +105,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
         return copy(self)
 
     @fill_doc
-    def get_data(self, picks=None) -> NDArray[float]:
+    def get_data(self, picks=None) -> ScalarFloatArray:
         """Retrieve the data array.
 
         Parameters
@@ -162,7 +169,7 @@ class ChData(CHData, ChannelsMixin, ContainsMixin, MontageMixin):
 
     # --------------------------------------------------------------------
     @property
-    def info(self) -> CHInfo:
+    def info(self) -> ChInfo:
         """Atemporal measurement information.
 
         :type: ChInfo

@@ -1,12 +1,13 @@
 from pathlib import Path as Path
-from typing import Any, Optional, Union
+from typing import Any
 
 from _typeshed import Incomplete
 from mne import BaseEpochs as BaseEpochs
 from mne.io import BaseRaw as BaseRaw
-from numpy.typing import NDArray
 
 from .._typing import Picks as Picks
+from .._typing import ScalarFloatArray as ScalarFloatArray
+from .._typing import ScalarIntArray as ScalarIntArray
 from ..utils import _corr_vectors as _corr_vectors
 from ..utils._checks import _check_type as _check_type
 from ..utils._docs import copy_doc as copy_doc
@@ -53,13 +54,13 @@ class AAHCluster(_BaseCluster):
 
     def fit(
         self,
-        inst: Union[BaseRaw, BaseEpochs],
+        inst: BaseRaw | BaseEpochs,
         picks: Picks = "eeg",
-        tmin: Optional[Union[int, float]] = None,
-        tmax: Optional[Union[int, float]] = None,
+        tmin: int | float | None = None,
+        tmax: int | float | None = None,
         reject_by_annotation: bool = True,
         *,
-        verbose: Optional[str] = None,
+        verbose: str | None = None,
     ) -> None:
         """Compute cluster centers.
 
@@ -93,7 +94,7 @@ class AAHCluster(_BaseCluster):
             ``"WARNING"`` for False and to ``"INFO"`` for True.
         """
 
-    def save(self, fname: Union[str, Path]):
+    def save(self, fname: str | Path):
         """Save clustering solution to disk.
 
         Parameters
@@ -104,20 +105,20 @@ class AAHCluster(_BaseCluster):
 
     @staticmethod
     def _aahc(
-        data: NDArray[float],
+        data: ScalarFloatArray,
         n_clusters: int,
         ignore_polarity: bool,
         normalize_input: bool,
-    ) -> tuple[float, NDArray[float], NDArray[int]]:
+    ) -> tuple[float, ScalarFloatArray, ScalarIntArray]:
         """Run the AAHC algorithm."""
 
     @staticmethod
     def _compute_maps(
-        data: NDArray[float],
+        data: ScalarFloatArray,
         n_clusters: int,
         ignore_polarity: bool,
         normalize_input: bool,
-    ) -> tuple[NDArray[float], NDArray[int]]:
+    ) -> tuple[ScalarFloatArray, ScalarIntArray]:
         """Compute microstates maps."""
 
     @property

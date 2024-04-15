@@ -1,16 +1,19 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from pathlib import Path as Path
-from typing import Any, Optional, Union
+from typing import Any
 
+import numpy as np
 from _typeshed import Incomplete
 from matplotlib.axes import Axes as Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
-from numpy.typing import NDArray
+from numpy.typing import NDArray as NDArray
 
-from .._typing import CHData as CHData
-from .._typing import Cluster as Cluster
+from .._typing import AxesArray as AxesArray
 from .._typing import Picks as Picks
+from .._typing import ScalarFloatArray as ScalarFloatArray
+from .._typing import ScalarIntArray as ScalarIntArray
+from ..io import ChData as ChData
 from ..segmentation import EpochsSegmentation as EpochsSegmentation
 from ..segmentation import RawSegmentation as RawSegmentation
 from ..utils import _corr_vectors as _corr_vectors
@@ -26,7 +29,7 @@ from ..utils.mixin import ContainsMixin as ContainsMixin
 from ..utils.mixin import MontageMixin as MontageMixin
 from .utils import optimize_order as optimize_order
 
-class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
+class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     """Base Class for Microstates Clustering algorithms."""
 
     _n_clusters: Incomplete
@@ -70,14 +73,14 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     @abstractmethod
     def fit(
         self,
-        inst: Union[BaseRaw, BaseEpochs, CHData],
+        inst: BaseRaw | BaseEpochs | ChData,
         picks: Picks = "eeg",
-        tmin: Optional[Union[int, float]] = None,
-        tmax: Optional[Union[int, float]] = None,
+        tmin: int | float | None = None,
+        tmax: int | float | None = None,
         reject_by_annotation: bool = True,
         *,
-        verbose: Optional[str] = None,
-    ) -> NDArray[float]:
+        verbose: str | None = None,
+    ) -> ScalarFloatArray:
         """Compute cluster centers.
 
         Parameters
@@ -112,8 +115,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     def rename_clusters(
         self,
-        mapping: Optional[dict[str, str]] = None,
-        new_names: Optional[Union[list[str], tuple[str, ...]]] = None,
+        mapping: dict[str, str] | None = None,
+        new_names: list[str] | tuple[str, ...] | None = None,
     ) -> None:
         """Rename the clusters.
 
@@ -133,9 +136,9 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     def reorder_clusters(
         self,
-        mapping: Optional[dict[int, int]] = None,
-        order: Optional[Union[list[int], tuple[int, ...], NDArray[int]]] = None,
-        template: Optional[Cluster] = None,
+        mapping: dict[int, int] | None = None,
+        order: list[int] | tuple[int, ...] | ScalarIntArray | None = None,
+        template: _BaseCluster | None = None,
     ) -> None:
         """
         Reorder the clusters of the fitted model.
@@ -167,7 +170,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         """
 
     def invert_polarity(
-        self, invert: Union[bool, list[bool], tuple[bool, ...], NDArray[bool]]
+        self, invert: bool | list[bool] | tuple[bool, ...] | NDArray[np.bool]
     ) -> None:
         """Invert map polarities.
 
@@ -190,8 +193,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     def plot(
         self,
-        axes: Optional[Union[Axes, NDArray[Axes]]] = None,
-        show_gradient: Optional[bool] = False,
+        axes: Axes | AxesArray | None = None,
+        show_gradient: bool | None = False,
         gradient_kwargs: dict[str, Any] = {
             "color": "black",
             "linestyle": "-",
@@ -199,8 +202,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         },
         *,
         block: bool = False,
-        show: Optional[bool] = None,
-        verbose: Optional[str] = None,
+        show: bool | None = None,
+        verbose: str | None = None,
         **kwargs,
     ):
         """
@@ -238,7 +241,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         """
 
     @abstractmethod
-    def save(self, fname: Union[str, Path]):
+    def save(self, fname: str | Path):
         """Save clustering solution to disk.
 
         Parameters
@@ -249,16 +252,16 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     def predict(
         self,
-        inst: Union[BaseRaw, BaseEpochs],
+        inst: BaseRaw | BaseEpochs,
         picks: Picks = None,
         factor: int = 0,
         half_window_size: int = 1,
-        tol: Union[int, float] = 1e-05,
+        tol: int | float = 1e-05,
         min_segment_length: int = 0,
         reject_edges: bool = True,
         reject_by_annotation: bool = True,
         *,
-        verbose: Optional[str] = None,
+        verbose: str | None = None,
     ):
         """Segment `~mne.io.Raw` or `~mne.Epochs` into microstate sequence.
 
@@ -320,9 +323,9 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     def _predict_raw(
         self,
         raw: BaseRaw,
-        picks_data: NDArray[int],
+        picks_data: ScalarIntArray,
         factor: int,
-        tol: Union[int, float],
+        tol: int | float,
         half_window_size: int,
         min_segment_length: int,
         reject_edges: bool,
@@ -333,9 +336,9 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
     def _predict_epochs(
         self,
         epochs: BaseEpochs,
-        picks_data: NDArray[int],
+        picks_data: ScalarIntArray,
         factor: int,
-        tol: Union[int, float],
+        tol: int | float,
         half_window_size: int,
         min_segment_length: int,
         reject_edges: bool,
@@ -344,23 +347,23 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @staticmethod
     def _segment(
-        data: NDArray[float],
-        states: NDArray[float],
+        data: ScalarFloatArray,
+        states: ScalarFloatArray,
         factor: int,
-        tol: Union[int, float],
+        tol: int | float,
         half_window_size: int,
-    ) -> NDArray[int]:
+    ) -> ScalarIntArray:
         """Create segmentation. Must operate on a copy of states."""
 
     @staticmethod
     def _smooth_segmentation(
-        data: NDArray[float],
-        states: NDArray[float],
-        labels: NDArray[int],
+        data: ScalarFloatArray,
+        states: ScalarFloatArray,
+        labels: ScalarIntArray,
         factor: int,
-        tol: Union[int, float],
+        tol: int | float,
         half_window_size: int,
-    ) -> NDArray[int]:
+    ) -> ScalarIntArray:
         """Apply smoothing.
 
         Adapted from [1].
@@ -377,8 +380,8 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
 
     @staticmethod
     def _reject_short_segments(
-        segmentation: NDArray[int], data: NDArray[float], min_segment_length: int
-    ) -> NDArray[int]:
+        segmentation: ScalarIntArray, data: ScalarFloatArray, min_segment_length: int
+    ) -> ScalarIntArray:
         """Reject segments that are too short.
 
         Reject segments that are too short by replacing the labels with the adjacent
@@ -386,7 +389,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         """
 
     @staticmethod
-    def _reject_edge_segments(segmentation: NDArray[int]) -> NDArray[int]:
+    def _reject_edge_segments(segmentation: ScalarIntArray) -> ScalarIntArray:
         """Set the first and last segment as unlabeled (0)."""
 
     @property
@@ -418,7 +421,7 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         """
 
     @property
-    def cluster_centers_(self) -> NDArray[float]:
+    def cluster_centers_(self) -> ScalarFloatArray:
         """Fitted clusters (the microstates maps).
 
         Returns None if cluster algorithm has not been fitted.
@@ -427,14 +430,14 @@ class _BaseCluster(Cluster, ChannelsMixin, ContainsMixin, MontageMixin):
         """
 
     @property
-    def fitted_data(self) -> NDArray[float]:
+    def fitted_data(self) -> ScalarFloatArray:
         """Data array used to fit the clustering algorithm.
 
         :type: `~numpy.array` of shape (n_channels, n_samples) | None
         """
 
     @property
-    def labels_(self) -> NDArray[int]:
+    def labels_(self) -> ScalarIntArray:
         """Microstate label attributed to each sample of the fitted data.
 
         :type: `~numpy.array` of shape (n_samples, ) | None

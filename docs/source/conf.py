@@ -247,10 +247,7 @@ sphinx_gallery_conf = {
     "compress_images": compress_images,
     "doc_module": ("pycrostates",),
     "examples_dirs": ["../../tutorials"],
-    "exclude_implicit_doc": {
-        r"pycrostates.CHData",
-        r"pycrostates.ChData.get_data",
-    },
+    "exclude_implicit_doc": {},
     "filename_pattern": r"\d{2}_",
     "gallery_dirs": ["generated/auto_tutorials"],
     "line_numbers": False,  # messes with style

@@ -1,6 +1,8 @@
 """Visualisation module for plotting segmentations."""
 
-from typing import Optional, Union
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 from matplotlib import colormaps, colors
@@ -9,16 +11,20 @@ from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.utils import check_version
-from numpy.typing import NDArray
 
 from ..utils._checks import _check_type, _ensure_valid_show
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
+if TYPE_CHECKING:
+    from typing import Optional, Union
+
+    from .._typing import ScalarFloatArray, ScalarIntArray
+
 
 @fill_doc
 def plot_raw_segmentation(
-    labels: NDArray[int],
+    labels: ScalarIntArray,
     raw: BaseRaw,
     n_clusters: int,
     cluster_names: list[str] = None,
@@ -107,7 +113,7 @@ def plot_raw_segmentation(
 
 @fill_doc
 def plot_epoch_segmentation(
-    labels: NDArray[int],
+    labels: ScalarIntArray,
     epochs: BaseEpochs,
     n_clusters: int,
     cluster_names: list[str] = None,
@@ -202,9 +208,9 @@ def plot_epoch_segmentation(
 
 @verbose
 def _plot_segmentation(
-    labels: NDArray[int],
-    gfp: NDArray[float],
-    times: NDArray[float],
+    labels: ScalarIntArray,
+    gfp: ScalarFloatArray,
+    times: ScalarFloatArray,
     n_clusters: int,
     cluster_names: list[str] = None,
     cmap: Optional[Union[str, colors.Colormap]] = None,

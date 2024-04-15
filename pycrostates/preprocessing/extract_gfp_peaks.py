@@ -1,5 +1,8 @@
 """Preprocessing functions to extract gfp peaks."""
-from typing import Optional, Union
+
+from __future__ import annotations  # c.f. PEP 563, PEP 649
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 from mne import BaseEpochs, pick_info
@@ -12,7 +15,6 @@ if check_version("mne", "1.6"):
 else:
     from mne.io.pick import _picks_to_idx
 
-from .._typing import CHData, Picks
 from ..utils._checks import (
     _check_picks_uniqueness,
     _check_reject_by_annotation,
@@ -22,6 +24,12 @@ from ..utils._checks import (
 )
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
+
+if TYPE_CHECKING:
+    from typing import Optional, Union
+
+    from .._typing import Picks, ScalarFloatArray
+    from ..io import ChData
 
 
 @fill_doc
@@ -36,7 +44,7 @@ def extract_gfp_peaks(
     tmax: Optional[float] = None,
     reject_by_annotation: bool = True,
     verbose=None,
-) -> CHData:
+) -> ChData:
     """:term:`Global Field Power` (:term:`GFP`) peaks extraction.
 
     Extract :term:`Global Field Power` (:term:`GFP`) peaks from :class:`~mne.Epochs` or
@@ -144,3 +152,27 @@ def extract_gfp_peaks(
 
     info = pick_info(inst.info, picks_all if return_all else picks)
     return ChData(peaks, info)
+
+
+def _extract_gfp_peaks(
+    data: NDArray[float], min_peak_distance: int = 2
+) -> NDArray[float]:
+    """Extract GFP peaks from input data.
+
+    Parameters
+    ----------
+    data : array of shape (n_channels, n_samples)
+        The data to extract GFP peaks from.
+    min_peak_distance : int
+        Required minimal horizontal distance (>= 1) in samples between neighboring
+        peaks. Smaller peaks are removed first until the condition is fulfilled for all
+        remaining peaks. Default to 2.
+
+    Returns
+    -------
+    peaks : array of shape (n_picks,)
+        The indices when peaks occur.
+    """
+    gfp = np.std(data, axis=0)
+    peaks, _ = find_peaks(gfp, distance=min_peak_distance)
+    return peaks

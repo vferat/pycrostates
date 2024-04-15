@@ -1,10 +1,9 @@
 from pathlib import Path as Path
-from typing import Union
 
 from mne import Info
-from numpy.typing import NDArray
 
-from .._typing import CHInfo as CHInfo
+from .._typing import ScalarFloatArray as ScalarFloatArray
+from .._typing import ScalarIntArray as ScalarIntArray
 from .._version import __version__ as __version__
 from ..cluster import AAHCluster as AAHCluster
 from ..cluster import ModKMeans as ModKMeans
@@ -12,15 +11,16 @@ from ..utils._checks import _check_type as _check_type
 from ..utils._checks import _check_value as _check_value
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
+from . import ChInfo as ChInfo
 
 def _write_cluster(
-    fname: Union[str, Path],
-    cluster_centers_: NDArray[float],
-    chinfo: Union[CHInfo, Info],
+    fname: str | Path,
+    cluster_centers_: ScalarFloatArray,
+    chinfo: ChInfo | Info,
     algorithm: str,
     cluster_names: list[str],
-    fitted_data: NDArray[float],
-    labels_: NDArray[int],
+    fitted_data: ScalarFloatArray,
+    labels_: ScalarIntArray,
     **kwargs,
 ):
     """Save clustering solution to disk.
@@ -47,7 +47,7 @@ def _write_cluster(
 def _prepare_kwargs(algorithm: str, kwargs: dict):
     """Prepare params to save from kwargs."""
 
-def _read_cluster(fname: Union[str, Path]):
+def _read_cluster(fname: str | Path):
     """Read clustering solution from disk.
 
     Parameters
@@ -67,31 +67,31 @@ def _check_fit_parameters_and_variables(fit_parameters: dict, fit_variables: dic
     """Check that we have all the keys we are looking for and return algo."""
 
 def _create_ModKMeans(
-    cluster_centers_: NDArray[float],
-    info: CHInfo,
+    cluster_centers_: ScalarFloatArray,
+    info: ChInfo,
     cluster_names: list[str],
-    fitted_data: NDArray[float],
-    labels_: NDArray[int],
+    fitted_data: ScalarFloatArray,
+    labels_: ScalarIntArray,
     n_init: int,
     max_iter: int,
-    tol: Union[int, float],
+    tol: int | float,
     GEV_: float,
 ):
     """Create a ModKMeans cluster."""
 
 def _create_AAHCluster(
-    cluster_centers_: NDArray[float],
-    info: CHInfo,
+    cluster_centers_: ScalarFloatArray,
+    info: ChInfo,
     cluster_names: list[str],
-    fitted_data: NDArray[float],
-    labels_: NDArray[int],
+    fitted_data: ScalarFloatArray,
+    labels_: ScalarIntArray,
     ignore_polarity: bool,
     normalize_input: bool,
     GEV_: float,
 ):
     """Create a AAHCluster object."""
 
-def _write_meas_info(fid, info: CHInfo):
+def _write_meas_info(fid, info: ChInfo):
     """Write measurement info into a file id (from a fif file).
 
     Parameters

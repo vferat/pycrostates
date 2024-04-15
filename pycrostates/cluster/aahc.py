@@ -6,10 +6,9 @@ from typing import Any, Optional, Union
 import numpy as np
 from mne import BaseEpochs
 from mne.io import BaseRaw
-from numpy.typing import NDArray
 
-from .._typing import Picks
-from ..utils import _gev
+from .._typing import Picks, ScalarFloatArray, ScalarIntArray
+from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
@@ -179,11 +178,11 @@ class AAHCluster(_BaseCluster):
     # --------------------------------------------------------------------
     @staticmethod
     def _aahc(
-        data: NDArray[float],
+        data: ScalarFloatArray,
         n_clusters: int,
         ignore_polarity: bool,
         normalize_input: bool,
-    ) -> tuple[float, NDArray[float], NDArray[int]]:
+    ) -> tuple[float, ScalarFloatArray, ScalarIntArray]:
         """Run the AAHC algorithm."""
         maps, segmentation = AAHCluster._compute_maps(
             data, n_clusters, ignore_polarity, normalize_input
@@ -194,11 +193,11 @@ class AAHCluster(_BaseCluster):
     # pylint: disable=too-many-locals
     @staticmethod
     def _compute_maps(
-        data: NDArray[float],
+        data: ScalarFloatArray,
         n_clusters: int,
         ignore_polarity: bool,
         normalize_input: bool,
-    ) -> tuple[NDArray[float], NDArray[int]]:
+    ) -> tuple[ScalarFloatArray, ScalarIntArray]:
         """Compute microstates maps."""
         n_chan, n_frame = data.shape
 

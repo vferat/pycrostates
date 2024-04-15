@@ -1,39 +1,36 @@
-"""Typing with ABC class for pycrostates classes.
+from __future__ import annotations  # c.f. PEP 563, PEP 649
 
-The type class can be used for type hinting for pycrostates classes that are at
-risk of circular imports, or for short-cut types re-grouping different types.
-"""
+from typing import Generic, TypeVar
 
-from abc import ABC
-from typing import Optional, Union
+import numpy as np
+from matplotlib.axes import Axes
+from numpy.random import Generator
+from numpy.random import RandomState as RandomState_np
 
-from numpy.random import Generator, RandomState
-from numpy.typing import NDArray
+ScalarFloatType = TypeVar("ScalarFloatType", np.float32, np.float64)
+ScalarIntType = TypeVar("ScalarIntType", np.int8, np.int16, np.int32, np.int64)
+ScalarType = TypeVar(
+    "ScalarType", np.int8, np.int16, np.int32, np.int64, np.float32, np.float64
+)
 
 
-class CHData(ABC):  # noqa: B024
-    """Typing for CHData."""
-
+class ScalarFloatArray(np.ndarray, Generic[ScalarFloatType]):
     pass
 
 
-class CHInfo(ABC):  # noqa: B024
-    """Typing for CHInfo."""
-
+class ScalarIntArray(np.ndarray, Generic[ScalarIntType]):
     pass
 
 
-class Cluster(ABC):  # noqa: B024
-    """Typing for a clustering class."""
-
+class ScalarArray(np.ndarray, Generic[ScalarType]):
     pass
 
 
-class Segmentation(ABC):  # noqa: B024
-    """Typing for a clustering class."""
-
+class AxesArray(np.ndarray, Generic[TypeVar("AxesType", bound=Axes)]):
     pass
 
 
-RANDomState = Optional[Union[int, RandomState, Generator]]
-Picks = Optional[Union[str, NDArray[int]]]
+RandomState = TypeVar("RandomState", int, RandomState_np, Generator)
+Picks = TypeVar(
+    "Picks", str, ScalarIntArray, list[str], list[int], tuple[str], tuple[int], None
+)

@@ -1,13 +1,10 @@
-from typing import Optional, Union
-
 from mne import Info
 
-from .._typing import CHInfo as CHInfo
 from ..utils._checks import _check_type as _check_type
 from ..utils._checks import _IntLike as _IntLike
 from ..utils._logs import logger as logger
 
-class ChInfo(CHInfo, Info):
+class ChInfo(Info):
     """Atemporal measurement information.
 
     Similar to a :class:`mne.Info` class, but without any temporal information.
@@ -132,9 +129,9 @@ class ChInfo(CHInfo, Info):
 
     def __init__(
         self,
-        info: Optional[Info] = None,
-        ch_names: Optional[Union[int, list[str], tuple[str, ...]]] = None,
-        ch_types: Optional[Union[str, list[str], tuple[str, ...]]] = None,
+        info: Info | None = None,
+        ch_names: int | list[str] | tuple[str, ...] | None = None,
+        ch_types: str | list[str] | tuple[str, ...] | None = None,
     ) -> None: ...
     def _init_from_info(self, info: Info):
         """Init instance from mne Info."""
@@ -142,8 +139,8 @@ class ChInfo(CHInfo, Info):
 
     def _init_from_channels(
         self,
-        ch_names: Union[int, list[str], tuple[str, ...]],
-        ch_types: Union[str, list[str], tuple[str, ...]],
+        ch_names: int | list[str] | tuple[str, ...],
+        ch_types: str | list[str] | tuple[str, ...],
     ):
         """Init instance from channel names and types."""
 

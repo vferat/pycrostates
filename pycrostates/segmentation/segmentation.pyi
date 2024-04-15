@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 from _typeshed import Incomplete
 from matplotlib.axes import Axes as Axes
 from mne import BaseEpochs
@@ -32,15 +30,15 @@ class RawSegmentation(_BaseSegmentation):
     def __init__(self, *args, **kwargs) -> None: ...
     def plot(
         self,
-        tmin: Optional[Union[int, float]] = None,
-        tmax: Optional[Union[int, float]] = None,
-        cmap: Optional[str] = None,
-        axes: Optional[Axes] = None,
-        cbar_axes: Optional[Axes] = None,
+        tmin: int | float | None = None,
+        tmax: int | float | None = None,
+        cmap: str | None = None,
+        axes: Axes | None = None,
+        cbar_axes: Axes | None = None,
         *,
         block: bool = False,
-        show: Optional[bool] = None,
-        verbose: Optional[str] = None,
+        show: bool | None = None,
+        verbose: str | None = None,
     ):
         """Plot the segmentation.
 
@@ -99,12 +97,12 @@ class EpochsSegmentation(_BaseSegmentation):
     def __init__(self, *args, **kwargs) -> None: ...
     def plot(
         self,
-        cmap: Optional[str] = None,
-        axes: Optional[Axes] = None,
-        cbar_axes: Optional[Axes] = None,
+        cmap: str | None = None,
+        axes: Axes | None = None,
+        cbar_axes: Axes | None = None,
         *,
         block: bool = False,
-        show: Optional[bool] = None,
+        show: bool | None = None,
         verbose: Incomplete | None = None,
     ):
         """Plot segmentation.

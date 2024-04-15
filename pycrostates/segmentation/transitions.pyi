@@ -1,15 +1,15 @@
-from numpy.typing import NDArray
-
+from .._typing import ScalarFloatArray as ScalarFloatArray
+from .._typing import ScalarIntArray as ScalarIntArray
 from ..utils._checks import _check_type as _check_type
 from ..utils._checks import _check_value as _check_value
 from ..utils._docs import fill_doc as fill_doc
 
 def compute_transition_matrix(
-    labels: NDArray[int],
+    labels: ScalarIntArray,
     n_clusters: int,
     stat: str = "probability",
     ignore_repetitions: bool = True,
-) -> NDArray[float]:
+) -> ScalarFloatArray:
     """Compute the observed transition matrix.
 
     Count the number of transitions from one state to another and aggregate the result
@@ -43,19 +43,19 @@ def compute_transition_matrix(
     """
 
 def _compute_transition_matrix(
-    labels: NDArray[int],
+    labels: ScalarIntArray,
     n_clusters: int,
     stat: str = "probability",
     ignore_repetitions: bool = True,
-) -> NDArray[float]:
+) -> ScalarFloatArray:
     """Compute observed transition."""
 
 def compute_expected_transition_matrix(
-    labels: NDArray[int],
+    labels: ScalarIntArray,
     n_clusters: int,
     stat: str = "probability",
     ignore_repetitions: bool = True,
-) -> NDArray[float]:
+) -> ScalarFloatArray:
     """Compute the expected transition matrix.
 
     Compute the theoretical transition matrix as if time course was ignored, but
@@ -92,15 +92,15 @@ def compute_expected_transition_matrix(
     """
 
 def _compute_expected_transition_matrix(
-    labels: NDArray[int],
+    labels: ScalarIntArray,
     n_clusters: int,
     stat: str = "probability",
     ignore_repetitions: bool = True,
-) -> NDArray[float]:
+) -> ScalarFloatArray:
     """Compute theoretical transition matrix.
 
     The theoretical transition matrix takes into account the time coverage.
     """
 
-def _check_labels_n_clusters(labels: NDArray[int], n_clusters: int) -> None:
+def _check_labels_n_clusters(labels: ScalarIntArray, n_clusters: int) -> None:
     """Checker for labels and n_clusters."""

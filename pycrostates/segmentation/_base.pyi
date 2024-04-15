@@ -1,13 +1,12 @@
-from abc import abstractmethod
-from typing import Optional, Union
+from abc import ABC, abstractmethod
 
 from _typeshed import Incomplete
 from matplotlib.axes import Axes as Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
-from numpy.typing import NDArray
 
-from .._typing import Segmentation as Segmentation
+from .._typing import ScalarFloatArray as ScalarFloatArray
+from .._typing import ScalarIntArray as ScalarIntArray
 from ..utils import _corr_vectors as _corr_vectors
 from ..utils._checks import _check_type as _check_type
 from ..utils._docs import fill_doc as fill_doc
@@ -18,7 +17,7 @@ from .transitions import (
 )
 from .transitions import _compute_transition_matrix as _compute_transition_matrix
 
-class _BaseSegmentation(Segmentation):
+class _BaseSegmentation(ABC):
     """Base class for a Microstates segmentation.
 
     Parameters
@@ -44,11 +43,11 @@ class _BaseSegmentation(Segmentation):
     @abstractmethod
     def __init__(
         self,
-        labels: NDArray[int],
-        inst: Union[BaseRaw, BaseEpochs],
-        cluster_centers_: NDArray[float],
-        cluster_names: Optional[list[str]] = None,
-        predict_parameters: Optional[dict] = None,
+        labels: ScalarIntArray,
+        inst: BaseRaw | BaseEpochs,
+        cluster_centers_: ScalarFloatArray,
+        cluster_names: list[str] | None = None,
+        predict_parameters: dict | None = None,
     ): ...
     def __repr__(self) -> str: ...
     def _repr_html_(self, caption: Incomplete | None = None): ...
@@ -161,9 +160,7 @@ class _BaseSegmentation(Segmentation):
             First axis indicates state ``"from"``. Second axis indicates state ``"to"``.
         """
 
-    def entropy(
-        self, ignore_repetitions: bool = False, log_base: Union[float, str] = 2
-    ):
+    def entropy(self, ignore_repetitions: bool = False, log_base: float | str = 2):
         """Compute the Shannon entropy of the segmentation.
 
         Compute the Shannon entropy\\ :footcite:p:`shannon1948mathematical`
@@ -195,11 +192,7 @@ class _BaseSegmentation(Segmentation):
         """
 
     def plot_cluster_centers(
-        self,
-        axes: Optional[Union[Axes, NDArray[Axes]]] = None,
-        *,
-        block: bool = False,
-        show: Optional[bool] = None,
+        self, axes: Axes | None = None, *, block: bool = False, show: bool | None = None
     ):
         """Plot cluster centers as topographic maps.
 
@@ -223,7 +216,7 @@ class _BaseSegmentation(Segmentation):
 
     @staticmethod
     def _check_cluster_names(
-        cluster_names: list[str], cluster_centers_: NDArray[float]
+        cluster_names: list[str], cluster_centers_: ScalarFloatArray
     ):
         """Check that the argument 'cluster_names' is valid."""
 
@@ -239,16 +232,15 @@ class _BaseSegmentation(Segmentation):
         """
 
     @property
-    def labels(self) -> NDArray[int]:
+    def labels(self) -> ScalarIntArray:
         """Microstate label attributed to each sample (the segmentation).
 
         :type: `~numpy.array`
         """
 
     @property
-    def cluster_centers_(self) -> NDArray[float]:
-        """Cluster centers (i.e topographies)
-        used to compute the segmentation.
+    def cluster_centers_(self) -> ScalarFloatArray:
+        """Cluster centers (i.e topographies) used to compute the segmentation.
 
         :type: `~numpy.array`
         """
