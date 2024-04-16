@@ -955,6 +955,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     def _segment(
         data: ScalarFloatArray,
         states: ScalarFloatArray,
+        ignore_polarity: bool,
         factor: int,
         tol: Union[int, float],
         half_window_size: int,
