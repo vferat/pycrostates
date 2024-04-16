@@ -968,7 +968,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         if factor != 0:
             labels = _BaseCluster._smooth_segmentation(
-                data, states, ignore_polarity, labels, factor, tol, half_window_size
+                data, states, labels, factor, tol, half_window_size
             )
         return labels
 
@@ -1032,6 +1032,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         segmentation: ScalarIntArray,
         data: ScalarFloatArray,
         min_segment_length: int,
+        ignore_polarity: bool,
     ) -> NDArray[int]:
         """Reject segments that are too short.
 
@@ -1228,3 +1229,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 f"Provided: '{n_clusters}'."
             )
         return n_clusters
+
+    @staticmethod
+    def _check_ignore_polarity(ignore_polarity: bool) -> bool:
+        """Check that ignore_polarity is a boolean."""
+        _check_type(ignore_polarity, (bool,), item_name="ignore_polarity")
+        return ignore_polarity

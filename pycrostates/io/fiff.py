@@ -201,7 +201,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
     """Prepare params to save from kwargs."""
     valids = {
         "ModKMeans": {
-            "parameters": ["n_init", "max_iter", "tol"],
+            "parameters": ["ignore_polarity", "n_init", "max_iter", "tol"],
             "variables": ["GEV_"],
         },
         "AAHCluster": {
@@ -240,6 +240,10 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
                 fit_parameters["max_iter"] = ModKMeans._check_max_iter(value)
             elif key == "tol":
                 fit_parameters["tol"] = ModKMeans._check_tol(value)
+            elif key == "ignore_polarity":
+                fit_parameters["ignore_polarity"] = ModKMeans._check_ignore_polarity(
+                    value
+                )
         elif algorithm == "AAHCluster":
             if key == "ignore_polarity":
                 fit_parameters["ignore_polarity"] = AAHCluster._check_ignore_polarity(
@@ -410,6 +414,7 @@ def _create_ModKMeans(
     n_init: int,
     max_iter: int,
     tol: Union[int, float],
+    ignore_polarity: bool,
     GEV_: float,
 ):
     """Create a ModKMeans cluster."""
@@ -423,6 +428,7 @@ def _create_ModKMeans(
     cluster._labels_ = labels_
     cluster._GEV_ = GEV_
     cluster._fitted = True
+    cluster._ignore_polarity = ignore_polarity
     return cluster
 
 
@@ -432,7 +438,7 @@ def _create_AAHCluster(
     cluster_names: list[str],
     fitted_data: ScalarFloatArray,
     labels_: ScalarIntArray,
-    ignore_polarity: bool,  # pylint: disable=unused-argument
+    ignore_polarity: bool,
     normalize_input: bool,
     GEV_: float,
 ):
@@ -452,6 +458,7 @@ def _create_AAHCluster(
     cluster._labels_ = labels_
     cluster._GEV_ = GEV_
     cluster._fitted = True
+    cluster._ignore_polarity = ignore_polarity
     return cluster
 
 

@@ -275,12 +275,6 @@ class AAHCluster(_BaseCluster):
             self._GEV_ = None
 
     @staticmethod
-    def _check_ignore_polarity(ignore_polarity: bool) -> bool:
-        """Check that ignore_polarity is a boolean."""
-        _check_type(ignore_polarity, (bool,), item_name="ignore_polarity")
-        return ignore_polarity
-
-    @staticmethod
     def _check_normalize_input(normalize_input: bool) -> bool:
         """Check that normalize_input is a boolean."""
         _check_type(normalize_input, (bool,), item_name="normalize_input")
