@@ -333,8 +333,9 @@ class ModKMeans(_BaseCluster):
             # Assign each sample to the best matching microstate
             activation = maps.dot(data)
             if ignore_polarity:
-                activation = np.abs(activation)
-            segmentation = np.argmax(activation, axis=0)
+                segmentation = np.argmax(np.abs(activation), axis=0)
+            else:
+                segmentation = np.argmax(activation, axis=0)
 
             # Recompute the topographic maps of the microstates, based on the
             # samples that were assigned to each state.
