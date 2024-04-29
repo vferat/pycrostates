@@ -89,9 +89,9 @@ html_theme_options = {
             "icon": "fab fa-github-square",
         },
         {
-            "name": "Slack",
-            "url": "https://pycrostates.slack.com",
-            "icon": "fab fa-slack",
+            'name': "Forum",
+            'url': "https://mne.discourse.group/",
+            'icon': "fa-brands fa-discourse fa-fw",
         },
     ],
     "external_links": [{"name": "MNE", "url": "https://mne.tools/stable/index.html"}],
