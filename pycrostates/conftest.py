@@ -23,6 +23,8 @@ def pytest_configure(config):
     # Joblib
     ignore:ast\.Num is deprecated.*:DeprecationWarning
     ignore:Attribute n is deprecated.*:DeprecationWarning
+    # MNE
+    ignore:Python 3.14 will, by default, filter extracted tar.*:DeprecationWarning
     """
     for warning_line in warnings_lines.split("\n"):
         warning_line = warning_line.strip()
