@@ -9,6 +9,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
+from intersphinx_registry import get_intersphinx_mapping
 from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
 
 import pycrostates
@@ -18,7 +19,7 @@ import pycrostates
 
 project = "pycrostates"
 author = "Victor Férat"
-copyright = f"{date.today().year}, {author}"
+copyright = f"{date.today().year}, {author}"  # noqa
 release = pycrostates.__version__
 package = pycrostates.__name__
 gh_url = "https://github.com/vferat/pycrostates/"
@@ -92,9 +93,9 @@ html_theme_options = {
             "icon": "fab fa-github-square",
         },
         {
-            'name': "Forum",
-            'url': "https://mne.discourse.group/",
-            'icon': "fa-brands fa-discourse fa-fw",
+            "name": "Forum",
+            "url": "https://mne.discourse.group/",
+            "icon": "fa-brands fa-discourse fa-fw",
         },
     ],
     "external_links": [{"name": "MNE", "url": "https://mne.tools/stable/index.html"}],
@@ -132,16 +133,18 @@ autosummary_generate = True
 autosectionlabel_prefix_document = True
 
 # -- intersphinx -------------------------------------------------------------
-intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
-    "numpy": ("https://numpy.org/doc/stable", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy", None),
-    "matplotlib": ("https://matplotlib.org", None),
-    "mne": ("https://mne.tools/stable/", None),
-    "joblib": ("https://joblib.readthedocs.io/en/latest", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
-    "sklearn": ("https://scikit-learn.org/stable/", None),
-}
+intersphinx_mapping = get_intersphinx_mapping(
+    only={
+        "joblib",
+        "matplotlib",
+        "mne",
+        "numpy",
+        "pandas",
+        "python",
+        "scipy",
+        "sklearn",
+    }
+)
 intersphinx_timeout = 5
 
 # -- sphinx-issues -----------------------------------------------------------
