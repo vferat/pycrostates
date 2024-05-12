@@ -48,10 +48,12 @@ def _corr_vectors(A, B, axis=0):
     np.seterr(divide="warn", invalid="warn")
     return corr
 
+
 def _distance_matrix(X, Y=None):
     """Distance matrix used in metrics."""
     distances = 1 - np.abs(1 / np.corrcoef(X, Y))
     return distances
+
 
 def _compare_infos(cluster_info, inst_info):
     """Check that channels in cluster_info are all present in inst_info."""
