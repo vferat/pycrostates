@@ -134,7 +134,7 @@ autosectionlabel_prefix_document = True
 
 # -- intersphinx -------------------------------------------------------------
 intersphinx_mapping = get_intersphinx_mapping(
-    only={
+    packages={
         "joblib",
         "matplotlib",
         "mne",
