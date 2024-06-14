@@ -11,7 +11,8 @@ from mne.io import BaseRaw
 from mne.parallel import parallel_func
 from numpy.random import Generator, RandomState
 
-from ..utils import _corr_vectors
+from .._typing import Picks
+from ..utils import _gev
 from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
@@ -73,6 +74,9 @@ class ModKMeans(_BaseCluster):
         # fit variables
         self._GEV_ = None
 
+        # ignore polarity
+        self._ignore_polarity = True
+
     def _repr_html_(self, caption=None):
         from ..html_templates import repr_templates_env
 
@@ -116,6 +120,7 @@ class ModKMeans(_BaseCluster):
                 # '_random_state',
                 # TODO: think about comparison and I/O for random states
                 "_GEV_",
+                "_ignore_polarity",
             )
             for attribute in attributes:
                 try:
@@ -191,7 +196,12 @@ class ModKMeans(_BaseCluster):
             count_converged = 0
             for init in inits:
                 gev, maps, segmentation, converged = ModKMeans._kmeans(
-                    data, self._n_clusters, self._max_iter, init, self._tol
+                    data,
+                    self._n_clusters,
+                    self._ignore_polarity,
+                    self._max_iter,
+                    init,
+                    self._tol,
                 )
                 if not converged:
                     continue
@@ -207,7 +217,14 @@ class ModKMeans(_BaseCluster):
                 ModKMeans._kmeans, n_jobs, total=self._n_init
             )
             runs = parallel(
-                p_fun(data, self._n_clusters, self._max_iter, init, self._tol)
+                p_fun(
+                    data,
+                    self._n_clusters,
+                    self._ignore_polarity,
+                    self._max_iter,
+                    init,
+                    self._tol,
+                )
                 for init in inits
             )
             try:
@@ -238,7 +255,6 @@ class ModKMeans(_BaseCluster):
         self._cluster_centers_ = best_maps
         self._labels_ = best_segmentation
         self._fitted = True
-        self._ignore_polarity = True
 
     @copy_doc(_BaseCluster.save)
     def save(self, fname: Union[str, Path]):
@@ -258,6 +274,7 @@ class ModKMeans(_BaseCluster):
             n_init=self._n_init,
             max_iter=self._max_iter,
             tol=self._tol,
+            ignore_polarity=self._ignore_polarity,
             GEV_=self._GEV_,
         )
 
@@ -266,25 +283,23 @@ class ModKMeans(_BaseCluster):
     def _kmeans(
         data: ScalarFloatArray,
         n_clusters: int,
+        ignore_polarity: bool,
         max_iter: int,
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
     ) -> tuple[float, ScalarFloatArray, ScalarIntArray, bool]:
         """Run the k-means algorithm."""
-        gfp_sum_sq = np.sum(data**2)
-        maps, converged = ModKMeans._compute_maps(
-            data, n_clusters, max_iter, random_state, tol
+        maps, segmentation, converged = ModKMeans._compute_maps(
+            data, n_clusters, ignore_polarity, max_iter, random_state, tol
         )
-        activation = maps.dot(data)
-        segmentation = np.argmax(np.abs(activation), axis=0)
-        map_corr = _corr_vectors(data, maps[segmentation].T)
-        gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
+        gev = _gev(data, maps, segmentation)
         return gev, maps, segmentation, converged
 
     @staticmethod
     def _compute_maps(
         data: ScalarFloatArray,
         n_clusters: int,
+        ignore_polarity: bool,
         max_iter: int,
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
@@ -317,7 +332,10 @@ class ModKMeans(_BaseCluster):
         for _ in range(max_iter):
             # Assign each sample to the best matching microstate
             activation = maps.dot(data)
-            segmentation = np.argmax(np.abs(activation), axis=0)
+            if ignore_polarity:
+                segmentation = np.argmax(np.abs(activation), axis=0)
+            else:
+                segmentation = np.argmax(activation, axis=0)
 
             # Recompute the topographic maps of the microstates, based on the
             # samples that were assigned to each state.
@@ -346,7 +364,7 @@ class ModKMeans(_BaseCluster):
         else:
             converged = False
 
-        return maps, converged
+        return maps, segmentation, converged
 
     # --------------------------------------------------------------------
     @property

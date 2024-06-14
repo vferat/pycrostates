@@ -12,7 +12,7 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.utils import check_version
 
-from ..utils import _corr_vectors
+from ..utils import _correlation
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
@@ -160,7 +160,7 @@ class _BaseSegmentation(ABC):
             # create a 1D view of the labels array
             labels = labels.reshape(-1)
 
-        gfp = np.std(data, axis=0)
+        gfp = np.std(data, axis=0)  # TODO: change gfp
         if norm_gfp:
             labeled = np.argwhere(labels != -1)  # ignore unlabeled segments
             gfp /= np.linalg.norm(gfp[labeled])  # normalize
@@ -174,11 +174,11 @@ class _BaseSegmentation(ABC):
             if len(arg_where) != 0:
                 labeled_tp = data.T[arg_where][:, 0, :].T
                 labeled_gfp = gfp[arg_where][:, 0]
-                state_array = np.array([state] * len(arg_where)).transpose()
-
-                dist_corr = _corr_vectors(state_array, labeled_tp)
+                dist_corr = _correlation(
+                    labeled_tp, state, ignore_polarity=True
+                )  # TODO: ignore_polarity
                 params[f"{state_name}_mean_corr"] = np.mean(np.abs(dist_corr))
-                dist_gev = (labeled_gfp * dist_corr) ** 2 / np.sum(gfp**2)
+                dist_gev = (labeled_gfp * dist_corr) ** 2 / np.sum(gfp**2)  # TODO: gev
                 params[f"{state_name}_gev"] = np.sum(dist_gev)
 
                 s_segments = np.array([len(group) for s_, group in segments if s_ == s])
