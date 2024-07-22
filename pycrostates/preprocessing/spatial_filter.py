@@ -11,7 +11,7 @@ from mne.io import BaseRaw
 from mne.parallel import parallel_func
 from mne.utils import check_version
 from mne.utils.check import _check_preload
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_array, csr_matrix
 
 if check_version("mne", "1.6"):
     from mne._fiff.pick import _picks_by_type
@@ -31,35 +31,36 @@ if TYPE_CHECKING:
 
 def _check_adjacency(adjacency, info, ch_type):
     """Check adjacency matrix."""
-    _check_type(adjacency, (csr_matrix, np.ndarray, str), "adjacency")
+    # in MNE 1.8, the type was changed from a csr_matrix to a csr_array
+    _check_type(adjacency, (csr_matrix, csr_array, np.ndarray, str), "adjacency")
     # auto
     if isinstance(adjacency, str):
         if adjacency != "auto":
             raise (
                 ValueError(
-                    f"Adjacency can be either a scipy.sparse.csr_matrix"
-                    f"or 'auto' but got string '{adjacency}' instead."
+                    "Adjacency can be either a scipy.sparse.csr_array (MNE 1.8 "
+                    "and above), a scipy.sparse.csr_matrix (MNE 1.7 and older) or "
+                    f"'auto' but got string '{adjacency}' instead."
                 )
             )
         adjacency, ch_names = find_ch_adjacency(info, ch_type)
     # custom
-    if isinstance(adjacency, csr_matrix):
+    if not isinstance(adjacency, np.ndarray):
         adjacency = adjacency.toarray()
-    if isinstance(adjacency, np.ndarray):
-        ch_names = info.ch_names
-        n_channels = len(ch_names)
-        if adjacency.ndim != 2:
-            raise ValueError(
-                "Adjacency must have exactly 2 dimensions but got "
-                f"{adjacency.ndim} dimensions instead."
-            )
-        if (adjacency.shape[0] != n_channels) or (adjacency.shape[1] != n_channels):
-            raise ValueError(
-                "Adjacency must be of shape (n_channels, n_channels) "
-                f"but got {adjacency.shape} instead."
-            )
-        if not np.array_equal(adjacency, adjacency.astype(bool)):
-            raise ValueError("Values contained in adjacency can only be 0 or 1.")
+    ch_names = info.ch_names
+    n_channels = len(ch_names)
+    if adjacency.ndim != 2:
+        raise ValueError(
+            f"Adjacency must have exactly 2 dimensions but got {adjacency.ndim} "
+            "dimensions instead."
+        )
+    if (adjacency.shape[0] != n_channels) or (adjacency.shape[1] != n_channels):
+        raise ValueError(
+            "Adjacency must be of shape (n_channels, n_channels) but got "
+            f"{adjacency.shape} instead."
+        )
+    if not np.array_equal(adjacency, adjacency.astype(bool)):
+        raise ValueError("Values contained in adjacency can only be 0 or 1.")
     return (adjacency, ch_names)
 
 
@@ -108,10 +109,10 @@ def apply_spatial_filter(
         Origin of the sphere in the head coordinate frame and in meters. Can be
         ``'auto'`` (default), which means a head-digitization-based origin fit.
     adjacency : array or csr_matrix of shape (n_channels, n_channels) | str
-        An adjacency matrix. Can be created using `mne.channels.find_ch_adjacency` and
-        edited with `mne.viz.plot_ch_adjacency`. If ``'auto'`` (default), the matrix
-        will be automatically created using `mne.channels.find_ch_adjacency` and other
-        parameters.
+        An adjacency matrix. Can be created using :func:`mne.channels.find_ch_adjacency`
+        and edited with :func:`mne.viz.plot_ch_adjacency`. If ``'auto'`` (default), the
+        matrix will be automatically created using
+        :func:`mne.channels.find_ch_adjacency` and other parameters.
     %(n_jobs)s
     %(verbose)s
 
