@@ -74,7 +74,7 @@ jobs:
           python -m pip install --quiet uv
           uv pip install --quiet --system .[test]
           uv pip install --quiet --system --upgrade git+https://github.com/mne-tools/mne-python
-          uv pip install --quiet --system --upgrade --prerelease allow --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple matplotlib numpy scipy scikit-learn
+          uv pip install --quiet --system --upgrade --prerelease allow --only-binary :all: --extra-index-url https://pypi.anaconda.org/scientific-python-nightly-wheels/simple matplotlib numpy scipy scikit-learn
       - name: Display system information
         run: pycrostates-sys_info --developer
       - name: Display MNE info
