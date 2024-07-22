@@ -174,7 +174,7 @@ def _check_labels_n_clusters(
         )
 
     # only accept array of integers to simplify maintenance
-    if labels.dtype != "int":
+    if not np.issubdtype(labels.dtype, np.integer):
         raise ValueError(
             "The argument 'labels' must contain the labels of each timepoint "
             "encoded as consecutive positive integers (0-indexed). Make sure "
