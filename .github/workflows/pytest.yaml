@@ -30,10 +30,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install package
+      - name: Install uv and package
         run: |
-          python -m pip install --progress-bar off --upgrade pip setuptools
-          python -m pip install --progress-bar off .[test]
+          python -m pip install --quiet uv
+          uv pip install --quiet --system .[test]
       - name: Display system information
         run: pycrostates-sys_info --developer
       - name: Display MNE info
@@ -69,14 +69,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+      - name: Install uv and package
         run: |
-          python -m pip install --progress-bar off --upgrade pip setuptools
-          python -m pip install --progress-bar off .[test]
-          python -m pip install --progress-bar off --upgrade git+https://github.com/mne-tools/mne-python
-          python -m pip install matplotlib
-          python -m pip install --progress-bar off --upgrade --no-deps --pre --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple --timeout=180 matplotlib
-          python -m pip install --progress-bar off --upgrade --pre --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple --timeout=180 numpy scipy scikit-learn
+          python -m pip install --quiet uv
+          uv pip install --quiet --system .[test]
+          uv pip install --quiet --system --upgrade git+https://github.com/mne-tools/mne-python
+          uv pip install --quiet --system --upgrade --prerelease allow --only-binary :all: -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple matplotlib numpy scipy scikit-learn
       - name: Display system information
         run: pycrostates-sys_info --developer
       - name: Display MNE info
