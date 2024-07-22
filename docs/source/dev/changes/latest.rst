@@ -9,8 +9,22 @@
 
 .. include:: ./names.inc
 
-Version 0.6
+.. _latest:
+
+Version 0.7
 -----------
 
-This version ensures compatibility with MNE-Python 1.8 and above and improves the
-developer tools configuration used by this project.
+Enhancements
+~~~~~~~~~~~~
+
+- xxx
+
+Bugs
+~~~~
+
+- xxx
+
+API and behavior changes
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- xxx
