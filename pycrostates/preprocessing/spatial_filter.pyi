@@ -57,10 +57,10 @@ def apply_spatial_filter(
         Origin of the sphere in the head coordinate frame and in meters. Can be
         ``'auto'`` (default), which means a head-digitization-based origin fit.
     adjacency : array or csr_matrix of shape (n_channels, n_channels) | str
-        An adjacency matrix. Can be created using `mne.channels.find_ch_adjacency` and
-        edited with `mne.viz.plot_ch_adjacency`. If ``'auto'`` (default), the matrix
-        will be automatically created using `mne.channels.find_ch_adjacency` and other
-        parameters.
+        An adjacency matrix. Can be created using :func:`mne.channels.find_ch_adjacency`
+        and edited with :func:`mne.viz.plot_ch_adjacency`. If ``'auto'`` (default), the
+        matrix will be automatically created using
+        :func:`mne.channels.find_ch_adjacency` and other parameters.
     n_jobs : int | None
         The number of jobs to run in parallel. If ``-1``, it is set
         to the number of CPU cores. Requires the :mod:`joblib` package.
