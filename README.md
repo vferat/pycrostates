@@ -42,7 +42,7 @@ by [Zenodo](https://zenodo.org/record/7129852).
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Pycrostates welcomes contributions from anyone interested in improving this project. These contributions can take the form of bug reports/fixes, feature requests/additions, documentation revision and new tutorials.
@@ -66,6 +66,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/LouPlanchamp"><img src="https://avatars.githubusercontent.com/u/107875645?v=4?s=100" width="100px;" alt="Lou"/><br /><sub><b>Lou</b></sub></a><br /><a href="#design-LouPlanchamp" title="Design">🎨</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/rkobler"><img src="https://avatars.githubusercontent.com/u/22491497?v=4?s=100" width="100px;" alt="rkobler"/><br /><sub><b>rkobler</b></sub></a><br /><a href="https://github.com/vferat/pycrostates/commits?author=rkobler" title="Code">💻</a> <a href="https://github.com/vferat/pycrostates/commits?author=rkobler" title="Documentation">📖</a> <a href="#ideas-rkobler" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/vferat/pycrostates/commits?author=rkobler" title="Tests">⚠️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Frederic-vW"><img src="https://avatars.githubusercontent.com/u/20075705?v=4?s=100" width="100px;" alt="Frederic-vW"/><br /><sub><b>Frederic-vW</b></sub></a><br /><a href="https://github.com/vferat/pycrostates/commits?author=Frederic-vW" title="Code">💻</a> <a href="#tutorial-Frederic-vW" title="Tutorials">✅</a> <a href="https://github.com/vferat/pycrostates/pulls?q=is%3Apr+reviewed-by%3AFrederic-vW" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://larsoner.com"><img src="https://avatars.githubusercontent.com/u/2365790?v=4?s=100" width="100px;" alt="Eric Larson"/><br /><sub><b>Eric Larson</b></sub></a><br /><a href="https://github.com/vferat/pycrostates/commits?author=larsoner" title="Documentation">📖</a> <a href="#infra-larsoner" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     </tr>
   </tbody>
 </table>
