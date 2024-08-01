@@ -100,8 +100,8 @@ test = [
 pycrostates-sys_info = 'pycrostates.commands.sys_info:run'
 
 [project.urls]
-documentation = 'https://pycrostates.readthedocs.io/en/master/'
-homepage = 'https://pycrostates.readthedocs.io/en/master/'
+documentation = 'https://pycrostates.readthedocs.io'
+homepage = 'https://pycrostates.readthedocs.io'
 source = 'https://github.com/vferat/pycrostates'
 tracker = 'https://github.com/vferat/pycrostates/issues'
 
