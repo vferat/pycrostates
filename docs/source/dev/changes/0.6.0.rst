@@ -9,6 +9,8 @@
 
 .. include:: ./names.inc
 
+.. _latest:
+
 Version 0.6
 -----------
 
