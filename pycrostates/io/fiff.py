@@ -57,13 +57,13 @@ else:
     )
 
 from .._version import __version__
-from ..cluster import AAHCluster, ModKMeans
+from ..cluster import AAHCluster, ClusterArray, ModKMeans
 from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 
 if TYPE_CHECKING:
-    from typing import Union
+    from typing import Optional, Union
 
     from .._typing import ScalarFloatArray, ScalarIntArray
     from . import ChInfo
@@ -105,8 +105,8 @@ def _write_cluster(
     chinfo: Union[ChInfo, Info],
     algorithm: str,
     cluster_names: list[str],
-    fitted_data: ScalarFloatArray,
-    labels_: ScalarIntArray,
+    fitted_data: Optional[ScalarFloatArray],
+    labels_: Optional[ScalarIntArray],
     **kwargs,
 ):
     """Save clustering solution to disk.
@@ -121,11 +121,13 @@ def _write_cluster(
     algorithm : str
         Clustering algorithm used. Valids are:
             'ModKMeans'
+            'AAHCluster'
+            'Array'
     cluster_names : list
         List of names for each of the clusters.
-    fitted_data : array
+    fitted_data : array of shape (n_channels, n_samples) | None
         Data array used for fitting of shape (n_channels, n_samples)
-    labels_ : array
+    labels_ : array of shape (n_samples,) | None
         Array of labels for each sample of shape (n_samples, )
     """
     from . import ChInfo
@@ -139,17 +141,17 @@ def _write_cluster(
     if isinstance(chinfo, Info):
         chinfo = ChInfo(chinfo)  # convert to ChInfo if a MNE Info is provided
     _check_type(algorithm, (str,), "algorithm")
-    _check_value(algorithm, ("ModKMeans", "AAHCluster"), "algorithm")
+    _check_value(algorithm, ("ModKMeans", "AAHCluster", "Array"), "algorithm")
     _check_type(cluster_names, (list,), "cluster_names")
     if len(cluster_names) != cluster_centers_.shape[0]:
         raise ValueError(
             "Argument 'cluster_names' and 'cluster_centers_' shapes do not match."
         )
-    _check_type(fitted_data, (np.ndarray,), "fitted_data")
-    if fitted_data.ndim != 2:
+    _check_type(fitted_data, (np.ndarray, None), "fitted_data")
+    if fitted_data is not None and fitted_data.ndim != 2:
         raise ValueError("Argument 'fitted_data' should be a 2D array.")
-    _check_type(labels_, (np.ndarray,), "labels_")
-    if labels_.ndim != 1:
+    _check_type(labels_, (np.ndarray, None), "labels_")
+    if labels_ is not None and labels_.ndim != 1:
         raise ValueError("Argument 'labels_' should be a 1D array.")
 
     # logging
@@ -176,15 +178,17 @@ def _write_cluster(
         # write cluster_names
         write_name_list(fid, FIFF.FIFF_MNE_ROW_NAMES, cluster_names)
         # write fitted_data
-        write_double_matrix(
-            fid, FIFF.FIFF_MNE_ICA_WHITENER, fitted_data.astype(np.float64)
-        )
+        if fitted_data is not None:
+            write_double_matrix(
+                fid, FIFF.FIFF_MNE_ICA_WHITENER, fitted_data.astype(np.float64)
+            )
         # write labels_
-        write_double_matrix(
-            fid,
-            FIFF.FIFF_MNE_ICA_PCA_MEAN,
-            labels_.reshape(-1, 1).astype(np.float64),
-        )
+        if labels_ is not None:
+            write_double_matrix(
+                fid,
+                FIFF.FIFF_MNE_ICA_PCA_MEAN,
+                labels_.reshape(-1, 1).astype(np.float64),
+            )
         # write fit_parameters
         write_string(
             fid, FIFF.FIFF_MNE_ICA_INTERFACE_PARAMS, _serialize(fit_parameters)
@@ -208,6 +212,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
             "parameters": ["ignore_polarity", "normalize_input"],
             "variables": ["GEV_"],
         },
+        "Array": {"parameters": ["ignore_polarity"], "variables": []},
     }
 
     # retrieve list of expected kwargs for this algorithm
@@ -338,8 +343,6 @@ def _read_cluster(fname: Union[str, Path]):
         cluster_centers_,
         info,
         cluster_names,
-        fitted_data,
-        labels_,
         fit_parameters,
         fit_variables,
     )
@@ -353,6 +356,7 @@ def _read_cluster(fname: Union[str, Path]):
     function = {
         "ModKMeans": _create_ModKMeans,
         "AAHCluster": _create_AAHCluster,
+        "Array": _create_ClusterArray,
     }
 
     return (
@@ -383,6 +387,7 @@ def _check_fit_parameters_and_variables(
             "parameters": ["ignore_polarity", "normalize_input"],
             "variables": ["GEV_"],
         },
+        "Array": {"parameters": ["ignore_polarity"], "variables": []},
     }
     if "algorithm" not in fit_parameters:
         raise ValueError("Key 'algorithm' is missing from .fif file.")
@@ -453,6 +458,20 @@ def _create_AAHCluster(
     cluster._GEV_ = GEV_
     cluster._fitted = True
     return cluster
+
+
+def _create_ClusterArray(
+    cluster_centers_: ScalarFloatArray,
+    info: ChInfo,
+    cluster_names: list[str],
+    fitted_data: ScalarFloatArray,
+    labels_: ScalarIntArray,
+    ignore_polarity: bool,
+):
+    """Create a ClusterArray object."""
+    return ClusterArray(
+        cluster_centers_, info, cluster_names, fitted_data, labels_, ignore_polarity
+    )
 
 
 # ----------------------------------------------------------------------------
