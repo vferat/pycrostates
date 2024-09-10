@@ -20,29 +20,23 @@ from ..utils._checks import (
     _check_reject_by_annotation,
     _check_tmin_tmax,
     _check_type,
+    _check_value,
 )
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
-    from typing import Optional, Union
+    from typing import Optional, Union, Callable
 
     from .._typing import Picks
     from ..io import ChData
 
 
-def _std():
-    def compute_std(data):
-        return np.std(data, axis=0)
-
-    return compute_std
-
-
-def _rms():
-    def compute_rms(data):
-        return np.sqrt(np.mean(data**2, axis=0))
-
-    return compute_rms
+_GFP_FUNC: dict[str, Callable] = {
+    "eeg": lambda x: np.std(x, axis=0),
+    "grad": lambda x: np.sqrt(np.mean(x**2, axis=0)),
+    "mag": lambda x: np.sqrt(np.mean(x**2, axis=0)),
+}
 
 
 @fill_doc
@@ -118,16 +112,10 @@ def extract_gfp_peaks(
     _check_picks_uniqueness(inst.info, picks)
 
     # gfp function
-    ch_type = inst.get_channel_types(picks)[0]
-    if ch_type == "eeg":
-        gfp_function = _std()
-    elif ch_type == "mag" or ch_type == "grad":
-        gfp_function = _rms()
-    else:
-        raise ValueError(
-            f"Unsupported channel type: {ch_type}. Supported types are 'eeg', 'mag' "
-            "and 'grad'."
-        )
+    ch_type = inst.get_channel_types(picks, unique=True)[0]
+    _check_value(ch_type, _GFP_FUNC, "ch_type")
+    gfp_function = _GFP_FUNC[ch_type]
+
 
     # set kwargs for .get_data()
     kwargs = dict(tmin=tmin, tmax=tmax)
