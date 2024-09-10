@@ -26,7 +26,7 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
-    from typing import Optional, Union, Callable
+    from typing import Callable, Optional, Union
 
     from .._typing import Picks
     from ..io import ChData
@@ -115,7 +115,6 @@ def extract_gfp_peaks(
     ch_type = inst.get_channel_types(picks, unique=True)[0]
     _check_value(ch_type, _GFP_FUNC, "ch_type")
     gfp_function = _GFP_FUNC[ch_type]
-
 
     # set kwargs for .get_data()
     kwargs = dict(tmin=tmin, tmax=tmax)
