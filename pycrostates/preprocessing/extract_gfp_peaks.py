@@ -2,8 +2,7 @@
 
 from __future__ import annotations  # c.f. PEP 563, PEP 649
 
-from typing import TYPE_CHECKING
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 from mne import BaseEpochs, pick_info
@@ -15,7 +14,6 @@ if check_version("mne", "1.6"):
     from mne._fiff.pick import _picks_to_idx
 else:
     from mne.io.pick import _picks_to_idx
-
 
 from ..utils._checks import (
     _check_picks_uniqueness,
@@ -36,13 +34,16 @@ if TYPE_CHECKING:
 def _std():
     def compute_std(data):
         return np.std(data, axis=0)
+
     return compute_std
 
 
 def _rms():
     def compute_rms(data):
         return np.sqrt(np.mean(data**2, axis=0))
+
     return compute_rms
+
 
 @fill_doc
 @verbose

@@ -25,27 +25,27 @@ epochs = mne.make_fixed_length_epochs(raw, duration=2, preload=True)
 def test_extract_gfp(inst, caplog):
     """Test valid arguments for extract_gfp_peaks."""
     # eeg
-    ch_data = extract_gfp_peaks(inst, picks='eeg')
+    ch_data = extract_gfp_peaks(inst, picks="eeg")
     assert isinstance(ch_data, ChData)
-    picks = _picks_to_idx(inst.info, 'eeg')
+    picks = _picks_to_idx(inst.info, "eeg")
     assert ch_data.info == pick_info(inst.info, picks)
 
     # grad
-    ch_data = extract_gfp_peaks(inst, picks='grad')
+    ch_data = extract_gfp_peaks(inst, picks="grad")
     assert isinstance(ch_data, ChData)
-    picks = _picks_to_idx(inst.info, 'grad')
+    picks = _picks_to_idx(inst.info, "grad")
     assert ch_data.info == pick_info(inst.info, picks)
 
     # mag
-    ch_data = extract_gfp_peaks(inst, picks='mag')
+    ch_data = extract_gfp_peaks(inst, picks="mag")
     assert isinstance(ch_data, ChData)
-    picks = _picks_to_idx(inst.info, 'mag')
+    picks = _picks_to_idx(inst.info, "mag")
     assert ch_data.info == pick_info(inst.info, picks)
 
     # default(eeg)
     ch_data = extract_gfp_peaks(inst)
     assert isinstance(ch_data, ChData)
-    picks = _picks_to_idx(inst.info, 'eeg')
+    picks = _picks_to_idx(inst.info, "eeg")
     assert ch_data.info == pick_info(inst.info, picks)
 
     # with min_peak_distance
