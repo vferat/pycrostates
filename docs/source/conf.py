@@ -118,6 +118,12 @@ html_context = {
     "pygment_dark_style": "native",
 }
 
+html_sidebars = {
+    "**": [
+        "paper",
+        "sidebar-nav-bs",
+        "sidebar-ethical-ads"]
+}
 # -- autodoc -----------------------------------------------------------------
 # autodoc
 autodoc_typehints = "none"
