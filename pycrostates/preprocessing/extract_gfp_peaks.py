@@ -2,7 +2,7 @@
 
 from __future__ import annotations  # c.f. PEP 563, PEP 649
 
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from mne import BaseEpochs, pick_info
