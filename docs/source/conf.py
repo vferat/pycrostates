@@ -121,7 +121,6 @@ html_context = {
 html_sidebars = {
     "**": [
         "paper",
-        "search-field",
         "sidebar-nav-bs",
         "sidebar-ethical-ads"]
 }
