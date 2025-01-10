@@ -124,8 +124,7 @@ def _check_type(item, types, item_name=None):
             type_name = ", ".join(type_name)
         item_name = "Item" if item_name is None else f"'{item_name}'"
         raise TypeError(
-            f"{item_name} must be an instance of {type_name}, "
-            f"got {type(item)} instead."
+            f"{item_name} must be an instance of {type_name}, got {type(item)} instead."
         )
 
     return item
