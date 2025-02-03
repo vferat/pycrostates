@@ -1,12 +1,12 @@
 repos:
     - repo: https://github.com/pycqa/isort
-      rev: 5.13.2
+      rev: 6.0.0
       hooks:
           - id: isort
             files: pycrostates
 
     - repo: https://github.com/astral-sh/ruff-pre-commit
-      rev: v0.9.3
+      rev: v0.9.4
       hooks:
           - id: ruff
             name: ruff linter
@@ -17,7 +17,7 @@ repos:
             files: pycrostates
 
     - repo: https://github.com/codespell-project/codespell
-      rev: v2.4.0
+      rev: v2.4.1
       hooks:
           - id: codespell
             additional_dependencies: [tomli]
