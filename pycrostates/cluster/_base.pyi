@@ -98,8 +98,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             names or indices are explicitly provided.
         tmin : float
             Start time of the raw data to use in seconds (must be >= 0).
-        tmax : float
+        tmax : float | None
             End time of the raw data to use in seconds (cannot exceed data duration).
+            If ``None`` (default), the current end of the data is used.
         reject_by_annotation : bool
             Whether to omit bad segments from the data before fitting. If ``True``
             (default), annotated segments whose description begins with ``'bad'`` are

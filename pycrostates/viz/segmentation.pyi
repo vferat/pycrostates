@@ -41,8 +41,9 @@ def plot_raw_segmentation(
         Name of the clusters.
     tmin : float
         Start time of the raw data to use in seconds (must be >= 0).
-    tmax : float
+    tmax : float | None
         End time of the raw data to use in seconds (cannot exceed data duration).
+        If ``None`` (default), the current end of the data is used.
     cmap : str | colormap | None
         The colormap to use. If None, ``viridis`` is used.
     axes : Axes | None
