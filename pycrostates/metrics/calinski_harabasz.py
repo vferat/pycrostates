@@ -2,7 +2,7 @@
 
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
-from sklearn.utils import _safe_indexing, check_X_y
+from sklearn.utils import check_X_y
 
 from ..cluster._base import _BaseCluster
 from ..utils import _distance_matrix
@@ -50,6 +50,7 @@ def calinski_harabasz_score(cluster):  # higher the better
     score = _calinski_harabasz_score(data.T, labels)
     return score
 
+
 def _calinski_harabasz_score(X, labels):
     X, labels = check_X_y(X, labels)
     le = LabelEncoder()
@@ -71,4 +72,3 @@ def _calinski_harabasz_score(X, labels):
         if intra_disp == 0.0
         else extra_disp * (n_samples - n_labels) / (intra_disp * (n_labels - 1.0))
     )
-
