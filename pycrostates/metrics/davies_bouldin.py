@@ -87,7 +87,7 @@ def _davies_bouldin_score(X, labels):
     if np.allclose(intra_dists, 0) or np.allclose(centroid_distances, 0):
         return 0.0
 
-    centroid_distances[centroid_distances == 0] = np.inf
+    centroid_distances[np.isclose(centroid_distances, 0)] = np.inf
     combined_intra_dists = intra_dists[:, None] + intra_dists
     scores = np.max(combined_intra_dists / centroid_distances, axis=1)
     return np.mean(scores)
