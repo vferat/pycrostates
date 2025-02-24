@@ -292,10 +292,7 @@ class ModKMeans(_BaseCluster):
             data, n_clusters, ignore_polarity, max_iter, random_state, tol
         )
         # Compute GEV
-        gfp_function = _ensure_gfp_function(method='auto', ch_type=self._info['ch_types'][0])
-        gfp = gfp_function(data)
-        ev = _gev(data, maps, segmentation, gfp)
-        gev = np.sum((gfp * ev) ** 2 / np.sum(gfp**2))
+        gev = _gev(data, maps, segmentation, ch_type=self._info["ch_types"][0])
         return gev, maps, segmentation, converged
 
     # --------------------------------------------------------------------

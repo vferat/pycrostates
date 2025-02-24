@@ -187,7 +187,8 @@ class AAHCluster(_BaseCluster):
         maps, segmentation = AAHCluster._compute_maps(
             data, n_clusters, ignore_polarity, normalize_input
         )
-        gev = _gev(data, maps, segmentation)
+        # Compute GEV
+        gev = _gev(data, maps, segmentation, ch_type=self._info["ch_types"][0])
         return gev, maps, segmentation
 
     # pylint: disable=too-many-locals

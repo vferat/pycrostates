@@ -58,6 +58,15 @@ def _distance_matrix(X, ignore_polarity=True):
     return dist
 
 
+def _gev(data, maps, segmentation, ch_type):
+    """Compute Global Explained Variance (GEV)."""
+    gfp_function = _ensure_gfp_function("auto", ch_type)
+    gfp = gfp_function(data)
+    ev = _correlation(data, maps[segmentation].T)
+    gev = (gfp * ev) ** 2 / np.sum(gfp**2)
+    return gev
+
+
 def _compare_infos(cluster_info, inst_info):
     """Check that channels in cluster_info are all present in inst_info."""
     for ch in cluster_info["ch_names"]:
