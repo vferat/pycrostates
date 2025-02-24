@@ -63,7 +63,7 @@ def _gev(data, maps, segmentation, ch_type):
     gfp_function = _ensure_gfp_function("auto", ch_type)
     gfp = gfp_function(data)
     ev = _correlation(data, maps[segmentation].T)
-    gev = (gfp * ev) ** 2 / np.sum(gfp**2)
+    gev = np.sum((gfp * ev) ** 2 / np.sum(gfp**2))
     return gev
 
 

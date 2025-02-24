@@ -195,16 +195,18 @@ class ModKMeans(_BaseCluster):
             best_gev, best_maps, best_segmentation = None, None, None
             count_converged = 0
             for init in inits:
-                gev, maps, segmentation, converged = self._kmeans(
+                maps, segmentation, converged = ModKMeans._kmeans(
                     data,
                     self._n_clusters,
                     self._ignore_polarity,
+                    self.get_channel_types()[0],
                     self._max_iter,
                     init,
                     self._tol,
                 )
                 if not converged:
                     continue
+                gev = _gev(data, maps, segmentation, ch_type=self.get_channel_types()[0])
                 if best_gev is None or gev > best_gev:
                     best_gev, best_maps, best_segmentation = (
                         gev,
@@ -214,13 +216,14 @@ class ModKMeans(_BaseCluster):
                 count_converged += 1
         else:
             parallel, p_fun, _ = parallel_func(
-                self._kmeans, n_jobs, total=self._n_init
+                ModKMeans._kmeans, n_jobs, total=self._n_init
             )
             runs = parallel(
                 p_fun(
                     data,
                     self._n_clusters,
                     self._ignore_polarity,
+                    self.get_channel_types()[0],
                     self._max_iter,
                     init,
                     self._tol,
@@ -279,10 +282,10 @@ class ModKMeans(_BaseCluster):
         )
 
     def _kmeans(
-        self,
         data: ScalarFloatArray,
         n_clusters: int,
         ignore_polarity: bool,
+        ch_type: str,
         max_iter: int,
         random_state: Union[RandomState, Generator],
         tol: Union[int, float],
@@ -292,7 +295,7 @@ class ModKMeans(_BaseCluster):
             data, n_clusters, ignore_polarity, max_iter, random_state, tol
         )
         # Compute GEV
-        gev = _gev(data, maps, segmentation, ch_type=self._info["ch_types"][0])
+        gev = _gev(data, maps, segmentation, ch_type=ch_type)
         return gev, maps, segmentation, converged
 
     # --------------------------------------------------------------------

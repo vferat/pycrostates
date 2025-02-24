@@ -160,7 +160,7 @@ class _BaseSegmentation(ABC):
             # create a 1D view of the labels array
             labels = labels.reshape(-1)
 
-        gfp_function = _ensure_gfp_function(method='auto', ch_type=self.inst.info.get_channel_types()[0])
+        gfp_function = _ensure_gfp_function(method='auto', ch_type=self._inst.info.get_channel_types()[0])
         gfp = gfp_function(data)
         if norm_gfp:
             labeled = np.argwhere(labels != -1)  # ignore unlabeled segments

@@ -141,6 +141,7 @@ class AAHCluster(_BaseCluster):
             data,
             self._n_clusters,
             self._ignore_polarity,
+            self.get_channel_types()[0],
             self._normalize_input,
         )
 
@@ -175,12 +176,12 @@ class AAHCluster(_BaseCluster):
             GEV_=self._GEV_,
         )
 
-    # --------------------------------------------------------------------
-    @staticmethod
     def _aahc(
+        self,
         data: ScalarFloatArray,
         n_clusters: int,
         ignore_polarity: bool,
+        ch_type: str,
         normalize_input: bool,
     ) -> tuple[float, ScalarFloatArray, ScalarIntArray]:
         """Run the AAHC algorithm."""
@@ -188,9 +189,10 @@ class AAHCluster(_BaseCluster):
             data, n_clusters, ignore_polarity, normalize_input
         )
         # Compute GEV
-        gev = _gev(data, maps, segmentation, ch_type=self._info["ch_types"][0])
+        gev = _gev(data, maps, segmentation, ch_type=ch_type)
         return gev, maps, segmentation
 
+    # --------------------------------------------------------------------
     # pylint: disable=too-many-locals
     @staticmethod
     def _compute_maps(
