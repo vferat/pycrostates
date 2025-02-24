@@ -13,7 +13,11 @@ from numpy.random import Generator, RandomState
 
 from .._typing import Picks
 from ..utils import _gev
-from ..utils._checks import _check_n_jobs, _check_random_state, _check_type, _ensure_gfp_function
+from ..utils._checks import (
+    _check_n_jobs,
+    _check_random_state,
+    _check_type,
+)
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
 from ._base import _BaseCluster
@@ -206,7 +210,9 @@ class ModKMeans(_BaseCluster):
                 )
                 if not converged:
                     continue
-                gev = _gev(data, maps, segmentation, ch_type=self.get_channel_types()[0])
+                gev = _gev(
+                    data, maps, segmentation, ch_type=self.get_channel_types()[0]
+                )
                 if best_gev is None or gev > best_gev:
                     best_gev, best_maps, best_segmentation = (
                         gev,
