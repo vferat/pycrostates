@@ -998,9 +998,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                https://doi.org/10.1109/10.391164.
         """
         if not ignore_polarity:
-            raise NotImplementedError(
-                "Smoothing with polarity is not implemented yet."
-            )
+            raise NotImplementedError("Smoothing with polarity is not implemented yet.")
         Ne, Nt = data.shape
         Nu = states.shape[0]
         Vvar = np.sum(data * data, axis=0)
