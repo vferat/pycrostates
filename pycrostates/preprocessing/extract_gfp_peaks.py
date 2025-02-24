@@ -152,27 +152,3 @@ def extract_gfp_peaks(
 
     info = pick_info(inst.info, picks_all if return_all else picks)
     return ChData(peaks, info)
-
-
-def _extract_gfp_peaks(
-    data: NDArray[float], min_peak_distance: int = 2
-) -> NDArray[float]:
-    """Extract GFP peaks from input data.
-
-    Parameters
-    ----------
-    data : array of shape (n_channels, n_samples)
-        The data to extract GFP peaks from.
-    min_peak_distance : int
-        Required minimal horizontal distance (>= 1) in samples between neighboring
-        peaks. Smaller peaks are removed first until the condition is fulfilled for all
-        remaining peaks. Default to 2.
-
-    Returns
-    -------
-    peaks : array of shape (n_picks,)
-        The indices when peaks occur.
-    """
-    gfp = np.std(data, axis=0)
-    peaks, _ = find_peaks(gfp, distance=min_peak_distance)
-    return peaks
