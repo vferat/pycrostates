@@ -841,6 +841,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             "min_segment_length": min_segment_length,
             "reject_edges": reject_edges,
             "reject_by_annotation": reject_by_annotation,
+            "ignore_polarity": self._ignore_polarity,
         }
 
         # retrieve data for picks
@@ -914,6 +915,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             "half_window_size": half_window_size,
             "min_segment_length": min_segment_length,
             "reject_edges": reject_edges,
+            "ignore_polarity": self._ignore_polarity,
         }
 
         # retrieve data for picks

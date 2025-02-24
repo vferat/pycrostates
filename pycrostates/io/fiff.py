@@ -380,11 +380,11 @@ def _check_fit_parameters_and_variables(
     """Check that we have all the keys we are looking for and return algo."""
     valids = {
         "ModKMeans": {
-            "parameters": ["n_init", "max_iter", "tol"],
+            "parameters": ["n_init", "max_iter", "tol", "ignore_polarity"],
             "variables": ["GEV_"],
         },
         "AAHCluster": {
-            "parameters": ["ignore_polarity", "normalize_input"],
+            "parameters": ["ignore_polarity", "normalize_input", "ignore_polarity"],
             "variables": ["GEV_"],
         },
     }
@@ -398,6 +398,12 @@ def _check_fit_parameters_and_variables(
     del fit_parameters["algorithm"]
     version = fit_parameters["version"]
     del fit_parameters["version"]
+
+    if "ignore_polarity" not in fit_parameters:
+        # TODO: Raise based on version ?
+        logger.warning("Key 'ignore_polarity' is missing from .fif file. Defaulting to True.")
+        fit_parameters["ignore_polarity"] = True
+    
     expected = set(reduce(operator.concat, valids[algorithm].values()))
     diff = set(list(fit_parameters) + list(fit_variables)).difference(expected)
     if len(diff) != 0:
@@ -445,10 +451,6 @@ def _create_AAHCluster(
     """Create a AAHCluster object."""
     cluster = AAHCluster(
         cluster_centers_.shape[0],
-        # TODO : ignor_polarity=True for now.
-        # After _BaseCluster and Metric support ignore_polarity
-        # make the parameter an argument
-        # ignore_polarity,
         normalize_input,
     )
     cluster._cluster_centers_ = cluster_centers_

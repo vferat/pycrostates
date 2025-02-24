@@ -5,6 +5,7 @@ from copy import deepcopy
 import numpy as np
 
 from ._logs import logger
+from ._checks import _ensure_gfp_function
 
 
 def _correlation(A, B, ignore_polarity=True):
@@ -55,12 +56,6 @@ def _distance_matrix(X, ignore_polarity=True):
     corr = _correlation_matrix(X, ignore_polarity)
     dist = 1 - corr
     return dist
-
-
-def _gev(data, maps, segmentation):
-    map_corr = _correlation(data, maps[segmentation].T)
-    gev = np.sum((data * map_corr) ** 2) / np.sum(data**2)
-    return gev
 
 
 def _compare_infos(cluster_info, inst_info):

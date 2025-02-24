@@ -13,7 +13,7 @@ from numpy.random import Generator, RandomState
 
 from .._typing import Picks
 from ..utils import _gev
-from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
+from ..utils._checks import _check_n_jobs, _check_random_state, _check_type, _ensure_gfp_function
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
 from ._base import _BaseCluster
@@ -195,7 +195,7 @@ class ModKMeans(_BaseCluster):
             best_gev, best_maps, best_segmentation = None, None, None
             count_converged = 0
             for init in inits:
-                gev, maps, segmentation, converged = ModKMeans._kmeans(
+                gev, maps, segmentation, converged = self._kmeans(
                     data,
                     self._n_clusters,
                     self._ignore_polarity,
@@ -214,7 +214,7 @@ class ModKMeans(_BaseCluster):
                 count_converged += 1
         else:
             parallel, p_fun, _ = parallel_func(
-                ModKMeans._kmeans, n_jobs, total=self._n_init
+                self._kmeans, n_jobs, total=self._n_init
             )
             runs = parallel(
                 p_fun(
@@ -278,9 +278,8 @@ class ModKMeans(_BaseCluster):
             GEV_=self._GEV_,
         )
 
-    # --------------------------------------------------------------------
-    @staticmethod
     def _kmeans(
+        self,
         data: ScalarFloatArray,
         n_clusters: int,
         ignore_polarity: bool,
@@ -292,9 +291,14 @@ class ModKMeans(_BaseCluster):
         maps, segmentation, converged = ModKMeans._compute_maps(
             data, n_clusters, ignore_polarity, max_iter, random_state, tol
         )
-        gev = _gev(data, maps, segmentation)
+        # Compute GEV
+        gfp_function = _ensure_gfp_function(method='auto', ch_type=self._info['ch_types'][0])
+        gfp = gfp_function(data)
+        ev = _gev(data, maps, segmentation, gfp)
+        gev = np.sum((gfp * ev) ** 2 / np.sum(gfp**2))
         return gev, maps, segmentation, converged
 
+    # --------------------------------------------------------------------
     @staticmethod
     def _compute_maps(
         data: ScalarFloatArray,
