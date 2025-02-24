@@ -976,6 +976,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     def _smooth_segmentation(
         data: NDArray[float],
         states: NDArray[float],
+        ignore_polarity: bool,
         labels: NDArray[int],
         factor: int,
         tol: Union[int, float],
@@ -994,7 +995,10 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                vol. 42, no. 7, pp. 658-665, July 1995,
                https://doi.org/10.1109/10.391164.
         """
-        # TODO: ignore_polarity
+        if not ignore_polarity:
+            raise NotImplementedError(
+                "Smoothing with polarity is not implemented yet."
+            )
         Ne, Nt = data.shape
         Nu = states.shape[0]
         Vvar = np.sum(data * data, axis=0)
