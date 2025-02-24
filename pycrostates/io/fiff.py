@@ -401,9 +401,11 @@ def _check_fit_parameters_and_variables(
 
     if "ignore_polarity" not in fit_parameters:
         # TODO: Raise based on version ?
-        logger.warning("Key 'ignore_polarity' is missing from .fif file. Defaulting to True.")
+        logger.warning(
+            "Key 'ignore_polarity' is missing from .fif file. Defaulting to True."
+        )
         fit_parameters["ignore_polarity"] = True
-    
+
     expected = set(reduce(operator.concat, valids[algorithm].values()))
     diff = set(list(fit_parameters) + list(fit_variables)).difference(expected)
     if len(diff) != 0:

@@ -5,7 +5,6 @@ from copy import deepcopy
 import numpy as np
 
 from ._logs import logger
-from ._checks import _ensure_gfp_function
 
 
 def _correlation(A, B, ignore_polarity=True):

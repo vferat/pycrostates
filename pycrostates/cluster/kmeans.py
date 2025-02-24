@@ -13,7 +13,12 @@ from numpy.random import Generator, RandomState
 
 from .._typing import Picks
 from ..utils import _gev
-from ..utils._checks import _check_n_jobs, _check_random_state, _check_type, _ensure_gfp_function
+from ..utils._checks import (
+    _check_n_jobs,
+    _check_random_state,
+    _check_type,
+    _ensure_gfp_function,
+)
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
 from ._base import _BaseCluster
@@ -213,9 +218,7 @@ class ModKMeans(_BaseCluster):
                     )
                 count_converged += 1
         else:
-            parallel, p_fun, _ = parallel_func(
-                self._kmeans, n_jobs, total=self._n_init
-            )
+            parallel, p_fun, _ = parallel_func(self._kmeans, n_jobs, total=self._n_init)
             runs = parallel(
                 p_fun(
                     data,
@@ -292,7 +295,9 @@ class ModKMeans(_BaseCluster):
             data, n_clusters, ignore_polarity, max_iter, random_state, tol
         )
         # Compute GEV
-        gfp_function = _ensure_gfp_function(method='auto', ch_type=self._info['ch_types'][0])
+        gfp_function = _ensure_gfp_function(
+            method="auto", ch_type=self._info["ch_types"][0]
+        )
         gfp = gfp_function(data)
         ev = _gev(data, maps, segmentation, gfp)
         gev = np.sum((gfp * ev) ** 2 / np.sum(gfp**2))
