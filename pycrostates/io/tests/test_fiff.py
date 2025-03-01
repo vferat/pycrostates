@@ -42,6 +42,7 @@ def test_write_and_read(tmp_path, caplog):
         ModK._labels_,
         n_init=ModK._n_init,
         max_iter=ModK._max_iter,
+        ignore_polarity=ModK._ignore_polarity,
         tol=ModK._tol,
         GEV_=ModK._GEV_,
     )
@@ -60,6 +61,7 @@ def test_write_and_read(tmp_path, caplog):
         ModK._labels_,
         n_init=ModK.n_init,
         max_iter=ModK.max_iter,
+        ignore_polarity=ModK._ignore_polarity,
         tol=ModK.tol,
         GEV_=ModK.GEV_,
     )
@@ -286,32 +288,39 @@ def test_prepare_kwargs():
         max_iter=ModK._max_iter,
         tol=ModK._tol,
         GEV_=ModK._GEV_,
+        ignore_polarity=False,
     )
     _prepare_kwargs("ModKMeans", kwargs)
 
     # remove one value
-    kwargs = dict(max_iter=ModK._max_iter, tol=ModK._tol, GEV_=ModK._GEV_, ignore_polarity=False)
+    kwargs = dict(max_iter=ModK._max_iter, tol=ModK._tol, GEV_=ModK._GEV_, ignore_polarity=ModK._ignore_polarity)
     with pytest.raises(ValueError, match="Wrong kwargs provided for"):
         _prepare_kwargs("ModKMeans", kwargs)
 
 
 def test_prepare_kwargs_ModKMeans():
     """Test invalid key/values for ModKMeans."""
-    kwargs = dict(n_init=-101, max_iter=ModK._max_iter, tol=ModK._tol, GEV_=ModK._GEV_, ignore_polarity=False)
+    kwargs = dict(n_init=-101, max_iter=ModK._max_iter, tol=ModK._tol, GEV_=ModK._GEV_, ignore_polarity=ModK._ignore_polarity)
     with pytest.raises(ValueError, match="initialization must be a positive integer"):
         _prepare_kwargs("ModKMeans", kwargs)
 
-    kwargs = dict(n_init=ModK._n_init, max_iter=-101, tol=ModK._tol, GEV_=ModK._GEV_, ignore_polarity=False)
+    kwargs = dict(n_init=ModK._n_init, max_iter=-101, tol=ModK._tol, GEV_=ModK._GEV_, ignore_polarity=ModK._ignore_polarity)
     with pytest.raises(ValueError, match="max iteration must be a positive"):
         _prepare_kwargs("ModKMeans", kwargs)
 
     kwargs = dict(
-        n_init=ModK._n_init, max_iter=ModK.max_iter, tol=-101, GEV_=ModK._GEV_
+        n_init=ModK._n_init, max_iter=ModK.max_iter, tol=-101, GEV_=ModK._GEV_, ignore_polarity=ModK._ignore_polarity
     )
-    with pytest.raises(ValueError, match="tolerance must be a positive number", ignore_polarity=False):
+    with pytest.raises(ValueError, match="tolerance must be a positive number"):
         _prepare_kwargs("ModKMeans", kwargs)
 
-    kwargs = dict(n_init=ModK.n_init, max_iter=ModK.max_iter, tol=ModK.tol, GEV_=101, ignore_polarity=False)
+    kwargs = dict(
+        n_init=ModK._n_init, max_iter=ModK.max_iter, tol=ModK._tol, GEV_=ModK._GEV_, ignore_polarity=22
+    )
+    with pytest.raises(TypeError, match="'ignore_polarity' must be an instance of bool"):
+        _prepare_kwargs("ModKMeans", kwargs)
+
+    kwargs = dict(n_init=ModK.n_init, max_iter=ModK.max_iter, tol=ModK.tol, GEV_=101, ignore_polarity=ModK._ignore_polarity)
     with pytest.raises(
         ValueError, match="'GEV_' should be a percentage between 0 and 1"
     ):

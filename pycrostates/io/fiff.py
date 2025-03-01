@@ -121,6 +121,7 @@ def _write_cluster(
     algorithm : str
         Clustering algorithm used. Valids are:
             'ModKMeans'
+            'AAHCluster'
     cluster_names : list
         List of names for each of the clusters.
     fitted_data : array
