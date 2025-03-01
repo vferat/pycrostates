@@ -199,7 +199,7 @@ class ModKMeans(_BaseCluster):
             best_gev, best_maps, best_segmentation = None, None, None
             count_converged = 0
             for init in inits:
-                maps, segmentation, converged = ModKMeans._kmeans(
+                gev, maps, segmentation, converged = ModKMeans._kmeans(
                     data,
                     self._n_clusters,
                     self._ignore_polarity,
@@ -210,9 +210,6 @@ class ModKMeans(_BaseCluster):
                 )
                 if not converged:
                     continue
-                gev = _gev(
-                    data, maps, segmentation, ch_type=self.get_channel_types()[0]
-                )
                 if best_gev is None or gev > best_gev:
                     best_gev, best_maps, best_segmentation = (
                         gev,
