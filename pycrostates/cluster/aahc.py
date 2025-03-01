@@ -177,7 +177,6 @@ class AAHCluster(_BaseCluster):
         )
 
     def _aahc(
-        self,
         data: ScalarFloatArray,
         n_clusters: int,
         ignore_polarity: bool,
