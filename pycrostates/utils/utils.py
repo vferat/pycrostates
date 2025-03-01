@@ -4,8 +4,9 @@ from copy import deepcopy
 
 import numpy as np
 
-from ._logs import logger
 from ..preprocessing.extract_gfp_peaks import _ensure_gfp_function
+from ._logs import logger
+
 
 def _correlation(A, B, ignore_polarity=True):
     """Compute pairwise correlation of multiple pairs of vectors."""
