@@ -179,6 +179,7 @@ select = ['A', 'B', 'E', 'F', 'UP', 'W']
 '*/cluster/_base.pyi' = ['B006']
 '*/segmentation/_base.pyi' = ['F811']
 '__init__.py' = ['F401']
+'pycrostates/io/__init__.py' = ['A005']
 
 [tool.setuptools]
 include-package-data = false
