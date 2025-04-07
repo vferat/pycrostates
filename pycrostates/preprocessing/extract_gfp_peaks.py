@@ -20,15 +20,23 @@ from ..utils._checks import (
     _check_reject_by_annotation,
     _check_tmin_tmax,
     _check_type,
+    _check_value,
 )
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
-    from typing import Optional, Union
+    from typing import Callable, Optional, Union
 
-    from .._typing import Picks, ScalarFloatArray
+    from .._typing import Picks
     from ..io import ChData
+
+
+_GFP_FUNC: dict[str, Callable] = {
+    "eeg": lambda x: np.std(x, axis=0),
+    "grad": lambda x: np.sqrt(np.mean(x**2, axis=0)),
+    "mag": lambda x: np.sqrt(np.mean(x**2, axis=0)),
+}
 
 
 @fill_doc
@@ -103,6 +111,11 @@ def extract_gfp_peaks(
     picks_all = _picks_to_idx(inst.info, inst.ch_names, none="all", exclude="bads")
     _check_picks_uniqueness(inst.info, picks)
 
+    # gfp function
+    ch_type = inst.get_channel_types(picks, unique=True)[0]
+    _check_value(ch_type, _GFP_FUNC, "ch_type")
+    gfp_function = _GFP_FUNC[ch_type]
+
     # set kwargs for .get_data()
     kwargs = dict(tmin=tmin, tmax=tmax)
     if isinstance(inst, BaseRaw):
@@ -113,7 +126,8 @@ def extract_gfp_peaks(
         # retrieve data array on which we look for GFP peaks
         data = inst.get_data(picks=picks, **kwargs)
         # retrieve indices of GFP peaks
-        ind_peaks = _extract_gfp_peaks(data, min_peak_distance)
+        gfp = gfp_function(data)
+        ind_peaks, _ = find_peaks(gfp, distance=min_peak_distance)
         # retrieve the peaks data
         if return_all:
             del data  # free up memory
@@ -124,7 +138,8 @@ def extract_gfp_peaks(
         for k in range(len(inst)):  # pylint: disable=consider-using-enumerate
             data = inst[k].get_data(picks=picks, **kwargs)[0, :, :]
             # data is 2D, of shape (n_channels, n_samples)
-            ind_peaks = _extract_gfp_peaks(data, min_peak_distance)
+            gfp = gfp_function(data)
+            ind_peaks, _ = find_peaks(gfp, distance=min_peak_distance)
             if return_all:
                 del data  # free up memory
                 data = inst[k].get_data(picks=picks_all, **kwargs)[0, :, :]
@@ -134,6 +149,7 @@ def extract_gfp_peaks(
     n_samples = inst.times.size
     if isinstance(inst, BaseEpochs):
         n_samples *= len(inst)
+
     logger.info(
         "%s GFP peaks extracted out of %s samples (%.2f%% of the original data).",
         peaks.shape[1],
@@ -143,27 +159,3 @@ def extract_gfp_peaks(
 
     info = pick_info(inst.info, picks_all if return_all else picks)
     return ChData(peaks, info)
-
-
-def _extract_gfp_peaks(
-    data: ScalarFloatArray, min_peak_distance: int = 2
-) -> ScalarFloatArray:
-    """Extract GFP peaks from input data.
-
-    Parameters
-    ----------
-    data : array of shape (n_channels, n_samples)
-        The data to extract GFP peaks from.
-    min_peak_distance : int
-        Required minimal horizontal distance (>= 1) in samples between neighboring
-        peaks. Smaller peaks are removed first until the condition is fulfilled for all
-        remaining peaks. Default to 2.
-
-    Returns
-    -------
-    peaks : array of shape (n_picks,)
-        The indices when peaks occur.
-    """
-    gfp = np.std(data, axis=0)
-    peaks, _ = find_peaks(gfp, distance=min_peak_distance)
-    return peaks
