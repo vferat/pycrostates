@@ -320,10 +320,11 @@ def test_reorder(caplog):
     assert ModK._cluster_names[0] == ModK_._cluster_names[1]
 
     # test ._labels_ reordering
-    x = ModK_._labels_[:20]
-    # x: before re-order:
-    # x = [3, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+    ModK_ = ModK.copy()
+    ModK_._labels_[:20] = [3, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+    ModK_.reorder_clusters(order=np.array([1, 0, 2, 3]))
     # y: expected re-ordered _labels
+    x = ModK_._labels_[:20]
     y = [3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]
     assert np.all(x == y)
 

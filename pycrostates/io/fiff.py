@@ -121,6 +121,7 @@ def _write_cluster(
     algorithm : str
         Clustering algorithm used. Valids are:
             'ModKMeans'
+            'AAHCluster'
     cluster_names : list
         List of names for each of the clusters.
     fitted_data : array
@@ -201,7 +202,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
     """Prepare params to save from kwargs."""
     valids = {
         "ModKMeans": {
-            "parameters": ["n_init", "max_iter", "tol"],
+            "parameters": ["ignore_polarity", "n_init", "max_iter", "tol"],
             "variables": ["GEV_"],
         },
         "AAHCluster": {
@@ -240,6 +241,10 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
                 fit_parameters["max_iter"] = ModKMeans._check_max_iter(value)
             elif key == "tol":
                 fit_parameters["tol"] = ModKMeans._check_tol(value)
+            elif key == "ignore_polarity":
+                fit_parameters["ignore_polarity"] = ModKMeans._check_ignore_polarity(
+                    value
+                )
         elif algorithm == "AAHCluster":
             if key == "ignore_polarity":
                 fit_parameters["ignore_polarity"] = AAHCluster._check_ignore_polarity(
@@ -376,11 +381,11 @@ def _check_fit_parameters_and_variables(
     """Check that we have all the keys we are looking for and return algo."""
     valids = {
         "ModKMeans": {
-            "parameters": ["n_init", "max_iter", "tol"],
+            "parameters": ["n_init", "max_iter", "tol", "ignore_polarity"],
             "variables": ["GEV_"],
         },
         "AAHCluster": {
-            "parameters": ["ignore_polarity", "normalize_input"],
+            "parameters": ["ignore_polarity", "normalize_input", "ignore_polarity"],
             "variables": ["GEV_"],
         },
     }
@@ -394,6 +399,14 @@ def _check_fit_parameters_and_variables(
     del fit_parameters["algorithm"]
     version = fit_parameters["version"]
     del fit_parameters["version"]
+
+    if "ignore_polarity" not in fit_parameters:
+        # TODO: Raise based on version ?
+        logger.warning(
+            "Key 'ignore_polarity' is missing from .fif file. Defaulting to True."
+        )
+        fit_parameters["ignore_polarity"] = True
+
     expected = set(reduce(operator.concat, valids[algorithm].values()))
     diff = set(list(fit_parameters) + list(fit_variables)).difference(expected)
     if len(diff) != 0:
@@ -410,6 +423,7 @@ def _create_ModKMeans(
     n_init: int,
     max_iter: int,
     tol: Union[int, float],
+    ignore_polarity: bool,
     GEV_: float,
 ):
     """Create a ModKMeans cluster."""
@@ -423,6 +437,7 @@ def _create_ModKMeans(
     cluster._labels_ = labels_
     cluster._GEV_ = GEV_
     cluster._fitted = True
+    cluster._ignore_polarity = ignore_polarity
     return cluster
 
 
@@ -432,17 +447,13 @@ def _create_AAHCluster(
     cluster_names: list[str],
     fitted_data: ScalarFloatArray,
     labels_: ScalarIntArray,
-    ignore_polarity: bool,  # pylint: disable=unused-argument
+    ignore_polarity: bool,
     normalize_input: bool,
     GEV_: float,
 ):
     """Create a AAHCluster object."""
     cluster = AAHCluster(
         cluster_centers_.shape[0],
-        # TODO : ignor_polarity=True for now.
-        # After _BaseCluster and Metric support ignore_polarity
-        # make the parameter an argument
-        # ignore_polarity,
         normalize_input,
     )
     cluster._cluster_centers_ = cluster_centers_
@@ -452,6 +463,7 @@ def _create_AAHCluster(
     cluster._labels_ = labels_
     cluster._GEV_ = GEV_
     cluster._fitted = True
+    cluster._ignore_polarity = ignore_polarity
     return cluster
 
 

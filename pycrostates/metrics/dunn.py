@@ -36,14 +36,15 @@ def dunn_score(cluster):  # higher the better
     cluster._check_fit()
     data = cluster._fitted_data
     labels = cluster._labels_
+    ignore_polarity = cluster._ignore_polarity
     keep = np.linalg.norm(data.T, axis=1) != 0
     data = data[:, keep]
     labels = labels[keep]
-    score = _dunn_score(data.T, labels)
+    score = _dunn_score(data, labels, ignore_polarity=ignore_polarity)
     return score
 
 
-def _dunn_score(X, labels):  # higher the better
+def _dunn_score(X, labels, ignore_polarity):  # higher the better
     """Compute the Dunn index.
 
     Parameters
@@ -57,7 +58,7 @@ def _dunn_score(X, labels):  # higher the better
     -----
     Based on https://github.com/jqmviegas/jqm_cvi
     """
-    distances = _distance_matrix(X)
+    distances = _distance_matrix(X, ignore_polarity)
     ks = np.sort(np.unique(labels))
 
     deltas = np.ones([len(ks), len(ks)]) * 1000000
