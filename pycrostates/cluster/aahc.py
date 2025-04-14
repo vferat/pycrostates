@@ -8,7 +8,7 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 
 from .._typing import Picks, ScalarFloatArray, ScalarIntArray
-from ..utils import _corr_vectors
+from ..utils import _gev
 from ..utils._checks import _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
@@ -141,6 +141,7 @@ class AAHCluster(_BaseCluster):
             data,
             self._n_clusters,
             self._ignore_polarity,
+            self.get_channel_types()[0],
             self._normalize_input,
         )
 
@@ -175,23 +176,22 @@ class AAHCluster(_BaseCluster):
             GEV_=self._GEV_,
         )
 
-    # --------------------------------------------------------------------
-    @staticmethod
     def _aahc(
         data: ScalarFloatArray,
         n_clusters: int,
         ignore_polarity: bool,
+        ch_type: str,
         normalize_input: bool,
     ) -> tuple[float, ScalarFloatArray, ScalarIntArray]:
         """Run the AAHC algorithm."""
-        gfp_sum_sq = np.sum(data**2)
         maps, segmentation = AAHCluster._compute_maps(
             data, n_clusters, ignore_polarity, normalize_input
         )
-        map_corr = _corr_vectors(data, maps[segmentation].T)
-        gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
+        # Compute GEV
+        gev = _gev(data, maps, segmentation, ch_type=ch_type)
         return gev, maps, segmentation
 
+    # --------------------------------------------------------------------
     # pylint: disable=too-many-locals
     @staticmethod
     def _compute_maps(
@@ -274,12 +274,6 @@ class AAHCluster(_BaseCluster):
         super(self.__class__, self.__class__).fitted.__set__(self, fitted)
         if not fitted:
             self._GEV_ = None
-
-    @staticmethod
-    def _check_ignore_polarity(ignore_polarity: bool) -> bool:
-        """Check that ignore_polarity is a boolean."""
-        _check_type(ignore_polarity, (bool,), item_name="ignore_polarity")
-        return ignore_polarity
 
     @staticmethod
     def _check_normalize_input(normalize_input: bool) -> bool:
