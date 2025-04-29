@@ -12,8 +12,8 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 from mne.utils import check_version
 
-from ..utils import _corr_vectors
-from ..utils._checks import _check_type
+from ..utils import _correlation
+from ..utils._checks import _check_type, _ensure_gfp_function
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
@@ -160,7 +160,10 @@ class _BaseSegmentation(ABC):
             # create a 1D view of the labels array
             labels = labels.reshape(-1)
 
-        gfp = np.std(data, axis=0)
+        gfp_function = _ensure_gfp_function(
+            method="auto", ch_type=self._inst.info.get_channel_types()[0]
+        )
+        gfp = gfp_function(data)
         if norm_gfp:
             labeled = np.argwhere(labels != -1)  # ignore unlabeled segments
             gfp /= np.linalg.norm(gfp[labeled])  # normalize
@@ -174,20 +177,24 @@ class _BaseSegmentation(ABC):
             if len(arg_where) != 0:
                 labeled_tp = data.T[arg_where][:, 0, :].T
                 labeled_gfp = gfp[arg_where][:, 0]
-                state_array = np.array([state] * len(arg_where)).transpose()
-
-                dist_corr = _corr_vectors(state_array, labeled_tp)
-                params[f"{state_name}_mean_corr"] = np.mean(np.abs(dist_corr))
+                # Correlation (i.e explained variance)
+                dist_corr = _correlation(
+                    labeled_tp,
+                    state,
+                    ignore_polarity=self._predict_parameters["ignore_polarity"],
+                )
+                params[f"{state_name}_mean_corr"] = np.mean(dist_corr)
+                # Global Explained Variance
                 dist_gev = (labeled_gfp * dist_corr) ** 2 / np.sum(gfp**2)
                 params[f"{state_name}_gev"] = np.sum(dist_gev)
-
                 s_segments = np.array([len(group) for s_, group in segments if s_ == s])
+                # Occurrences
                 occurrences = len(s_segments) / len(np.where(labels != -1)[0]) * sfreq
                 params[f"{state_name}_occurrences"] = occurrences
-
+                # Time coverage
                 timecov = np.sum(s_segments) / len(np.where(labels != -1)[0])
                 params[f"{state_name}_timecov"] = timecov
-
+                # Mean durations
                 dist_durs = s_segments / sfreq
                 params[f"{state_name}_meandurs"] = np.mean(dist_durs)
 
@@ -208,7 +215,7 @@ class _BaseSegmentation(ABC):
                     params[f"{state_name}_dist_gev"] = np.array([], dtype=float)
                     params[f"{state_name}_dist_durs"] = np.array([], dtype=float)
 
-        params["unlabeled"] = len(np.argwhere(labels == -1)) / len(gfp)
+        params["unlabeled"] = len(np.argwhere(labels == -1)) / len(labels)
         return params
 
     def compute_transition_matrix(self, stat="probability", ignore_repetitions=True):

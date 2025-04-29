@@ -205,7 +205,6 @@ def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix):
     neighbor_indices = np.argwhere(adjacency_vector == 1)
     # too much bads /edge
     if len(neighbor_indices) <= 3:
-        print(index)
         return data[index]
     # neighbor_matrix shape (n_neighbor, n_samples)
     neighbor_matrix = np.array([neighbor_indices.flatten().tolist()] * data.shape[-1]).T

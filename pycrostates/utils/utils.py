@@ -4,58 +4,67 @@ from copy import deepcopy
 
 import numpy as np
 
+from ..preprocessing.extract_gfp_peaks import _ensure_gfp_function
 from ._logs import logger
 
 
-# TODO: Add test for this. Also compare speed with latest version of numpy.
-# Also compared speed with a numba implementation.
-def _corr_vectors(A, B, axis=0):
-    # based on:
-    # https://github.com/wmvanvliet/mne_microstates/blob/master/microstates.py
-    # written by Marijn van Vliet <w.m.vanvliet@gmail.com>
-    """Compute pairwise correlation of multiple pairs of vectors.
-
-    Fast way to compute correlation of multiple pairs of vectors without computing all
-    pairs as would with corr(A,B). Borrowed from Oli at StackOverflow. Note the
-    resulting coefficients vary slightly from the ones obtained from corr due to
-    differences in the order of the calculations. (Differences are of a magnitude of
-    1e-9 to 1e-17 depending on the tested data).
-
-    Parameters
-    ----------
-    A : ndarray, shape (n, m)
-        The first collection of vectors
-    B : ndarray, shape (n, m)
-        The second collection of vectors
-    axis : int
-        The axis that contains the elements of each vector. Defaults to 0.
-
-    Returns
-    -------
-    corr : ndarray, shape (m, )
-        For each pair of vectors, the correlation between them.
-    """
-    if A.shape != B.shape:
+def _correlation(A, B, ignore_polarity=True):
+    """Compute pairwise correlation of multiple pairs of vectors."""
+    # correlation with a given vector
+    if A.ndim == 1 and B.ndim == 1:
+        A = np.tile(A.T, (1, 1)).T
+        B = np.tile(B.T, (1, 1)).T
+    else:
+        if B.ndim == 1:
+            B = np.tile(B.T, (A.shape[1], 1)).T
+        if A.ndim == 1:
+            A = np.tile(A.T, (B.shape[1], 1)).T
+    # correlation element-wise (A1,B1), (A2,B2), ...
+    if A.shape == B.shape:
+        # If maps is null, divide will not throw an error.
+        np.seterr(divide="ignore", invalid="ignore")
+        An = A - np.mean(A, axis=0)
+        Bn = B - np.mean(B, axis=0)
+        An /= np.linalg.norm(An, axis=0)
+        Bn /= np.linalg.norm(Bn, axis=0)
+        corr = np.sum(An * Bn, axis=0)
+        corr = np.nan_to_num(corr, posinf=0, neginf=0)
+        np.seterr(divide="warn", invalid="warn")
+    else:
         raise ValueError("All input arrays must have the same shape")
-    # If maps is null, divide will not trhow an error.
-    np.seterr(divide="ignore", invalid="ignore")
-    An = A - np.mean(A, axis=axis)
-    Bn = B - np.mean(B, axis=axis)
-    An /= np.linalg.norm(An, axis=axis)
-    Bn /= np.linalg.norm(Bn, axis=axis)
-    corr = np.sum(An * Bn, axis=axis)
-    corr = np.nan_to_num(corr, posinf=0, neginf=0)
-    np.seterr(divide="warn", invalid="warn")
+
+    if ignore_polarity:
+        corr = np.abs(corr)
     return corr
 
 
-def _distance_matrix(X, Y=None):
-    """Distance matrix used in metrics."""
-    distances = np.abs(1 / np.corrcoef(X, Y)) - 1
-    distances = np.nan_to_num(
-        distances, copy=False, nan=10e300, posinf=1e300, neginf=-1e300
-    )
-    return distances
+def _distance(X, Y, ignore_polarity=True):
+    """Compute pairwise distance of multiple pairs of vectors."""
+    corr = _correlation(X, Y, ignore_polarity=ignore_polarity)
+    dist = 1 - corr
+    return dist
+
+
+def _correlation_matrix(X, ignore_polarity=True):
+    corr = np.corrcoef(X.T)
+    if ignore_polarity:
+        corr = np.abs(corr)
+    return corr
+
+
+def _distance_matrix(X, ignore_polarity=True):
+    corr = _correlation_matrix(X, ignore_polarity)
+    dist = 1 - corr
+    return dist
+
+
+def _gev(data, maps, segmentation, ch_type):
+    """Compute Global Explained Variance (GEV)."""
+    gfp_function = _ensure_gfp_function("auto", ch_type)
+    gfp = gfp_function(data)
+    ev = _correlation(data, maps[segmentation].T)
+    gev = np.sum((gfp * ev) ** 2 / np.sum(gfp**2))
+    return gev
 
 
 def _compare_infos(cluster_info, inst_info):
