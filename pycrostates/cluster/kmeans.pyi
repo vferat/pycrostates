@@ -80,6 +80,7 @@ class ModKMeans(_BaseCluster):
     _fitted: bool
     _ignore_polarity: bool
 
+    @fill_doc
     def fit(
         self,
         inst: BaseRaw | BaseEpochs | ChData,

@@ -52,6 +52,7 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
             If True, `~copy.deepcopy` is used instead of `~copy.copy`.
         """
 
+    @fill_doc
     def get_data(self, picks: Incomplete | None = None) -> ScalarFloatArray:
         """Retrieve the data array.
 
@@ -73,6 +74,7 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
             Data array of shape ``(n_channels, n_samples)``.
         """
 
+    @fill_doc
     def pick(self, picks, exclude: str = "bads"):
         """Pick a subset of channels.
 

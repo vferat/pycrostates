@@ -126,6 +126,7 @@ class _BaseSegmentation(ABC):
             predicting the segmentation.
         """
 
+    @fill_doc
     def compute_expected_transition_matrix(
         self, stat: str = "probability", ignore_repetitions: bool = True
     ):
@@ -160,6 +161,7 @@ class _BaseSegmentation(ABC):
             First axis indicates state ``"from"``. Second axis indicates state ``"to"``.
         """
 
+    @fill_doc
     def entropy(self, ignore_repetitions: bool = False, log_base: float | str = 2):
         """Compute the Shannon entropy of the segmentation.
 
@@ -191,6 +193,7 @@ class _BaseSegmentation(ABC):
         .. footbibliography::
         """
 
+    @fill_doc
     def plot_cluster_centers(
         self, axes: Axes | None = None, *, block: bool = False, show: bool | None = None
     ):

@@ -9,6 +9,7 @@ from ._base import _BaseSegmentation as _BaseSegmentation
 
 def _check_log_base(log_base) -> float: ...
 def _check_lags(lags) -> ScalarIntArray: ...
+@fill_doc
 def _joint_entropy(
     x: ScalarIntArray,
     y: ScalarIntArray,
@@ -43,6 +44,7 @@ def _check_labels(labels, item_name: str = "labels") -> None: ...
 def _check_segmentation(
     segmentation, item_name: str = "segmentation"
 ) -> ScalarIntArray: ...
+@fill_doc
 def _joint_entropy_history(
     labels: ScalarIntArray,
     k: int,
@@ -73,6 +75,7 @@ def _joint_entropy_history(
         The Shannon entropy of the sequence labels[t:t+k].
     """
 
+@fill_doc
 def _entropy(
     labels: ScalarIntArray, state_to_ignore: int | None = -1, log_base: float | str = 2
 ) -> float:
@@ -103,6 +106,7 @@ def _entropy(
         The Shannon entropy of the sequence.
     """
 
+@fill_doc
 def entropy(
     segmentation: _BaseSegmentation,
     ignore_repetitions: bool = False,
@@ -140,6 +144,7 @@ def entropy(
     .. footbibliography::
     """
 
+@fill_doc
 def _excess_entropy_rate(
     labels: ScalarIntArray,
     history_length: int,
@@ -186,6 +191,7 @@ def _excess_entropy_rate(
         Joint entropy value for each lag.
     """
 
+@fill_doc
 def excess_entropy_rate(
     segmentation: _BaseSegmentation,
     history_length: int,
@@ -248,6 +254,7 @@ def excess_entropy_rate(
     .. footbibliography::
     """
 
+@fill_doc
 def _auto_information(
     labels: ScalarIntArray,
     k: int,
@@ -278,6 +285,7 @@ def _auto_information(
         time-lagged auto-information for lag k.
     """
 
+@fill_doc
 def auto_information_function(
     segmentation: _BaseSegmentation,
     lags: int | list[int] | tuple[int, ...] | ScalarIntArray,
@@ -336,6 +344,7 @@ def auto_information_function(
     .. footbibliography::
     """
 
+@fill_doc
 def _partial_auto_information(
     labels: ScalarIntArray,
     k: int,
@@ -366,6 +375,7 @@ def _partial_auto_information(
         Partial auto-information for lag k.
     """
 
+@fill_doc
 def partial_auto_information_function(
     segmentation: _BaseSegmentation,
     lags: int | list[int] | tuple[int, ...] | ScalarIntArray,

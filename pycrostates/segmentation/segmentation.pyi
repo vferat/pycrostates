@@ -28,6 +28,7 @@ class RawSegmentation(_BaseSegmentation):
     """
 
     def __init__(self, *args, **kwargs) -> None: ...
+    @fill_doc
     def plot(
         self,
         tmin: int | float | None = None,
@@ -96,6 +97,7 @@ class EpochsSegmentation(_BaseSegmentation):
     """
 
     def __init__(self, *args, **kwargs) -> None: ...
+    @fill_doc
     def plot(
         self,
         cmap: str | None = None,

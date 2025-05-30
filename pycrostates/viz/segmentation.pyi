@@ -11,6 +11,7 @@ from ..utils._checks import _ensure_valid_show as _ensure_valid_show
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 
+@fill_doc
 def plot_raw_segmentation(
     labels: ScalarIntArray,
     raw: BaseRaw,
@@ -71,6 +72,7 @@ def plot_raw_segmentation(
         Matplotlib figure(s) on which topographic maps are plotted.
     """
 
+@fill_doc
 def plot_epoch_segmentation(
     labels: ScalarIntArray,
     epochs: BaseEpochs,
@@ -125,6 +127,7 @@ def plot_epoch_segmentation(
         Matplotlib figure on which topographic maps are plotted.
     """
 
+@verbose
 def _plot_segmentation(
     labels: ScalarIntArray,
     gfp: ScalarFloatArray,

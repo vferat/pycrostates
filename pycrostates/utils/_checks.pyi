@@ -100,6 +100,7 @@ def _check_tmin_tmax(inst, tmin, tmax):
 def _check_picks_uniqueness(info, picks) -> None:
     """Check that the provided picks yield a single channel type."""
 
+@fill_doc
 def _check_verbose(verbose: Any) -> int:
     """Check that the value of verbose is valid.
 

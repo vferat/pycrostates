@@ -9,6 +9,7 @@ from ._checks import _check_verbose as _check_verbose
 from ._docs import fill_doc as fill_doc
 from ._fixes import _WrapStdOut as _WrapStdOut
 
+@fill_doc
 def _init_logger(*, verbose: bool | str | int | None = None) -> logging.Logger:
     """Initialize a logger.
 
@@ -28,6 +29,7 @@ def _init_logger(*, verbose: bool | str | int | None = None) -> logging.Logger:
         The initialized logger.
     """
 
+@fill_doc
 def add_file_handler(
     fname: str | Path,
     mode: str = "a",
@@ -52,6 +54,7 @@ def add_file_handler(
         ``"WARNING"`` for False and to ``"INFO"`` for True.
     """
 
+@fill_doc
 def set_log_level(verbose: bool | str | int | None, apply_to_mne: bool = True) -> None:
     """Set the log level for the logger and the first handler ``sys.stdout``.
 

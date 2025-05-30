@@ -8,6 +8,7 @@ def _optimize_order(
     template_centers: ScalarFloatArray,
     ignore_polarity: bool = True,
 ): ...
+@fill_doc
 def optimize_order(inst: _BaseCluster, template_inst: _BaseCluster):
     """Optimize the order of cluster centers between two cluster instances.
 

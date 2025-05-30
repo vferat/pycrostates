@@ -71,6 +71,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         """Check if the cluster is unfitted."""
 
     @abstractmethod
+    @fill_doc
+    @verbose
     def fit(
         self,
         inst: BaseRaw | BaseEpochs | ChData,
@@ -192,6 +194,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         an article).
         """
 
+    @fill_doc
+    @verbose
     def plot(
         self,
         axes: Axes | AxesArray | None = None,
@@ -251,6 +255,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             Path to the ``.fif`` file where the clustering solution is saved.
         """
 
+    @fill_doc
+    @verbose
     def predict(
         self,
         inst: BaseRaw | BaseEpochs,

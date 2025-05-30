@@ -14,6 +14,8 @@ from ..utils._logs import logger as logger
 def _check_adjacency(adjacency, info, ch_type):
     """Check adjacency matrix."""
 
+@fill_doc
+@verbose
 def apply_spatial_filter(
     inst: BaseRaw | BaseEpochs | ChData,
     ch_type: str = "eeg",

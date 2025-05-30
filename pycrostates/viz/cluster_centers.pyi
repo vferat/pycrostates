@@ -14,6 +14,8 @@ from ..utils._logs import logger as logger
 
 _GRADIENT_KWARGS_DEFAULTS: dict[str, str]
 
+@fill_doc
+@verbose
 def plot_cluster_centers(
     cluster_centers: ScalarFloatArray,
     info: Info | ChInfo,

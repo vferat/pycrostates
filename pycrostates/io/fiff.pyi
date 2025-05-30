@@ -13,6 +13,7 @@ from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 from . import ChInfo as ChInfo
 
+@fill_doc
 def _write_cluster(
     fname: str | Path,
     cluster_centers_: ScalarFloatArray,
@@ -47,6 +48,7 @@ def _write_cluster(
 def _prepare_kwargs(algorithm: str, kwargs: dict):
     """Prepare params to save from kwargs."""
 
+@fill_doc
 def _read_cluster(fname: str | Path):
     """Read clustering solution from disk.
 

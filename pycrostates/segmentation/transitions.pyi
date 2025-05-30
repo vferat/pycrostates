@@ -4,6 +4,7 @@ from ..utils._checks import _check_type as _check_type
 from ..utils._checks import _check_value as _check_value
 from ..utils._docs import fill_doc as fill_doc
 
+@fill_doc
 def compute_transition_matrix(
     labels: ScalarIntArray,
     n_clusters: int,
@@ -50,6 +51,7 @@ def _compute_transition_matrix(
 ) -> ScalarFloatArray:
     """Compute observed transition."""
 
+@fill_doc
 def compute_expected_transition_matrix(
     labels: ScalarIntArray,
     n_clusters: int,

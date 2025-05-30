@@ -12,6 +12,8 @@ from ..utils._checks import _check_type as _check_type
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 
+@fill_doc
+@verbose
 def extract_gfp_peaks(
     inst: BaseRaw | BaseEpochs,
     picks: Picks = "eeg",
