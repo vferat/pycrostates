@@ -18,7 +18,7 @@ classifiers = [
   'Programming Language :: Python :: 3.10',
   'Programming Language :: Python :: 3.11',
   'Programming Language :: Python :: 3.12',
-  'Programming Language :: Python :: 3.9',
+  'Programming Language :: Python :: 3.13',
   'Topic :: Scientific/Engineering',
 ]
 dependencies = [
@@ -50,7 +50,7 @@ maintainers = [
 ]
 name = 'pycrostates'
 readme = 'README.md'
-requires-python = '>=3.9'
+requires-python = '>=3.10'
 version = '0.7.0.dev0'
 
 [project.optional-dependencies]
@@ -141,7 +141,7 @@ extend_skip_glob = [
 line_length = 88
 multi_line_output = 3
 profile = 'black'
-py_version = 39
+py_version = 310
 
 [tool.pydocstyle]
 add_ignore = 'D100,D104,D107'
@@ -161,7 +161,7 @@ extend-exclude = [
   'setup.py',
 ]
 line-length = 88
-target-version = 'py39'
+target-version = 'py310'
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -173,7 +173,6 @@ select = ['A', 'B', 'E', 'F', 'UP', 'W']
 [tool.ruff.lint.per-file-ignores]
 '*' = [
   'B904', # 'Within an except clause, raise exceptions with raise ... from ...'
-  'UP007', # 'Use `X | Y` for type annotations', requires python 3.10
 ]
 '*.pyi' = ['E501']
 '*/cluster/_base.pyi' = ['B006']
