@@ -18,7 +18,6 @@ from ..utils._checks import _check_n_jobs, _check_type, _check_value, _ensure_in
 from ..utils._docs import fill_doc
 
 if TYPE_CHECKING:
-
     from .._typing import ScalarFloatArray, ScalarIntArray
     from ._base import _BaseSegmentation
 

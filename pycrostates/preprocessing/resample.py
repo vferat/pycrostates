@@ -24,7 +24,6 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
-
     from .._typing import Picks, RandomState
     from ..io import ChData
 
@@ -84,7 +83,7 @@ def resample(
     from ..io import ChData
 
     _check_type(inst, (BaseRaw, BaseEpochs, ChData))
-    if isinstance(inst, (BaseRaw, BaseEpochs)):
+    if isinstance(inst, (BaseRaw | BaseEpochs)):
         tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)
     if isinstance(inst, BaseRaw):
         reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)

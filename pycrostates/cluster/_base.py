@@ -232,7 +232,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         self._check_unfitted()
         _check_type(inst, (BaseRaw, BaseEpochs, ChData), item_name="inst")
-        if isinstance(inst, (BaseRaw, BaseEpochs)):
+        if isinstance(inst, (BaseRaw | BaseEpochs)):
             tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)
         if isinstance(inst, BaseRaw):
             reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)
@@ -481,7 +481,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         )
         if isinstance(invert, bool):
             invert = [invert] * self._n_clusters
-        elif isinstance(invert, (list, tuple)):
+        elif isinstance(invert, (list | tuple)):
             for inv in invert:
                 _check_type(inv, (bool,), item_name="invert")
         elif isinstance(invert, np.ndarray):

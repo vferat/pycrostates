@@ -238,7 +238,7 @@ class ChInfo(Info):
             this_ch_dict = ch_types_dict[ch_type]
             kind = this_ch_dict["kind"]
             # handle chpi, where kind is a *list* of FIFF constants:
-            kind = kind[0] if isinstance(kind, (list, tuple)) else kind
+            kind = kind[0] if isinstance(kind, (list | tuple)) else kind
             # mirror what tag.py does here
             coord_frame = _ch_coord_dict.get(kind, FIFF.FIFFV_COORD_UNKNOWN)
             coil_type = this_ch_dict.get("coil_type", FIFF.FIFFV_COIL_NONE)
@@ -377,7 +377,9 @@ class ChInfo(Info):
         chs = [ch["ch_name"] for ch in self["chs"]]
         if (
             len(self["ch_names"]) != len(chs)
-            or any(ch_1 != ch_2 for ch_1, ch_2 in zip(self["ch_names"], chs, strict=False))
+            or any(
+                ch_1 != ch_2 for ch_1, ch_2 in zip(self["ch_names"], chs, strict=False)
+            )
             or self["nchan"] != len(chs)
         ):
             raise RuntimeError(

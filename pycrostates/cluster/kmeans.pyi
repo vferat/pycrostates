@@ -1,10 +1,10 @@
-from pathlib import Path as Path
+from pathlib import Path
 from typing import Any
 
 from _typeshed import Incomplete
-from mne import BaseEpochs as BaseEpochs
-from mne.io import BaseRaw as BaseRaw
-from numpy.random import Generator as Generator
+from mne import BaseEpochs
+from mne.io import BaseRaw
+from numpy.random import Generator
 
 from .._typing import Picks as Picks
 from .._typing import RandomState as RandomState

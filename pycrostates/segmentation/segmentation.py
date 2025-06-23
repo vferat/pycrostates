@@ -1,6 +1,5 @@
 """Segmentation module for segmented data."""
 
-
 from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw

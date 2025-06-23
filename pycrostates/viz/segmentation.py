@@ -17,7 +17,6 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
-
     from .._typing import ScalarFloatArray, ScalarIntArray
 
 
@@ -310,7 +309,7 @@ def _compatibility_cmap(
             cmap = colormaps[cmap]  # the cmap name is checked by matplotlib
         cmap = cmap.resampled(n_colors)
     else:
-        if isinstance(cmap, (str, type(None))):
+        if isinstance(cmap, (str | type(None))):
             cmap = plt.cm.get_cmap(cmap, n_colors)
         else:
             raise RuntimeError(

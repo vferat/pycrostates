@@ -67,9 +67,7 @@ def add_file_handler(
 
 
 @fill_doc
-def set_log_level(
-    verbose: bool | str | int | None, apply_to_mne: bool = True
-) -> None:
+def set_log_level(verbose: bool | str | int | None, apply_to_mne: bool = True) -> None:
     """Set the log level for the logger and the first handler ``sys.stdout``.
 
     Parameters

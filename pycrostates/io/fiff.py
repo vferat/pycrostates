@@ -63,7 +63,6 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger
 
 if TYPE_CHECKING:
-
     from .._typing import ScalarFloatArray, ScalarIntArray
     from . import ChInfo
 
@@ -642,7 +641,7 @@ def _serialize(dict_: dict, outer_sep: str = ";", inner_sep: str = ":"):
             for subkey, subvalue in value.items():
                 if isinstance(subvalue, list):
                     if len(subvalue) > 0:
-                        if isinstance(subvalue[0], (int, np.integer)):
+                        if isinstance(subvalue[0], (int | np.integer)):
                             value[subkey] = [int(i) for i in subvalue]
 
         s.append(key + inner_sep + json.dumps(value))

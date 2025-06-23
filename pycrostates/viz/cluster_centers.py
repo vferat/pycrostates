@@ -134,7 +134,9 @@ def plot_cluster_centers(
         del figs
 
     # plot cluster centers
-    for k, (center, name) in enumerate(zip(cluster_centers, cluster_names, strict=False)):
+    for k, (center, name) in enumerate(
+        zip(cluster_centers, cluster_names, strict=False)
+    ):
         # select axes from ax
         if axes.ndim == 1:
             ax = axes[k]

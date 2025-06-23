@@ -21,7 +21,6 @@ from .entropy import entropy
 from .transitions import _compute_expected_transition_matrix, _compute_transition_matrix
 
 if TYPE_CHECKING:
-
     from .._typing import ScalarFloatArray, ScalarIntArray
 
 

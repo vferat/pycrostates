@@ -1,6 +1,6 @@
 import logging
-from pathlib import Path as Path
 from collections.abc import Callable
+from pathlib import Path
 
 from _typeshed import Incomplete
 

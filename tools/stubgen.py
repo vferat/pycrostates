@@ -43,7 +43,7 @@ for stub in stubs:
     objects = [
         node
         for node in module_ast.body
-        if isinstance(node, (ast.ClassDef, ast.FunctionDef))
+        if isinstance(node, (ast.ClassDef | ast.FunctionDef))
     ]
     for node in objects:
         docstring = getattr(module, node.name).__doc__
@@ -74,5 +74,5 @@ for stub in stubs:
     isort.file(stub, config=config_isort)
 
 # run ruff to improve stub style
-exec = subprocess.run(["ruff", "format", str(directory), "--config", config])
-sys.exit(exec.returncode)
+execution = subprocess.run(["ruff", "format", str(directory), "--config", config])
+sys.exit(execution.returncode)

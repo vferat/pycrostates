@@ -25,7 +25,6 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
-
     from .._typing import Picks, ScalarFloatArray
     from ..io import ChData
 

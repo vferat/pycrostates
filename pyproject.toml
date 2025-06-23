@@ -174,11 +174,12 @@ select = ['A', 'B', 'E', 'F', 'UP', 'W']
 '*' = [
   'B904', # 'Within an except clause, raise exceptions with raise ... from ...'
 ]
-'*.pyi' = ['E501']
+'*.pyi' = ['E501', 'F821']
 '*/cluster/_base.pyi' = ['B006']
 '*/segmentation/_base.pyi' = ['F811']
 '__init__.py' = ['F401']
 'pycrostates/io/__init__.py' = ['A005']
+'tutorials/*' = ['B018', 'E402', 'E501']
 
 [tool.setuptools]
 include-package-data = false
