@@ -1,6 +1,5 @@
 """Segmentation module for segmented data."""
 
-from typing import Optional, Union
 
 from matplotlib.axes import Axes
 from mne import BaseEpochs
@@ -46,15 +45,15 @@ class RawSegmentation(_BaseSegmentation):
     @fill_doc
     def plot(
         self,
-        tmin: Optional[Union[int, float]] = None,
-        tmax: Optional[Union[int, float]] = None,
-        cmap: Optional[str] = None,
-        axes: Optional[Axes] = None,
-        cbar_axes: Optional[Axes] = None,
+        tmin: int | float | None = None,
+        tmax: int | float | None = None,
+        cmap: str | None = None,
+        axes: Axes | None = None,
+        cbar_axes: Axes | None = None,
         *,
         block: bool = False,
-        show: Optional[bool] = None,
-        verbose: Optional[str] = None,
+        show: bool | None = None,
+        verbose: str | None = None,
     ):
         """Plot the segmentation.
 
@@ -136,12 +135,12 @@ class EpochsSegmentation(_BaseSegmentation):
     @fill_doc
     def plot(
         self,
-        cmap: Optional[str] = None,
-        axes: Optional[Axes] = None,
-        cbar_axes: Optional[Axes] = None,
+        cmap: str | None = None,
+        axes: Axes | None = None,
+        cbar_axes: Axes | None = None,
         *,
         block: bool = False,
-        show: Optional[bool] = None,
+        show: bool | None = None,
         verbose=None,
     ):
         """Plot segmentation.

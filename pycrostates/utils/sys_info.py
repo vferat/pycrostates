@@ -2,7 +2,8 @@ import platform
 import sys
 from functools import partial
 from importlib.metadata import requires, version
-from typing import IO, Callable, Optional
+from typing import IO
+from collections.abc import Callable
 
 import psutil
 from packaging.requirements import Requirement
@@ -10,7 +11,7 @@ from packaging.requirements import Requirement
 from ._checks import _check_type
 
 
-def sys_info(fid: Optional[IO] = None, developer: bool = False):
+def sys_info(fid: IO | None = None, developer: bool = False):
     """Print the system information for debugging.
 
     Parameters

@@ -18,7 +18,6 @@ from ..utils._checks import _check_n_jobs, _check_type, _check_value, _ensure_in
 from ..utils._docs import fill_doc
 
 if TYPE_CHECKING:
-    from typing import Optional, Union
 
     from .._typing import ScalarFloatArray, ScalarIntArray
     from ._base import _BaseSegmentation
@@ -64,8 +63,8 @@ def _check_lags(lags) -> ScalarIntArray:
 def _joint_entropy(
     x: ScalarIntArray,
     y: ScalarIntArray,
-    state_to_ignore: Optional[int] = -1,
-    log_base: Union[float, str] = 2,
+    state_to_ignore: int | None = -1,
+    log_base: float | str = 2,
 ) -> float:
     """Joint Shannon entropy of the symbolic sequences x, y.
 
@@ -129,8 +128,8 @@ def _check_segmentation(
 def _joint_entropy_history(
     labels: ScalarIntArray,
     k: int,
-    state_to_ignore: Optional[int] = -1,
-    log_base: Union[float, str] = 2,
+    state_to_ignore: int | None = -1,
+    log_base: float | str = 2,
 ) -> float:
     r"""Compute the joint Shannon of k-histories x[t:t+k].
 
@@ -174,8 +173,8 @@ def _joint_entropy_history(
 @fill_doc
 def _entropy(
     labels: ScalarIntArray,
-    state_to_ignore: Optional[int] = -1,
-    log_base: Union[float, str] = 2,
+    state_to_ignore: int | None = -1,
+    log_base: float | str = 2,
 ) -> float:
     r"""Compute the Shannon entropy of the a symbolic sequence.
 
@@ -204,7 +203,7 @@ def _entropy(
 def entropy(
     segmentation: _BaseSegmentation,
     ignore_repetitions: bool = False,
-    log_base: Union[float, str] = 2,
+    log_base: float | str = 2,
 ) -> float:
     r"""Compute the Shannon entropy of a symbolic sequence.
 
@@ -239,8 +238,8 @@ def entropy(
 def _excess_entropy_rate(
     labels: ScalarIntArray,
     history_length: int,
-    state_to_ignore: Optional[int] = -1,
-    log_base: Union[float, str] = 2,
+    state_to_ignore: int | None = -1,
+    log_base: float | str = 2,
     n_jobs: int = 1,
 ) -> tuple[float, float, float, ScalarIntArray, ScalarFloatArray]:
     """Estimate the entropy rate and the excess_entropy from a linear fit.
@@ -286,7 +285,7 @@ def excess_entropy_rate(
     segmentation: _BaseSegmentation,
     history_length: int,
     ignore_repetitions: bool = False,
-    log_base: Union[float, str] = 2,
+    log_base: float | str = 2,
     n_jobs: int = 1,
 ) -> tuple[float, float, float, ScalarIntArray, ScalarFloatArray]:
     r"""Estimate the entropy rate and the ``excess_entropy`` of the segmentation.
@@ -346,8 +345,8 @@ def excess_entropy_rate(
 def _auto_information(
     labels: ScalarIntArray,
     k: int,
-    state_to_ignore: Optional[int] = -1,
-    log_base: Union[float, str] = 2,
+    state_to_ignore: int | None = -1,
+    log_base: float | str = 2,
 ) -> float:
     """Compute the Auto-information for lag k.
 
@@ -390,14 +389,9 @@ def _auto_information(
 @fill_doc
 def auto_information_function(
     segmentation: _BaseSegmentation,
-    lags: Union[
-        int,
-        list[int],
-        tuple[int, ...],
-        ScalarIntArray,
-    ],
+    lags: int | list[int] | tuple[int, ...] | ScalarIntArray,
     ignore_repetitions: bool = False,
-    log_base: Union[float, str] = 2,
+    log_base: float | str = 2,
     n_jobs: int = 1,
 ) -> tuple[ScalarIntArray, ScalarFloatArray]:
     r"""Compute the Auto-information function (aif).
@@ -451,8 +445,8 @@ def auto_information_function(
 def _partial_auto_information(
     labels: ScalarIntArray,
     k: int,
-    state_to_ignore: Optional[int] = -1,
-    log_base: Union[float, str] = 2,
+    state_to_ignore: int | None = -1,
+    log_base: float | str = 2,
 ) -> float:
     """Compute the partial auto-information for lag k.
 
@@ -501,15 +495,10 @@ def _partial_auto_information(
 @fill_doc
 def partial_auto_information_function(
     segmentation: _BaseSegmentation,
-    lags: Union[
-        int,
-        list[int],
-        tuple[int, ...],
-        ScalarIntArray,
-    ],
+    lags: int | list[int] | tuple[int, ...] | ScalarIntArray,
     ignore_repetitions: bool = False,
-    log_base: Union[float, str] = 2,
-    n_jobs: Optional[int] = 1,
+    log_base: float | str = 2,
+    n_jobs: int | None = 1,
 ) -> tuple[ScalarIntArray, ScalarFloatArray]:
     r"""Compute the Partial auto-information function.
 

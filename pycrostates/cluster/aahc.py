@@ -1,7 +1,7 @@
 """Atomize and Agglomerate Hierarchical Clustering (AAHC)."""
 
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 
 import numpy as np
 from mne import BaseEpochs
@@ -66,7 +66,7 @@ class AAHCluster(_BaseCluster):
             )
             ch_repr = [
                 f"{ch_count} {ch_type.upper()}"
-                for ch_type, ch_count in zip(ch_types, ch_counts)
+                for ch_type, ch_count in zip(ch_types, ch_counts, strict=False)
             ]
             GEV = f"{self._GEV_ * 100:.2f}"
         else:
@@ -120,13 +120,13 @@ class AAHCluster(_BaseCluster):
     @copy_doc(_BaseCluster.fit)
     def fit(
         self,
-        inst: Union[BaseRaw, BaseEpochs],
+        inst: BaseRaw | BaseEpochs,
         picks: Picks = "eeg",
-        tmin: Optional[Union[int, float]] = None,
-        tmax: Optional[Union[int, float]] = None,
+        tmin: int | float | None = None,
+        tmax: int | float | None = None,
         reject_by_annotation: bool = True,
         *,
-        verbose: Optional[str] = None,
+        verbose: str | None = None,
     ) -> None:
         data = super().fit(
             inst,
@@ -153,7 +153,7 @@ class AAHCluster(_BaseCluster):
         self._fitted = True
 
     @copy_doc(_BaseCluster.save)
-    def save(self, fname: Union[str, Path]):
+    def save(self, fname: str | Path):
         super().save(fname)
         # TODO: to be replaced by a general writer than infers the writer from the file
         # extension.

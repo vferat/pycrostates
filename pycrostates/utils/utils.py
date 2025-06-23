@@ -80,7 +80,7 @@ def _compare_infos(cluster_info, inst_info):
 
     # Compare loc
     assert len(cluster_loc) == len(inst_loc)  # sanity-check
-    for l1, l2 in zip(cluster_loc, inst_loc):
+    for l1, l2 in zip(cluster_loc, inst_loc, strict=False):
         if not np.allclose(l1, l2, equal_nan=True):
             logger.warning(
                 "Instance to segment into microstates sequence does not have "
@@ -117,17 +117,17 @@ def _compare_infos(cluster_info, inst_info):
         elt[1] for elt in sorted(inst_coord_frames, key=lambda x: x[0])
     ]
 
-    if not all(kind1 == kind2 for kind1, kind2 in zip(cluster_kinds, inst_kinds)):
+    if not all(kind1 == kind2 for kind1, kind2 in zip(cluster_kinds, inst_kinds, strict=False)):
         logger.warning(
             "Instance to segment into microstates sequence does not have "
             "the same channels kinds as the instance used for fitting. "
         )
-    if not all(unit1 == unit2 for unit1, unit2 in zip(cluster_units, inst_units)):
+    if not all(unit1 == unit2 for unit1, unit2 in zip(cluster_units, inst_units, strict=False)):
         logger.warning(
             "Instance to segment into microstates sequence does not have "
             "the same channels units as the instance used for fitting. "
         )
-    if not all(f1 == f2 for f1, f2 in zip(cluster_coord_frame, inst_coord_frames)):
+    if not all(f1 == f2 for f1, f2 in zip(cluster_coord_frame, inst_coord_frames, strict=False)):
         logger.warning(
             "Instance to segment into microstates sequence does not have "
             "the same coordinate frames as the instance used for fitting. "

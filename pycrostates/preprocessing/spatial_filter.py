@@ -23,7 +23,6 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
-    from typing import Union
 
     from .._typing import ScalarFloatArray
     from ..io import ChData
@@ -67,11 +66,11 @@ def _check_adjacency(adjacency, info, ch_type):
 @fill_doc
 @verbose
 def apply_spatial_filter(
-    inst: Union[BaseRaw, BaseEpochs, ChData],
+    inst: BaseRaw | BaseEpochs | ChData,
     ch_type: str = "eeg",
     exclude_bads: bool = True,
-    origin: Union[str, ScalarFloatArray] = "auto",
-    adjacency: Union[csr_matrix, str] = "auto",
+    origin: str | ScalarFloatArray = "auto",
+    adjacency: csr_matrix | str = "auto",
     n_jobs: int = 1,
     verbose=None,
 ):

@@ -63,7 +63,6 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger
 
 if TYPE_CHECKING:
-    from typing import Union
 
     from .._typing import ScalarFloatArray, ScalarIntArray
     from . import ChInfo
@@ -100,9 +99,9 @@ FIFF_MNE_ICA_MISC_PARAMS -> fit variables (ending with '_')
 
 @fill_doc
 def _write_cluster(
-    fname: Union[str, Path],
+    fname: str | Path,
     cluster_centers_: ScalarFloatArray,
-    chinfo: Union[ChInfo, Info],
+    chinfo: ChInfo | Info,
     algorithm: str,
     cluster_names: list[str],
     fitted_data: ScalarFloatArray,
@@ -263,7 +262,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
 
 
 @fill_doc
-def _read_cluster(fname: Union[str, Path]):
+def _read_cluster(fname: str | Path):
     """Read clustering solution from disk.
 
     Parameters
@@ -409,7 +408,7 @@ def _create_ModKMeans(
     labels_: ScalarIntArray,
     n_init: int,
     max_iter: int,
-    tol: Union[int, float],
+    tol: int | float,
     GEV_: float,
 ):
     """Create a ModKMeans cluster."""

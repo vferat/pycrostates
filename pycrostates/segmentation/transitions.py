@@ -63,7 +63,7 @@ def _compute_transition_matrix(
 
     T = np.zeros(shape=(n_clusters, n_clusters))
     # number of transitions
-    for i, j in zip(labels, labels[1:]):
+    for i, j in zip(labels, labels[1:], strict=False):
         if i == -1 or j == -1:
             continue  # ignore unlabeled
         T[i, j] += 1
