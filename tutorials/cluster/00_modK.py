@@ -7,7 +7,7 @@ This tutorial introduces the main clustering object
 K-means algorithm is based on :footcite:t:`Marqui1995`.
 """
 
-#%%
+# %%
 # .. include:: ../../../../links.inc
 
 # %%
@@ -31,13 +31,13 @@ from pycrostates.datasets import lemon
 
 
 # load sample dataset
-raw_fname = lemon.data_path(subject_id='010017', condition='EC')
+raw_fname = lemon.data_path(subject_id="010017", condition="EC")
 raw = read_raw_eeglab(raw_fname, preload=True)
 raw.crop(0, 10)  # crop the dataset to speed up computation
-raw.pick('eeg')  # select EEG channels
-raw.set_eeg_reference('average')  # Apply a common average reference
+raw.pick("eeg")  # select EEG channels
+raw.set_eeg_reference("average")  # Apply a common average reference
 
-#%%
+# %%
 # The modified K-means\ :footcite:p:`Marqui1995` can be instantiated with the
 # number of :term:`cluster centers` ``n_clusters`` to fit. By default, the
 # modified K-means will only work with EEG data, but other channel types can be
@@ -52,7 +52,7 @@ raw.set_eeg_reference('average')  # Apply a common average reference
 n_clusters = 5
 ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
 
-#%%
+# %%
 # After creating a :class:`~pycrostates.cluster.ModKMeans`, the next step is to
 # fit the model. In other words, fitting a clustering algorithm will determine
 # the microstate maps, also called :term:`cluster centers`. A clustering
@@ -67,7 +67,7 @@ ModK = ModKMeans(n_clusters=n_clusters, random_state=42)
 
 ModK.fit(raw, n_jobs=5)
 
-#%%
+# %%
 # Now that our algorithm is fitted, we can visualize the
 # :term:`cluster centers`, also called microstate maps or microstate
 # topographies using :meth:`pycrostates.cluster.ModKMeans.plot`.
@@ -76,13 +76,13 @@ ModK.fit(raw, n_jobs=5)
 
 ModK.plot(show_gradient=True)
 
-#%%
+# %%
 # The :term:`cluster centers` can be retrieved as a numpy array with the
 # ``cluster_centers_`` attribute.
 
 ModK.cluster_centers_
 
-#%%
+# %%
 # By default, the :term:`cluster centers` are named from ``0`` to
 # ``n_clusters - 1`` and are ordered based on the fit. You can reorder
 # (:meth:`pycrostates.cluster.ModKMeans.reorder_clusters`) and
@@ -90,10 +90,10 @@ ModK.cluster_centers_
 # microstates to match your preference.
 
 ModK.reorder_clusters(order=[3, 0, 1, 2, 4])
-ModK.rename_clusters(new_names=['A', 'B', 'C', 'D', 'F'])
+ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
 ModK.plot()
 
-#%%
+# %%
 # The map polarities can be inverted using the
 # :meth:`pycrostates.cluster.ModKMeans.invert_polarity`.
 # method. Note that it only affects visualization, it has not effect during

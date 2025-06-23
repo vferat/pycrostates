@@ -6,10 +6,10 @@ This tutorial introduces how to use :class:`pycrostates.preprocessing.resample`
 to compute individual microstate topographies and study the stability of
 the clustering results.
 """
-#%%
+# %%
 # .. include:: ../../../../links.inc
 
-#%%
+# %%
 # .. note::
 #
 #     The lemon datasets used in this tutorial is composed of EEGLAB files. To
@@ -31,13 +31,13 @@ from pycrostates.cluster import ModKMeans
 from pycrostates.datasets import lemon
 
 
-raw_fname = lemon.data_path(subject_id='010017', condition='EC')
+raw_fname = lemon.data_path(subject_id="010017", condition="EC")
 raw = read_raw_eeglab(raw_fname, preload=True)
 raw.crop(0, 60)
-raw.pick('eeg')
-raw.set_eeg_reference('average')
+raw.pick("eeg")
+raw.set_eeg_reference("average")
 
-#%%
+# %%
 # Resampling is a technique which consist of selecting a subset from a
 # dataset several times. This method can be useful to study the stability and
 # reliability of clustering results. In this example, we will split our data in
@@ -60,7 +60,7 @@ from pycrostates.preprocessing import resample
 
 resamples = resample(raw, n_resamples=3, n_samples=1000, random_state=42)
 
-#%%
+# %%
 # We can compute the :term:`cluster centers` on each of the resample and plot
 # the topographic maps fitted on a unique figure with the ``axes`` argument.
 
@@ -75,9 +75,11 @@ for k, resamp in enumerate(resamples):
     # plot the cluster centers
     fig = ModK.plot(axes=ax[k, :])
     plt.text(
-        0.5, 1.4, f"GEV: {ModK.GEV_:.2f}",
-        horizontalalignment='center',
-        verticalalignment='center',
+        0.5,
+        1.4,
+        f"GEV: {ModK.GEV_:.2f}",
+        horizontalalignment="center",
+        verticalalignment="center",
         transform=ax[k, 2].transAxes,
         fontdict=dict(size=14),
     )
@@ -85,7 +87,7 @@ for k, resamp in enumerate(resamples):
 plt.subplots_adjust(top=0.9, hspace=0.5)
 plt.show()
 
-#%%
+# %%
 # Each resampling clustering solution explains about 70% of its Global
 # Explained Variance (:term:`GEV`). We can distinguish similar topographies
 # between fits, although with large variation, different signs and in a
@@ -108,7 +110,7 @@ ModK = ModKMeans(n_clusters=5, random_state=42)
 ModK.fit(all_resampling_results, n_jobs=2, verbose="WARNING")
 ModK.plot()
 
-#%%
+# %%
 # .. note::
 #
 #     This method can also be applied for group level analysis by mixing
