@@ -1,9 +1,9 @@
 import platform
 import sys
+from collections.abc import Callable
 from functools import partial
 from importlib.metadata import requires, version
 from typing import IO
-from collections.abc import Callable
 
 import psutil
 from packaging.requirements import Requirement
