@@ -24,8 +24,6 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
-    from typing import Optional, Union
-
     from .._typing import Picks, RandomState
     from ..io import ChData
 
@@ -33,10 +31,10 @@ if TYPE_CHECKING:
 @fill_doc
 @verbose
 def resample(
-    inst: Union[BaseRaw, BaseEpochs, ChData],
+    inst: BaseRaw | BaseEpochs | ChData,
     picks: Picks = None,
-    tmin: Optional[float] = None,
-    tmax: Optional[float] = None,
+    tmin: float | None = None,
+    tmax: float | None = None,
     reject_by_annotation: bool = True,
     n_resamples: int = None,
     n_samples: int = None,
@@ -85,7 +83,7 @@ def resample(
     from ..io import ChData
 
     _check_type(inst, (BaseRaw, BaseEpochs, ChData))
-    if isinstance(inst, (BaseRaw, BaseEpochs)):
+    if isinstance(inst, (BaseRaw | BaseEpochs)):
         tmin, tmax = _check_tmin_tmax(inst, tmin, tmax)
     if isinstance(inst, BaseRaw):
         reject_by_annotation = _check_reject_by_annotation(reject_by_annotation)

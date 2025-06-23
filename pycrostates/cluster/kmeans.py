@@ -18,7 +18,7 @@ from ..utils._logs import logger
 from ._base import _BaseCluster
 
 if TYPE_CHECKING:
-    from typing import Any, Optional, Union
+    from typing import Any
 
     from .._typing import Picks, RandomState, ScalarFloatArray, ScalarIntArray
     from ..io import ChData
@@ -55,7 +55,7 @@ class ModKMeans(_BaseCluster):
         n_clusters: int,
         n_init: int = 100,
         max_iter: int = 300,
-        tol: Union[int, float] = 1e-6,
+        tol: int | float = 1e-6,
         random_state: RandomState = None,
     ):
         super().__init__()
@@ -84,7 +84,7 @@ class ModKMeans(_BaseCluster):
             )
             ch_repr = [
                 f"{ch_count} {ch_type.upper()}"
-                for ch_type, ch_count in zip(ch_types, ch_counts)
+                for ch_type, ch_count in zip(ch_types, ch_counts, strict=False)
             ]
             GEV = f"{self._GEV_ * 100:.2f}"
         else:
@@ -142,14 +142,14 @@ class ModKMeans(_BaseCluster):
     @fill_doc
     def fit(
         self,
-        inst: Union[BaseRaw, BaseEpochs, ChData],
+        inst: BaseRaw | BaseEpochs | ChData,
         picks: Picks = "eeg",
-        tmin: Optional[Union[int, float]] = None,
-        tmax: Optional[Union[int, float]] = None,
+        tmin: int | float | None = None,
+        tmax: int | float | None = None,
         reject_by_annotation: bool = True,
         n_jobs: int = 1,
         *,
-        verbose: Optional[str] = None,
+        verbose: str | None = None,
     ) -> None:
         """Compute cluster centers.
 
@@ -241,7 +241,7 @@ class ModKMeans(_BaseCluster):
         self._ignore_polarity = True
 
     @copy_doc(_BaseCluster.save)
-    def save(self, fname: Union[str, Path]):
+    def save(self, fname: str | Path):
         super().save(fname)
         # TODO: to be replaced by a general writer than infers the writer from
         # the file extension.
@@ -267,8 +267,8 @@ class ModKMeans(_BaseCluster):
         data: ScalarFloatArray,
         n_clusters: int,
         max_iter: int,
-        random_state: Union[RandomState, Generator],
-        tol: Union[int, float],
+        random_state: RandomState | Generator,
+        tol: int | float,
     ) -> tuple[float, ScalarFloatArray, ScalarIntArray, bool]:
         """Run the k-means algorithm."""
         gfp_sum_sq = np.sum(data**2)
@@ -286,8 +286,8 @@ class ModKMeans(_BaseCluster):
         data: ScalarFloatArray,
         n_clusters: int,
         max_iter: int,
-        random_state: Union[RandomState, Generator],
-        tol: Union[int, float],
+        random_state: RandomState | Generator,
+        tol: int | float,
     ) -> tuple[ScalarFloatArray, bool]:
         """Compute microstates maps.
 
@@ -366,7 +366,7 @@ class ModKMeans(_BaseCluster):
         return self._max_iter
 
     @property
-    def tol(self) -> Union[int, float]:
+    def tol(self) -> int | float:
         """Relative tolerance to reach convergence.
 
         :type: `float`
@@ -374,7 +374,7 @@ class ModKMeans(_BaseCluster):
         return self._tol
 
     @property
-    def random_state(self) -> Union[RandomState, Generator]:
+    def random_state(self) -> RandomState | Generator:
         """Random state to fix seed generation.
 
         :type: `~numpy.random.RandomState` | `~numpy.random.Generator`
@@ -426,7 +426,7 @@ class ModKMeans(_BaseCluster):
         return max_iter
 
     @staticmethod
-    def _check_tol(tol: Union[int, float]) -> Union[int, float]:
+    def _check_tol(tol: int | float) -> int | float:
         """Check that tol is a positive number."""
         _check_type(tol, ("numeric",), item_name="tol")
         if tol <= 0:

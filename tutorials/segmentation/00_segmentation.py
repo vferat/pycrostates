@@ -5,10 +5,10 @@ Microstate Segmentation
 This tutorial introduces the concept of segmentation.
 """
 
-#%%
+# %%
 # .. include:: ../../../../links.inc
 
-#%%
+# %%
 # Segmentation
 # ------------
 #
@@ -60,7 +60,7 @@ ModK.reorder_clusters(order=[4, 1, 3, 2, 0])
 ModK.rename_clusters(new_names=["A", "B", "C", "D", "F"])
 ModK.plot()
 
-#%%
+# %%
 # Once a set of cluster centers has been fitted, It can be used to predict the
 # microstate segmentation with the method
 # :meth:`pycrostates.cluster.ModKMeans.predict`. It returns either a
@@ -77,7 +77,7 @@ segmentation = ModK.predict(
     reject_edges=True,
 )
 
-#%%
+# %%
 # The ``factor`` and ``half_window_size`` arguments control the smoothing
 # algorithm introduced by Pascual Marqui\ :footcite:p:`Marqui1995`. This
 # algorithm corrects wrong label assignments which occur during periods of low
@@ -92,19 +92,19 @@ segmentation = ModK.predict(
 # ``min_segment_length`` parameter, it re-assigns segments of short duration to
 # their neighboring segments.
 
-#%%
+# %%
 # The label of each datapoints are stored in the ``labels`` attribute.
 
 segmentation.labels
 
-#%%
+# %%
 # The segmentation can be visualized with the method
 # :meth:`~pycrostates.segmentation.RawSegmentation.plot`.
 
 segmentation.plot(tmin=1, tmax=5)
 plt.show()
 
-#%%
+# %%
 # Microstates parameters
 # ----------------------
 #
@@ -117,7 +117,7 @@ plt.show()
 parameters = segmentation.compute_parameters()
 parameters
 
-#%%
+# %%
 # Global Explained Variance
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -133,7 +133,7 @@ ax.set_xlabel("Microstates")
 ax.set_ylabel("Global explained Variance (ratio)")
 plt.show()
 
-#%%
+# %%
 # Mean correlation
 # ~~~~~~~~~~~~~~~~
 #
@@ -148,7 +148,7 @@ ax.set_xlabel("Microstates")
 ax.set_ylabel("Mean correlation")
 plt.show()
 
-#%%
+# %%
 # Time coverage
 # ~~~~~~~~~~~~~
 #
@@ -163,7 +163,7 @@ ax.set_xlabel("Microstates")
 ax.set_ylabel("Time Coverage (ratio)")
 plt.show()
 
-#%%
+# %%
 # Mean durations
 # ~~~~~~~~~~~~~~
 #
@@ -178,7 +178,7 @@ ax.set_xlabel("Microstates")
 ax.set_ylabel("Mean duration (s)")
 plt.show()
 
-#%%
+# %%
 # Occurrence per second
 # ~~~~~~~~~~~~~~~~~~~~~
 #
@@ -190,10 +190,10 @@ y = [parameters[elt + "_occurrences"] for elt in x]
 
 ax = sns.barplot(x=x, y=y)
 ax.set_xlabel("Microstates")
-ax.set_ylabel('Occurrences (segment/s)')
+ax.set_ylabel("Occurrences (segment/s)")
 plt.show()
 
-#%%
+# %%
 # Distributions
 # ~~~~~~~~~~~~~
 #
@@ -203,20 +203,20 @@ plt.show()
 parameters = segmentation.compute_parameters(return_dist=True)
 parameters
 
-#%%
+# %%
 # For example, the distribution of ``C`` segment durations can be plotted.
 
-sns.displot(parameters['C_dist_durs'], stat='probability', bins=30)
+sns.displot(parameters["C_dist_durs"], stat="probability", bins=30)
 plt.show()
 
-#%%
+# %%
 # Or it can be used to compute other custom metrics from the segmentation. For
 # instance, the median.
 
-median = np.median(parameters['C_dist_durs'])
+median = np.median(parameters["C_dist_durs"])
 print(f"Microstate C segments have a median duration of {median:.2f}s.")
 
-#%%
+# %%
 # Transition probabilities
 # ------------------------
 #
@@ -225,7 +225,7 @@ print(f"Microstate C segments have a median duration of {median:.2f}s.")
 
 T_observed = segmentation.compute_transition_matrix()
 
-#%%
+# %%
 # This method returns a `~numpy.array` of shape ``(n_clusters, n_clusters)``
 # containing the value corresponding to the chosen statistic:
 #
@@ -259,7 +259,7 @@ ax.set_ylabel("From")
 ax.set_xlabel("To")
 plt.show()
 
-#%%
+# %%
 # It is however important to take into account the time coverage of each
 # microstate in order to interpret this matrix. The more a state is
 # present, the more there is a chance that a transition towards this state is
@@ -284,7 +284,7 @@ ax.set_ylabel("From")
 ax.set_xlabel("To")
 plt.show()
 
-#%%
+# %%
 # The difference between the observed transition probability matrix
 # ``T_observed`` and the theoretical transition probability matrix
 # ``T_expected`` reveals particular dynamic present in the segmentation.
@@ -305,7 +305,7 @@ ax.set_ylabel("From")
 ax.set_xlabel("To")
 plt.show()
 
-#%%
+# %%
 # References
 # ----------
 # .. footbibliography::

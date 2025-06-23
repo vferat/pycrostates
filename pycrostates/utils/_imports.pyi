@@ -1,4 +1,4 @@
-from types import ModuleType as ModuleType
+from types import ModuleType
 
 _INSTALL_MAPPING: dict[str, str]
 

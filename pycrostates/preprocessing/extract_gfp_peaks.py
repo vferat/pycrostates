@@ -25,8 +25,6 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
-    from typing import Optional, Union
-
     from .._typing import Picks, ScalarFloatArray
     from ..io import ChData
 
@@ -34,12 +32,12 @@ if TYPE_CHECKING:
 @fill_doc
 @verbose
 def extract_gfp_peaks(
-    inst: Union[BaseRaw, BaseEpochs],
+    inst: BaseRaw | BaseEpochs,
     picks: Picks = "eeg",
     return_all: bool = False,
     min_peak_distance: int = 1,
-    tmin: Optional[float] = None,
-    tmax: Optional[float] = None,
+    tmin: float | None = None,
+    tmax: float | None = None,
     reject_by_annotation: bool = True,
     verbose=None,
 ) -> ChData:

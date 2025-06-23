@@ -16,7 +16,7 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
-    from typing import Any, Optional, Union
+    from typing import Any
 
     from .._typing import AxesArray, ScalarFloatArray
     from ..io import ChInfo
@@ -33,15 +33,15 @@ _GRADIENT_KWARGS_DEFAULTS: dict[str, str] = {
 @verbose
 def plot_cluster_centers(
     cluster_centers: ScalarFloatArray,
-    info: Union[Info, ChInfo],
+    info: Info | ChInfo,
     cluster_names: list[str] = None,
-    axes: Optional[Union[Axes, AxesArray]] = None,
-    show_gradient: Optional[bool] = False,
+    axes: Axes | AxesArray | None = None,
+    show_gradient: bool | None = False,
     gradient_kwargs: dict[str, Any] = _GRADIENT_KWARGS_DEFAULTS,
     *,
     block: bool = False,
-    show: Optional[bool] = None,
-    verbose: Optional[str] = None,
+    show: bool | None = None,
+    verbose: str | None = None,
     **kwargs,
 ):
     """Create topographic maps for cluster centers.
@@ -134,7 +134,9 @@ def plot_cluster_centers(
         del figs
 
     # plot cluster centers
-    for k, (center, name) in enumerate(zip(cluster_centers, cluster_names)):
+    for k, (center, name) in enumerate(
+        zip(cluster_centers, cluster_names, strict=False)
+    ):
         # select axes from ax
         if axes.ndim == 1:
             ax = axes[k]
