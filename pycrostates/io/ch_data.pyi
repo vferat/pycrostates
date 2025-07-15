@@ -34,7 +34,7 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
     def __repr__(self) -> str:
         """String representation."""
 
-    def _repr_html_(self, caption: Incomplete | None = None):
+    def _repr_html_(self, caption=None):
         """HTML representation."""
 
     def __eq__(self, other: Any) -> bool:
@@ -53,7 +53,7 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
         """
 
     @fill_doc
-    def get_data(self, picks: Incomplete | None = None) -> ScalarFloatArray:
+    def get_data(self, picks=None) -> ScalarFloatArray:
         """Retrieve the data array.
 
         Parameters
@@ -99,7 +99,7 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
             The instance modified in-place.
         """
 
-    def _get_channel_positions(self, picks: Incomplete | None = None):
+    def _get_channel_positions(self, picks=None):
         """Get channel locations from info.
 
         Parameters

@@ -46,7 +46,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     def __repr__(self) -> str:
         """String representation."""
 
-    def _repr_html_(self, caption: Incomplete | None = None):
+    def _repr_html_(self, caption=None):
         """HTML representation."""
 
     def __eq__(self, other: Any) -> bool:

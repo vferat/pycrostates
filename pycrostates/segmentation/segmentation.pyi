@@ -1,4 +1,3 @@
-from _typeshed import Incomplete
 from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
@@ -106,7 +105,7 @@ class EpochsSegmentation(_BaseSegmentation):
         *,
         block: bool = False,
         show: bool | None = None,
-        verbose: Incomplete | None = None,
+        verbose=None,
     ):
         """Plot segmentation.
 

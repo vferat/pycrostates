@@ -1,4 +1,3 @@
-from _typeshed import Incomplete
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
@@ -25,7 +24,7 @@ def resample(
     coverage: float = None,
     replace: bool = True,
     random_state: RandomState = None,
-    verbose: Incomplete | None = None,
+    verbose=None,
 ) -> list[ChData]:
     """Resample a recording into epochs of random samples.
 
