@@ -14,5 +14,5 @@
 Version 0.7
 -----------
 
-- Match MNE 1.11 behavior for :class:`~pycrostates.io.ChInfo` which now defauls to ``None`` for the ``dev_head_t`` instead of an identity matrix.
+- Match MNE 1.11 behavior for :class:`~pycrostates.io.ChInfo` which now default to ``None`` for the ``dev_head_t`` instead of an identity matrix.
 - Set Minimum MNE version to 1.10 and minimum matplotlib version to 3.6.
