@@ -73,7 +73,11 @@ def test_create_from_info():
     assert chinfo["nchan"] == 3
     assert chinfo["ctf_head_t"] is None
     assert chinfo["dev_ctf_t"] is None
-    assert chinfo["dev_head_t"] == Transform("meg", "head")
+    if check_version("mne", "1.11"):
+        assert chinfo["dev_head_t"] is None
+    else:
+        # identity MEG -> head transformation
+        assert chinfo["dev_head_t"] == Transform("meg", "head")
 
     # test with multiple channel types
     ch_names = [f"MEG{n:03}" for n in range(1, 10)] + ["EOG001"]
