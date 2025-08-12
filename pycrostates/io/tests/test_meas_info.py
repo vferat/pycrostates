@@ -9,6 +9,7 @@ from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import read_raw_fif
 from mne.io.constants import FIFF
+from mne.utils import check_version
 from numpy.testing import assert_allclose
 
 from pycrostates.io import ChInfo
@@ -43,7 +44,12 @@ def test_create_from_info():
     assert chinfo["nchan"] == 3
     assert chinfo["ctf_head_t"] is None
     assert chinfo["dev_ctf_t"] is None
-    assert chinfo["dev_head_t"] == Transform("meg", "head")
+
+    if check_version("mne", "1.11"):
+        assert chinfo["dev_head_t"] is None
+    else:
+        # identity MEG -> head transformation
+        assert chinfo["dev_head_t"] == Transform("meg", "head")
 
     # test changing a value from info
     with info._unlock():

@@ -19,15 +19,16 @@ classifiers = [
   'Programming Language :: Python :: 3.11',
   'Programming Language :: Python :: 3.12',
   'Programming Language :: Python :: 3.13',
+  'Programming Language :: Python :: 3.14',
   'Topic :: Scientific/Engineering',
 ]
 dependencies = [
   'decorator',
   'jinja2',
   'joblib',
-  'matplotlib>=3.5',
-  'mne>=1.2',
-  'numpy>=1.21',
+  'matplotlib>=3.6',
+  'mne>=1.6',
+  'numpy>=1.24',
   'packaging',
   'pooch',
   'psutil',
@@ -45,7 +46,7 @@ keywords = [
 ]
 license = {file = 'LICENSE'}
 maintainers = [
-  {email = 'mathieu.scheltienne@fcbg.ch', name = 'Mathieu Scheltienne'},
+  {email = 'mathieu.scheltienne@gmail.com', name = 'Mathieu Scheltienne'},
   {email = 'victor.ferat@unige.ch', name = 'Victor Férat'},
 ]
 name = 'pycrostates'
