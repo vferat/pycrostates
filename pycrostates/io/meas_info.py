@@ -9,6 +9,7 @@ from mne._fiff.meas_info import _check_ch_keys, _unique_channel_names
 from mne._fiff.pick import get_channel_type_constants
 from mne._fiff.tag import _ch_coord_dict
 from mne.io.constants import FIFF
+from mne.utils import check_version
 
 from ..utils._checks import _check_type, _IntLike
 from ..utils._logs import logger
@@ -169,7 +170,10 @@ class ChInfo(Info):
         self["chs"] = info["chs"]
         self["ctf_head_t"] = info.get("ctf_head_t", None)
         self["dev_ctf_t"] = info.get("dev_ctf_t", None)
-        self["dev_head_t"] = info.get("dev_head_t", Transform("meg", "head"))
+        self["dev_head_t"] = info.get(
+            "dev_head_t",
+            None if check_version("mne", "1.11") else Transform("meg", "head"),
+        )
         self["dig"] = info.get("dig", None)
         self["comps"] = info.get("comps", [])
         self["projs"] = info.get("projs", [])
@@ -213,7 +217,9 @@ class ChInfo(Info):
         # init empty coordinate transformation
         self["ctf_head_t"] = None
         self["dev_ctf_t"] = None
-        self["dev_head_t"] = Transform("meg", "head")
+        self["dev_head_t"] = (
+            None if check_version("mne", "1.11") else Transform("meg", "head")
+        )
 
         # create chs information
         self["chs"] = []
