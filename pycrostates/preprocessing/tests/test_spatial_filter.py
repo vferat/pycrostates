@@ -1,14 +1,9 @@
 import mne
 import numpy as np
 import pytest
+from mne._fiff.pick import _picks_by_type
 from mne.channels import find_ch_adjacency
 from mne.datasets import testing
-from mne.utils import check_version
-
-if check_version("mne", "1.6"):
-    from mne._fiff.pick import _picks_by_type
-else:
-    from mne.io.pick import _picks_by_type
 
 from pycrostates.io import ChData
 from pycrostates.preprocessing import apply_spatial_filter

@@ -6,14 +6,9 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from mne import BaseEpochs, pick_info
+from mne._fiff.pick import _picks_to_idx
 from mne.io import BaseRaw
-from mne.utils import check_version
 from scipy.signal import find_peaks
-
-if check_version("mne", "1.6"):
-    from mne._fiff.pick import _picks_to_idx
-else:
-    from mne.io.pick import _picks_to_idx
 
 from ..utils._checks import (
     _check_picks_uniqueness,

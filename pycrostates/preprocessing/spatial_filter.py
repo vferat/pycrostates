@@ -4,19 +4,14 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from mne import BaseEpochs, pick_info
+from mne._fiff.pick import _picks_by_type
 from mne.bem import _check_origin
 from mne.channels import find_ch_adjacency
 from mne.channels.interpolation import _make_interpolation_matrix
 from mne.io import BaseRaw
 from mne.parallel import parallel_func
-from mne.utils import check_version
 from mne.utils.check import _check_preload
 from scipy.sparse import csr_array, csr_matrix
-
-if check_version("mne", "1.6"):
-    from mne._fiff.pick import _picks_by_type
-else:
-    from mne.io.pick import _picks_by_type
 
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
 from ..utils._docs import fill_doc

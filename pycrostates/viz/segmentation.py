@@ -10,7 +10,6 @@ from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
-from mne.utils import check_version
 
 from ..utils._checks import _check_type, _ensure_valid_show
 from ..utils._docs import fill_doc
@@ -155,8 +154,7 @@ def plot_epoch_segmentation(
     _check_type(block, (bool,), "block")
     show = _ensure_valid_show(show)
 
-    kwargs_epochs = dict(copy=False) if check_version("mne", "1.6") else dict()
-    data = epochs.get_data(**kwargs_epochs).swapaxes(0, 1)
+    data = epochs.get_data(copy=False).swapaxes(0, 1)
     data = data.reshape(data.shape[0], -1)
     gfp = np.std(data, axis=0)
     times = np.arange(0, data.shape[-1])
@@ -302,19 +300,9 @@ def _compatibility_cmap(
     Matplotlib 3.6 introduced a deprecation of plt.cm.get_cmap().
     When support for the 3.6 version is dropped, this checker can be removed.
     """
-    if check_version("matplotlib", "3.6"):
-        if cmap is None:
-            cmap = colormaps["viridis"]
-        elif isinstance(cmap, str):
-            cmap = colormaps[cmap]  # the cmap name is checked by matplotlib
-        cmap = cmap.resampled(n_colors)
-    else:
-        if isinstance(cmap, (str | type(None))):
-            cmap = plt.cm.get_cmap(cmap, n_colors)
-        else:
-            raise RuntimeError(
-                "User-defined colormaps are supported as of matplotlib 3.6 "
-                "and above. Please update matplotlib or provide a colormap "
-                "name as a string."
-            )
+    if cmap is None:
+        cmap = colormaps["viridis"]
+    elif isinstance(cmap, str):
+        cmap = colormaps[cmap]  # the cmap name is checked by matplotlib
+    cmap = cmap.resampled(n_colors)
     return cmap
