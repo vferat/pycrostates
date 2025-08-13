@@ -1,5 +1,5 @@
-from mne.io.meas_info import ContainsMixin as MNEContainsMixin
-from mne.io.meas_info import MontageMixin as MNEMontageMixin
+from mne._fiff.meas_info import ContainsMixin as MNEContainsMixin
+from mne._fiff.meas_info import MontageMixin as MNEMontageMixin
 
 from ._docs import copy_doc as copy_doc
 
