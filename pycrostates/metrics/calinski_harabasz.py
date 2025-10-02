@@ -1,9 +1,11 @@
 """Calinski Harabasz score."""
 
 import numpy as np
-from sklearn.metrics import calinski_harabasz_score as sk_calinski_harabasz_score
+from sklearn.preprocessing import LabelEncoder
+from sklearn.utils import check_X_y
 
 from ..cluster._base import _BaseCluster
+from ..utils import _distance_matrix
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 
@@ -45,5 +47,28 @@ def calinski_harabasz_score(cluster):  # higher the better
     x = cluster.cluster_centers_[labels].T
     sign = np.sign((x.T * data.T).sum(axis=1))
     data = data * sign
-    score = sk_calinski_harabasz_score(data.T, labels)
+    score = _calinski_harabasz_score(data.T, labels)
     return score
+
+
+def _calinski_harabasz_score(X, labels):
+    X, labels = check_X_y(X, labels)
+    le = LabelEncoder()
+    labels = le.fit_transform(labels)
+
+    n_samples, _ = X.shape
+    n_labels = len(le.classes_)
+
+    extra_disp, intra_disp = 0.0, 0.0
+    mean = np.mean(X, axis=0)
+    for k in range(n_labels):
+        cluster_k = X[labels == k]
+        mean_k = np.mean(cluster_k, axis=0)
+        extra_disp += len(cluster_k) * _distance_matrix([mean_k], [mean])[-1, 0]
+        intra_disp += np.sum(_distance_matrix(cluster_k, [mean_k])[-1:, :-1])
+
+    return (
+        1.0
+        if intra_disp == 0.0
+        else extra_disp * (n_samples - n_labels) / (intra_disp * (n_labels - 1.0))
+    )
