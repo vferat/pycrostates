@@ -268,7 +268,13 @@ def _plot_segmentation(
                 pos = pos[:-1]
             x[pos] = True
             axes.fill_between(
-                times, gfp, color=color, where=x, step=None, interpolate=False
+                times,
+                gfp,
+                color=color,
+                where=x,
+                step=None,
+                interpolate=False,
+                linewidth=0,
             )
     logger.info(
         "For visualization purposes, the last segment appears truncated by 1 sample. "
