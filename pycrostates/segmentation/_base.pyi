@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from _typeshed import Incomplete
-from matplotlib.axes import Axes as Axes
+from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
@@ -50,7 +50,7 @@ class _BaseSegmentation(ABC):
         predict_parameters: dict | None = None,
     ): ...
     def __repr__(self) -> str: ...
-    def _repr_html_(self, caption: Incomplete | None = None): ...
+    def _repr_html_(self, caption=None): ...
     def compute_parameters(self, norm_gfp: bool = True, return_dist: bool = False):
         """Compute microstate parameters.
 

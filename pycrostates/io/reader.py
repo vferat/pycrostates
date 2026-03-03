@@ -1,7 +1,6 @@
 """Reader module to reader clusters."""
 
 from pathlib import Path
-from typing import Union
 
 from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
@@ -10,7 +9,7 @@ from .fiff import _read_cluster as _read_cluster_fif
 
 
 @fill_doc
-def read_cluster(fname: Union[str, Path]):
+def read_cluster(fname: str | Path):
     """Read clustering solution from disk.
 
     Parameters

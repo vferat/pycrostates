@@ -1,7 +1,7 @@
 import logging
+from collections.abc import Callable
 from functools import wraps
 from pathlib import Path
-from typing import Callable, Optional, Union
 
 import mne
 
@@ -11,7 +11,7 @@ from ._fixes import _WrapStdOut
 
 
 @fill_doc
-def _init_logger(*, verbose: Optional[Union[bool, str, int]] = None) -> logging.Logger:
+def _init_logger(*, verbose: bool | str | int | None = None) -> logging.Logger:
     """Initialize a logger.
 
     Assigns sys.stdout as the first handler of the logger.
@@ -41,11 +41,11 @@ def _init_logger(*, verbose: Optional[Union[bool, str, int]] = None) -> logging.
 
 @fill_doc
 def add_file_handler(
-    fname: Union[str, Path],
+    fname: str | Path,
     mode: str = "a",
-    encoding: Optional[str] = None,
+    encoding: str | None = None,
     *,
-    verbose: Optional[Union[bool, str, int]] = None,
+    verbose: bool | str | int | None = None,
 ) -> None:
     """Add a file handler to the logger.
 
@@ -67,9 +67,7 @@ def add_file_handler(
 
 
 @fill_doc
-def set_log_level(
-    verbose: Union[bool, str, int, None], apply_to_mne: bool = True
-) -> None:
+def set_log_level(verbose: bool | str | int | None, apply_to_mne: bool = True) -> None:
     """Set the log level for the logger and the first handler ``sys.stdout``.
 
     Parameters
@@ -158,7 +156,7 @@ class _use_log_level:
     %(verbose)s
     """
 
-    def __init__(self, verbose: Optional[Union[bool, str, int]] = None):
+    def __init__(self, verbose: bool | str | int | None = None):
         self._old_level = logger.level
         self._level = verbose
 

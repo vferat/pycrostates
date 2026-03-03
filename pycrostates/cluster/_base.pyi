@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
-from pathlib import Path as Path
+from pathlib import Path
 from typing import Any
 
 import numpy as np
 from _typeshed import Incomplete
-from matplotlib.axes import Axes as Axes
+from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
-from numpy.typing import NDArray as NDArray
+from numpy.typing import NDArray
 
 from .._typing import AxesArray as AxesArray
 from .._typing import Picks as Picks
@@ -46,7 +46,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     def __repr__(self) -> str:
         """String representation."""
 
-    def _repr_html_(self, caption: Incomplete | None = None):
+    def _repr_html_(self, caption=None):
         """HTML representation."""
 
     def __eq__(self, other: Any) -> bool:

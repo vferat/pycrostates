@@ -1,9 +1,9 @@
-from pathlib import Path as Path
+from pathlib import Path
 from typing import Any
 
 from _typeshed import Incomplete
-from mne import BaseEpochs as BaseEpochs
-from mne.io import BaseRaw as BaseRaw
+from mne import BaseEpochs
+from mne.io import BaseRaw
 
 from .._typing import Picks as Picks
 from .._typing import ScalarFloatArray as ScalarFloatArray
@@ -39,7 +39,7 @@ class AAHCluster(_BaseCluster):
     _GEV_: Incomplete
 
     def __init__(self, n_clusters: int, normalize_input: bool = False) -> None: ...
-    def _repr_html_(self, caption: Incomplete | None = None): ...
+    def _repr_html_(self, caption=None): ...
     def __eq__(self, other: Any) -> bool:
         """Equality == method."""
 

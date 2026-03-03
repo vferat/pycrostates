@@ -5,10 +5,10 @@ Spatial Filter
 This example demonstrates the effect of spatial filter on EEG data.
 """
 
-#%%
+# %%
 # .. include:: ../../../../links.inc
 
-#%%
+# %%
 # .. note::
 #
 #     The lemon datasets used in this tutorial is composed of EEGLAB files. To
@@ -31,13 +31,13 @@ from mne.viz import plot_ch_adjacency, plot_topomap
 from pycrostates.datasets import lemon
 from pycrostates.preprocessing import apply_spatial_filter
 
-raw_fname = lemon.data_path(subject_id='010004', condition='EC')
+raw_fname = lemon.data_path(subject_id="010004", condition="EC")
 raw = read_raw_eeglab(raw_fname, preload=True)
 
-raw.pick('eeg')
-raw.set_eeg_reference('average')
+raw.pick("eeg")
+raw.set_eeg_reference("average")
 
-#%%
+# %%
 # Spatial filters were first introduced in the context of EEG source imaging
 # in\ :footcite:t:`michel2019eeg`, with the aim to reduce the impact of
 # local transient artifacts on EEG channels. The computation of a spatial
@@ -50,7 +50,7 @@ adjacency, ch_names = find_ch_adjacency(info=raw.info, ch_type="eeg")
 plot_ch_adjacency(raw.info, adjacency, ch_names, kind="2d", edit=False)
 plt.show()
 
-#%%
+# %%
 # The spatial filter averages the signal locally by using the samples of each
 # channel and its nearest neighbors. The maximum and minimum value of the
 # neighboring channels is removed to improve the signal to noise ratio.
@@ -66,7 +66,7 @@ plt.show()
 raw_filter = raw.copy()
 apply_spatial_filter(raw_filter, n_jobs=-1)
 
-#%%
+# %%
 # To assess the impact of the spatial filter, we can display topographies from
 # random points in the recording.
 
@@ -78,14 +78,14 @@ for s, sample in enumerate(random_sample):
         raw.get_data()[:, sample],
         pos=raw.info,
         axes=axes[0, s],
-        sphere=np.array([0,0,0,0.1]),
+        sphere=np.array([0, 0, 0, 0.1]),
         show=False,
     )
     plot_topomap(
         raw_filter.get_data()[:, sample],
         pos=raw_filter.info,
         axes=axes[1, s],
-        sphere=np.array([0,0,0,0.1]),
+        sphere=np.array([0, 0, 0, 0.1]),
         show=False,
     )
     axes[0, s].set_title(f"Sample\n{sample}")
@@ -98,7 +98,7 @@ plt.show()
 # These topographies, presenting less local artifact, can be used as input for
 # a clustering algorithm.
 
-#%%
+# %%
 # References
 # ----------
 # .. footbibliography::

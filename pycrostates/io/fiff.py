@@ -11,50 +11,27 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from mne import Info, Transform
+from mne._fiff._digitization import _format_dig_points, _read_dig_fif
+from mne._fiff.ctf_comp import _read_ctf_comp, write_ctf_comp
+from mne._fiff.meas_info import _read_bad_channels, _write_ch_infos
+from mne._fiff.open import fiff_open
+from mne._fiff.proj import _read_proj, _write_proj
+from mne._fiff.tag import read_tag
+from mne._fiff.tree import dir_tree_find
+from mne._fiff.write import (
+    end_block,
+    start_and_end_file,
+    start_block,
+    write_coord_trans,
+    write_dig_points,
+    write_double_matrix,
+    write_id,
+    write_int,
+    write_name_list,
+    write_string,
+)
 from mne.io.constants import FIFF
 from mne.transforms import invert_transform
-from mne.utils import check_version
-
-if check_version("mne", "1.6"):
-    from mne._fiff._digitization import _format_dig_points, _read_dig_fif
-    from mne._fiff.ctf_comp import _read_ctf_comp, write_ctf_comp
-    from mne._fiff.meas_info import _read_bad_channels, _write_ch_infos
-    from mne._fiff.open import fiff_open
-    from mne._fiff.proj import _read_proj, _write_proj
-    from mne._fiff.tag import read_tag
-    from mne._fiff.tree import dir_tree_find
-    from mne._fiff.write import (
-        end_block,
-        start_and_end_file,
-        start_block,
-        write_coord_trans,
-        write_dig_points,
-        write_double_matrix,
-        write_id,
-        write_int,
-        write_name_list,
-        write_string,
-    )
-else:
-    from mne.io._digitization import _format_dig_points, _read_dig_fif
-    from mne.io.ctf_comp import _read_ctf_comp, write_ctf_comp
-    from mne.io.meas_info import _read_bad_channels, _write_ch_infos
-    from mne.io.open import fiff_open
-    from mne.io.proj import _read_proj, _write_proj
-    from mne.io.tag import read_tag
-    from mne.io.tree import dir_tree_find
-    from mne.io.write import (
-        end_block,
-        start_and_end_file,
-        start_block,
-        write_coord_trans,
-        write_dig_points,
-        write_double_matrix,
-        write_id,
-        write_int,
-        write_name_list,
-        write_string,
-    )
 
 from .._version import __version__
 from ..cluster import AAHCluster, ModKMeans
@@ -63,8 +40,6 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger
 
 if TYPE_CHECKING:
-    from typing import Union
-
     from .._typing import ScalarFloatArray, ScalarIntArray
     from . import ChInfo
 
@@ -100,9 +75,9 @@ FIFF_MNE_ICA_MISC_PARAMS -> fit variables (ending with '_')
 
 @fill_doc
 def _write_cluster(
-    fname: Union[str, Path],
+    fname: str | Path,
     cluster_centers_: ScalarFloatArray,
-    chinfo: Union[ChInfo, Info],
+    chinfo: ChInfo | Info,
     algorithm: str,
     cluster_names: list[str],
     fitted_data: ScalarFloatArray,
@@ -263,7 +238,7 @@ def _prepare_kwargs(algorithm: str, kwargs: dict):
 
 
 @fill_doc
-def _read_cluster(fname: Union[str, Path]):
+def _read_cluster(fname: str | Path):
     """Read clustering solution from disk.
 
     Parameters
@@ -409,7 +384,7 @@ def _create_ModKMeans(
     labels_: ScalarIntArray,
     n_init: int,
     max_iter: int,
-    tol: Union[int, float],
+    tol: int | float,
     GEV_: float,
 ):
     """Create a ModKMeans cluster."""
@@ -643,7 +618,7 @@ def _serialize(dict_: dict, outer_sep: str = ";", inner_sep: str = ":"):
             for subkey, subvalue in value.items():
                 if isinstance(subvalue, list):
                     if len(subvalue) > 0:
-                        if isinstance(subvalue[0], (int, np.integer)):
+                        if isinstance(subvalue[0], (int | np.integer)):
                             value[subkey] = [int(i) for i in subvalue]
 
         s.append(key + inner_sep + json.dumps(value))
