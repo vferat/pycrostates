@@ -36,7 +36,7 @@ jobs:
       - run: mne sys_info -pd
       - uses: ./.github/actions/get-testing-dataset
       - run: pytest pycrostates --cov=pycrostates --cov-report=xml --cov-config=pyproject.toml
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         with:
           files: ./coverage.xml
           flags: unittests  # optional
@@ -67,7 +67,7 @@ jobs:
       - run: mne sys_info -pd
       - uses: ./.github/actions/get-testing-dataset
       - run: pytest pycrostates --cov=pycrostates --cov-report=xml --cov-config=pyproject.toml
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         with:
           files: ./coverage.xml
           flags: unittests  # optional
