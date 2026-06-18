@@ -923,14 +923,27 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         tol: int | float,
         half_window_size: int,
     ) -> ScalarIntArray:
-        """Create segmentation. Must operate on a copy of states."""
-        data -= np.mean(data, axis=0)
-        std = np.std(data, axis=0)
-        std[std == 0] = 1  # std == 0 -> null map
-        data /= std
+        """Create segmentation.
 
-        states -= np.mean(states, axis=1)[:, np.newaxis]
-        states /= np.std(states, axis=1)[:, np.newaxis]
+        Maps are normalised to row L2-norm ``1/sqrt(Ne)``, matching Koenig's
+        ``NormDim(M,2)/sqrt(Ns)`` in SmoothLabels.m [1]_. Data is not
+        normalised. Non-in-place division avoids modifying the caller's array,
+        which fixes a latent bug when this method is called in a loop over
+        epochs.
+
+        Modified by Frederic von Wegner with Claude assistance
+        (claude-sonnet-4-6, 2026-06-18).
+
+        References
+        ----------
+        .. [1] T. Koenig, L. Kottlow, M. Stein, L. Melie-Garcia.
+               Ragu: a free tool for the analysis of EEG and MEG eventrelated
+               scalp field data using global randomization statistics.
+               Comput Intell Neurosci, 2011.
+        """
+        Ne = data.shape[0]
+        row_norms = np.linalg.norm(states, axis=1, keepdims=True)
+        states = states / (row_norms * np.sqrt(Ne))
 
         labels = np.argmax(np.abs(np.dot(states, data)), axis=0)
 
@@ -952,7 +965,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     ) -> ScalarIntArray:
         """Apply smoothing.
 
-        Adapted from [1].
+        Adapted from [1]. Verified equivalent to the Matlab reference
+        implementation (Koenig/SmoothLabels.m) by Frederic von Wegner with
+        Claude assistance (claude-sonnet-4-6, 2026-06-18). Correctness depends
+        on ``_segment`` supplying Koenig-normalised maps (row L2-norm to
+        ``1/sqrt(Ne)``); see ``_segment`` for details.
 
         References
         ----------
