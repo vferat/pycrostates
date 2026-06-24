@@ -1,5 +1,4 @@
-from _typeshed import Incomplete
-from matplotlib.axes import Axes as Axes
+from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
@@ -28,6 +27,7 @@ class RawSegmentation(_BaseSegmentation):
     """
 
     def __init__(self, *args, **kwargs) -> None: ...
+    @fill_doc
     def plot(
         self,
         tmin: int | float | None = None,
@@ -96,6 +96,7 @@ class EpochsSegmentation(_BaseSegmentation):
     """
 
     def __init__(self, *args, **kwargs) -> None: ...
+    @fill_doc
     def plot(
         self,
         cmap: str | None = None,
@@ -104,7 +105,7 @@ class EpochsSegmentation(_BaseSegmentation):
         *,
         block: bool = False,
         show: bool | None = None,
-        verbose: Incomplete | None = None,
+        verbose=None,
     ):
         """Plot segmentation.
 

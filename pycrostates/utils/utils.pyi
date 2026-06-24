@@ -1,5 +1,3 @@
-from _typeshed import Incomplete
-
 from ._logs import logger as logger
 
 def _corr_vectors(A, B, axis: int = 0):
@@ -26,7 +24,7 @@ def _corr_vectors(A, B, axis: int = 0):
         For each pair of vectors, the correlation between them.
     """
 
-def _distance_matrix(X, Y: Incomplete | None = None):
+def _distance_matrix(X, Y=None):
     """Distance matrix used in metrics."""
 
 def _compare_infos(cluster_info, inst_info):

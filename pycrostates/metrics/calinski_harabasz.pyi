@@ -2,6 +2,7 @@ from ..cluster._base import _BaseCluster as _BaseCluster
 from ..utils._checks import _check_type as _check_type
 from ..utils._docs import fill_doc as fill_doc
 
+@fill_doc
 def calinski_harabasz_score(cluster):
     """Compute the Calinski-Harabasz score.
 

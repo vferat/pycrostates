@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from _typeshed import Incomplete
-from matplotlib.axes import Axes as Axes
+from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
@@ -50,7 +50,7 @@ class _BaseSegmentation(ABC):
         predict_parameters: dict | None = None,
     ): ...
     def __repr__(self) -> str: ...
-    def _repr_html_(self, caption: Incomplete | None = None): ...
+    def _repr_html_(self, caption=None): ...
     def compute_parameters(self, norm_gfp: bool = True, return_dist: bool = False):
         """Compute microstate parameters.
 
@@ -126,6 +126,7 @@ class _BaseSegmentation(ABC):
             predicting the segmentation.
         """
 
+    @fill_doc
     def compute_expected_transition_matrix(
         self, stat: str = "probability", ignore_repetitions: bool = True
     ):
@@ -160,6 +161,7 @@ class _BaseSegmentation(ABC):
             First axis indicates state ``"from"``. Second axis indicates state ``"to"``.
         """
 
+    @fill_doc
     def entropy(self, ignore_repetitions: bool = False, log_base: float | str = 2):
         """Compute the Shannon entropy of the segmentation.
 
@@ -191,6 +193,7 @@ class _BaseSegmentation(ABC):
         .. footbibliography::
         """
 
+    @fill_doc
     def plot_cluster_centers(
         self, axes: Axes | None = None, *, block: bool = False, show: bool | None = None
     ):
