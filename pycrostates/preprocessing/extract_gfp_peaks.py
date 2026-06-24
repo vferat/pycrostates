@@ -87,6 +87,10 @@ def extract_gfp_peaks(
     :func:`scipy.signal.find_peaks`. Only the ``distance`` argument is filled with the
     value provided in ``min_peak_distance``. The other arguments are set to their
     default values.
+
+    .. versionchanged:: 0.7
+           The global field power is now computed with different functions depending on data type. 
+           ``eeg`` uses the standard deviation, while ``grad`` and ``mag`` use the root mean square.
     """
     from ..io import ChData
 
