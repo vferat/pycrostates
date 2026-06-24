@@ -603,7 +603,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             provided.
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing. Default to 0.
-            
+
             .. versionchanged:: 0.7
                 For a given ``Factor`` value, the effect on segmentation
                 now match the Koenig2011 :footcite:p:`Koenig2011` implementation.
@@ -929,7 +929,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     ) -> ScalarIntArray:
         """Create segmentation.
 
-        Verified equivalent to the Matlab reference 
+        Verified equivalent to the Matlab reference
         implementation ``NormDim(M,2)/sqrt(Ns)`` (Koenig/SmoothLabels.m)
         :footcite:p:`Koenig2011` by Frederic von Wegner with Claude assistance
         (claude-sonnet-4-6, 2026-06-18).
