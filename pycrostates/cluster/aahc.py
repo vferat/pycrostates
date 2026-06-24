@@ -177,8 +177,6 @@ class AAHCluster(_BaseCluster):
             GEV_=self._GEV_,
         )
 
-    # --------------------------------------------------------------------
-    @staticmethod
     def _aahc(
         data: ScalarFloatArray,
         n_clusters: int,
@@ -193,6 +191,7 @@ class AAHCluster(_BaseCluster):
         gev = _compute_gev(data, maps, segmentation, ch_type)
         return gev, maps, segmentation
 
+    # --------------------------------------------------------------------
     # pylint: disable=too-many-locals
     @staticmethod
     def _compute_maps(
@@ -275,12 +274,6 @@ class AAHCluster(_BaseCluster):
         super(self.__class__, self.__class__).fitted.__set__(self, fitted)
         if not fitted:
             self._GEV_ = None
-
-    @staticmethod
-    def _check_ignore_polarity(ignore_polarity: bool) -> bool:
-        """Check that ignore_polarity is a boolean."""
-        _check_type(ignore_polarity, (bool,), item_name="ignore_polarity")
-        return ignore_polarity
 
     @staticmethod
     def _check_normalize_input(normalize_input: bool) -> bool:

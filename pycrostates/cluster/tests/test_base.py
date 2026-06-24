@@ -40,7 +40,7 @@ def test_reject_short_segments():
             [3, 3, 3, 3, 3, 3, 3, 6, 4, 5, 2, 2, 2],
         ]
     )
-    segmentation = _BaseCluster._reject_short_segments(segmentation, data, 3)
+    segmentation = _BaseCluster._reject_short_segments(segmentation, data, 3, True)
     # solo 1 should turn to 2; initial 0 should not change
     assert [0, 0, 1, 1, 1, 3, 3, 3, 2, 2, 2, 2, 2] == segmentation
 
@@ -53,7 +53,7 @@ def test_reject_short_segments():
             [3, 3, 3, 3, 3, 3, 3, 6, 4, 4, 6, 2, 2, 2],
         ]
     )
-    segmentation = _BaseCluster._reject_short_segments(segmentation, data, 3)
+    segmentation = _BaseCluster._reject_short_segments(segmentation, data, 3, True)
     assert [0, 0, 1, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2, 2] == segmentation
 
     # singleton, same correlation
@@ -65,7 +65,32 @@ def test_reject_short_segments():
             [3, 3, 3, 3, 3, 3, 3, 6, 4, 6, 2, 2, 2],
         ]
     )
-    segmentation = _BaseCluster._reject_short_segments(segmentation, data, 3)
+    segmentation = _BaseCluster._reject_short_segments(segmentation, data, 3, True)
+    assert [0, 0, 1, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2] == segmentation
+
+    # ignore polarity
+    segmentation = [0, 0, 1, 1, 1, 3, 3, 3, 1, 2, 2, 2, 2]
+    data = np.array(
+        [
+            [1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 1, 1, 1],
+            [2, 2, 2, 2, 2, 2, 3, 0.5, -0.5, -0.5, 1, 1, 1],
+            [3, 3, 3, 3, 3, 3, 3, 4, -4, -4, 2, 2, 2],
+        ]
+    )
+    segmentation = _BaseCluster._reject_short_segments(segmentation, data, 3, False)
+    # solo 1 should turn to 2; initial 0 should not change
+    assert [0, 0, 1, 1, 1, 3, 3, 3, 2, 2, 2, 2, 2] == segmentation
+
+    segmentation = [0, 0, 1, 1, 1, 3, 3, 3, 1, 2, 2, 2, 2]
+    data = np.array(
+        [
+            [1, 1, 1, 1, 1, 1, 1, -1, -1, 1, 1, 1, 1],
+            [2, 2, 2, 2, 2, 2, 3, -0.5, -0.5, 0.5, 1, 1, 1],
+            [3, 3, 3, 3, 3, 3, 3, -4, -4, 4, 2, 2, 2],
+        ]
+    )
+    segmentation = _BaseCluster._reject_short_segments(segmentation, data, 3, False)
+    # solo 1 should turn to 2; initial 0 should not change
     assert [0, 0, 1, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2] == segmentation
 
 
