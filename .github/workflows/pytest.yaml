@@ -24,7 +24,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
@@ -36,7 +36,7 @@ jobs:
       - run: mne sys_info -pd
       - uses: ./.github/actions/get-testing-dataset
       - run: pytest pycrostates --cov=pycrostates --cov-report=xml --cov-config=pyproject.toml
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         with:
           files: ./coverage.xml
           flags: unittests  # optional
@@ -53,7 +53,7 @@ jobs:
     name: pip pre-release - py${{ matrix.python-version }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
@@ -67,7 +67,7 @@ jobs:
       - run: mne sys_info -pd
       - uses: ./.github/actions/get-testing-dataset
       - run: pytest pycrostates --cov=pycrostates --cov-report=xml --cov-config=pyproject.toml
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         with:
           files: ./coverage.xml
           flags: unittests  # optional
