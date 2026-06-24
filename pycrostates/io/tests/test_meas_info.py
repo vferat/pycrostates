@@ -22,6 +22,8 @@ logger.propagate = True
 directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname, preload=False)
+montage_name = "colin27_1005" if check_version("mne", "1.14") else "standard_1005"
+
 
 
 def test_create_from_info():
@@ -63,7 +65,7 @@ def test_create_from_info():
 
     # test with info that has montage
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("colin27_1020")
+    info.set_montage(montage_name)
     chinfo = ChInfo(info=info)
     assert chinfo["ch_names"] == ["Fp1", "Fp2", "Fpz"]
     for ch in info["chs"]:
@@ -235,7 +237,7 @@ def test_create_without_arguments():
 def test_montage():
     """Test methods from montage Mixin."""
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("colin27_1020")
+    info.set_montage(montage_name)
     chinfo = ChInfo(info=info)
     assert chinfo["ch_names"] == ["Fp1", "Fp2", "Fpz"]
     for ch in info["chs"]:
@@ -254,7 +256,7 @@ def test_montage():
     assert chinfo2["dig"] is None
     montage2 = chinfo2.get_montage()
     assert montage2 is None
-    chinfo2.set_montage(montage)
+    chinfo2.set_montage(montage_name)
     montage2 = chinfo2.get_montage()
     assert isinstance(montage2, DigMontage)
     assert montage2.ch_names == ["Fp1", "Fp2", "Fpz"]
@@ -281,7 +283,7 @@ def test_montage():
 def test_contains():
     """Test methods from contain Mixin."""
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("colin27_1020")
+    info.set_montage(montage_name)
     chinfo = ChInfo(info=info)
     assert chinfo.get_channel_types() == ["eeg"] * 3
     assert chinfo.compensation_grade is None
@@ -290,7 +292,7 @@ def test_contains():
 def test_copy():
     """Test copy (which is a deepcopy)."""
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("colin27_1020")
+    info.set_montage(montage_name)
     chinfo = ChInfo(info=info)
     chinfo2 = chinfo.copy()
     with chinfo._unlock():
@@ -302,7 +304,7 @@ def test_copy():
 def test_repr():
     """Test normal and HTML representation."""
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("colin27_1020")
+    info.set_montage(montage_name)
     chinfo = ChInfo(info=info)
 
     # normal repr
@@ -359,7 +361,7 @@ def test_comparison(caplog):
 
     # with montage
     chinfo1 = ChInfo(ch_names=["Cz", "Oz"], ch_types="eeg")
-    chinfo1.set_montage("colin27_1020")
+    chinfo1.set_montage(montage_name)
     chinfo2 = chinfo1.copy()
     assert chinfo1 == chinfo2
     chinfo2 = ChInfo(ch_names=["Cz", "Oz"], ch_types="eeg")

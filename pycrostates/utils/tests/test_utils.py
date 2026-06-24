@@ -1,6 +1,7 @@
 import pytest
 from mne import create_info
 from mne.io.constants import FIFF
+from mne.utils import check_version
 
 from pycrostates.io import ChInfo
 from pycrostates.utils import _compare_infos
@@ -8,6 +9,9 @@ from pycrostates.utils._logs import logger, set_log_level
 
 set_log_level("INFO")
 logger.propagate = True
+
+montage_name = "colin27_1005" if check_version("mne", "1.14") else "standard_1005"
+
 
 
 def test_compare_infos(caplog):
@@ -17,7 +21,7 @@ def test_compare_infos(caplog):
     _compare_infos(chinfo, chinfo.copy())
 
     # with montage
-    chinfo.set_montage("colin27_1020")
+    chinfo.set_montage(montage_name)
     caplog.clear()
     _compare_infos(chinfo, chinfo.copy())
     assert "does not have the same channels montage" not in caplog.text
@@ -33,7 +37,7 @@ def test_compare_infos(caplog):
 
     # with MNE info with montage
     info = create_info(["Fpz", "Cz", "CPz"], 1, "eeg")
-    info.set_montage("colin27_1020")
+    info.set_montage(montage_name)
     caplog.clear()
     _compare_infos(chinfo, info)
     assert "does not have the same channels montage" not in caplog.text
@@ -59,7 +63,7 @@ def test_compare_infos(caplog):
 
     # with different kind/unit/coord_frame
     chinfo1 = ChInfo(ch_names=["Fpz", "Cz", "CPz"], ch_types="eeg")
-    chinfo1.set_montage("colin27_1020")
+    chinfo1.set_montage(montage_name)
     chinfo2 = chinfo1.copy()
     chinfo2["chs"][0]["unit"] = FIFF.FIFF_UNIT_C
     caplog.clear()

@@ -7,6 +7,7 @@ import numpy as np
 import pooch
 from mne import create_info
 from mne.io import BaseRaw, RawArray
+from mne.utils import check_version
 
 from ...utils._checks import _check_type, _check_value
 from ...utils._config import get_config
@@ -128,7 +129,9 @@ def standardize(raw: BaseRaw):
 
     raw.add_reference_channels("FCz")
     raw.reorder_channels(standard_channels)
-    raw.set_montage("standard_1005")
+    montage_name = "colin27_1005" if check_version("mne", "1.14") else "standard_1005"
+
+    raw.set_montage(montage_name)
     raw.interpolate_bads()
     raw.set_eeg_reference("average")
     return raw
