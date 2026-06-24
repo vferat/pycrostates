@@ -30,7 +30,9 @@ def calinski_harabasz_score(cluster):  # higher the better
     Notes
     -----
     For more details regarding the implementation, please refer to
-    :func:`sklearn.metrics.calinski_harabasz_score`.
+    :func:`sklearn.metrics.calinski_harabasz_score`. This implementation is modified
+    to use absolute spatial correlation for distance computations instead of the
+    Euclidean distance.
 
     References
     ----------
@@ -58,6 +60,8 @@ def _calinski_harabasz_score(X, labels):
 
     n_samples, _ = X.shape
     n_labels = len(le.classes_)
+    if n_labels < 2:
+        raise ValueError("Number of labels is 1. Valid values are 2 to n_samples - 1.")
 
     extra_disp, intra_disp = 0.0, 0.0
     mean = np.mean(X, axis=0)

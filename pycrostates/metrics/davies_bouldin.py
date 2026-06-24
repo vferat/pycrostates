@@ -73,6 +73,8 @@ def _davies_bouldin_score(X, labels):
     le = LabelEncoder()
     labels = le.fit_transform(labels)
     n_labels = len(le.classes_)
+    if n_labels < 2:
+        raise ValueError("Number of labels is 1. Valid values are 2 to n_samples - 1.")
 
     intra_dists = np.zeros(n_labels)
     centroids = np.zeros((n_labels, len(X[0])), dtype=float)
