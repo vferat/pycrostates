@@ -40,9 +40,9 @@ class _BaseSegmentation(ABC):
     %(predict_parameters)s
 
         .. versionchanged:: 0.7
-           The global field power is now computed with different functions depending
-            on data type. ``eeg`` uses the standard deviation, while ``grad`` and
-            ``mag`` use the root mean square.
+            The global explained variance is now computed with different
+            functions depending on data type. ``eeg`` uses the standard
+            deviation,  while ``grad`` and ``mag`` use the root mean square.
     """
 
     @abstractmethod
