@@ -8,7 +8,7 @@ on reliable metrics in order to evaluate the relevance of the parameters used
 in our model, and more particularly the number of :term:`cluster centers`.
 """
 
-#%%
+# %%
 # .. include:: ../../../../links.inc
 
 # %%
@@ -59,7 +59,7 @@ raw.crop(0, 180)
 raw.pick("eeg")
 raw.set_eeg_reference("average")
 
-#%%
+# %%
 # Intra/Inter cluster distances
 # -----------------------------
 # Clustering scores often rely on :term:`inter-cluster distance` and
@@ -87,7 +87,7 @@ raw.set_eeg_reference("average")
 # Depending on the score used, those distances can be computed in different
 # ways.
 
-#%%
+# %%
 # Silhouette score
 # ----------------
 # The Silhouette score\ :footcite:p:`Silhouettes` focuses on 2 metrics: the
@@ -107,7 +107,7 @@ raw.set_eeg_reference("average")
 # dense and well separated. Higher values indicates higher cluster density and
 # better separation.
 
-#%%
+# %%
 # Dunn score
 # ----------
 #
@@ -116,7 +116,7 @@ raw.set_eeg_reference("average")
 # Overall, it summarizes how well clusters are farther apart and less
 # dispersed. Higher values indicates a better separation.
 
-#%%
+# %%
 # Davies-Bouldin score
 # --------------------
 # The Davies-Bouldin score\ :footcite:p:`Davies-Bouldin` is defined as the
@@ -168,7 +168,7 @@ for k, n_clusters in enumerate(cluster_numbers):
     scores["Dunn"][k] = dunn_score(ModK)
     scores["Davies-Bouldin"][k] = davies_bouldin_score(ModK)
 
-#%%
+# %%
 # Plot individual scores
 # ----------------------
 # We can plot the different scores with :func:`matplotlib.pyplot.bar`.
@@ -178,23 +178,27 @@ for k, (score, values) in enumerate(scores.items()):
     ax[k // 2, k % 2].bar(x=cluster_numbers, height=values)
     ax[k // 2, k % 2].set_title(score)
 plt.text(
-    0.03, 0.5, "Score",
-    horizontalalignment='center',
-    verticalalignment='center',
+    0.03,
+    0.5,
+    "Score",
+    horizontalalignment="center",
+    verticalalignment="center",
     rotation=90,
     fontdict=dict(size=14),
     transform=f.transFigure,
 )
 plt.text(
-    0.5, 0.03, "Number of clusters",
-    horizontalalignment='center',
-    verticalalignment='center',
+    0.5,
+    0.03,
+    "Number of clusters",
+    horizontalalignment="center",
+    verticalalignment="center",
     fontdict=dict(size=14),
     transform=f.transFigure,
 )
 plt.show()
 
-#%%
+# %%
 # Compare scores
 # --------------
 # We can compare the different scores on a barplot using
@@ -209,8 +213,11 @@ scores["Davies-Bouldin"] = 1 / (1 + scores["Davies-Bouldin"])
 
 # normalize scores using sklearn
 from sklearn.preprocessing import normalize
-scores = {score: normalize(value[:, np.newaxis], axis=0).ravel()
-          for score, value in scores.items()}
+
+scores = {
+    score: normalize(value[:, np.newaxis], axis=0).ravel()
+    for score, value in scores.items()
+}
 
 # set width of a bar and define colors
 barWidth = 0.2
@@ -219,8 +226,10 @@ colors = ["#4878D0", "#EE854A", "#6ACC64", "#D65F5F"]
 # create figure
 plt.figure(figsize=(10, 8))
 # create the position of the bars on the X-axis
-x = [[elt + k * barWidth for elt in np.arange(len(cluster_numbers))]
-     for k in range(len(scores))]
+x = [
+    [elt + k * barWidth for elt in np.arange(len(cluster_numbers))]
+    for k in range(len(scores))
+]
 # create plots
 for k, (score, values) in enumerate(scores.items()):
     plt.bar(
@@ -241,7 +250,7 @@ plt.xticks(
 plt.legend()
 plt.show()
 
-#%%
+# %%
 # Conclusion
 # ----------
 # There is no global consensus on which ``n_cluster`` value to
@@ -259,7 +268,7 @@ plt.show()
 # analysis to evaluate the most judicious choice, by exploring for example
 # several clustering solutions.
 
-#%%
+# %%
 # Microstates fitted for n=5
 # --------------------------
 # In this case, ``n_clusters=5`` seems like a reasonable choice. This number of
@@ -268,12 +277,12 @@ plt.show()
 ModK = ModKMeans(n_clusters=5, random_state=42)
 ModK.fit(gfp_peaks, n_jobs=2, verbose="WARNING")
 
-ModK.reorder_clusters(order=[4,1,3,0,2])
-ModK.rename_clusters(new_names=['A', 'B', 'C', 'D', 'E'])
+ModK.reorder_clusters(order=[4, 1, 3, 0, 2])
+ModK.rename_clusters(new_names=["A", "B", "C", "D", "E"])
 ModK.plot()
 
 
-#%%
+# %%
 # References
 # ----------
 # .. footbibliography::

@@ -3,6 +3,7 @@ from ..utils import _distance_matrix as _distance_matrix
 from ..utils._checks import _check_type as _check_type
 from ..utils._docs import fill_doc as fill_doc
 
+@fill_doc
 def davies_bouldin_score(cluster):
     """Compute the Davies-Bouldin score.
 

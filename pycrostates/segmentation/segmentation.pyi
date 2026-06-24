@@ -1,5 +1,4 @@
-from _typeshed import Incomplete
-from matplotlib.axes import Axes as Axes
+from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
@@ -28,6 +27,7 @@ class RawSegmentation(_BaseSegmentation):
     """
 
     def __init__(self, *args, **kwargs) -> None: ...
+    @fill_doc
     def plot(
         self,
         tmin: int | float | None = None,
@@ -46,8 +46,9 @@ class RawSegmentation(_BaseSegmentation):
         ----------
         tmin : float
             Start time of the raw data to use in seconds (must be >= 0).
-        tmax : float
+        tmax : float | None
             End time of the raw data to use in seconds (cannot exceed data duration).
+            If ``None`` (default), the current end of the data is used.
         cmap : str | colormap | None
             The colormap to use. If None, ``viridis`` is used.
         axes : Axes | None
@@ -95,6 +96,7 @@ class EpochsSegmentation(_BaseSegmentation):
     """
 
     def __init__(self, *args, **kwargs) -> None: ...
+    @fill_doc
     def plot(
         self,
         cmap: str | None = None,
@@ -103,7 +105,7 @@ class EpochsSegmentation(_BaseSegmentation):
         *,
         block: bool = False,
         show: bool | None = None,
-        verbose: Incomplete | None = None,
+        verbose=None,
     ):
         """Plot segmentation.
 

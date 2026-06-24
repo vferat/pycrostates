@@ -124,8 +124,7 @@ def _check_type(item, types, item_name=None):
             type_name = ", ".join(type_name)
         item_name = "Item" if item_name is None else f"'{item_name}'"
         raise TypeError(
-            f"{item_name} must be an instance of {type_name}, "
-            f"got {type(item)} instead."
+            f"{item_name} must be an instance of {type_name}, got {type(item)} instead."
         )
 
     return item
@@ -288,7 +287,7 @@ def _check_picks_uniqueness(info, picks):
         ch_types, counts = np.unique(ch_types, return_counts=True)
         channels_msg = ", ".join(
             "%s '%s' channel(s)" % t  # noqa: UP031
-            for t in zip(counts, ch_types)
+            for t in zip(counts, ch_types, strict=False)
         )
         raise ValueError(
             f"Only one datatype can be selected, but 'picks' results in {channels_msg}."

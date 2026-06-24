@@ -1,10 +1,10 @@
-from pathlib import Path as Path
+from pathlib import Path
 from typing import Any
 
 from _typeshed import Incomplete
-from mne import BaseEpochs as BaseEpochs
-from mne.io import BaseRaw as BaseRaw
-from numpy.random import Generator as Generator
+from mne import BaseEpochs
+from mne.io import BaseRaw
+from numpy.random import Generator
 
 from .._typing import Picks as Picks
 from .._typing import RandomState as RandomState
@@ -66,7 +66,7 @@ class ModKMeans(_BaseCluster):
         tol: int | float = 1e-06,
         random_state: RandomState = None,
     ) -> None: ...
-    def _repr_html_(self, caption: Incomplete | None = None): ...
+    def _repr_html_(self, caption=None): ...
     def __eq__(self, other: Any) -> bool:
         """Equality == method."""
 
@@ -80,6 +80,7 @@ class ModKMeans(_BaseCluster):
     _fitted: bool
     _ignore_polarity: bool
 
+    @fill_doc
     def fit(
         self,
         inst: BaseRaw | BaseEpochs | ChData,
@@ -108,8 +109,9 @@ class ModKMeans(_BaseCluster):
             names or indices are explicitly provided.
         tmin : float
             Start time of the raw data to use in seconds (must be >= 0).
-        tmax : float
+        tmax : float | None
             End time of the raw data to use in seconds (cannot exceed data duration).
+            If ``None`` (default), the current end of the data is used.
         reject_by_annotation : bool
             Whether to omit bad segments from the data before fitting. If ``True``
             (default), annotated segments whose description begins with ``'bad'`` are

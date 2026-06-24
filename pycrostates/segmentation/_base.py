@@ -10,7 +10,6 @@ import numpy as np
 from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
-from mne.utils import check_version
 
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
@@ -21,8 +20,6 @@ from .entropy import entropy
 from .transitions import _compute_expected_transition_matrix, _compute_transition_matrix
 
 if TYPE_CHECKING:
-    from typing import Optional, Union
-
     from .._typing import ScalarFloatArray, ScalarIntArray
 
 
@@ -45,10 +42,10 @@ class _BaseSegmentation(ABC):
     def __init__(
         self,
         labels: ScalarIntArray,
-        inst: Union[BaseRaw, BaseEpochs],
+        inst: BaseRaw | BaseEpochs,
         cluster_centers_: ScalarFloatArray,
-        cluster_names: Optional[list[str]] = None,
-        predict_parameters: Optional[dict] = None,
+        cluster_names: list[str] | None = None,
+        predict_parameters: dict | None = None,
     ):
         # check input
         _check_type(labels, (np.ndarray,), "labels")
@@ -148,8 +145,7 @@ class _BaseSegmentation(ABC):
             assert data.ndim == 2
             assert labels.size == data.shape[1]
         elif isinstance(self._inst, BaseEpochs):
-            kwargs_epochs = dict(copy=False) if check_version("mne", "1.6") else dict()
-            data = self._inst.get_data(**kwargs_epochs)
+            data = self._inst.get_data(copy=False)
             # sanity-checks
             assert labels.ndim == 2
             assert data.ndim == 3
@@ -278,7 +274,7 @@ class _BaseSegmentation(ABC):
     def entropy(
         self,
         ignore_repetitions: bool = False,
-        log_base: Union[float, str] = 2,
+        log_base: float | str = 2,
     ):
         r"""Compute the Shannon entropy of the segmentation.
 
@@ -308,10 +304,10 @@ class _BaseSegmentation(ABC):
     @fill_doc
     def plot_cluster_centers(
         self,
-        axes: Optional[Union[Axes,]] = None,
+        axes: Axes | None = None,
         *,
         block: bool = False,
-        show: Optional[bool] = None,
+        show: bool | None = None,
     ):
         """Plot cluster centers as topographic maps.
 

@@ -6,14 +6,9 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from mne import BaseEpochs, pick_info
+from mne._fiff.pick import _picks_to_idx
 from mne.io import BaseRaw
-from mne.utils import check_version
 from scipy.signal import find_peaks
-
-if check_version("mne", "1.6"):
-    from mne._fiff.pick import _picks_to_idx
-else:
-    from mne.io.pick import _picks_to_idx
 
 from ..utils._checks import (
     _check_picks_uniqueness,
@@ -27,8 +22,7 @@ from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
     from typing import Callable, Optional, Union
-
-    from .._typing import Picks
+    from .._typing import Picks ScalarFloatArray
     from ..io import ChData
 
 
@@ -42,12 +36,12 @@ _GFP_FUNC: dict[str, Callable] = {
 @fill_doc
 @verbose
 def extract_gfp_peaks(
-    inst: Union[BaseRaw, BaseEpochs],
+    inst: BaseRaw | BaseEpochs,
     picks: Picks = "eeg",
     return_all: bool = False,
     min_peak_distance: int = 1,
-    tmin: Optional[float] = None,
-    tmax: Optional[float] = None,
+    tmin: float | None = None,
+    tmax: float | None = None,
     reject_by_annotation: bool = True,
     verbose=None,
 ) -> ChData:

@@ -6,10 +6,10 @@ In this tutorial, we will learn how to conduct group level analysis
 by computing group-level topographies based on individual clusters.
 """
 
-#%%
+# %%
 # .. include:: ../../../../links.inc
 
-#%%
+# %%
 # .. note::
 #
 #     The lemon datasets used in this tutorial is composed of EEGLAB files. To
@@ -38,7 +38,7 @@ from pycrostates.preprocessing import extract_gfp_peaks
 condition = "EO"
 subject_ids = ["010020", "010021", "010022", "010023", "010024"]
 
-#%%
+# %%
 # In this example, we start with a subject level analysis by computing
 # individual topographies from :term:`Global Field Power` (:term:`GFP`) peaks.
 # Then, the individual topographies are concatenated and used in the group
@@ -68,14 +68,14 @@ ModK = ModKMeans(n_clusters=5, random_state=42)
 ModK.fit(group_cluster_centers, n_jobs=2)
 ModK.plot()
 
-#%%
+# %%
 # The :term:`cluster centers` can be re-organize to our needs.
 
 ModK.reorder_clusters(order=[4, 2, 0, 1, 3])
 ModK.rename_clusters(new_names=["MS1", "MS2", "MS3", "MS4", "MS5"])
 ModK.plot()
 
-#%%
+# %%
 # We can now use this fitted clustering algorithm to predict the segmentation
 # on each individual. This is also referred to as backfitting the group level
 # maps to each individual recording. Finally, we can extract microstate
@@ -95,12 +95,12 @@ for subject_id in subject_ids:
     d["subject_id"] = subject_id
     ms_data.append(d)
 
-#%%
+# %%
 # From this point on, we can visualize our results and do a statistical
 # analysis. For example we can plot the :term:`GEV` of each microstate class.
 
 data = [
-    [d['MS1_gev'], d['MS2_gev'], d['MS3_gev'], d['MS4_gev'], d['MS5_gev']]
+    [d["MS1_gev"], d["MS2_gev"], d["MS3_gev"], d["MS4_gev"], d["MS5_gev"]]
     for d in ms_data
 ]
 

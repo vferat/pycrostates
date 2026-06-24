@@ -11,6 +11,7 @@ from ..utils._checks import _ensure_valid_show as _ensure_valid_show
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 
+@fill_doc
 def plot_raw_segmentation(
     labels: ScalarIntArray,
     raw: BaseRaw,
@@ -41,8 +42,9 @@ def plot_raw_segmentation(
         Name of the clusters.
     tmin : float
         Start time of the raw data to use in seconds (must be >= 0).
-    tmax : float
+    tmax : float | None
         End time of the raw data to use in seconds (cannot exceed data duration).
+        If ``None`` (default), the current end of the data is used.
     cmap : str | colormap | None
         The colormap to use. If None, ``viridis`` is used.
     axes : Axes | None
@@ -70,6 +72,7 @@ def plot_raw_segmentation(
         Matplotlib figure(s) on which topographic maps are plotted.
     """
 
+@fill_doc
 def plot_epoch_segmentation(
     labels: ScalarIntArray,
     epochs: BaseEpochs,
@@ -124,6 +127,7 @@ def plot_epoch_segmentation(
         Matplotlib figure on which topographic maps are plotted.
     """
 
+@verbose
 def _plot_segmentation(
     labels: ScalarIntArray,
     gfp: ScalarFloatArray,

@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
-from pathlib import Path as Path
+from pathlib import Path
 from typing import Any
 
 import numpy as np
 from _typeshed import Incomplete
-from matplotlib.axes import Axes as Axes
+from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
-from numpy.typing import NDArray as NDArray
+from numpy.typing import NDArray
 
 from .._typing import AxesArray as AxesArray
 from .._typing import Picks as Picks
@@ -46,7 +46,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     def __repr__(self) -> str:
         """String representation."""
 
-    def _repr_html_(self, caption: Incomplete | None = None):
+    def _repr_html_(self, caption=None):
         """HTML representation."""
 
     def __eq__(self, other: Any) -> bool:
@@ -71,6 +71,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         """Check if the cluster is unfitted."""
 
     @abstractmethod
+    @fill_doc
+    @verbose
     def fit(
         self,
         inst: BaseRaw | BaseEpochs | ChData,
@@ -98,8 +100,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             names or indices are explicitly provided.
         tmin : float
             Start time of the raw data to use in seconds (must be >= 0).
-        tmax : float
+        tmax : float | None
             End time of the raw data to use in seconds (cannot exceed data duration).
+            If ``None`` (default), the current end of the data is used.
         reject_by_annotation : bool
             Whether to omit bad segments from the data before fitting. If ``True``
             (default), annotated segments whose description begins with ``'bad'`` are
@@ -191,6 +194,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         an article).
         """
 
+    @fill_doc
+    @verbose
     def plot(
         self,
         axes: Axes | AxesArray | None = None,
@@ -250,6 +255,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             Path to the ``.fif`` file where the clustering solution is saved.
         """
 
+    @fill_doc
+    @verbose
     def predict(
         self,
         inst: BaseRaw | BaseEpochs,

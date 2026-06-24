@@ -1,4 +1,3 @@
-from _typeshed import Incomplete
 from mne import BaseEpochs
 from mne.io import BaseRaw
 from scipy.sparse import csr_matrix
@@ -14,6 +13,8 @@ from ..utils._logs import logger as logger
 def _check_adjacency(adjacency, info, ch_type):
     """Check adjacency matrix."""
 
+@fill_doc
+@verbose
 def apply_spatial_filter(
     inst: BaseRaw | BaseEpochs | ChData,
     ch_type: str = "eeg",
@@ -21,7 +22,7 @@ def apply_spatial_filter(
     origin: str | ScalarFloatArray = "auto",
     adjacency: csr_matrix | str = "auto",
     n_jobs: int = 1,
-    verbose: Incomplete | None = None,
+    verbose=None,
 ):
     """Apply a spatial filter.
 

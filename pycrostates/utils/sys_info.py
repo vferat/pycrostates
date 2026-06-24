@@ -1,8 +1,9 @@
 import platform
 import sys
+from collections.abc import Callable
 from functools import partial
 from importlib.metadata import requires, version
-from typing import IO, Callable, Optional
+from typing import IO
 
 import psutil
 from packaging.requirements import Requirement
@@ -10,7 +11,7 @@ from packaging.requirements import Requirement
 from ._checks import _check_type
 
 
-def sys_info(fid: Optional[IO] = None, developer: bool = False):
+def sys_info(fid: IO | None = None, developer: bool = False):
     """Print the system information for debugging.
 
     Parameters
@@ -38,9 +39,9 @@ def sys_info(fid: Optional[IO] = None, developer: bool = False):
     out("Logical cores:".ljust(ljust) + str(psutil.cpu_count(True)) + "\n")
     # memory information
     out("RAM:".ljust(ljust))
-    out(f"{psutil.virtual_memory().total / float(2 ** 30):0.1f} GB\n")
+    out(f"{psutil.virtual_memory().total / float(2**30):0.1f} GB\n")
     out("SWAP:".ljust(ljust))
-    out(f"{psutil.swap_memory().total / float(2 ** 30):0.1f} GB\n")
+    out(f"{psutil.swap_memory().total / float(2**30):0.1f} GB\n")
     # package information
     out(f"{package}:".ljust(ljust) + version(package) + "\n")
 

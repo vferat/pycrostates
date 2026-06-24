@@ -9,6 +9,7 @@ from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import read_raw_fif
 from mne.io.constants import FIFF
+from mne.utils import check_version
 from numpy.testing import assert_allclose
 
 from pycrostates.io import ChInfo
@@ -21,6 +22,7 @@ logger.propagate = True
 directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname, preload=False)
+montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
 
 
 def test_create_from_info():
@@ -43,7 +45,12 @@ def test_create_from_info():
     assert chinfo["nchan"] == 3
     assert chinfo["ctf_head_t"] is None
     assert chinfo["dev_ctf_t"] is None
-    assert chinfo["dev_head_t"] == Transform("meg", "head")
+
+    if check_version("mne", "1.11"):
+        assert chinfo["dev_head_t"] is None
+    else:
+        # identity MEG -> head transformation
+        assert chinfo["dev_head_t"] == Transform("meg", "head")
 
     # test changing a value from info
     with info._unlock():
@@ -57,7 +64,7 @@ def test_create_from_info():
 
     # test with info that has montage
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage(montage_name)
     chinfo = ChInfo(info=info)
     assert chinfo["ch_names"] == ["Fp1", "Fp2", "Fpz"]
     for ch in info["chs"]:
@@ -67,7 +74,11 @@ def test_create_from_info():
     assert chinfo["nchan"] == 3
     assert chinfo["ctf_head_t"] is None
     assert chinfo["dev_ctf_t"] is None
-    assert chinfo["dev_head_t"] == Transform("meg", "head")
+    if check_version("mne", "1.11"):
+        assert chinfo["dev_head_t"] is None
+    else:
+        # identity MEG -> head transformation
+        assert chinfo["dev_head_t"] == Transform("meg", "head")
 
     # test with multiple channel types
     ch_names = [f"MEG{n:03}" for n in range(1, 10)] + ["EOG001"]
@@ -225,7 +236,7 @@ def test_create_without_arguments():
 def test_montage():
     """Test methods from montage Mixin."""
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage(montage_name)
     chinfo = ChInfo(info=info)
     assert chinfo["ch_names"] == ["Fp1", "Fp2", "Fpz"]
     for ch in info["chs"]:
@@ -244,7 +255,7 @@ def test_montage():
     assert chinfo2["dig"] is None
     montage2 = chinfo2.get_montage()
     assert montage2 is None
-    chinfo2.set_montage(montage)
+    chinfo2.set_montage(montage_name)
     montage2 = chinfo2.get_montage()
     assert isinstance(montage2, DigMontage)
     assert montage2.ch_names == ["Fp1", "Fp2", "Fpz"]
@@ -271,7 +282,7 @@ def test_montage():
 def test_contains():
     """Test methods from contain Mixin."""
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage(montage_name)
     chinfo = ChInfo(info=info)
     assert chinfo.get_channel_types() == ["eeg"] * 3
     assert chinfo.compensation_grade is None
@@ -280,7 +291,7 @@ def test_contains():
 def test_copy():
     """Test copy (which is a deepcopy)."""
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage(montage_name)
     chinfo = ChInfo(info=info)
     chinfo2 = chinfo.copy()
     with chinfo._unlock():
@@ -292,7 +303,7 @@ def test_copy():
 def test_repr():
     """Test normal and HTML representation."""
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage(montage_name)
     chinfo = ChInfo(info=info)
 
     # normal repr
@@ -349,7 +360,7 @@ def test_comparison(caplog):
 
     # with montage
     chinfo1 = ChInfo(ch_names=["Cz", "Oz"], ch_types="eeg")
-    chinfo1.set_montage("standard_1020")
+    chinfo1.set_montage(montage_name)
     chinfo2 = chinfo1.copy()
     assert chinfo1 == chinfo2
     chinfo2 = ChInfo(ch_names=["Cz", "Oz"], ch_types="eeg")
