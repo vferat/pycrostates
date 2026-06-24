@@ -16,7 +16,6 @@ logger.propagate = True
 montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
 
 
-
 def test_plot_cluster_centers(caplog):
     """Test topographic plots for cluster_centers."""
     caplog.set_level(logging.WARNING)

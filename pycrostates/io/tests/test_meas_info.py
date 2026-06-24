@@ -25,7 +25,6 @@ raw = read_raw_fif(fname, preload=False)
 montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
 
 
-
 def test_create_from_info():
     """Test creation of a ChInfo from an Info instance."""
     info = create_info(ch_names=["1", "2", "3"], sfreq=1, ch_types="eeg")
