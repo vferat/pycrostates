@@ -22,7 +22,7 @@ Enhancements
 Bugs
 ~~~~
 
-- xxx
+- Update montage name from ``standard_1020`` to ``colin27_1005`` for mne.version >= 1.13 (:pr:`276` by `Victor Férat`_).
 
 API and behavior changes
 ~~~~~~~~~~~~~~~~~~~~~~~~
