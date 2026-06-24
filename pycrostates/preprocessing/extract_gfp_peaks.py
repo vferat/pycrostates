@@ -21,8 +21,9 @@ from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
-    from typing import Callable, Optional, Union
-    from .._typing import Picks ScalarFloatArray
+    from collections.abc import Callable
+
+    from .._typing import Picks
     from ..io import ChData
 
 
