@@ -605,7 +605,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             Factor used for label smoothing. ``0`` means no smoothing. Default to 0.
             
             .. versionchanged:: 0.7
-                The effect of factor value now match :footcite:p:`Koenig2011` implementation.
+                For a given ``Factor`` value, the effect on segmentation
+                now match the Koenig2011 :footcite:p:`Koenig2011` implementation.
         half_window_size : int
             Number of samples used for the half window size while smoothing labels. The
             half window size is defined as ``window_size = 2 * half_window_size + 1``.
