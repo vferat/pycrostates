@@ -10,7 +10,6 @@ from mne.io import BaseRaw
 from pycrostates.utils.utils import _compute_gev
 
 from .._typing import Picks, ScalarFloatArray, ScalarIntArray
-from ..utils import _corr_vectors
 from ..utils._checks import _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
