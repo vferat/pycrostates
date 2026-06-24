@@ -13,7 +13,6 @@ logger.propagate = True
 montage_name = "colin27_1005" if check_version("mne", "1.14") else "standard_1005"
 
 
-
 def test_compare_infos(caplog):
     """Test _compare_infos(cluster_info, inst_info)."""
     # minimum chinfo

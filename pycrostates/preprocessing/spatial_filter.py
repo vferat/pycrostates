@@ -24,7 +24,6 @@ if TYPE_CHECKING:
 montage_name = "colin27_1005" if check_version("mne", "1.14") else "standard_1005"
 
 
-
 def _check_adjacency(adjacency, info, ch_type):
     """Check adjacency matrix."""
     # in MNE 1.8, the type was changed from a csr_matrix to a csr_array
