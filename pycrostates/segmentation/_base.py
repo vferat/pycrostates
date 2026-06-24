@@ -12,7 +12,7 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 
 from ..utils import _correlation
-from ..utils._checks import _check_type, _ensure_gfp_function
+from ..utils._checks import _check_type
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers

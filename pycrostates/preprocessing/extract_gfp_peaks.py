@@ -15,13 +15,11 @@ from ..utils._checks import (
     _check_reject_by_annotation,
     _check_tmin_tmax,
     _check_type,
-    _ensure_gfp_function,
 )
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
-    from typing import Optional, Union
     from .._typing import Picks
     from ..io import ChData
 
