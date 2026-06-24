@@ -7,6 +7,8 @@ import numpy as np
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
+from pycrostates.utils.utils import _compute_gev
+
 from .._typing import Picks, ScalarFloatArray, ScalarIntArray
 from ..utils import _corr_vectors
 from ..utils._checks import _check_type
@@ -141,6 +143,7 @@ class AAHCluster(_BaseCluster):
             data,
             self._n_clusters,
             self._ignore_polarity,
+            self.get_channel_types(unique=True)[0],
             self._normalize_input,
         )
 
@@ -181,15 +184,14 @@ class AAHCluster(_BaseCluster):
         data: ScalarFloatArray,
         n_clusters: int,
         ignore_polarity: bool,
+        ch_type: str,
         normalize_input: bool,
     ) -> tuple[float, ScalarFloatArray, ScalarIntArray]:
         """Run the AAHC algorithm."""
-        sum_sq = np.sum(data**2)
         maps, segmentation = AAHCluster._compute_maps(
             data, n_clusters, ignore_polarity, normalize_input
         )
-        map_corr = _corr_vectors(data, maps[segmentation].T)
-        gev = np.sum((data * map_corr) ** 2) / sum_sq
+        gev = _compute_gev(data, maps, segmentation, ch_type)
         return gev, maps, segmentation
 
     # pylint: disable=too-many-locals
