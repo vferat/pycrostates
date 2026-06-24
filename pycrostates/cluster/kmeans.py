@@ -271,14 +271,14 @@ class ModKMeans(_BaseCluster):
         tol: int | float,
     ) -> tuple[float, ScalarFloatArray, ScalarIntArray, bool]:
         """Run the k-means algorithm."""
-        gfp_sum_sq = np.sum(data**2)
+        sum_sq = np.sum(data**2)
         maps, converged = ModKMeans._compute_maps(
             data, n_clusters, max_iter, random_state, tol
         )
         activation = maps.dot(data)
         segmentation = np.argmax(np.abs(activation), axis=0)
         map_corr = _corr_vectors(data, maps[segmentation].T)
-        gev = np.sum((data * map_corr) ** 2) / gfp_sum_sq
+        gev = np.sum((data * map_corr) ** 2) / sum_sq
         return gev, maps, segmentation, converged
 
     @staticmethod
