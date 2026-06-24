@@ -27,4 +27,4 @@ Bugs
 API and behavior changes
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-- xxx
+- Update ``pycrostates.cluster._base._BaseCluster._segment`` to match reference implementation by applying L2 normalization  (:pr:`274` by `Frederic von Wegner`_).
