@@ -10,15 +10,12 @@ from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
-from mne.utils import check_version
 
 from ..utils._checks import _check_type, _ensure_valid_show
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
-    from typing import Optional, Union
-
     from .._typing import ScalarFloatArray, ScalarIntArray
 
 
@@ -28,15 +25,15 @@ def plot_raw_segmentation(
     raw: BaseRaw,
     n_clusters: int,
     cluster_names: list[str] = None,
-    tmin: Optional[Union[int, float]] = None,
-    tmax: Optional[Union[int, float]] = None,
-    cmap: Optional[str] = None,
-    axes: Optional[Axes] = None,
-    cbar_axes: Optional[Axes] = None,
+    tmin: int | float | None = None,
+    tmax: int | float | None = None,
+    cmap: str | None = None,
+    axes: Axes | None = None,
+    cbar_axes: Axes | None = None,
     *,
     block: bool = False,
-    show: Optional[bool] = None,
-    verbose: Optional[str] = None,
+    show: bool | None = None,
+    verbose: str | None = None,
     **kwargs,
 ):
     """Plot raw segmentation.
@@ -117,13 +114,13 @@ def plot_epoch_segmentation(
     epochs: BaseEpochs,
     n_clusters: int,
     cluster_names: list[str] = None,
-    cmap: Optional[str] = None,
-    axes: Optional[Axes] = None,
-    cbar_axes: Optional[Axes] = None,
+    cmap: str | None = None,
+    axes: Axes | None = None,
+    cbar_axes: Axes | None = None,
     *,
     block: bool = False,
-    show: Optional[bool] = None,
-    verbose: Optional[str] = None,
+    show: bool | None = None,
+    verbose: str | None = None,
     **kwargs,
 ):
     """
@@ -157,8 +154,7 @@ def plot_epoch_segmentation(
     _check_type(block, (bool,), "block")
     show = _ensure_valid_show(show)
 
-    kwargs_epochs = dict(copy=False) if check_version("mne", "1.6") else dict()
-    data = epochs.get_data(**kwargs_epochs).swapaxes(0, 1)
+    data = epochs.get_data(copy=False).swapaxes(0, 1)
     data = data.reshape(data.shape[0], -1)
     gfp = np.std(data, axis=0)
     times = np.arange(0, data.shape[-1])
@@ -213,11 +209,11 @@ def _plot_segmentation(
     times: ScalarFloatArray,
     n_clusters: int,
     cluster_names: list[str] = None,
-    cmap: Optional[Union[str, colors.Colormap]] = None,
-    axes: Optional[Axes] = None,
-    cbar_axes: Optional[Axes] = None,
+    cmap: str | colors.Colormap | None = None,
+    axes: Axes | None = None,
+    cbar_axes: Axes | None = None,
     *,
-    verbose: Optional[str] = None,
+    verbose: str | None = None,
     **kwargs,
 ) -> tuple[plt.Figure, Axes]:
     """Code snippet to plot segmentation for raw and epochs."""
@@ -263,7 +259,7 @@ def _plot_segmentation(
 
     # plot
     axes.plot(times, gfp, **kwargs)
-    for state, color in zip(state_labels, cmap.colors):
+    for state, color in zip(state_labels, cmap.colors, strict=False):
         pos = np.where(labels == state)[0]
         if len(pos):
             pos = np.unique([pos, pos + 1])
@@ -272,7 +268,13 @@ def _plot_segmentation(
                 pos = pos[:-1]
             x[pos] = True
             axes.fill_between(
-                times, gfp, color=color, where=x, step=None, interpolate=False
+                times,
+                gfp,
+                color=color,
+                where=x,
+                step=None,
+                interpolate=False,
+                linewidth=0,
             )
     logger.info(
         "For visualization purposes, the last segment appears truncated by 1 sample. "
@@ -296,7 +298,7 @@ def _plot_segmentation(
 
 
 def _compatibility_cmap(
-    cmap: Optional[Union[str, colors.Colormap]],
+    cmap: str | colors.Colormap | None,
     n_colors: int,
 ):
     """Convert the 'cmap' argument to a colormap.
@@ -304,19 +306,9 @@ def _compatibility_cmap(
     Matplotlib 3.6 introduced a deprecation of plt.cm.get_cmap().
     When support for the 3.6 version is dropped, this checker can be removed.
     """
-    if check_version("matplotlib", "3.6"):
-        if cmap is None:
-            cmap = colormaps["viridis"]
-        elif isinstance(cmap, str):
-            cmap = colormaps[cmap]  # the cmap name is checked by matplotlib
-        cmap = cmap.resampled(n_colors)
-    else:
-        if isinstance(cmap, (str, type(None))):
-            cmap = plt.cm.get_cmap(cmap, n_colors)
-        else:
-            raise RuntimeError(
-                "User-defined colormaps are supported as of matplotlib 3.6 "
-                "and above. Please update matplotlib or provide a colormap "
-                "name as a string."
-            )
+    if cmap is None:
+        cmap = colormaps["viridis"]
+    elif isinstance(cmap, str):
+        cmap = colormaps[cmap]  # the cmap name is checked by matplotlib
+    cmap = cmap.resampled(n_colors)
     return cmap

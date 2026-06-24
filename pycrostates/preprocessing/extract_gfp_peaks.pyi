@@ -1,4 +1,3 @@
-from _typeshed import Incomplete
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
@@ -12,6 +11,8 @@ from ..utils._checks import _check_type as _check_type
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 
+@fill_doc
+@verbose
 def extract_gfp_peaks(
     inst: BaseRaw | BaseEpochs,
     picks: Picks = "eeg",
@@ -20,7 +21,7 @@ def extract_gfp_peaks(
     tmin: float | None = None,
     tmax: float | None = None,
     reject_by_annotation: bool = True,
-    verbose: Incomplete | None = None,
+    verbose=None,
 ) -> ChData:
     """:term:`Global Field Power` (:term:`GFP`) peaks extraction.
 

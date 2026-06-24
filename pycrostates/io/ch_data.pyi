@@ -34,7 +34,7 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
     def __repr__(self) -> str:
         """String representation."""
 
-    def _repr_html_(self, caption: Incomplete | None = None):
+    def _repr_html_(self, caption=None):
         """HTML representation."""
 
     def __eq__(self, other: Any) -> bool:
@@ -52,7 +52,8 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
             If True, `~copy.deepcopy` is used instead of `~copy.copy`.
         """
 
-    def get_data(self, picks: Incomplete | None = None) -> ScalarFloatArray:
+    @fill_doc
+    def get_data(self, picks=None) -> ScalarFloatArray:
         """Retrieve the data array.
 
         Parameters
@@ -63,9 +64,9 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
             'eeg']``) will pick channels of those types, channel *name* strings (e.g.,
             ``['MEG0111', 'MEG2623']`` will pick the given channels. Can also be the
             string values ``'all'`` to pick all channels, or ``'data'`` to pick
-            :term:`data channels`. None (default) will pick all channels. Note that
-            channels in ``info['bads']`` *will be included* if their names or indices
-            are explicitly provided.
+            :term:`data channels`. None (default) will pick all channels. Bad channels
+            are included by default. Note that channels in ``info['bads']`` *will be
+            included* if their names or indices are explicitly provided.
 
         Returns
         -------
@@ -73,6 +74,7 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
             Data array of shape ``(n_channels, n_samples)``.
         """
 
+    @fill_doc
     def pick(self, picks, exclude: str = "bads"):
         """Pick a subset of channels.
 
@@ -84,9 +86,9 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
             'eeg']``) will pick channels of those types, channel *name* strings (e.g.,
             ``['MEG0111', 'MEG2623']`` will pick the given channels. Can also be the
             string values ``'all'`` to pick all channels, or ``'data'`` to pick
-            :term:`data channels`. None (default) will pick all channels. Note that
-            channels in ``info['bads']`` *will be included* if their names or indices
-            are explicitly provided.
+            :term:`data channels`. None (default) will pick all channels. Bad channels
+            are included by default. Note that channels in ``info['bads']`` *will be
+            included* if their names or indices are explicitly provided.
         exclude : list | str
             Set of channels to exclude, only used when picking based on types (e.g.,
             ``exclude="bads"`` when ``picks="meg"``).
@@ -97,7 +99,7 @@ class ChData(ChannelsMixin, ContainsMixin, MontageMixin):
             The instance modified in-place.
         """
 
-    def _get_channel_positions(self, picks: Incomplete | None = None):
+    def _get_channel_positions(self, picks=None):
         """Get channel locations from info.
 
         Parameters
