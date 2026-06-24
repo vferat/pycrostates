@@ -15,11 +15,14 @@ from ..utils._checks import (
     _check_reject_by_annotation,
     _check_tmin_tmax,
     _check_type,
+    _check_value,
 )
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from .._typing import Picks
     from ..io import ChData
 
