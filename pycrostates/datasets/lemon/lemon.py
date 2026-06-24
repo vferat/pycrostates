@@ -129,7 +129,7 @@ def standardize(raw: BaseRaw):
 
     raw.add_reference_channels("FCz")
     raw.reorder_channels(standard_channels)
-    montage_name = "colin27_1005" if check_version("mne", "1.14") else "standard_1005"
+    montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
 
     raw.set_montage(montage_name)
     raw.interpolate_bads()

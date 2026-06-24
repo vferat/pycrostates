@@ -7,7 +7,7 @@ from mne.utils import check_version
 from pycrostates.io import ChInfo
 from pycrostates.utils.mixin import ContainsMixin, MontageMixin
 
-montage_name = "colin27_1005" if check_version("mne", "1.14") else "standard_1005"
+montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
 
 
 

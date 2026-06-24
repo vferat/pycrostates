@@ -22,7 +22,7 @@ logger.propagate = True
 directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname, preload=False)
-montage_name = "colin27_1005" if check_version("mne", "1.14") else "standard_1005"
+montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
 
 
 

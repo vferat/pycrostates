@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from .._typing import ScalarFloatArray
     from ..io import ChData
 
-montage_name = "colin27_1005" if check_version("mne", "1.14") else "standard_1005"
+montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
 
 
 

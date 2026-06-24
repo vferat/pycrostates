@@ -6,7 +6,7 @@ from numpy.testing import assert_allclose
 
 from pycrostates.io import ChData, ChInfo
 
-montage_name = "colin27_1005" if check_version("mne", "1.14") else "standard_1005"
+montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
 
 
 # create fake data as 3 sin sources measured across 6 channels
