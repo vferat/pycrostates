@@ -11,7 +11,9 @@ from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
-from ..utils._checks import _check_type, _ensure_valid_show
+from pycrostates.preprocessing.extract_gfp_peaks import _GFP_FUNC
+
+from ..utils._checks import _check_type, _check_value, _ensure_valid_show
 from ..utils._docs import fill_doc
 from ..utils._logs import logger, verbose
 
@@ -69,7 +71,11 @@ def plot_raw_segmentation(
     show = _ensure_valid_show(show)
 
     data = raw.get_data(tmin=tmin, tmax=tmax)
-    gfp = np.std(data, axis=0)
+
+    ch_type = raw.get_channel_types(unique=True)[0]
+    _check_value(ch_type, _GFP_FUNC, "ch_type")
+    gfp_function = _GFP_FUNC[ch_type]
+    gfp = gfp_function(data)
     # build times array instead of using raw.times because the time-based
     # selection in MNE can be a bit funky.
     if tmin is None:
@@ -156,7 +162,11 @@ def plot_epoch_segmentation(
 
     data = epochs.get_data(copy=False).swapaxes(0, 1)
     data = data.reshape(data.shape[0], -1)
-    gfp = np.std(data, axis=0)
+
+    ch_type = epochs.get_channel_types(unique=True)[0]
+    _check_value(ch_type, _GFP_FUNC, "ch_type")
+    gfp_function = _GFP_FUNC[ch_type]
+    gfp = gfp_function(data)
     times = np.arange(0, data.shape[-1])
     labels = labels.reshape(-1)
 

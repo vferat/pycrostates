@@ -26,6 +26,13 @@ if TYPE_CHECKING:
     from ..io import ChData
 
 
+_GFP_FUNC: dict[str, Callable] = {
+    "eeg": lambda x: np.std(x, axis=0),
+    "grad": lambda x: np.sqrt(np.mean(x**2, axis=0)),
+    "mag": lambda x: np.sqrt(np.mean(x**2, axis=0)),
+}
+
+
 @fill_doc
 @verbose
 def extract_gfp_peaks(
@@ -81,6 +88,11 @@ def extract_gfp_peaks(
     :func:`scipy.signal.find_peaks`. Only the ``distance`` argument is filled with the
     value provided in ``min_peak_distance``. The other arguments are set to their
     default values.
+
+    .. versionchanged:: 0.7
+           The global field power is now computed with different functions depending
+            on data type. ``eeg`` uses the standard deviation, while ``grad`` and
+            ``mag`` use the root mean square.
     """
     from ..io import ChData
 
@@ -100,9 +112,10 @@ def extract_gfp_peaks(
     picks_all = _picks_to_idx(inst.info, inst.ch_names, none="all", exclude="bads")
     _check_picks_uniqueness(inst.info, picks)
 
-    # ensure gfp function
-    ch_type = inst.info.get_channel_types(picks)[0]
-    gfp_function = _ensure_gfp_function(method, ch_type=ch_type)
+    # gfp function
+    ch_type = inst.get_channel_types(picks, unique=True)[0]
+    _check_value(ch_type, _GFP_FUNC, "ch_type")
+    gfp_function = _GFP_FUNC[ch_type]
 
     # set kwargs for .get_data()
     kwargs = dict(tmin=tmin, tmax=tmax)
@@ -137,6 +150,7 @@ def extract_gfp_peaks(
     n_samples = inst.times.size
     if isinstance(inst, BaseEpochs):
         n_samples *= len(inst)
+
     logger.info(
         "%s GFP peaks extracted out of %s samples (%.2f%% of the original data).",
         peaks.shape[1],

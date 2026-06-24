@@ -7,6 +7,8 @@ import numpy as np
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
+from pycrostates.utils.utils import _compute_gev
+
 from .._typing import Picks, ScalarFloatArray, ScalarIntArray
 from ..utils import _gev
 from ..utils._checks import _check_type
@@ -141,7 +143,7 @@ class AAHCluster(_BaseCluster):
             data,
             self._n_clusters,
             self._ignore_polarity,
-            self.get_channel_types()[0],
+            self.get_channel_types(unique=True)[0],
             self._normalize_input,
         )
 
@@ -187,8 +189,7 @@ class AAHCluster(_BaseCluster):
         maps, segmentation = AAHCluster._compute_maps(
             data, n_clusters, ignore_polarity, normalize_input
         )
-        # Compute GEV
-        gev = _gev(data, maps, segmentation, ch_type=ch_type)
+        gev = _compute_gev(data, maps, segmentation, ch_type)
         return gev, maps, segmentation
 
     # --------------------------------------------------------------------
