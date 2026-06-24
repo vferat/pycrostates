@@ -913,7 +913,7 @@ def test_picks_fit_predict(caplog):
 
     # create mock raw for fitting
     info_ = create_info(["Fp1", "Fp2", "CP1", "CP2"], sfreq=1024, ch_types="eeg")
-    info_.set_montage("standard_1020")
+    info_.set_montage("colin27_1020")
     data = np.random.randn(4, 1024 * 10)
 
     # Ignore bad channel Fp2 during fitting
@@ -962,7 +962,7 @@ def test_picks_fit_predict(caplog):
 
     # Try with one additional channel in the instance used for prediction.
     info_ = create_info(["Fp1", "Fp2", "Fpz", "CP2", "CP1"], sfreq=1024, ch_types="eeg")
-    info_.set_montage("standard_1020")
+    info_.set_montage("colin27_1020")
     data = np.random.randn(5, 1024 * 10)
     raw_predict = RawArray(data, info_)
 
@@ -1124,7 +1124,7 @@ def test_montage_mixin():
     with pytest.raises(
         ValueError, match="Instance 'AAHCluster' attribute 'info' is None."
     ):
-        aahCluster_.set_montage("standard_1020")
+        aahCluster_.set_montage("colin27_1020")
 
     with pytest.raises(
         ValueError, match="Instance 'AAHCluster' attribute 'info' is None."

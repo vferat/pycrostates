@@ -63,7 +63,7 @@ def test_create_from_info():
 
     # test with info that has montage
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage("colin27_1020")
     chinfo = ChInfo(info=info)
     assert chinfo["ch_names"] == ["Fp1", "Fp2", "Fpz"]
     for ch in info["chs"]:
@@ -235,7 +235,7 @@ def test_create_without_arguments():
 def test_montage():
     """Test methods from montage Mixin."""
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage("colin27_1020")
     chinfo = ChInfo(info=info)
     assert chinfo["ch_names"] == ["Fp1", "Fp2", "Fpz"]
     for ch in info["chs"]:
@@ -281,7 +281,7 @@ def test_montage():
 def test_contains():
     """Test methods from contain Mixin."""
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage("colin27_1020")
     chinfo = ChInfo(info=info)
     assert chinfo.get_channel_types() == ["eeg"] * 3
     assert chinfo.compensation_grade is None
@@ -290,7 +290,7 @@ def test_contains():
 def test_copy():
     """Test copy (which is a deepcopy)."""
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage("colin27_1020")
     chinfo = ChInfo(info=info)
     chinfo2 = chinfo.copy()
     with chinfo._unlock():
@@ -302,7 +302,7 @@ def test_copy():
 def test_repr():
     """Test normal and HTML representation."""
     info = create_info(ch_names=["Fp1", "Fp2", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage("colin27_1020")
     chinfo = ChInfo(info=info)
 
     # normal repr
@@ -359,7 +359,7 @@ def test_comparison(caplog):
 
     # with montage
     chinfo1 = ChInfo(ch_names=["Cz", "Oz"], ch_types="eeg")
-    chinfo1.set_montage("standard_1020")
+    chinfo1.set_montage("colin27_1020")
     chinfo2 = chinfo1.copy()
     assert chinfo1 == chinfo2
     chinfo2 = ChInfo(ch_names=["Cz", "Oz"], ch_types="eeg")

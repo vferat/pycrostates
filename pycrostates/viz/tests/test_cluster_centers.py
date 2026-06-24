@@ -17,7 +17,7 @@ def test_plot_cluster_centers(caplog):
     caplog.set_level(logging.WARNING)
     cluster_centers = np.array([[1.1, 1, 1.2], [0.4, 0.8, 0.7]])
     info = create_info(["Oz", "Cz", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage("colin27_1020")
     chinfo = ChInfo(info)
 
     # plot with info
@@ -110,7 +110,7 @@ def test_with_grid_layout():
         ]
     )
     info = create_info(["Oz", "Cz", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage("colin27_1020")
 
     f, ax = plt.subplots(2, 2)
     plot_cluster_centers(cluster_centers, info, axes=ax)

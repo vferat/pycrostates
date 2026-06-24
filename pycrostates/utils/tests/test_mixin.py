@@ -68,7 +68,7 @@ def test_montage_mixin():
 
     foo = Foo(info)
     assert foo.info["dig"] is None
-    foo.set_montage("standard_1020")
+    foo.set_montage("colin27_1020")
     assert foo.info["dig"] is not None
 
     montage = foo.get_montage()
@@ -77,7 +77,7 @@ def test_montage_mixin():
     # test with info equal to None
     foo = Foo(None)
     with pytest.raises(ValueError, match="Instance 'Foo' attribute 'info' is None."):
-        foo.set_montage("standard_1020")
+        foo.set_montage("colin27_1020")
     with pytest.raises(ValueError, match="Instance 'Foo' attribute 'info' is None."):
         foo.get_montage()
 
@@ -86,7 +86,7 @@ def test_montage_mixin():
     with pytest.raises(
         ValueError, match="Instance 'Foo2' is missing an attribute 'info'"
     ):
-        foo.set_montage("standard_1020")
+        foo.set_montage("colin27_1020")
     with pytest.raises(
         ValueError, match="Instance 'Foo2' is missing an attribute 'info'"
     ):

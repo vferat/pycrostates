@@ -17,7 +17,7 @@ def test_compare_infos(caplog):
     _compare_infos(chinfo, chinfo.copy())
 
     # with montage
-    chinfo.set_montage("standard_1020")
+    chinfo.set_montage("colin27_1020")
     caplog.clear()
     _compare_infos(chinfo, chinfo.copy())
     assert "does not have the same channels montage" not in caplog.text
@@ -33,7 +33,7 @@ def test_compare_infos(caplog):
 
     # with MNE info with montage
     info = create_info(["Fpz", "Cz", "CPz"], 1, "eeg")
-    info.set_montage("standard_1020")
+    info.set_montage("colin27_1020")
     caplog.clear()
     _compare_infos(chinfo, info)
     assert "does not have the same channels montage" not in caplog.text
@@ -59,7 +59,7 @@ def test_compare_infos(caplog):
 
     # with different kind/unit/coord_frame
     chinfo1 = ChInfo(ch_names=["Fpz", "Cz", "CPz"], ch_types="eeg")
-    chinfo1.set_montage("standard_1020")
+    chinfo1.set_montage("colin27_1020")
     chinfo2 = chinfo1.copy()
     chinfo2["chs"][0]["unit"] = FIFF.FIFF_UNIT_C
     caplog.clear()
