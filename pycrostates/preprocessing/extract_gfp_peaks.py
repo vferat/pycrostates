@@ -36,7 +36,6 @@ _GFP_FUNC: dict[str, Callable] = {
 def extract_gfp_peaks(
     inst: BaseRaw | BaseEpochs,
     picks: Picks = "eeg",
-    method: str = "auto",
     return_all: bool = False,
     min_peak_distance: int = 1,
     tmin: float | None = None,
@@ -61,7 +60,6 @@ def extract_gfp_peaks(
         ``“data”`` to pick data channels. ``"eeg"`` (default) will pick all eeg
         channels. Note that channels in ``info['bads']`` will be included if their
         names or indices are explicitly provided.
-    %(gfp_method)s
     return_all : bool
         If True, the returned `~pycrostates.io.ChData` instance will include all
         channels. If False (default), the returned `~pycrostates.io.ChData` instance
