@@ -4,6 +4,8 @@ from copy import deepcopy
 
 import numpy as np
 
+from pycrostates.preprocessing.extract_gfp_peaks import _GFP_FUNC
+
 from ._logs import logger
 
 
@@ -135,3 +137,12 @@ def _compare_infos(cluster_info, inst_info):
             "Instance to segment into microstates sequence does not have "
             "the same coordinate frames as the instance used for fitting. "
         )
+
+
+def _compute_gev(data, maps, segmentation, ch_type):
+    """Compute Global Explained Variance (GEV)."""
+    gfp_function = _GFP_FUNC[ch_type]
+    gfp = gfp_function(data)
+    ev = _corr_vectors(data, maps[segmentation].T)
+    gev = np.sum((gfp * ev) ** 2 / np.sum(gfp**2))
+    return gev

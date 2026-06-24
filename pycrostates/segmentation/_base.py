@@ -11,8 +11,10 @@ from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
+from pycrostates.preprocessing.extract_gfp_peaks import _GFP_FUNC
+
 from ..utils import _corr_vectors
-from ..utils._checks import _check_type
+from ..utils._checks import _check_type, _check_value
 from ..utils._docs import fill_doc
 from ..utils._logs import logger
 from ..viz import plot_cluster_centers
@@ -36,6 +38,11 @@ class _BaseSegmentation(ABC):
     %(cluster_centers_seg)s
     %(cluster_names)s
     %(predict_parameters)s
+
+        .. versionchanged:: 0.7
+            The global explained variance is now computed with different
+            functions depending on data type. ``eeg`` uses the standard
+            deviation,  while ``grad`` and ``mag`` use the root mean square.
     """
 
     @abstractmethod
@@ -156,7 +163,11 @@ class _BaseSegmentation(ABC):
             # create a 1D view of the labels array
             labels = labels.reshape(-1)
 
-        gfp = np.std(data, axis=0)
+        ch_type = self._inst.get_channel_types(unique=True)[0]
+        _check_value(ch_type, _GFP_FUNC, "ch_type")
+        gfp_function = _GFP_FUNC[ch_type]
+        gfp = gfp_function(data)
+
         if norm_gfp:
             labeled = np.argwhere(labels != -1)  # ignore unlabeled segments
             gfp /= np.linalg.norm(gfp[labeled])  # normalize
