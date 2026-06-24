@@ -13,7 +13,6 @@ from numpy.random import Generator, RandomState
 
 from pycrostates.utils.utils import _compute_gev
 
-from ..utils import _corr_vectors
 from ..utils._checks import _check_n_jobs, _check_random_state, _check_type
 from ..utils._docs import copy_doc, fill_doc
 from ..utils._logs import logger
@@ -193,7 +192,12 @@ class ModKMeans(_BaseCluster):
             count_converged = 0
             for init in inits:
                 gev, maps, segmentation, converged = ModKMeans._kmeans(
-                    data, self._n_clusters, self.get_channel_types(unique=True)[0], self._max_iter, init, self._tol
+                    data,
+                    self._n_clusters,
+                    self.get_channel_types(unique=True)[0],
+                    self._max_iter,
+                    init,
+                    self._tol,
                 )
                 if not converged:
                     continue
@@ -209,7 +213,14 @@ class ModKMeans(_BaseCluster):
                 ModKMeans._kmeans, n_jobs, total=self._n_init
             )
             runs = parallel(
-                p_fun(data, self._n_clusters, self.get_channel_types(unique=True)[0], self._max_iter, init, self._tol)
+                p_fun(
+                    data,
+                    self._n_clusters,
+                    self.get_channel_types(unique=True)[0],
+                    self._max_iter,
+                    init,
+                    self._tol,
+                )
                 for init in inits
             )
             try:

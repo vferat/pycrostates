@@ -162,7 +162,6 @@ class _BaseSegmentation(ABC):
             # create a 1D view of the labels array
             labels = labels.reshape(-1)
 
-
         ch_type = self._inst.get_channel_types(unique=True)[0]
         _check_value(ch_type, _GFP_FUNC, "ch_type")
         gfp_function = _GFP_FUNC[ch_type]
