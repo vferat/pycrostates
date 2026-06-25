@@ -5,10 +5,13 @@ from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
+from pycrostates.preprocessing.extract_gfp_peaks import _GFP_FUNC as _GFP_FUNC
+
 from .._typing import ScalarFloatArray as ScalarFloatArray
 from .._typing import ScalarIntArray as ScalarIntArray
 from ..utils import _corr_vectors as _corr_vectors
 from ..utils._checks import _check_type as _check_type
+from ..utils._checks import _check_value as _check_value
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
 from .entropy import entropy as entropy
@@ -32,6 +35,11 @@ class _BaseSegmentation(ABC):
         Name of the clusters.
     predict_parameters : dict | None
         The prediction parameters.
+
+        .. versionchanged:: 0.7
+            The global explained variance is now computed with different
+            functions depending on data type. ``eeg`` uses the standard
+            deviation,  while ``grad`` and ``mag`` use the root mean square.
     """
 
     _labels: Incomplete

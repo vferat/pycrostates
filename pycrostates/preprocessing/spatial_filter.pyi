@@ -1,3 +1,4 @@
+from _typeshed import Incomplete
 from mne import BaseEpochs
 from mne.io import BaseRaw
 from scipy.sparse import csr_matrix
@@ -9,6 +10,8 @@ from ..utils._checks import _check_type as _check_type
 from ..utils._checks import _check_value as _check_value
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
+
+montage_name: Incomplete
 
 def _check_adjacency(adjacency, info, ch_type):
     """Check adjacency matrix."""

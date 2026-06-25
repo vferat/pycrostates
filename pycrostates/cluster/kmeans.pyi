@@ -6,12 +6,13 @@ from mne import BaseEpochs
 from mne.io import BaseRaw
 from numpy.random import Generator
 
+from pycrostates.utils.utils import _compute_gev as _compute_gev
+
 from .._typing import Picks as Picks
 from .._typing import RandomState as RandomState
 from .._typing import ScalarFloatArray as ScalarFloatArray
 from .._typing import ScalarIntArray as ScalarIntArray
 from ..io import ChData as ChData
-from ..utils import _corr_vectors as _corr_vectors
 from ..utils._checks import _check_n_jobs as _check_n_jobs
 from ..utils._checks import _check_random_state as _check_random_state
 from ..utils._checks import _check_type as _check_type
@@ -145,6 +146,7 @@ class ModKMeans(_BaseCluster):
     def _kmeans(
         data: ScalarFloatArray,
         n_clusters: int,
+        ch_type: str,
         max_iter: int,
         random_state: RandomState | Generator,
         tol: int | float,
