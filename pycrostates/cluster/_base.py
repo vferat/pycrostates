@@ -603,6 +603,10 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             provided.
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing. Default to 0.
+
+            .. versionchanged:: 0.7
+                For a given ``Factor`` value, the effect on segmentation
+                now match the Koenig2011 :footcite:p:`Koenig2011` implementation.
         half_window_size : int
             Number of samples used for the half window size while smoothing labels. The
             half window size is defined as ``window_size = 2 * half_window_size + 1``.
@@ -923,14 +927,20 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         tol: int | float,
         half_window_size: int,
     ) -> ScalarIntArray:
-        """Create segmentation. Must operate on a copy of states."""
-        data -= np.mean(data, axis=0)
-        std = np.std(data, axis=0)
-        std[std == 0] = 1  # std == 0 -> null map
-        data /= std
+        """Create segmentation.
 
-        states -= np.mean(states, axis=1)[:, np.newaxis]
-        states /= np.std(states, axis=1)[:, np.newaxis]
+        Verified equivalent to the Matlab reference
+        implementation ``NormDim(M,2)/sqrt(Ns)`` (Koenig/SmoothLabels.m)
+        :footcite:p:`Koenig2011` by Frederic von Wegner with Claude assistance
+        (claude-sonnet-4-6, 2026-06-18).
+
+        References
+        ----------
+        .. footbibliography::
+        """
+        Ne = data.shape[0]
+        row_norms = np.linalg.norm(states, axis=1, keepdims=True)
+        states = states / (row_norms * np.sqrt(Ne))
 
         labels = np.argmax(np.abs(np.dot(states, data)), axis=0)
 
@@ -952,16 +962,14 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     ) -> ScalarIntArray:
         """Apply smoothing.
 
-        Adapted from [1].
+        Adapted from :footcite:p:`Marqui1995`.
+        Verified equivalent to the Matlab reference
+        implementation (Koenig/SmoothLabels.m) by Frederic von Wegner with
+        Claude assistance (claude-sonnet-4-6, 2026-06-18).
 
         References
         ----------
-        .. [1] R. D. Pascual-Marqui, C. M. Michel and D. Lehmann.
-               Segmentation of brain electrical activity into microstates:
-               model estimation and validation.
-               IEEE Transactions on Biomedical Engineering,
-               vol. 42, no. 7, pp. 658-665, July 1995,
-               https://doi.org/10.1109/10.391164.
+        .. footbibliography::
         """
         Ne, Nt = data.shape
         Nu = states.shape[0]
