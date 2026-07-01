@@ -5,10 +5,11 @@ from _typeshed import Incomplete
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
+from pycrostates.utils.utils import _compute_gev as _compute_gev
+
 from .._typing import Picks as Picks
 from .._typing import ScalarFloatArray as ScalarFloatArray
 from .._typing import ScalarIntArray as ScalarIntArray
-from ..utils import _corr_vectors as _corr_vectors
 from ..utils._checks import _check_type as _check_type
 from ..utils._docs import copy_doc as copy_doc
 from ..utils._docs import fill_doc as fill_doc
@@ -109,6 +110,7 @@ class AAHCluster(_BaseCluster):
         data: ScalarFloatArray,
         n_clusters: int,
         ignore_polarity: bool,
+        ch_type: str,
         normalize_input: bool,
     ) -> tuple[float, ScalarFloatArray, ScalarIntArray]:
         """Run the AAHC algorithm."""

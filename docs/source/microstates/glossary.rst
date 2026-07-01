@@ -8,8 +8,9 @@ Glossary
     global field power
         Global Field Power (GFP) is a measure of the (non-)uniformity of the
         electromagnetic field at the sensors. It is typically calculated as the
-        standard deviation of the sensor values at each time point. Thus, it is
-        a one-dimensional time series capturing the spatial variability of the
+        standard deviation for ``eeg`` data, and  as the root mean square for
+        ``grad`` and ``mag`` data. GFP is computed at each time point, thus
+        it is a one-dimensional time series capturing the spatial variability of the
         signal across sensor locations. Local maxima of the global field power
         (GFP) are known to represent the portions of EEG data with highest
         signal-to-noise ratio (:cite:t:`KOENIG20161104`).
