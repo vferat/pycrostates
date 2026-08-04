@@ -1,3 +1,5 @@
+from pycrostates.preprocessing.extract_gfp_peaks import _GFP_FUNC as _GFP_FUNC
+
 from ._logs import logger as logger
 
 def _corr_vectors(A, B, axis: int = 0):
@@ -29,3 +31,6 @@ def _distance_matrix(X, Y=None):
 
 def _compare_infos(cluster_info, inst_info):
     """Check that channels in cluster_info are all present in inst_info."""
+
+def _compute_gev(data, maps, segmentation, ch_type):
+    """Compute Global Explained Variance (GEV)."""

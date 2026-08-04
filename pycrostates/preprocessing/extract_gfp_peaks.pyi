@@ -1,15 +1,19 @@
+from collections.abc import Callable as Callable
+
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
 from .._typing import Picks as Picks
-from .._typing import ScalarFloatArray as ScalarFloatArray
 from ..io import ChData as ChData
 from ..utils._checks import _check_picks_uniqueness as _check_picks_uniqueness
 from ..utils._checks import _check_reject_by_annotation as _check_reject_by_annotation
 from ..utils._checks import _check_tmin_tmax as _check_tmin_tmax
 from ..utils._checks import _check_type as _check_type
+from ..utils._checks import _check_value as _check_value
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger
+
+_GFP_FUNC: dict[str, Callable]
 
 @fill_doc
 @verbose
@@ -76,24 +80,9 @@ def extract_gfp_peaks(
     :func:`scipy.signal.find_peaks`. Only the ``distance`` argument is filled with the
     value provided in ``min_peak_distance``. The other arguments are set to their
     default values.
-    """
 
-def _extract_gfp_peaks(
-    data: ScalarFloatArray, min_peak_distance: int = 2
-) -> ScalarFloatArray:
-    """Extract GFP peaks from input data.
-
-    Parameters
-    ----------
-    data : array of shape (n_channels, n_samples)
-        The data to extract GFP peaks from.
-    min_peak_distance : int
-        Required minimal horizontal distance (>= 1) in samples between neighboring
-        peaks. Smaller peaks are removed first until the condition is fulfilled for all
-        remaining peaks. Default to 2.
-
-    Returns
-    -------
-    peaks : array of shape (n_picks,)
-        The indices when peaks occur.
+    .. versionchanged:: 0.7
+           The global field power is now computed with different functions depending
+            on data type. ``eeg`` uses the standard deviation, while ``grad`` and
+            ``mag`` use the root mean square.
     """
