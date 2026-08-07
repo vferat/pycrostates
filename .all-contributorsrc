@@ -78,6 +78,16 @@
         "doc",
         "infra"
       ]
+    },
+    {
+      "login": "dr-r-kan",
+      "name": "Rohan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/55947955?v=4",
+      "profile": "https://github.com/dr-r-kan",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
