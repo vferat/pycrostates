@@ -13,6 +13,7 @@ from mne._fiff.pick import _picks_to_idx
 from mne.channels import DigMontage
 from mne.datasets import testing
 from mne.io import RawArray, read_raw_fif
+from mne.utils import check_version
 from numpy.testing import assert_allclose
 
 from pycrostates import __version__
@@ -27,6 +28,8 @@ logger.propagate = True
 
 directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
+montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
+
 
 # raw
 raw_meg = read_raw_fif(fname, preload=False)
@@ -913,7 +916,7 @@ def test_picks_fit_predict(caplog):
 
     # create mock raw for fitting
     info_ = create_info(["Fp1", "Fp2", "CP1", "CP2"], sfreq=1024, ch_types="eeg")
-    info_.set_montage("standard_1020")
+    info_.set_montage(montage_name)
     data = np.random.randn(4, 1024 * 10)
 
     # Ignore bad channel Fp2 during fitting
@@ -962,7 +965,7 @@ def test_picks_fit_predict(caplog):
 
     # Try with one additional channel in the instance used for prediction.
     info_ = create_info(["Fp1", "Fp2", "Fpz", "CP2", "CP1"], sfreq=1024, ch_types="eeg")
-    info_.set_montage("standard_1020")
+    info_.set_montage(montage_name)
     data = np.random.randn(5, 1024 * 10)
     raw_predict = RawArray(data, info_)
 
@@ -1124,7 +1127,7 @@ def test_montage_mixin():
     with pytest.raises(
         ValueError, match="Instance 'AAHCluster' attribute 'info' is None."
     ):
-        aahCluster_.set_montage("standard_1020")
+        aahCluster_.set_montage(montage_name)
 
     with pytest.raises(
         ValueError, match="Instance 'AAHCluster' attribute 'info' is None."

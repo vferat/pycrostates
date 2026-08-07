@@ -2,9 +2,12 @@
 
 import pytest
 from mne.channels import DigMontage
+from mne.utils import check_version
 
 from pycrostates.io import ChInfo
 from pycrostates.utils.mixin import ContainsMixin, MontageMixin
+
+montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
 
 
 class Foo(ContainsMixin, MontageMixin):
@@ -68,7 +71,7 @@ def test_montage_mixin():
 
     foo = Foo(info)
     assert foo.info["dig"] is None
-    foo.set_montage("standard_1020")
+    foo.set_montage(montage_name)
     assert foo.info["dig"] is not None
 
     montage = foo.get_montage()
@@ -77,7 +80,7 @@ def test_montage_mixin():
     # test with info equal to None
     foo = Foo(None)
     with pytest.raises(ValueError, match="Instance 'Foo' attribute 'info' is None."):
-        foo.set_montage("standard_1020")
+        foo.set_montage(montage_name)
     with pytest.raises(ValueError, match="Instance 'Foo' attribute 'info' is None."):
         foo.get_montage()
 
@@ -86,7 +89,7 @@ def test_montage_mixin():
     with pytest.raises(
         ValueError, match="Instance 'Foo2' is missing an attribute 'info'"
     ):
-        foo.set_montage("standard_1020")
+        foo.set_montage(montage_name)
     with pytest.raises(
         ValueError, match="Instance 'Foo2' is missing an attribute 'info'"
     ):

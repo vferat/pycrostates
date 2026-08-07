@@ -4,9 +4,12 @@ from matplotlib.axes import Axes
 from mne import BaseEpochs
 from mne.io import BaseRaw
 
+from pycrostates.preprocessing.extract_gfp_peaks import _GFP_FUNC as _GFP_FUNC
+
 from .._typing import ScalarFloatArray as ScalarFloatArray
 from .._typing import ScalarIntArray as ScalarIntArray
 from ..utils._checks import _check_type as _check_type
+from ..utils._checks import _check_value as _check_value
 from ..utils._checks import _ensure_valid_show as _ensure_valid_show
 from ..utils._docs import fill_doc as fill_doc
 from ..utils._logs import logger as logger

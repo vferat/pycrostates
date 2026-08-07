@@ -10,7 +10,7 @@ from mne.channels import find_ch_adjacency
 from mne.channels.interpolation import _make_interpolation_matrix
 from mne.io import BaseRaw
 from mne.parallel import parallel_func
-from mne.utils.check import _check_preload
+from mne.utils.check import _check_preload, check_version
 from scipy.sparse import csr_array, csr_matrix
 
 from ..utils._checks import _check_n_jobs, _check_type, _check_value
@@ -20,6 +20,8 @@ from ..utils._logs import logger, verbose
 if TYPE_CHECKING:
     from .._typing import ScalarFloatArray
     from ..io import ChData
+
+montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
 
 
 def _check_adjacency(adjacency, info, ch_type):

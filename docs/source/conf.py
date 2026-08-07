@@ -67,6 +67,9 @@ nitpick_ignore = [
         "v, remove specified key and return the corresponding value.",
     ),
 ]
+nitpick_ignore_regex = [
+    (r"py:obj", r"^(same|as|the|data)$"),
+]
 
 # A list of ignored prefixes for module index sorting.
 modindex_common_prefix = [f"{package}."]

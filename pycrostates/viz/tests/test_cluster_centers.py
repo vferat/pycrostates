@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 from matplotlib import pyplot as plt
 from mne import create_info
+from mne.utils import check_version
 
 from pycrostates.io import ChInfo
 from pycrostates.utils._logs import logger
@@ -12,12 +13,15 @@ from pycrostates.viz import plot_cluster_centers
 logger.propagate = True
 
 
+montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
+
+
 def test_plot_cluster_centers(caplog):
     """Test topographic plots for cluster_centers."""
     caplog.set_level(logging.WARNING)
     cluster_centers = np.array([[1.1, 1, 1.2], [0.4, 0.8, 0.7]])
     info = create_info(["Oz", "Cz", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage(montage_name)
     chinfo = ChInfo(info)
 
     # plot with info
@@ -110,7 +114,7 @@ def test_with_grid_layout():
         ]
     )
     info = create_info(["Oz", "Cz", "Fpz"], sfreq=1, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage(montage_name)
 
     f, ax = plt.subplots(2, 2)
     plot_cluster_centers(cluster_centers, info, axes=ax)

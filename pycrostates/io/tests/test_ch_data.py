@@ -1,9 +1,13 @@
 import numpy as np
 import pytest
 from mne import create_info, pick_types
+from mne.utils import check_version
 from numpy.testing import assert_allclose
 
 from pycrostates.io import ChData, ChInfo
+
+montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
+
 
 # create fake data as 3 sin sources measured across 6 channels
 times = np.linspace(0, 5, 2000)
@@ -38,7 +42,7 @@ def test_ChData():
 
     # test MontageMixin
     assert ch_data.get_montage() is None
-    ch_data.set_montage("standard_1020")
+    ch_data.set_montage(montage_name)
     assert ch_data.get_montage() is not None
     assert len(ch_data.get_montage().dig) == 9  # 6 channels + 3 fiducials
 
@@ -110,7 +114,7 @@ def test_ChData_invalid_arguments():
 def test_ChData_get_channel_positions():
     """Test get for sensor positions."""
     ch_data = ChData(data, ch_info_types.copy())
-    ch_data.set_montage("standard_1020")
+    ch_data.set_montage(montage_name)
     picks = pick_types(ch_data.info, meg=False, eeg=True)
     pos = np.array([ch["loc"][:3] for ch in ch_data.info["chs"]])[picks]
     ch_data_pos = ch_data._get_channel_positions(picks=picks)
