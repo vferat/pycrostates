@@ -10,8 +10,6 @@ The output is saved as a CSV file with one row per
 
 from __future__ import annotations
 
-import argparse
-import csv
 from pathlib import Path
 
 import numpy as np
