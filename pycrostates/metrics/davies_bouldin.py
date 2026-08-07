@@ -47,7 +47,8 @@ def davies_bouldin_score(cluster):  # lower the better
     labels = labels[keep]
     # Align polarities just in case..
     x = cluster.cluster_centers_[labels].T
-    sign = np.sign((x.T * data.T).sum(axis=1))
+    # Keep a valid polarity factor even for zero dot products.
+    sign = np.where((x.T * data.T).sum(axis=1) < 0, -1.0, 1.0)
     data = data * sign
     davies_bouldin_score = _davies_bouldin_score(data.T, labels)
     return davies_bouldin_score
