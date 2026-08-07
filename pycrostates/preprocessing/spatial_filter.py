@@ -59,7 +59,9 @@ def _check_adjacency(adjacency, info, ch_type):
 
     # check if diagonal is 1
     if not np.all(np.diag(adjacency) == 1):
-        logger.warning("Diagonal of adjacency matrix is not 1. Channnels will not be used to interpolate themselves.")
+        logger.warning(
+            "Diagonal of adjacency matrix is not 1. Channnels will not be used to interpolate themselves."
+        )
     return (adjacency, ch_names)
 
 
