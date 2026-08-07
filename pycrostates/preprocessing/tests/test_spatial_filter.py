@@ -144,13 +144,13 @@ def test_spatial_filter_custom_adjacency(caplog):
     adjacency_[0, 0] = 0
     apply_spatial_filter(raw_all.copy(), "eeg", adjacency=adjacency_)
     assert (
-        "Diagonal of adjacency matrix is not 1. Channnels will not be used to "
+        "Diagonal of adjacency matrix is not 1. Channels will not be used to "
         "interpolate themselves." in caplog.text
     )
 
     caplog.clear()
     apply_spatial_filter(raw_all.copy(), "eeg")
     assert (
-        "Diagonal of adjacency matrix is not 1. Channnels will not be used to "
+        "Diagonal of adjacency matrix is not 1. Channels will not be used to "
         "interpolate themselves." not in caplog.text
     )
