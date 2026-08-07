@@ -56,6 +56,10 @@ def _check_adjacency(adjacency, info, ch_type):
         )
     if not np.array_equal(adjacency, adjacency.astype(bool)):
         raise ValueError("Values contained in adjacency can only be 0 or 1.")
+
+    # check if diagonal is 1
+    if not np.all(np.diag(adjacency) == 1):
+        logger.warning("Diagonal of adjacency matrix is not 1. Channnels will not be used to interpolate themselves.")
     return (adjacency, ch_names)
 
 
@@ -143,9 +147,6 @@ def apply_spatial_filter(
     info = pick_info(inst.info, picks)
     # adjacency matrix
     adjacency, ch_names = _check_adjacency(adjacency, info, ch_type)
-    # add self to its neighbors
-    adjacency.setdiag(1)
-    
     if exclude_bads:
         for c, chan in enumerate(ch_names):
             if chan in inst.info["bads"]:
@@ -164,6 +165,7 @@ def apply_spatial_filter(
         )
     pos = pos - origin
     interpolate_matrix = _make_interpolation_matrix(pos, pos)
+
     # retrieve data
     data = inst.get_data(picks=picks)
     if isinstance(inst, BaseEpochs):

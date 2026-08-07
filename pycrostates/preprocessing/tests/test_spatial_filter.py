@@ -7,6 +7,9 @@ from mne.datasets import testing
 
 from pycrostates.io import ChData
 from pycrostates.preprocessing import apply_spatial_filter
+from pycrostates.utils._logs import logger
+
+logger.propagate = True
 
 dir_ = testing.data_path() / "MEG" / "sample"
 fname_raw_testing = dir_ / "sample_audvis_trunc_raw.fif"
@@ -119,7 +122,7 @@ def test_spatial_filter_eeg_and_meg():
     assert np.all(new_inst._data[picks_non_eeg, :] == raw_all._data[picks_non_eeg, :])
 
 
-def test_spatial_filter_custom_adjacency():
+def test_spatial_filter_custom_adjacency(caplog):
     """Test apply_spatial_filter with custom adjacency."""
     adjacency_matrix, ch_names = find_ch_adjacency(raw_all.info, "eeg")
     apply_spatial_filter(raw_all.copy(), "eeg", adjacency=adjacency_matrix)
@@ -135,3 +138,19 @@ def test_spatial_filter_custom_adjacency():
         adjacency_ = adjacency_matrix.copy()
         adjacency_[0, 0] = 2
         apply_spatial_filter(raw_all.copy(), "eeg", adjacency=adjacency_)
+
+    caplog.clear()
+    adjacency_ = adjacency_matrix.copy()
+    adjacency_[0, 0] = 0
+    apply_spatial_filter(raw_all.copy(), "eeg", adjacency=adjacency_)
+    assert (
+        "Diagonal of adjacency matrix is not 1. Channnels will not be used to "
+        "interpolate themselves." in caplog.text
+    )
+
+    caplog.clear()
+    apply_spatial_filter(raw_all.copy(), "eeg")
+    assert (
+        "Diagonal of adjacency matrix is not 1. Channnels will not be used to "
+        "interpolate themselves." not in caplog.text
+    )
