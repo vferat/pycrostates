@@ -199,33 +199,19 @@ def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix):
     drop exactly one max and one min at each time-point (so that the kept count is
     fixed across time), and then interpolate using those weights.
     """
-    neighbors_data = data[adjacency_vector == 1, :]  # shape (n_neighbors, n_times)
-    neighbor_indices = np.argwhere(adjacency_vector == 1)  # shape (n_neighbors, 1)
+    neighbors_data = data[adjacency_vector == 1, :]
+    neighbor_indices = np.argwhere(adjacency_vector == 1).flatten()
     if len(neighbor_indices) <= 3:
-        return data[index].copy()
+        return data[index]
 
-    # Number of neighbours and samples
-    n_neighbors, n_samples = neighbors_data.shape
-
-    # Preallocate an integer array of shape (n_samples, n_neighbors−2)
-    # so that we can fill in “kept” neighbour-indices for each i.
-    keep_indices = np.zeros((n_samples, n_neighbors - 2), dtype=int)
-
+    n_samples = neighbors_data.shape[-1]
+    order = np.argsort(neighbors_data, axis=0)
+    keep_order = order[1:-1, :]
+    
+    channel_data = data[index].copy()
     for i in range(n_samples):
-        vals = neighbors_data[:, i]  # shape (n_neighbors,)
-        idx_sort = np.argsort(vals)  # length n_neighbors
-
-        keep_loc = idx_sort[1:-1]  # length = n_neighbors - 2
-
-        keep_inds = neighbor_indices.flatten()[keep_loc]
-        keep_indices[i, :] = keep_inds
-
-    channel_data = data[index].copy()  # shape (n_samples,)
-
-    for i in range(n_samples):
-        inds = keep_indices[i, :]  # (n_neighbors−2,)
-        weights = interpolate_matrix[inds, index]  # (n_neighbors−2,)
+        keep_ind = neighbor_indices[keep_order[:, i]]
+        weights = interpolate_matrix[keep_ind, index]
         weights = weights / np.linalg.norm(weights)
-        channel_data[i] = np.average(data[inds, i], weights=weights)
-
+        channel_data[i] = np.average(data[keep_ind, i], weights=weights)
     return channel_data
