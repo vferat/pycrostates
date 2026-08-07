@@ -143,6 +143,9 @@ def apply_spatial_filter(
     info = pick_info(inst.info, picks)
     # adjacency matrix
     adjacency, ch_names = _check_adjacency(adjacency, info, ch_type)
+    # add self to its neighbors
+    adjacency.setdiag(1)
+    
     if exclude_bads:
         for c, chan in enumerate(ch_names):
             if chan in inst.info["bads"]:
@@ -215,6 +218,5 @@ def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix):
     for i in range(n_samples):
         keep_ind = neighbor_indices[keep_order[:, i]]
         weights = interpolate_matrix[keep_ind, index]
-        weights = weights / np.linalg.norm(weights)
         channel_data[i] = np.average(data[keep_ind, i], weights=weights)
     return channel_data
