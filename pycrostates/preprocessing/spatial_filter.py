@@ -145,7 +145,7 @@ def apply_spatial_filter(
     adjacency, ch_names = _check_adjacency(adjacency, info, ch_type)
     # add self to its neighbors
     adjacency.setdiag(1)
-    
+
     if exclude_bads:
         for c, chan in enumerate(ch_names):
             if chan in inst.info["bads"]:
