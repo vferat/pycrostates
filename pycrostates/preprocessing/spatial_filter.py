@@ -196,7 +196,8 @@ def apply_spatial_filter(
 
 
 def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix):
-    """
+    """Apply spatial filter to a single channel.
+
     For each channel (given by 'index'), take its neighbours (adjacency_vector==1),
     drop exactly one max and one min at each time-point (so that the kept count is
     fixed across time), and then interpolate using those weights.
