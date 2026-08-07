@@ -47,7 +47,8 @@ def calinski_harabasz_score(cluster):  # higher the better
     labels = labels[keep]
     # Align polarities just in case..
     x = cluster.cluster_centers_[labels].T
-    sign = np.sign((x.T * data.T).sum(axis=1))
+    # Keep a valid polarity factor even for zero dot products.
+    sign = np.where((x.T * data.T).sum(axis=1) < 0, -1.0, 1.0)
     data = data * sign
     score = _calinski_harabasz_score(data.T, labels)
     return score
@@ -68,8 +69,9 @@ def _calinski_harabasz_score(X, labels):
     for k in range(n_labels):
         cluster_k = X[labels == k]
         mean_k = np.mean(cluster_k, axis=0)
-        extra_disp += len(cluster_k) * _distance_matrix([mean_k], [mean])[-1, 0]
-        intra_disp += np.sum(_distance_matrix(cluster_k, [mean_k])[-1:, :-1])
+        # Mirror sklearn's CH structure with squared distance-like terms.
+        extra_disp += len(cluster_k) * _distance_matrix([mean_k], [mean])[-1, 0] ** 2
+        intra_disp += np.sum(_distance_matrix(cluster_k, [mean_k])[-1:, :-1] ** 2)
 
     return (
         1.0
