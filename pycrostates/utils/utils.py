@@ -54,6 +54,8 @@ def _corr_vectors(A, B, axis=0):
 def _distance_matrix(X, Y=None):
     """Distance matrix used in metrics."""
     distances = 1 - np.abs(np.corrcoef(X, Y))
+    distances = np.nan_to_num(distances, nan=0.0, posinf=1.0, neginf=0.0)
+    distances = np.clip(distances, 0.0, 1.0)
     return distances
 
 
