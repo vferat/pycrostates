@@ -207,7 +207,7 @@ def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix):
     n_samples = neighbors_data.shape[-1]
     order = np.argsort(neighbors_data, axis=0)
     keep_order = order[1:-1, :]
-    
+
     channel_data = data[index].copy()
     for i in range(n_samples):
         keep_ind = neighbor_indices[keep_order[:, i]]
