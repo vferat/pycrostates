@@ -69,6 +69,11 @@ def test_metrics_with_orthogonal_sample_are_stable():
     orth /= np.linalg.norm(orth)
     modified._fitted_data[:, sample] = orth
 
-    for scorer in (silhouette_score, calinski_harabasz_score, dunn_score, davies_bouldin_score):
+    for scorer in (
+        silhouette_score,
+        calinski_harabasz_score,
+        dunn_score,
+        davies_bouldin_score,
+    ):
         value = scorer(modified)
         assert np.isfinite(value)
