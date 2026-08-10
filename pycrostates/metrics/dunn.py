@@ -59,8 +59,10 @@ def _dunn_score(X, labels):  # higher the better
     """
     distances = _distance_matrix(X)
     ks = np.sort(np.unique(labels))
+    if len(ks) < 2:
+        raise ValueError("Number of labels is 1. Valid values are 2 to n_samples - 1.")
 
-    deltas = np.ones([len(ks), len(ks)]) * 1000000
+    deltas = np.ones([len(ks), len(ks)]) * np.inf
     big_deltas = np.zeros([len(ks), 1])
 
     for i, ks_i in enumerate(ks):
@@ -70,13 +72,18 @@ def _dunn_score(X, labels):  # higher the better
             deltas[i, j] = _delta_fast((labels == ks_i), (labels == ks_j), distances)
         big_deltas[i] = _big_delta_fast((labels == ks_i), distances)
 
-    di = np.min(deltas) / np.max(big_deltas)
+    numerator = np.min(deltas)
+    denominator = np.max(big_deltas)
+    if np.isclose(denominator, 0):
+        return np.inf if numerator > 0 else 0.0
+    di = numerator / denominator
     return di
 
 
 def _delta_fast(ck, cl, distances):
     values = distances[np.where(ck)][:, np.where(cl)]
-    values = values[np.nonzero(values)]
+    if values.size == 0:
+        return 0.0
     return np.min(values)
 
 
