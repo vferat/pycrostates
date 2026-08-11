@@ -1,4 +1,5 @@
 from ..cluster._base import _BaseCluster as _BaseCluster
+from ..utils import _distance_matrix as _distance_matrix
 from ..utils._checks import _check_type as _check_type
 from ..utils._docs import fill_doc as fill_doc
 
@@ -25,9 +26,13 @@ def calinski_harabasz_score(cluster):
     Notes
     -----
     For more details regarding the implementation, please refer to
-    :func:`sklearn.metrics.calinski_harabasz_score`.
+    :func:`sklearn.metrics.calinski_harabasz_score`. This implementation is modified
+    to use absolute spatial correlation for distance computations instead of the
+    Euclidean distance.
 
     References
     ----------
     .. footbibliography::
     """
+
+def _calinski_harabasz_score(X, labels): ...
