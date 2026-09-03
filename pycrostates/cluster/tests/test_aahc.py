@@ -781,7 +781,9 @@ def test_predict_default(caplog):
     caplog.clear()
 
     # raw, min_corr, no smoothing, no edge rejection
-    segmentation = aah_cluster.predict(raw_eeg, min_corr=0.5, factor=0, reject_edges=False)
+    segmentation = aah_cluster.predict(
+        raw_eeg, min_corr=0.5, factor=0, reject_edges=False
+    )
     assert isinstance(segmentation, RawSegmentation)
     assert "Rejecting samples with correlation below" in caplog.text
     caplog.clear()

@@ -125,4 +125,3 @@ def test_smooth_segmentation_skips_too_short_subsegments(monkeypatch):
     )
     assert calls == []
     assert smoothed.tolist() == labels.tolist()
-
