@@ -589,7 +589,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         algorithm\ :footcite:p:`Marqui1995`.
 
         .. note::
-            This method allows several options to alters the segmentation process. 
+            This method allows several options to alters the segmentation process.
             Pycrostates will always apply the modifications in the following order:
 
             1. Reject by annotation (``reject_by_annotation``).
@@ -597,14 +597,14 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             3. Reject first and last segments (``reject_edges``).
             4. Temporal smoothing (``factor`` and ``half_window_size``).
             5. Minimum segment length rejetion (``min_segment_length``).
-            
+
             Whenever a step creates ``unlabeled`` samples, these samples will be ignored
             in the next steps.
-            
+
             Some of these options can achieve similar goals. More specifically,
-            temporal smoothing and minimum segment length rejection are both used to 
-            reject short, transient artefacts in the segmentation. Therefore, 
-            it is recommended to use only one of these two. 
+            temporal smoothing and minimum segment length rejection are both used to
+            reject short, transient artefacts in the segmentation. Therefore,
+            it is recommended to use only one of these two.
 
         Parameters
         ----------
@@ -626,7 +626,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             Default to ``None``.
 
             .. versionadded:: 0.7.0
-                Before version 0.7.0, the behavior of the function was not to reject any sample, 
+                Before version 0.7.0, the behavior of the function was not to reject any sample,
                 which is equivalent to setting ``min_corr`` to ``0`` or ``None``.
 
         factor : int
@@ -789,16 +789,24 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         )
 
         # minimum correlation
-        _check_type(min_corr, ("numeric", None,), item_name="min_corr")
+        _check_type(
+            min_corr,
+            (
+                "numeric",
+                None,
+            ),
+            item_name="min_corr",
+        )
         if min_corr is None:
             min_corr = 0
         if not 0 <= min_corr < 1:
             raise ValueError("'min_corr' must be 0 <= min_corr < 1.")
-        
+
         # logging messages
         if min_corr < 1:
             logger.info(
-            "Rejecting samples with correlation below %.2f %% (min_corr).", min_corr*100
+                "Rejecting samples with correlation below %.2f %% (min_corr).",
+                min_corr * 100,
             )
         if factor == 0:
             logger.info("Segmenting data without smoothing.")
@@ -882,9 +890,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
                 data_ = data[:, onset:end]
                 segment = _BaseCluster._segment(
-                    data_, cluster_centers_, 
-                    min_corr,
-                    factor, tol, half_window_size
+                    data_, cluster_centers_, min_corr, factor, tol, half_window_size
                 )
                 if reject_edges:
                     segment = _BaseCluster._reject_edge_segments(segment)
@@ -892,9 +898,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         else:
             segmentation = _BaseCluster._segment(
-                data, cluster_centers_,
-                min_corr,
-                factor, tol, half_window_size
+                data, cluster_centers_, min_corr, factor, tol, half_window_size
             )
             if reject_edges:
                 segmentation = _BaseCluster._reject_edge_segments(segmentation)
@@ -942,9 +946,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         segments = []
         for epoch_data in data:
             segment = _BaseCluster._segment(
-                epoch_data, cluster_centers_,
-                min_corr,
-                factor, tol, half_window_size
+                epoch_data, cluster_centers_, min_corr, factor, tol, half_window_size
             )
 
             if 0 < min_segment_length:

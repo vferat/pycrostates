@@ -735,9 +735,7 @@ def test_predict_default(caplog):
     caplog.clear()
 
     # raw with min_corr and smoothing
-    segmentation = ModK.predict(
-        raw_eeg, min_corr=0.5, factor=3, reject_edges=False
-    )
+    segmentation = ModK.predict(raw_eeg, min_corr=0.5, factor=3, reject_edges=False)
     assert isinstance(segmentation, RawSegmentation)
 
     # raw with min_corr, smoothing, and min_segment_length
