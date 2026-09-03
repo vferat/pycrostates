@@ -1137,12 +1137,6 @@ def test_predict_invalid_arguments():
         TypeError, match="'reject_by_annotation' must be an instance of "
     ):
         aah_cluster.predict(raw_eeg, reject_by_annotation=1)
-        with pytest.raises(ValueError, match="Only one datatype can be selected"):
-            aah_cluster.predict(raw, picks=None)  # fails -> eeg + grad + mag
-        with pytest.raises(ValueError, match="Only one datatype can be selected"):
-            aah_cluster.predict(raw, picks="meg")  # fails -> grad + mag
-        with pytest.raises(ValueError, match="Only one datatype can be selected"):
-            aah_cluster.predict(raw, picks="data")  # fails -> eeg + grad + mag
     with pytest.raises(ValueError, match="'reject_by_annotation' can be"):
         aah_cluster.predict(raw_eeg, reject_by_annotation="101")
 

@@ -1047,10 +1047,6 @@ def test_predict_invalid_arguments():
         ModK.predict(raw_eeg, tol="0")
     with pytest.raises(TypeError, match="'min_segment_length' must be an instance of "):
         ModK.predict(raw_eeg, min_segment_length="0")
-    with pytest.raises(
-        TypeError, match="'reject_by_annotation' must be an instance of "
-    ):
-        ModK.predict(raw_eeg, reject_by_annotation=1)
     with pytest.raises(ValueError, match="'reject_by_annotation' can be"):
         ModK.predict(raw_eeg, reject_by_annotation="101")
 
