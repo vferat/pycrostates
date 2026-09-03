@@ -621,13 +621,15 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             ``info['bads']`` will be included if their names or indices are explicitly
             provided.
         min_corr : float | None
-            All samples with correlation below this value will be set to unlabeled (``-1``).
+            All samples with correlation below this value will be set to 
+            unlabeled (``-1``).
             If ``None``, the value is set to ``0`` and no rejection is applied.
             Default to ``None``.
 
             .. versionadded:: 0.7.0
-                Before version 0.7.0, the behavior of the function was not to reject any sample,
-                which is equivalent to setting ``min_corr`` to ``0`` or ``None``.
+                Before version 0.7.0, the behavior of the function was not to reject 
+                any sample, which is equivalent to setting ``min_corr`` to 
+                ``0`` or ``None``.
 
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing. Default to 0.
@@ -1010,7 +1012,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         tol: int | float,
         half_window_size: int,
     ) -> ScalarIntArray:
-        """Apply smoothing independently on each contiguous run of labeled (!=-1) samples.
+        """Apply smoothing independently on each contiguous run of labeled samples.
 
         Unlabeled (-1) samples split the sequence into sub-segments (e.g.
         ``11111222333-1-1111122233`` gives ``[11111222333]`` and ``[111122233]``)
