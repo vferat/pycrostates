@@ -69,4 +69,60 @@ def test_reject_short_segments():
     assert [0, 0, 1, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2] == segmentation
 
 
-# TODO: Add tests for _smooth_segmentation and _segment?
+def test_smooth_segmentation_splits_on_unlabeled(monkeypatch):
+    """Test that smoothing is applied independently on runs split by -1 labels."""
+    # "11111222333-1-1111122233" -> sub-segments of length 11 and 9
+    labels = np.array(
+        [1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, -1, -1, 1, 1, 1, 1, 2, 2, 2, 3, 3]
+    )
+    n_channels = 3
+    data = np.zeros((n_channels, labels.size))
+    states = np.zeros((4, n_channels))  # labels go up to 3
+
+    calls = []
+
+    def fake_smooth_segment(data_, states_, labels_, factor, tol, half_window_size):
+        calls.append(labels_.copy())
+        return np.full(labels_.shape, 99)
+
+    monkeypatch.setattr(
+        _BaseCluster, "_smooth_segment", staticmethod(fake_smooth_segment)
+    )
+
+    smoothed = _BaseCluster._smooth_segmentation(
+        data, states, labels, factor=1, tol=1e-4, half_window_size=1
+    )
+
+    # only the 2 unlabeled-free sub-segments are smoothed independently
+    assert len(calls) == 2
+    assert calls[0].tolist() == labels[:11].tolist()
+    assert calls[1].tolist() == labels[13:].tolist()
+
+    expected = labels.copy()
+    expected[:11] = 99
+    expected[13:] = 99
+    assert smoothed.tolist() == expected.tolist()
+    # -1 samples are left untouched
+    assert (smoothed[11:13] == -1).all()
+
+
+def test_smooth_segmentation_skips_too_short_subsegments(monkeypatch):
+    """Test that sub-segments shorter than the smoothing window are left untouched."""
+    labels = np.array([1, 1, 1, -1, -1, 2, 2, 2])
+    data = np.zeros((3, labels.size))
+    states = np.zeros((3, 3))
+
+    calls = []
+    monkeypatch.setattr(
+        _BaseCluster,
+        "_smooth_segment",
+        staticmethod(lambda *args, **kwargs: calls.append(1) or args[2]),
+    )
+
+    # half_window_size=2 requires sub-segments of at least 5 samples
+    smoothed = _BaseCluster._smooth_segmentation(
+        data, states, labels, factor=1, tol=1e-4, half_window_size=2
+    )
+    assert calls == []
+    assert smoothed.tolist() == labels.tolist()
+

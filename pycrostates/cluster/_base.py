@@ -573,6 +573,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         inst: BaseRaw | BaseEpochs,
         picks: Picks = None,
+        min_corr: float | None = None,
         factor: int = 0,
         half_window_size: int = 1,
         tol: int | float = 10e-6,
@@ -586,6 +587,24 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         Segment instance into microstate sequence using the segmentation smoothing
         algorithm\ :footcite:p:`Marqui1995`.
+
+        .. note::
+            This method allows several options to alters the segmentation process. 
+            Pycrostates will always apply the modifications in the following order:
+
+            1. Reject by annotation (``reject_by_annotation``).
+            2. Reject samples with low correlation (``min_corr``).
+            3. Reject first and last segments (``reject_edges``).
+            4. Temporal smoothing (``factor`` and ``half_window_size``).
+            5. Minimum segment length rejetion (``min_segment_length``).
+            
+            Whenever a step creates ``unlabeled`` samples, these samples will be ignored
+            in the next steps.
+            
+            Some of these options can achieve similar goals. More specifically,
+            temporal smoothing and minimum segment length rejection are both used to 
+            reject short, transient artefacts in the segmentation. Therefore, 
+            it is recommended to use only one of these two. 
 
         Parameters
         ----------
@@ -601,6 +620,15 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             used during fitting (e.g., ``self.info['ch_names']``). Note that channels in
             ``info['bads']`` will be included if their names or indices are explicitly
             provided.
+        min_corr : float | None
+            All samples with correlation below this value will be set to unlabeled (``-1``).
+            If ``None``, the value is set to ``0`` and no rejection is applied.
+            Default to ``None``.
+
+            .. versionadded:: 0.7.0
+                Before version 0.7.0, the behavior of the function was not to reject any sample, 
+                which is equivalent to setting ``min_corr`` to ``0`` or ``None``.
+
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing. Default to 0.
         half_window_size : int
@@ -760,7 +788,18 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             inst.info, self._info["ch_names"], none="all", exclude=[]
         )
 
+        # minimum correlation
+        _check_type(min_corr, ("numeric", None,), item_name="min_corr")
+        if min_corr is None:
+            min_corr = 0
+        if not 0 <= min_corr < 1:
+            raise ValueError("'min_corr' must be 0 <= min_corr < 1.")
+        
         # logging messages
+        if min_corr < 1:
+            logger.info(
+            "Rejecting samples with correlation below %.2f %% (min_corr).", min_corr*100
+            )
         if factor == 0:
             logger.info("Segmenting data without smoothing.")
         else:
@@ -782,6 +821,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             segmentation = self._predict_raw(
                 inst,
                 picks_data,
+                min_corr,
                 factor,
                 tol,
                 half_window_size,
@@ -793,6 +833,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             segmentation = self._predict_epochs(
                 inst,
                 picks_data,
+                min_corr,
                 factor,
                 tol,
                 half_window_size,
@@ -805,6 +846,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         raw: BaseRaw,
         picks_data: ScalarIntArray,
+        min_corr: float,
         factor: int,
         tol: int | float,
         half_window_size: int,
@@ -815,6 +857,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         """Create segmentation for raw."""
         predict_parameters = {
             "factor": factor,
+            "min_corr": min_corr,
             "tol": tol,
             "half_window_size": half_window_size,
             "min_segment_length": min_segment_length,
@@ -839,7 +882,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
                 data_ = data[:, onset:end]
                 segment = _BaseCluster._segment(
-                    data_, cluster_centers_, factor, tol, half_window_size
+                    data_, cluster_centers_, 
+                    min_corr,
+                    factor, tol, half_window_size
                 )
                 if reject_edges:
                     segment = _BaseCluster._reject_edge_segments(segment)
@@ -847,7 +892,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         else:
             segmentation = _BaseCluster._segment(
-                data, cluster_centers_, factor, tol, half_window_size
+                data, cluster_centers_,
+                min_corr,
+                factor, tol, half_window_size
             )
             if reject_edges:
                 segmentation = _BaseCluster._reject_edge_segments(segmentation)
@@ -870,6 +917,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         epochs: BaseEpochs,
         picks_data: ScalarIntArray,
+        min_corr: float,
         factor: int,
         tol: int | float,
         half_window_size: int,
@@ -879,6 +927,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         """Create segmentation for epochs."""
         predict_parameters = {
             "factor": factor,
+            "min_corr": min_corr,
             "tol": tol,
             "half_window_size": half_window_size,
             "min_segment_length": min_segment_length,
@@ -893,7 +942,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         segments = []
         for epoch_data in data:
             segment = _BaseCluster._segment(
-                epoch_data, cluster_centers_, factor, tol, half_window_size
+                epoch_data, cluster_centers_,
+                min_corr,
+                factor, tol, half_window_size
             )
 
             if 0 < min_segment_length:
@@ -919,6 +970,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     def _segment(
         data: ScalarFloatArray,
         states: ScalarFloatArray,
+        min_corr: float,
         factor: int,
         tol: int | float,
         half_window_size: int,
@@ -932,8 +984,14 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         states -= np.mean(states, axis=1)[:, np.newaxis]
         states /= np.std(states, axis=1)[:, np.newaxis]
 
+        # segment
         labels = np.argmax(np.abs(np.dot(states, data)), axis=0)
 
+        # reject low correlation
+        corr = np.abs(_corr_vectors(states[labels].T, data))
+        labels[corr < min_corr] = -1
+
+        # smooth segmentation
         if factor != 0:
             labels = _BaseCluster._smooth_segmentation(
                 data, states, labels, factor, tol, half_window_size
@@ -950,7 +1008,35 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         tol: int | float,
         half_window_size: int,
     ) -> ScalarIntArray:
-        """Apply smoothing.
+        """Apply smoothing independently on each contiguous run of labeled (!=-1) samples.
+
+        Unlabeled (-1) samples split the sequence into sub-segments (e.g.
+        ``11111222333-1-1111122233`` gives ``[11111222333]`` and ``[111122233]``)
+        which are smoothed separately and recombined, leaving -1 samples untouched.
+        """
+        smoothed_labels = labels.copy()
+        boundaries = np.flatnonzero(labels == -1)
+        starts = np.r_[0, boundaries + 1]
+        ends = np.r_[boundaries, labels.size]
+        for start, end in zip(starts, ends, strict=False):
+            if end - start >= 2 * half_window_size + 1:
+                sl = slice(start, end)
+                smoothed_labels[sl] = _BaseCluster._smooth_segment(
+                    data[:, sl], states, labels[sl], factor, tol, half_window_size
+                )
+
+        return smoothed_labels
+
+    @staticmethod
+    def _smooth_segment(
+        data: ScalarFloatArray,
+        states: ScalarFloatArray,
+        labels: ScalarIntArray,
+        factor: int,
+        tol: int | float,
+        half_window_size: int,
+    ) -> ScalarIntArray:
+        """Apply smoothing on a segment containing no -1 labels.
 
         Adapted from [1].
 
