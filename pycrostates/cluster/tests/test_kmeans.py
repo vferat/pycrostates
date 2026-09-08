@@ -735,8 +735,29 @@ def test_predict_default(caplog):
     caplog.clear()
 
     # raw with min_corr and smoothing
-    segmentation = ModK.predict(raw_eeg, min_corr=0.5, factor=3, reject_edges=False)
-    assert isinstance(segmentation, RawSegmentation)
+    segmentation_0 = ModK.predict(
+        raw_eeg, min_corr=0.5, factor=0, min_segment_length=0, reject_edges=False
+    )
+    assert isinstance(segmentation_0, RawSegmentation)
+    n_unlabeled_0 = np.sum(segmentation_0._labels == -1)
+    assert n_unlabeled_0 > 0
+    segmentation_1 = ModK.predict(
+        raw_eeg, min_corr=0.5, factor=5, min_segment_length=0, reject_edges=False
+    )
+    n_unlabeled_1 = np.sum(segmentation_1._labels == -1)
+    assert isinstance(segmentation_1, RawSegmentation)
+    assert n_unlabeled_1 > 0
+    # Smoothing should not change the number of unlabeled samples
+    assert n_unlabeled_0 == n_unlabeled_1
+
+    segmentation_2 = ModK.predict(
+        raw_eeg, min_corr=0.5, factor=0, min_segment_length=5, reject_edges=False
+    )
+    n_unlabeled_2 = np.sum(segmentation_2._labels == -1)
+    assert isinstance(segmentation_2, RawSegmentation)
+    assert n_unlabeled_2 > 0
+    # min_segment_length can increase the number of unlabeled samples
+    assert n_unlabeled_0 <= n_unlabeled_2
 
     # raw with min_corr, smoothing, and min_segment_length
     segmentation = ModK.predict(

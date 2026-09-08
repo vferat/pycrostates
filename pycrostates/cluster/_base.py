@@ -606,6 +606,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             reject short, transient artefacts in the segmentation. Therefore,
             it is recommended to use only one of these two.
 
+            Since minimum segment length rejetion can reassign timepoints to
+            neighboring segments, it is possible that the final segmentation
+            contains timepoints with correlation smaller than ``min_corr``.
+
+
         Parameters
         ----------
         inst : Raw | Epochs
