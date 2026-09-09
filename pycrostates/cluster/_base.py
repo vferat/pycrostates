@@ -610,7 +610,6 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             neighboring segments, it is possible that the final segmentation
             contains timepoints with correlation smaller than ``min_corr``.
 
-
         Parameters
         ----------
         inst : Raw | Epochs
