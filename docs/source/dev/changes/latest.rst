@@ -19,6 +19,7 @@ Enhancements
 
 - Update ``pycrostates`` function to use different GFP computation functions based on data type (:pr:`197` by `Victor Férat`_).
 - Update the distance function used in ``pycrostates.metrics`` from ``1 / |corrcoef|`` to ``1 - |corrcoef|`` (:pr:`220` by `Victor Férat`_).
+- Add optional correlation-threshold rejection to cluster prediction and apply smoothing independently between unlabeled samples. (:pr:`291` by `Victor Férat`_).
 
 Bugs
 ~~~~
@@ -29,4 +30,4 @@ Bugs
 API and behavior changes
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-- xxx
+- Add optional correlation-threshold rejection to cluster prediction and apply smoothing independently between unlabeled samples. (:pr:`291` by `Victor Férat`_).

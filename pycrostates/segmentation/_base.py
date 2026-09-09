@@ -370,6 +370,7 @@ class _BaseSegmentation(ABC):
             return None
         # valid keys from pycrostates prediction
         valid_keys = (
+            "min_corr",
             "factor",
             "tol",
             "half_window_size",
