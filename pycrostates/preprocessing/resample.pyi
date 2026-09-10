@@ -68,11 +68,9 @@ def resample(
         Whether or not to allow resampling with replacement.
     random_state : None | int | instance of ~numpy.random.RandomState
         A seed for the NumPy random number generator (RNG). If ``None`` (default),
-        the seed will be  obtained from the operating system
-        (see  :class:`~numpy.random.RandomState` for details), meaning it will most
-        likely produce different output every time this function or method is run.
-        To achieve reproducible results, pass a value here to explicitly initialize
-        the RNG with a defined state.
+        NumPy's global :class:`~numpy.random.RandomState` singleton is used.
+        Pass an int to use a new ``RandomState`` seeded with that value, or a
+        ``RandomState`` to control the random-number stream.
     verbose : int | str | bool | None
         Sets the verbosity level. The verbosity increases gradually between ``"CRITICAL"``,
         ``"ERROR"``, ``"WARNING"``, ``"INFO"`` and ``"DEBUG"``. If None is provided, the

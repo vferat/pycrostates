@@ -261,6 +261,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         inst: BaseRaw | BaseEpochs,
         picks: Picks = None,
+        min_corr: float | None = None,
         factor: int = 0,
         half_window_size: int = 1,
         tol: int | float = 1e-05,
@@ -274,6 +275,28 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         Segment instance into microstate sequence using the segmentation smoothing
         algorithm\\ :footcite:p:`Marqui1995`.
+
+        .. note::
+            This method allows several options to alters the segmentation process.
+            Pycrostates will always apply the modifications in the following order:
+
+            1. Reject by annotation (``reject_by_annotation``).
+            2. Reject samples with low correlation (``min_corr``).
+            3. Reject first and last segments (``reject_edges``).
+            4. Temporal smoothing (``factor`` and ``half_window_size``).
+            5. Minimum segment length rejetion (``min_segment_length``).
+
+            Whenever a step creates ``unlabeled`` samples, these samples will be ignored
+            in the next steps.
+
+            Some of these options can achieve similar goals. More specifically,
+            temporal smoothing and minimum segment length rejection are both used to
+            reject short, transient artefacts in the segmentation. Therefore,
+            it is recommended to use only one of these two.
+
+            Since minimum segment length rejetion can reassign timepoints to
+            neighboring segments, it is possible that the final segmentation
+            contains timepoints with correlation smaller than ``min_corr``.
 
         Parameters
         ----------
@@ -289,6 +312,17 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             used during fitting (e.g., ``self.info['ch_names']``). Note that channels in
             ``info['bads']`` will be included if their names or indices are explicitly
             provided.
+        min_corr : float | None
+            All samples with correlation below this value will be set to
+            unlabeled (``-1``).
+            If ``None``, the value is set to ``0`` and no rejection is applied.
+            Default to ``None``.
+
+            .. versionadded:: 0.7.0
+                Before version 0.7.0, the behavior of the function was not to reject
+                any sample, which is equivalent to setting ``min_corr`` to
+                ``0`` or ``None``.
+
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing. Default to 0.
         half_window_size : int
@@ -331,6 +365,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         raw: BaseRaw,
         picks_data: ScalarIntArray,
+        min_corr: float,
         factor: int,
         tol: int | float,
         half_window_size: int,
@@ -344,6 +379,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         self,
         epochs: BaseEpochs,
         picks_data: ScalarIntArray,
+        min_corr: float,
         factor: int,
         tol: int | float,
         half_window_size: int,
@@ -356,6 +392,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     def _segment(
         data: ScalarFloatArray,
         states: ScalarFloatArray,
+        min_corr: float,
         factor: int,
         tol: int | float,
         half_window_size: int,
@@ -371,7 +408,23 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         tol: int | float,
         half_window_size: int,
     ) -> ScalarIntArray:
-        """Apply smoothing.
+        """Apply smoothing independently on each contiguous run of labeled samples.
+
+        Unlabeled (-1) samples split the sequence into sub-segments (e.g.
+        ``11111222333-1-1111122233`` gives ``[11111222333]`` and ``[111122233]``)
+        which are smoothed separately and recombined, leaving -1 samples untouched.
+        """
+
+    @staticmethod
+    def _smooth_segment(
+        data: ScalarFloatArray,
+        states: ScalarFloatArray,
+        labels: ScalarIntArray,
+        factor: int,
+        tol: int | float,
+        half_window_size: int,
+    ) -> ScalarIntArray:
+        """Apply smoothing on a segment containing no -1 labels.
 
         Adapted from [1].
 
