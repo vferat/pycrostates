@@ -40,9 +40,7 @@ def test_reject_short_segments_basic():
             [3, 3, 3, 3, 3, 3, 3, 6, 4, 5, 2, 2, 2],
         ]
     )
-    segmentation = _BaseCluster._reject_short_segments_basic(segmentation,
-                                                        data,
-                                                        3)
+    segmentation = _BaseCluster._reject_short_segments_basic(segmentation, data, 3)
     # solo 1 should turn to 2; initial 0 should not change
     assert [0, 0, 1, 1, 1, 3, 3, 3, 2, 2, 2, 2, 2] == segmentation
 
@@ -55,9 +53,7 @@ def test_reject_short_segments_basic():
             [3, 3, 3, 3, 3, 3, 3, 6, 4, 4, 6, 2, 2, 2],
         ]
     )
-    segmentation = _BaseCluster._reject_short_segments_basic(segmentation,
-                                                       data,
-                                                       3)
+    segmentation = _BaseCluster._reject_short_segments_basic(segmentation, data, 3)
     assert [0, 0, 1, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2, 2] == segmentation
 
     # singleton, same correlation
@@ -71,7 +67,6 @@ def test_reject_short_segments_basic():
     )
     segmentation = _BaseCluster._reject_short_segments_basic(segmentation, data, 3)
     assert [0, 0, 1, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2] == segmentation
-
 
 
 def test_reject_short_segments_ranked():
@@ -88,10 +83,24 @@ def test_reject_short_segments_ranked():
     data = cluster_centers[segmentation]
     print(data.shape)
     print(cluster_centers.shape)
-    
-    segmentation = _BaseCluster._reject_short_segments_ranked(segmentation, data, cluster_centers, 3)
-    assert [0, 0, 1, 1, 1, 3, 3, 3, 2, 2, 2, 2,
-            ] == segmentation
+
+    segmentation = _BaseCluster._reject_short_segments_ranked(
+        segmentation, data, cluster_centers, 3
+    )
+    assert [
+        0,
+        0,
+        1,
+        1,
+        1,
+        3,
+        3,
+        3,
+        2,
+        2,
+        2,
+        2,
+    ] == segmentation
 
 
 def test_smooth_segmentation_splits_on_unlabeled(monkeypatch):
