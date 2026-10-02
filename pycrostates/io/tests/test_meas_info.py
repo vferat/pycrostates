@@ -23,7 +23,7 @@ directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname, preload=False)
 montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
-compensation_grade = 0 if check_version("mne", "1.13") else None
+compensation_grade = 0 if check_version("mne", "1.14") else None
 
 
 def test_create_from_info():
