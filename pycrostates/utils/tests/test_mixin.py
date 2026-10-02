@@ -8,7 +8,7 @@ from pycrostates.io import ChInfo
 from pycrostates.utils.mixin import ContainsMixin, MontageMixin
 
 montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
-
+compensation_grade = 0 if check_version("mne", "1.13") else None
 
 class Foo(ContainsMixin, MontageMixin):
     def __init__(self, info):
@@ -36,7 +36,7 @@ def test_contains_mixin():
     info = ChInfo(ch_names=5, ch_types=ch_types)
     foo = Foo(info)
     assert "eeg" in foo
-    assert foo.compensation_grade is None
+    assert foo.compensation_grade == compensation_grade
     assert foo.get_channel_types() == ch_types
 
     # test with info equal to None

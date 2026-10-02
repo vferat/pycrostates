@@ -1162,7 +1162,7 @@ def test_randomseed():
 def test_contains_mixin():
     """Test contains mixin class."""
     assert "eeg" in ModK
-    assert ModK.compensation_grade is None
+    assert ModK.== 0
     assert ModK.get_channel_types() == ["eeg"] * ModK._info["nchan"]
 
     # test raise with non-fitted instance

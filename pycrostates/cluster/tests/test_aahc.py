@@ -29,6 +29,7 @@ logger.propagate = True
 directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
 montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
+compensation_grade = 0 if check_version("mne", "1.13") else None
 
 
 # raw
@@ -1144,7 +1145,7 @@ def test_predict_invalid_arguments():
 def test_contains_mixin():
     """Test contains mixin class."""
     assert "eeg" in aah_cluster
-    assert aah_cluster.compensation_grade is None
+    assert aah_cluster.compensation_grade == compensation_grade
     assert aah_cluster.get_channel_types() == ["eeg"] * aah_cluster._info["nchan"]
 
     # test raise with non-fitted instance
