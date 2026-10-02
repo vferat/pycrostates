@@ -149,7 +149,7 @@ from pycrostates.metrics import (
 from pycrostates.preprocessing import extract_gfp_peaks
 
 
-cluster_numbers = range(2, 9)
+cluster_numbers = range(3, 9)
 scores = {
     "Silhouette": np.zeros(len(cluster_numbers)),
     "Calinski-Harabasaz": np.zeros(len(cluster_numbers)),
@@ -203,19 +203,13 @@ plt.show()
 # --------------
 # We can compare the different scores on a barplot using
 # :func:`matplotlib.pyplot.bar`. However, each score spans a different scale,
-# often several order of magnitude different from the others. First, we will
-# normalize each score to unit norm. Except for Davies-Bouldin score, the
-# general rule is the higher the better. Thus, the Davies-Bouldin scores will
-# be inverted.
-
-# invert davies-bouldin scores
-scores["Davies-Bouldin"] = 1 / (1 + scores["Davies-Bouldin"])
-
-# normalize scores using sklearn
-from sklearn.preprocessing import normalize
-
+# often several order of magnitude different from the others. To compare them,
+# we min-max scale every score between 0 and 1 and invert Davies-Bouldin so
+# that higher values are better for every metric.
 scores = {
-    score: normalize(value[:, np.newaxis], axis=0).ravel()
+    score: (value.max() - value) / (value.max() - value.min())
+    if score == "Davies-Bouldin"
+    else (value - value.min()) / (value.max() - value.min())
     for score, value in scores.items()
 }
 
@@ -242,7 +236,7 @@ for k, (score, values) in enumerate(scores.items()):
     )
 # add labels and legend
 plt.xlabel("Number of clusters")
-plt.ylabel("Score normalize to unit norm")
+plt.ylabel("Min-max normalized score")
 plt.xticks(
     [pos + 1.5 * barWidth for pos in range(len(cluster_numbers))],
     [str(k) for k in cluster_numbers],
@@ -269,16 +263,13 @@ plt.show()
 # several clustering solutions.
 
 # %%
-# Microstates fitted for n=5
+# Microstates fitted for n=4
 # --------------------------
-# In this case, ``n_clusters=5`` seems like a reasonable choice. This number of
+# In this case, ``n_clusters=4`` seems like a reasonable choice. This number of
 # clusters yields the following maps:
 
-ModK = ModKMeans(n_clusters=5, random_state=42)
+ModK = ModKMeans(n_clusters=4, random_state=42)
 ModK.fit(gfp_peaks, n_jobs=2, verbose="WARNING")
-
-ModK.reorder_clusters(order=[4, 1, 3, 0, 2])
-ModK.rename_clusters(new_names=["A", "B", "C", "D", "E"])
 ModK.plot()
 
 

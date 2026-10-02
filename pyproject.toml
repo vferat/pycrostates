@@ -4,7 +4,7 @@ requires = ['setuptools >= 64.0.0']
 
 [project]
 authors = [
-  {email = 'victor.ferat@unige.ch', name = 'Victor Férat'},
+  { email = 'victor.ferat@unige.ch', name = 'Victor Férat' },
 ]
 classifiers = [
   'Intended Audience :: Developers',
@@ -44,10 +44,10 @@ keywords = [
   'neuroscience',
   'python',
 ]
-license = {file = 'LICENSE'}
+license = { file = 'LICENSE' }
 maintainers = [
-  {email = 'mathieu.scheltienne@gmail.com', name = 'Mathieu Scheltienne'},
-  {email = 'victor.ferat@unige.ch', name = 'Victor Férat'},
+  { email = 'mathieu.scheltienne@gmail.com', name = 'Mathieu Scheltienne' },
+  { email = 'victor.ferat@unige.ch', name = 'Victor Férat' },
 ]
 name = 'pycrostates'
 readme = 'README.md'

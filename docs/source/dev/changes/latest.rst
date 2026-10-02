@@ -18,13 +18,17 @@ Enhancements
 ~~~~~~~~~~~~
 
 - Update ``pycrostates`` function to use different GFP computation functions based on data type (:pr:`197` by `Victor Férat`_).
+- Update the distance function used in ``pycrostates.metrics`` from ``1 / |corrcoef|`` to ``1 - |corrcoef|`` (:pr:`220` by `Victor Férat`_).
+- Add optional correlation-threshold rejection to cluster prediction and apply smoothing independently between unlabeled samples. (:pr:`291` by `Victor Férat`_).
 
 Bugs
 ~~~~
 
 - Update montage name from ``standard_1020`` to ``colin27_1005`` for mne.version >= 1.13 (:pr:`276` by `Victor Férat`_).
+- Fix bug in ``_channel_spatial_filter`` function that caused an error when the several neighbours had the same value (:pr:`235` by `Victor Férat`_, `Armen Bagdasarov`_ and `Rohan Kandasamy`_).
 
 API and behavior changes
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Update ``pycrostates.cluster._base._BaseCluster._segment`` to match reference implementation by applying L2 normalization  (:pr:`274` by `Frederic von Wegner`_).
+- Add optional correlation-threshold rejection to cluster prediction and apply smoothing independently between unlabeled samples. (:pr:`291` by `Victor Férat`_).

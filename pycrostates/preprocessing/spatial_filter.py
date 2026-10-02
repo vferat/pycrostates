@@ -56,6 +56,13 @@ def _check_adjacency(adjacency, info, ch_type):
         )
     if not np.array_equal(adjacency, adjacency.astype(bool)):
         raise ValueError("Values contained in adjacency can only be 0 or 1.")
+
+    # check if diagonal is 1
+    if not np.all(np.diag(adjacency) == 1):
+        logger.warning(
+            "Diagonal of adjacency matrix is not 1. "
+            "Some channels might not be used to interpolate themselves."
+        )
     return (adjacency, ch_names)
 
 
@@ -161,6 +168,7 @@ def apply_spatial_filter(
         )
     pos = pos - origin
     interpolate_matrix = _make_interpolation_matrix(pos, pos)
+
     # retrieve data
     data = inst.get_data(picks=picks)
     if isinstance(inst, BaseEpochs):
@@ -196,28 +204,24 @@ def apply_spatial_filter(
 
 
 def _channel_spatial_filter(index, data, adjacency_vector, interpolate_matrix):
+    """Apply spatial filter to a single channel.
+
+    For each channel (given by 'index'), take its neighbours (adjacency_vector==1),
+    drop exactly one max and one min at each time-point (so that the kept count is
+    fixed across time), and then interpolate using those weights.
+    """
     neighbors_data = data[adjacency_vector == 1, :]
-    neighbor_indices = np.argwhere(adjacency_vector == 1)
-    # too much bads /edge
+    neighbor_indices = np.argwhere(adjacency_vector == 1).flatten()
     if len(neighbor_indices) <= 3:
-        print(index)
         return data[index]
-    # neighbor_matrix shape (n_neighbor, n_samples)
-    neighbor_matrix = np.array([neighbor_indices.flatten().tolist()] * data.shape[-1]).T
 
-    # Create a mask
-    max_mask = neighbors_data == np.amax(neighbors_data, keepdims=True, axis=0)
-    min_mask = neighbors_data == np.amin(neighbors_data, keepdims=True, axis=0)
-    keep_mask = ~(max_mask | min_mask)
+    n_samples = neighbors_data.shape[-1]
+    order = np.argsort(neighbors_data, axis=0)
+    keep_order = order[1:-1, :]
 
-    keep_indices = np.array(
-        [neighbor_matrix[:, i][keep_mask[:, i]] for i in range(keep_mask.shape[-1])]
-    )
-    channel_data = data[index]
-    for i, keep_ind in enumerate(keep_indices):
+    channel_data = data[index].copy()
+    for i in range(n_samples):
+        keep_ind = neighbor_indices[keep_order[:, i]]
         weights = interpolate_matrix[keep_ind, index]
-        # normalize weights
-        weights = weights / np.linalg.norm(weights)
-        # average
         channel_data[i] = np.average(data[keep_ind, i], weights=weights)
     return channel_data

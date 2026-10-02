@@ -704,20 +704,24 @@ def test_predict_default(caplog):
     assert "Segmenting data without smoothing" in caplog.text
     caplog.clear()
 
-    # raw, no smoothing, with edge rejection
+    # raw, min_corr, no smoothing, no edge rejection
+    segmentation = ModK.predict(raw_eeg, min_corr=0.5, factor=0, reject_edges=False)
+    assert isinstance(segmentation, RawSegmentation)
+    assert "Rejecting samples with correlation below" in caplog.text
+    caplog.clear()
+
+    # raw, no min_corr, with smoothing, no edge rejection
+    segmentation = ModK.predict(raw_eeg, factor=3, reject_edges=False)
+    assert isinstance(segmentation, RawSegmentation)
+    assert "Segmenting data with factor 3" in caplog.text
+    caplog.clear()
+
+    # raw, no min_corr, no smoothing, with edge rejection
     segmentation = ModK.predict(raw_eeg, factor=0, reject_edges=True)
     assert isinstance(segmentation, RawSegmentation)
     assert segmentation._labels[0] == -1
     assert segmentation._labels[-1] == -1
     assert "Rejecting first and last segments." in caplog.text
-    caplog.clear()
-
-    # raw, with smoothing
-    segmentation = ModK.predict(raw_eeg, factor=3, reject_edges=True)
-    assert isinstance(segmentation, RawSegmentation)
-    assert segmentation._labels[0] == -1
-    assert segmentation._labels[-1] == -1
-    assert "Segmenting data with factor 3" in caplog.text
     caplog.clear()
 
     # raw with min_segment_length
@@ -729,6 +733,41 @@ def test_predict_default(caplog):
     assert all(5 <= size for size in segment_lengths[1:-1])
     assert "Rejecting segments shorter than" in caplog.text
     caplog.clear()
+
+    # raw with min_corr and smoothing
+    segmentation_0 = ModK.predict(
+        raw_eeg, min_corr=0.5, factor=0, min_segment_length=0, reject_edges=False
+    )
+    assert isinstance(segmentation_0, RawSegmentation)
+    n_unlabeled_0 = np.sum(segmentation_0._labels == -1)
+    assert n_unlabeled_0 > 0
+    segmentation_1 = ModK.predict(
+        raw_eeg, min_corr=0.5, factor=5, min_segment_length=0, reject_edges=False
+    )
+    n_unlabeled_1 = np.sum(segmentation_1._labels == -1)
+    assert isinstance(segmentation_1, RawSegmentation)
+    assert n_unlabeled_1 > 0
+    # Smoothing should not change the number of unlabeled samples
+    assert n_unlabeled_0 == n_unlabeled_1
+
+    segmentation_2 = ModK.predict(
+        raw_eeg, min_corr=0.5, factor=0, min_segment_length=5, reject_edges=False
+    )
+    n_unlabeled_2 = np.sum(segmentation_2._labels == -1)
+    assert isinstance(segmentation_2, RawSegmentation)
+    assert n_unlabeled_2 > 0
+    # min_segment_length can increase the number of unlabeled samples
+    assert n_unlabeled_0 <= n_unlabeled_2
+
+    # raw with min_corr, smoothing, and min_segment_length
+    segmentation = ModK.predict(
+        raw_eeg,
+        min_corr=0.5,
+        factor=3,
+        min_segment_length=5,
+        reject_edges=False,
+    )
+    assert isinstance(segmentation, RawSegmentation)
 
     # epochs, no smoothing, no_edge
     segmentation = ModK.predict(epochs_eeg, factor=0, reject_edges=False)
@@ -809,6 +848,44 @@ def test_predict_default(caplog):
     assert not np.allclose(
         segmentation2._labels, segmentation3._labels, rtol=1e-7, atol=0
     )
+
+
+@pytest.mark.parametrize(
+    ("min_corr", "factor", "min_segment_length"),
+    [
+        (None, 0, 0),
+        (None, 0, 5),
+        (None, 3, 0),
+        (None, 3, 5),
+        (0.5, 0, 0),
+        (0.5, 0, 5),
+        (0.5, 3, 0),
+        (0.5, 3, 5),
+    ],
+)
+def test_predict_parameter_combinations(min_corr, factor, min_segment_length):
+    """Test combinations of correlation and temporal rejection parameters."""
+    segmentation = ModK.predict(
+        raw_eeg,
+        min_corr=min_corr,
+        factor=factor,
+        min_segment_length=min_segment_length,
+        reject_edges=False,
+    )
+    labels = segmentation._labels
+
+    if min_corr is not None:
+        assert np.any(labels == -1)
+        unsmoothed = ModK.predict(
+            raw_eeg, min_corr=min_corr, factor=0, reject_edges=False
+        )._labels
+        assert np.all(labels[unsmoothed == -1] == -1)
+
+    if min_segment_length:
+        segments = [(label, list(group)) for label, group in groupby(labels)]
+        for label, segment in segments[1:-1]:
+            if label != -1:
+                assert len(segment) >= min_segment_length
 
 
 def test_picks_fit_predict(caplog):
@@ -991,10 +1068,6 @@ def test_predict_invalid_arguments():
         ModK.predict(raw_eeg, tol="0")
     with pytest.raises(TypeError, match="'min_segment_length' must be an instance of "):
         ModK.predict(raw_eeg, min_segment_length="0")
-    with pytest.raises(
-        TypeError, match="'reject_by_annotation' must be an instance of "
-    ):
-        ModK.predict(raw_eeg, reject_by_annotation=1)
     with pytest.raises(ValueError, match="'reject_by_annotation' can be"):
         ModK.predict(raw_eeg, reject_by_annotation="101")
 
