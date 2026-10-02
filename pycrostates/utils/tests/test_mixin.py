@@ -10,6 +10,7 @@ from pycrostates.utils.mixin import ContainsMixin, MontageMixin
 montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
 compensation_grade = 0 if check_version("mne", "1.13") else None
 
+
 class Foo(ContainsMixin, MontageMixin):
     def __init__(self, info):
         self.info = info
