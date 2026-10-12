@@ -11,13 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: astral-sh/setup-uv@v7
         with:
+          activate-environment: true
           python-version: 3.13
-      - name: Install uv and package
-        run: |
-          python -m pip install --quiet uv
-          uv pip install --quiet --system -e .[build,stubs]
+      - run: uv sync -q --locked --no-default-groups --group stubs
       - run: pycrostates-sys_info --developer
       - run: python tools/stubgen.py
       - name: Build and publish
@@ -25,6 +23,6 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN  }}
         run: |
-          python -m build
-          twine check dist/*
-          twine upload dist/*
+          uv build
+          uvx twine check --strict dist/*
+          uvx twine upload dist/*
