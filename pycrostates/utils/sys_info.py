@@ -12,6 +12,11 @@ from packaging.requirements import Requirement
 
 from ._checks import _check_type
 
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
+
 
 def sys_info(fid: IO | None = None, *, extra: bool = False, developer: bool = False):
     """Print the system information for debugging.
@@ -71,11 +76,6 @@ def sys_info(fid: IO | None = None, *, extra: bool = False, developer: bool = Fa
             _list_dependencies_info(out, ljust, package, extra_dependencies)
 
     if developer:
-        if sys.version_info >= (3, 11):
-            import tomllib
-        else:
-            import tomli as tomllib
-
         # following PEP 735, dependency-groups are intentionally omitted from metadata,
         # thus we need to parse the pyproject.toml file directly.
         origin = Path(find_spec(package).origin)
