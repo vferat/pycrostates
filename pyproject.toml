@@ -56,6 +56,7 @@ dependencies = [
   'psutil',
   'scikit-learn',
   'scipy',
+  'tomli; python_version < "3.11"',
 ]
 description = 'A simple open source Python package for EEG microstate segmentation.'
 keywords = [
