@@ -6,7 +6,7 @@ repos:
             files: pycrostates
 
     - repo: https://github.com/astral-sh/ruff-pre-commit
-      rev: v0.16.10
+      rev: v0.17.0
       hooks:
           - id: ruff
             name: ruff linter
@@ -30,11 +30,10 @@ repos:
             additional_dependencies: [tomli]
 
     - repo: https://github.com/mscheltienne/bibclean
-      rev: 0.8.0
+      rev: 1.0.0
       hooks:
           - id: bibclean-fix
             files: docs/references.bib
-            args: [--exit-non-zero-on-fix]
 
     - repo: https://github.com/pappasam/toml-sort
       rev: v0.25.0
