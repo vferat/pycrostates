@@ -2,7 +2,9 @@ import platform
 import sys
 from collections.abc import Callable
 from functools import partial
-from importlib.metadata import requires, version
+from importlib.metadata import metadata, requires, version
+from importlib.util import find_spec
+from pathlib import Path
 from typing import IO
 
 import psutil
@@ -11,7 +13,7 @@ from packaging.requirements import Requirement
 from ._checks import _check_type
 
 
-def sys_info(fid: IO | None = None, developer: bool = False):
+def sys_info(fid: IO | None = None, *, extra: bool = False, developer: bool = False):
     """Print the system information for debugging.
 
     Parameters
@@ -19,9 +21,13 @@ def sys_info(fid: IO | None = None, developer: bool = False):
     fid : file-like | None
         The file to write to, passed to :func:`print`. Can be None to use
         :data:`sys.stdout`.
-    developer : bool
+    extra : bool
         If True, display information about optional dependencies.
+    developer : bool
+        If True, display information about developer dependencies. Only available for
+        the package installed in editable mode.
     """
+    _check_type(extra, (bool,), "extra")
     _check_type(developer, (bool,), "developer")
 
     ljust = 26
@@ -51,15 +57,9 @@ def sys_info(fid: IO | None = None, developer: bool = False):
     core_dependencies = [dep for dep in dependencies if "extra" not in str(dep.marker)]
     _list_dependencies_info(out, ljust, package, core_dependencies)
 
-    # extras
-    if developer:
-        keys = (
-            "build",
-            "docs",
-            "test",
-            "style",
-        )
-        for key in keys:
+    if extra:
+        extras = metadata(package).get_all("Provides-Extra") or []
+        for key in sorted(elt for elt in extras if elt != "all"):
             extra_dependencies = [
                 dep
                 for dep in dependencies
@@ -69,6 +69,29 @@ def sys_info(fid: IO | None = None, developer: bool = False):
                 continue
             out(f"\nOptional '{key}' dependencies\n")
             _list_dependencies_info(out, ljust, package, extra_dependencies)
+
+    if developer:
+        if sys.version_info >= (3, 11):
+            import tomllib
+        else:
+            import tomli as tomllib
+
+        # following PEP 735, dependency-groups are intentionally omitted from metadata,
+        # thus we need to parse the pyproject.toml file directly.
+        origin = Path(find_spec(package).origin)
+        pyproject = origin.parents[1] / "pyproject.toml"
+        if not pyproject.exists():
+            raise RuntimeError(
+                f"The pyproject.toml file for the package {package} could not be "
+                "found. To retrieve developer dependencies, please install the package "
+                "from source in an editable install, e.g. using 'uv sync'."
+            )
+        pyproject_data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+        dependency_groups = pyproject_data.get("dependency-groups", {})
+        for key in sorted(dependency_groups):
+            dependencies = [Requirement(dep) for dep in dependency_groups[key]]
+            out(f"\nDeveloper '{key}' dependencies\n")
+            _list_dependencies_info(out, ljust, package, dependencies)
 
 
 def _list_dependencies_info(
