@@ -2,6 +2,28 @@
 build-backend = 'setuptools.build_meta'
 requires = ['setuptools >= 64.0.0']
 
+[dependency-groups]
+stubs = [
+  'isort',
+  'mypy',
+  'ruff>=0.1.8',
+]
+style = [
+  'bibclean>=1.0; python_version >= "3.11"',
+  'codespell[toml]>=2.2.4',
+  'isort',
+  'pre-commit',
+  'pydocstyle[toml]',
+  'ruff>=0.1.8',
+  'toml-sort',
+  'yamllint',
+]
+test = [
+  'pymatreader',
+  'pytest-cov',
+  'pytest>=8.0',
+]
+
 [project]
 authors = [
   { email = 'victor.ferat@unige.ch', name = 'Victor Férat' },
@@ -34,6 +56,7 @@ dependencies = [
   'psutil',
   'scikit-learn',
   'scipy',
+  'tomli; python_version < "3.11"',
 ]
 description = 'A simple open source Python package for EEG microstate segmentation.'
 keywords = [
@@ -56,12 +79,8 @@ version = '0.7.0.dev0'
 
 [project.optional-dependencies]
 all = [
-  'pycrostates[build]',
   'pycrostates[docs]',
-  'pycrostates[style]',
-  'pycrostates[test]',
 ]
-build = ['build', 'twine']
 docs = [
   'intersphinx_registry',
   'memory-profiler',
@@ -76,25 +95,6 @@ docs = [
   'sphinx-issues',
   'sphinx_gallery',
   'sphinxcontrib-bibtex',
-]
-stubs = [
-  'isort',
-  'mypy',
-  'ruff>=0.1.8',
-]
-style = [
-  'bibclean',
-  'codespell[toml]>=2.2.4',
-  'isort',
-  'pydocstyle[toml]',
-  'ruff>=0.1.8',
-  'toml-sort',
-  'yamllint',
-]
-test = [
-  'pymatreader',
-  'pytest-cov',
-  'pytest>=8.0',
 ]
 
 [project.scripts]
@@ -197,3 +197,6 @@ include = ['pycrostates*']
 all = true
 ignore_case = true
 trailing_comma_inline_array = true
+
+[tool.uv]
+default-groups = 'all'

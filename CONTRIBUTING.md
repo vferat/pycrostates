@@ -23,10 +23,17 @@ Once the contribution discussed, you can propose a change by creating a new pull
 
 - Navigate to the repository's root folder
 
-- Install pycrostates in editable mode with all optional dependencies:
+- Install pycrostates in editable mode with all development dependency groups
+  (`stubs`, `style`, `test`) and the `docs` extra:
 
     ```console
-    pip install -e .[all]
+    uv sync --extra docs
+    ```
+
+    or, with `pip>=25.1`:
+
+    ```console
+    pip install -e .[docs] --group stubs --group style --group test
     ```
 
 - Make your changes.
