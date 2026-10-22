@@ -1,5 +1,6 @@
 from __future__ import annotations  # c.f. PEP 563, PEP 649
 
+import heapq
 from abc import ABC, abstractmethod
 from copy import copy, deepcopy
 from itertools import groupby
@@ -578,6 +579,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         half_window_size: int = 1,
         tol: int | float = 10e-6,
         min_segment_length: int = 0,
+        min_segment_method: str = "ranked",
         reject_edges: bool = True,
         reject_by_annotation: bool = True,
         *,
@@ -647,6 +649,22 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             Minimum segment length (in samples). If a segment is shorter than this
             value, it will be recursively reasigned to neighbouring segments based on
             absolute spatial correlation.
+        min_segment_method : ``'ranked'`` | ``'basic'``
+            Method used to reject segments shorter than ``min_segment_length``. It has
+            no effect if ``min_segment_length=0`` (default).
+
+            * ``'ranked'``: short segments are processed from shortest to longest
+              (ties are broken by lowest mean absolute correlation with their own
+              cluster center). Each sample is reassigned to the left or right
+              neighbouring segment based on its absolute spatial correlation with the
+              neighbouring cluster centers.
+            * ``'basic'``: short segments are processed from left to right. Each
+              sample is reassigned to the left or right neighbouring segment based on
+              its absolute spatial correlation with the adjacent data samples.
+
+            Default to ``'ranked'``.
+
+            .. versionadded:: 0.7.0
         reject_edges : bool
             If ``True``, set first and last segments to unlabeled.
         %(reject_by_annotation_raw)s
@@ -671,6 +689,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         _check_type(half_window_size, ("int",), item_name="half_window_size")
         _check_type(tol, ("numeric",), item_name="tol")
         _check_type(min_segment_length, ("int",), item_name="min_segment_length")
+        _check_value(
+            min_segment_method, ("ranked", "basic"), item_name="min_segment_method"
+        )
         _check_type(reject_edges, (bool,), item_name="reject_edges")
         _check_type(
             reject_by_annotation,
@@ -840,6 +861,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 tol,
                 half_window_size,
                 min_segment_length,
+                min_segment_method,
                 reject_edges,
                 reject_by_annotation,
             )
@@ -852,6 +874,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 tol,
                 half_window_size,
                 min_segment_length,
+                min_segment_method,
                 reject_edges,
             )
         return segmentation
@@ -865,6 +888,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         tol: int | float,
         half_window_size: int,
         min_segment_length: int,
+        min_segment_method: str,
         reject_edges: bool,
         reject_by_annotation: bool,
     ) -> RawSegmentation:
@@ -875,6 +899,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             "tol": tol,
             "half_window_size": half_window_size,
             "min_segment_length": min_segment_length,
+            "min_segment_method": min_segment_method,
             "reject_edges": reject_edges,
             "reject_by_annotation": reject_by_annotation,
         }
@@ -911,7 +936,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         if 0 < min_segment_length:
             segmentation = _BaseCluster._reject_short_segments(
-                segmentation, data, min_segment_length
+                segmentation,
+                data,
+                cluster_centers_,
+                min_segment_length,
+                method=min_segment_method,
             )
 
         # Provide properties to copy the arrays
@@ -932,6 +961,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         tol: int | float,
         half_window_size: int,
         min_segment_length: int,
+        min_segment_method: str,
         reject_edges: bool,
     ) -> EpochsSegmentation:
         """Create segmentation for epochs."""
@@ -941,6 +971,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             "tol": tol,
             "half_window_size": half_window_size,
             "min_segment_length": min_segment_length,
+            "min_segment_method": min_segment_method,
             "reject_edges": reject_edges,
         }
 
@@ -957,7 +988,11 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
             if 0 < min_segment_length:
                 segment = _BaseCluster._reject_short_segments(
-                    segment, epoch_data, min_segment_length
+                    segment,
+                    epoch_data,
+                    cluster_centers_,
+                    min_segment_length,
+                    method=min_segment_method,
                 )
             if reject_edges:
                 segment = _BaseCluster._reject_edge_segments(segment)
@@ -1093,6 +1128,28 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     def _reject_short_segments(
         segmentation: ScalarIntArray,
         data: ScalarFloatArray,
+        cluster_centers: ScalarFloatArray,
+        min_segment_length: int,
+        method: str = "basic",
+    ) -> ScalarIntArray:
+        """Reject segments that are too short.
+
+        Reject segments that are too short by replacing the labels with the adjacent
+        labels based on data correlation.
+        """
+        if method == "basic":
+            return _BaseCluster._reject_short_segments_basic(
+                segmentation, data, min_segment_length
+            )
+        elif method == "ranked":
+            return _BaseCluster._reject_short_segments_ranked(
+                segmentation, data, cluster_centers, min_segment_length
+            )
+
+    @staticmethod
+    def _reject_short_segments_basic(
+        segmentation: ScalarIntArray,
+        data: ScalarFloatArray,
         min_segment_length: int,
     ) -> ScalarIntArray:
         """Reject segments that are too short.
@@ -1159,6 +1216,156 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 break
             else:
                 break  # stop while loop because all segments are long enough
+
+        return segmentation
+
+    @staticmethod
+    def _reject_short_segments_ranked(
+        segmentation: ScalarIntArray,
+        data: ScalarFloatArray,
+        cluster_centers: ScalarFloatArray,
+        min_segment_length: int,
+    ) -> ScalarIntArray:
+        """Reject segments that are too short."""
+
+        def _find_segments(arr):
+            if arr.size == 0:
+                e = np.array([], dtype=int)
+                return e, e, np.array([], dtype=arr.dtype)
+            cp = np.flatnonzero(np.diff(arr)) + 1
+            starts = np.concatenate(([0], cp))
+            ends = np.concatenate((cp, [arr.size]))  # exclusive
+            return starts, ends, arr[starts]
+
+        def _tile(map_vec, n_samples):
+            """Broadcast a single (n_channels,) map to (n_channels, n_samples)."""
+            return np.broadcast_to(map_vec[:, None], (map_vec.shape[0], n_samples))
+
+        segmentation = np.asarray(segmentation).copy()
+
+        N = segmentation.size
+        if N == 0 or min_segment_length <= 0:
+            return segmentation
+
+        def _mean_corr(label, l, r):
+            seg = data[:, l : r + 1]
+            map_tiled = _tile(cluster_centers[label, :], seg.shape[1])
+            return float(np.mean(np.abs(_corr_vectors(map_tiled, seg))))
+
+        # --- segment store: id -> [start, end(inclusive), label, prev_id, next_id, alive]
+        segs = {}
+        next_id = [0]
+
+        def new_seg(start, end, label, prev_id, nxt_id):
+            sid = next_id[0]
+            next_id[0] += 1
+            segs[sid] = [start, end, label, prev_id, nxt_id, True]
+            return sid
+
+        heap = []
+
+        def push_if_eligible(sid):
+            s, e, label, p, n, alive = segs[sid]
+            if not alive:
+                return
+            interior = s != 0 and e != N - 1
+            length = e - s + 1
+            if interior and label != -1 and length < min_segment_length:
+                corr = _mean_corr(label, s, e)
+                heapq.heappush(heap, (length, corr, s, sid))
+
+        # --- init from a full scan (only done once)
+        starts, ends, labels = _find_segments(segmentation)
+        ids = [
+            new_seg(starts[i], ends[i] - 1, labels[i], None, None)
+            for i in range(len(starts))
+        ]
+        for i, sid in enumerate(ids):
+            segs[sid][3] = ids[i - 1] if i > 0 else None
+            segs[sid][4] = ids[i + 1] if i < len(ids) - 1 else None
+        for sid in ids:
+            push_if_eligible(sid)
+
+        while heap:
+            length, corr, s, sid = heapq.heappop(heap)
+            if not segs[sid][5]:
+                continue  # stale entry
+
+            left, right, label, prev_id, next_id_, _ = segs[sid]
+            label_left = segs[prev_id][2]
+            label_right = segs[next_id_][2]
+
+            map_left = (
+                data[:, left - 1].T
+                if label_left == -1
+                else cluster_centers[label_left, :]
+            )
+            map_right = (
+                data[:, right + 1].T
+                if label_right == -1
+                else cluster_centers[label_right, :]
+            )
+
+            if label_left == label_right:
+                segmentation[left : right + 1] = label_left
+            else:
+                seg_slice = data[:, left : right + 1]
+                n = seg_slice.shape[1]
+                map_left_tiled = _tile(map_left, n)
+                map_right_tiled = _tile(map_right, n)
+
+                left_corrs = np.abs(_corr_vectors(map_left_tiled, seg_slice))
+                right_corrs = np.abs(_corr_vectors(seg_slice, map_right_tiled))
+
+                li, ri = 0, right - left
+                while li <= ri:
+                    lc, rc = left_corrs[li], right_corrs[ri]
+                    if np.abs(rc - lc) <= 1e-8:
+                        if li == ri:
+                            segmentation[left + li] = label_left
+                            li += 1
+                        else:
+                            segmentation[left + li] = label_left
+                            segmentation[left + ri] = label_right
+                            li += 1
+                            ri -= 1
+                    elif lc < rc:
+                        segmentation[left + ri] = label_right
+                        ri -= 1
+                    else:
+                        segmentation[left + li] = label_left
+                        li += 1
+
+            # --- local repair over [prev.start, next.end]
+            repair_start = segs[prev_id][0]
+            repair_end = segs[next_id_][1]
+            outer_prev = segs[prev_id][3]
+            outer_next = segs[next_id_][4]
+
+            segs[prev_id][5] = segs[sid][5] = segs[next_id_][5] = False  # retire
+
+            sub = segmentation[repair_start : repair_end + 1]
+            r_starts, r_ends, r_labels = _find_segments(sub)
+            new_ids = [
+                new_seg(
+                    repair_start + r_starts[i],
+                    repair_start + r_ends[i] - 1,
+                    r_labels[i],
+                    None,
+                    None,
+                )
+                for i in range(len(r_starts))
+            ]
+            for i, nid in enumerate(new_ids):
+                segs[nid][3] = new_ids[i - 1] if i > 0 else outer_prev
+                segs[nid][4] = new_ids[i + 1] if i < len(new_ids) - 1 else outer_next
+            if outer_prev is not None:
+                segs[outer_prev][4] = new_ids[0]
+            if outer_next is not None:
+                segs[outer_next][3] = new_ids[-1]
+
+            for nid in new_ids:
+                push_if_eligible(nid)
 
         return segmentation
 
