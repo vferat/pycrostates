@@ -23,6 +23,7 @@ directory = testing.data_path() / "MEG" / "sample"
 fname = directory / "sample_audvis_trunc_raw.fif"
 raw = read_raw_fif(fname, preload=False)
 montage_name = "colin27_1005" if check_version("mne", "1.13") else "standard_1005"
+compensation_grade = 0 if check_version("mne", "1.14") else None
 
 
 def test_create_from_info():
@@ -285,7 +286,7 @@ def test_contains():
     info.set_montage(montage_name)
     chinfo = ChInfo(info=info)
     assert chinfo.get_channel_types() == ["eeg"] * 3
-    assert chinfo.compensation_grade is None
+    assert chinfo.compensation_grade == compensation_grade
 
 
 def test_copy():

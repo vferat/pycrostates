@@ -1,7 +1,11 @@
 """Test config.py"""
 
 from io import StringIO
+from pathlib import Path
 
+import pytest
+
+import pycrostates
 from pycrostates.utils.sys_info import sys_info
 
 
@@ -26,11 +30,22 @@ def test_sys_info():
     assert "test" not in value
 
     out = StringIO()
+    sys_info(fid=out, extra=True)
+    value = out.getvalue()
+    out.close()
+    assert "Optional 'docs' dependencies" in value
+    assert "Developer" not in value
+
+
+@pytest.mark.skipif(
+    not (Path(pycrostates.__file__).parents[1] / "pyproject.toml").exists(),
+    reason="not editable install",
+)
+def test_sys_info_developer():
+    """Test info-showing utility, with developer dependencies."""
+    out = StringIO()
     sys_info(fid=out, developer=True)
     value = out.getvalue()
     out.close()
-
-    assert "build" in value
-    assert "docs" in value
-    assert "style" in value
-    assert "test" in value
+    assert "Developer 'style' dependencies" in value
+    assert "Developer 'test' dependencies" in value
