@@ -30,5 +30,5 @@ Bugs
 API and behavior changes
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Update ``pycrostates.cluster._base._BaseCluster._segment`` to match reference implementation by applying L2 normalization  (:pr:`274` by `Frederic von Wegner`_).
+- Fix the data and map normalization used for label smoothing to match the original Pascual-Marqui implementation. The effect of a given ``factor`` value on the segmentation changes (:pr:`274` by `Frederic von Wegner`_ and `Victor Férat`_).
 - Add optional correlation-threshold rejection to cluster prediction and apply smoothing independently between unlabeled samples. (:pr:`291` by `Victor Férat`_).

@@ -639,8 +639,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             Factor used for label smoothing. ``0`` means no smoothing. Default to 0.
 
             .. versionchanged:: 0.7
-                For a given ``Factor`` value, the effect on segmentation
-                now match the Koenig2011 :footcite:p:`Koenig2011` implementation.
+                For a given ``factor`` value, the effect on segmentation now
+                matches the original Pascual-Marqui :footcite:p:`Marqui1995`
+                implementation.
         half_window_size : int
             Number of samples used for the half window size while smoothing labels. The
             half window size is defined as ``window_size = 2 * half_window_size + 1``.
@@ -989,18 +990,17 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     ) -> ScalarIntArray:
         """Create segmentation.
 
-        Verified equivalent to the Matlab reference
-        implementation ``NormDim(M,2)/sqrt(Ns)`` (Koenig/SmoothLabels.m)
-        :footcite:p:`Koenig2011` by Frederic von Wegner with Claude assistance
-        (claude-sonnet-4-6, 2026-06-18).
+        The data is average-referenced without per-sample scaling and the maps are
+        L2-normalized, as in :footcite:t:`Marqui1995`. Must operate on a copy of
+        data and states.
 
         References
         ----------
         .. footbibliography::
         """
-        Ne = data.shape[0]
-        row_norms = np.linalg.norm(states, axis=1, keepdims=True)
-        states = states / (row_norms * np.sqrt(Ne))
+        data -= np.mean(data, axis=0)
+        states -= np.mean(states, axis=1)[:, np.newaxis]
+        states /= np.linalg.norm(states, axis=1, keepdims=True)
 
         # segment
         labels = np.argmax(np.abs(np.dot(states, data)), axis=0)
@@ -1056,10 +1056,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     ) -> ScalarIntArray:
         """Apply smoothing on a segment containing no -1 labels.
 
-        Adapted from :footcite:p:`Marqui1995`.
-        Verified equivalent to the Matlab reference
-        implementation (Koenig/SmoothLabels.m) by Frederic von Wegner with
-        Claude assistance (claude-sonnet-4-6, 2026-06-18).
+        Adapted from :footcite:p:`Marqui1995`. Expects average-referenced data and
+        unit-norm states.
 
         References
         ----------
