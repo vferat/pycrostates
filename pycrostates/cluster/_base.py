@@ -610,6 +610,23 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             neighboring segments, it is possible that the final segmentation
             contains timepoints with correlation smaller than ``min_corr``.
 
+        .. note::
+            The temporal smoothing follows the segmentation smoothing algorithm
+            (Table II) of :footcite:t:`Marqui1995`, with 2 deliberate differences:
+
+            - The neighborhood of a sample includes the sample itself, as in the
+              Matlab implementation of :footcite:t:`Koenig2011`, while the paper
+              excludes it. This favors keeping the current label and makes the
+              smoothing more stable.
+            - Samples near the edges of a segment are smoothed using a truncated
+              window, while the paper leaves the first and last
+              ``half_window_size`` samples unchanged. This matters for the short
+              segments created by ``min_corr`` and ``reject_by_annotation``.
+
+            If the smoothing oscillates between 2 segmentations, the one that best
+            fits the data is kept. A warning is logged if the smoothing does not
+            converge on some of the samples.
+
         Parameters
         ----------
         inst : Raw | Epochs
@@ -645,7 +662,8 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         half_window_size : int
             Number of samples used for the half window size while smoothing labels. The
             half window size is defined as ``window_size = 2 * half_window_size + 1``.
-            It has no effect if ``factor=0`` (default). Default to 1.
+            The window includes the current sample. It has no effect if ``factor=0``
+            (default). Default to 1.
         tol : float
             Convergence tolerance.
         min_segment_length : int
@@ -1070,9 +1088,20 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
     ) -> tuple[ScalarIntArray, bool]:
         """Apply smoothing on a segment containing no -1 labels.
 
-        Adapted from :footcite:p:`Marqui1995`. Expects average-referenced data and
-        unit-norm states. Returns the smoothed labels and whether the smoothing
-        converged within ``max_iter`` iterations.
+        Adapted from :footcite:p:`Marqui1995` (Table II), with 2 deliberate
+        differences:
+
+        - The neighbor count ``Nb`` includes the current sample ``t``, as in
+          ``SmoothLabels.m`` from :footcite:t:`Koenig2011`, while the paper excludes
+          it. This adds a bonus of ``factor`` to the current label, which dampens
+          oscillations of the synchronous update.
+        - All samples are updated, using a truncated window near the edges of the
+          segment, while the paper keeps the first and last ``half_window_size``
+          labels unchanged. This matters for the short segments created by
+          ``min_corr``.
+
+        Expects average-referenced data and unit-norm states. Returns the smoothed
+        labels and whether the smoothing converged within ``max_iter`` iterations.
 
         References
         ----------
@@ -1088,6 +1117,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         e = np.sum(Vvar - np.sum(np.dot(w.T, states).T * data, axis=0) ** 2) / (
             Nt * (Ne - 1)
         )
+        # the window includes the current sample, see docstring
         window = np.ones((1, 2 * half_window_size + 1))
 
         S0 = 0
