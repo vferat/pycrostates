@@ -83,15 +83,16 @@ def test_smooth_segmentation_splits_on_unlabeled(monkeypatch):
 
     def fake_smooth_segment(data_, states_, labels_, factor, tol, half_window_size):
         calls.append(labels_.copy())
-        return np.full(labels_.shape, 99)
+        return np.full(labels_.shape, 99), True
 
     monkeypatch.setattr(
         _BaseCluster, "_smooth_segment", staticmethod(fake_smooth_segment)
     )
 
-    smoothed = _BaseCluster._smooth_segmentation(
+    smoothed, n_unconverged = _BaseCluster._smooth_segmentation(
         data, states, labels, factor=1, tol=1e-4, half_window_size=1
     )
+    assert n_unconverged == 0
 
     # only the 2 unlabeled-free sub-segments are smoothed independently
     assert len(calls) == 2
@@ -116,12 +117,79 @@ def test_smooth_segmentation_skips_too_short_subsegments(monkeypatch):
     monkeypatch.setattr(
         _BaseCluster,
         "_smooth_segment",
-        staticmethod(lambda *args, **kwargs: calls.append(1) or args[2]),
+        staticmethod(lambda *args, **kwargs: calls.append(1) or (args[2], True)),
     )
 
     # half_window_size=2 requires sub-segments of at least 5 samples
-    smoothed = _BaseCluster._smooth_segmentation(
+    smoothed, _ = _BaseCluster._smooth_segmentation(
         data, states, labels, factor=1, tol=1e-4, half_window_size=2
     )
     assert calls == []
     assert smoothed.tolist() == labels.tolist()
+
+
+def _cycling_segment():
+    """Segment on which the synchronous smoothing update oscillates."""
+    rng = np.random.default_rng(125)
+    data = rng.standard_normal((8, 10))
+    states = rng.standard_normal((2, 8))
+    data -= data.mean(axis=0)
+    states -= states.mean(axis=1, keepdims=True)
+    states /= np.linalg.norm(states, axis=1, keepdims=True)
+    labels = np.argmax(np.abs(states @ data), axis=0)
+    return data, states, labels
+
+
+def _residual(data, states, labels):
+    Ne, Nt = data.shape
+    Vvar = np.sum(data * data, axis=0)
+    return np.sum(Vvar - np.sum(states[labels].T * data, axis=0) ** 2) / (Nt * (Ne - 1))
+
+
+def test_smooth_segment_cycle():
+    """Test that a 2-cycle stops on the labeling with the lowest residual."""
+    data, states, labels = _cycling_segment()
+    smoothed, converged = _BaseCluster._smooth_segment(
+        data, states, labels, factor=5, tol=10e-6, half_window_size=3
+    )
+    assert converged
+    # one more update moves to the other labeling of the cycle, which fits worse
+    other, _ = _BaseCluster._smooth_segment(
+        data, states, smoothed, factor=5, tol=10e-6, half_window_size=3, max_iter=1
+    )
+    assert not np.array_equal(other, smoothed)
+    assert _residual(data, states, smoothed) < _residual(data, states, other)
+
+
+def test_smooth_segment_max_iter():
+    """Test that smoothing reports non-convergence after max_iter iterations."""
+    data, states, labels = _cycling_segment()
+    _, converged = _BaseCluster._smooth_segment(
+        data, states, labels, factor=5, tol=10e-6, half_window_size=3, max_iter=1
+    )
+    assert not converged
+
+
+def test_smooth_segmentation_counts_unconverged(monkeypatch):
+    """Test that samples of non-converged sub-segments are counted."""
+    labels = np.array([0, 0, 0, -1, 1, 1, 1, 1, -1, 0, 0, 0])
+    data = np.zeros((3, labels.size))
+    states = np.zeros((3, 3))
+    # only the 4-sample sub-segment does not converge
+    monkeypatch.setattr(
+        _BaseCluster,
+        "_smooth_segment",
+        staticmethod(lambda *args, **kwargs: (args[2], args[2].size != 4)),
+    )
+    _, n_unconverged = _BaseCluster._smooth_segmentation(
+        data, states, labels, factor=1, tol=1e-4, half_window_size=1
+    )
+    assert n_unconverged == 4
+
+
+def test_warn_unconverged(caplog):
+    """Test the warning reporting the share of non-converged samples."""
+    _BaseCluster._warn_unconverged(0, 100)
+    assert "did not converge" not in caplog.text
+    _BaseCluster._warn_unconverged(5, 200)
+    assert "did not converge on 5 samples (2.50% of the data)" in caplog.text

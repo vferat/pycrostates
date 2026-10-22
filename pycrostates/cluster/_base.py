@@ -893,6 +893,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             # retrieve onsets/ends for BAD annotations
             onsets, ends = _annotations_starts_stops(raw, ["BAD"], invert=True)
             segmentation = np.full(data.shape[-1], -1)
+            n_unconverged = 0
 
             for onset, end in zip(onsets, ends, strict=False):
                 # small segments can't be smoothed
@@ -900,19 +901,21 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                     continue
 
                 data_ = data[:, onset:end]
-                segment = _BaseCluster._segment(
+                segment, n = _BaseCluster._segment(
                     data_, cluster_centers_, min_corr, factor, tol, half_window_size
                 )
+                n_unconverged += n
                 if reject_edges:
                     segment = _BaseCluster._reject_edge_segments(segment)
                 segmentation[onset:end] = segment
 
         else:
-            segmentation = _BaseCluster._segment(
+            segmentation, n_unconverged = _BaseCluster._segment(
                 data, cluster_centers_, min_corr, factor, tol, half_window_size
             )
             if reject_edges:
                 segmentation = _BaseCluster._reject_edge_segments(segmentation)
+        _BaseCluster._warn_unconverged(n_unconverged, segmentation.size)
 
         if 0 < min_segment_length:
             segmentation = _BaseCluster._reject_short_segments(
@@ -955,10 +958,12 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         cluster_centers_ = deepcopy(self._cluster_centers_)
 
         segments = []
+        n_unconverged = 0
         for epoch_data in data:
-            segment = _BaseCluster._segment(
+            segment, n = _BaseCluster._segment(
                 epoch_data, cluster_centers_, min_corr, factor, tol, half_window_size
             )
+            n_unconverged += n
 
             if 0 < min_segment_length:
                 segment = _BaseCluster._reject_short_segments(
@@ -968,6 +973,7 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
                 segment = _BaseCluster._reject_edge_segments(segment)
 
             segments.append(segment)
+        _BaseCluster._warn_unconverged(n_unconverged, data.shape[0] * data.shape[-1])
 
         # Provide properties to copy the arrays
         return EpochsSegmentation(
@@ -987,12 +993,13 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         factor: int,
         tol: int | float,
         half_window_size: int,
-    ) -> ScalarIntArray:
+    ) -> tuple[ScalarIntArray, int]:
         """Create segmentation.
 
         The data is average-referenced without per-sample scaling and the maps are
         L2-normalized, as in :footcite:t:`Marqui1995`. Must operate on a copy of
-        data and states.
+        data and states. Returns the labels and the number of samples on which the
+        smoothing did not converge.
 
         References
         ----------
@@ -1010,12 +1017,13 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         labels[corr < min_corr] = -1
 
         # smooth segmentation
+        n_unconverged = 0
         if factor != 0:
-            labels = _BaseCluster._smooth_segmentation(
+            labels, n_unconverged = _BaseCluster._smooth_segmentation(
                 data, states, labels, factor, tol, half_window_size
             )
 
-        return labels
+        return labels, n_unconverged
 
     @staticmethod
     def _smooth_segmentation(
@@ -1025,25 +1033,30 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         factor: int,
         tol: int | float,
         half_window_size: int,
-    ) -> ScalarIntArray:
+    ) -> tuple[ScalarIntArray, int]:
         """Apply smoothing independently on each contiguous run of labeled samples.
 
         Unlabeled (-1) samples split the sequence into sub-segments (e.g.
         ``11111222333-1-1111122233`` gives ``[11111222333]`` and ``[111122233]``)
         which are smoothed separately and recombined, leaving -1 samples untouched.
+        Returns the smoothed labels and the number of samples in sub-segments on
+        which the smoothing did not converge.
         """
         smoothed_labels = labels.copy()
+        n_unconverged = 0
         boundaries = np.flatnonzero(labels == -1)
         starts = np.r_[0, boundaries + 1]
         ends = np.r_[boundaries, labels.size]
         for start, end in zip(starts, ends, strict=False):
             if end - start >= 2 * half_window_size + 1:
                 sl = slice(start, end)
-                smoothed_labels[sl] = _BaseCluster._smooth_segment(
+                smoothed_labels[sl], converged = _BaseCluster._smooth_segment(
                     data[:, sl], states, labels[sl], factor, tol, half_window_size
                 )
+                if not converged:
+                    n_unconverged += end - start
 
-        return smoothed_labels
+        return smoothed_labels, n_unconverged
 
     @staticmethod
     def _smooth_segment(
@@ -1053,11 +1066,13 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         factor: int,
         tol: int | float,
         half_window_size: int,
-    ) -> ScalarIntArray:
+        max_iter: int = 1000,
+    ) -> tuple[ScalarIntArray, bool]:
         """Apply smoothing on a segment containing no -1 labels.
 
         Adapted from :footcite:p:`Marqui1995`. Expects average-referenced data and
-        unit-norm states.
+        unit-norm states. Returns the smoothed labels and whether the smoothing
+        converged within ``max_iter`` iterations.
 
         References
         ----------
@@ -1076,12 +1091,24 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         window = np.ones((1, 2 * half_window_size + 1))
 
         S0 = 0
-        while True:
+        prev_labels = None
+        for _ in range(max_iter):
             Nb = convolve2d(w, window, mode="same")
             x = (np.tile(Vvar, (Nu, 1)) - (np.dot(states, data)) ** 2) / (
                 2 * e * (Ne - 1)
             ) - factor * Nb
             dlt = np.argmin(x, axis=0)
+
+            # the synchronous update can oscillate between 2 labelings, in which
+            # case we keep the one with the lowest residual variance.
+            if prev_labels is not None and np.array_equal(dlt, prev_labels):
+                Sp = np.sum(
+                    Vvar - np.sum(states[prev_labels].T * data, axis=0) ** 2
+                ) / (Nt * (Ne - 1))
+                if Sp < S0:
+                    labels = prev_labels
+                break
+            prev_labels = labels
 
             labels = dlt
             w = np.zeros((Nu, Nt))
@@ -1092,8 +1119,22 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             if np.abs(Su - S0) <= np.abs(tol * Su):
                 break
             S0 = Su
+        else:
+            return labels, False
 
-        return labels
+        return labels, True
+
+    @staticmethod
+    def _warn_unconverged(n_unconverged: int, n_samples: int) -> None:
+        """Warn if the smoothing did not converge on some of the samples."""
+        if n_unconverged == 0:
+            return
+        logger.warning(
+            "Label smoothing did not converge on %i samples (%.2f%% of the data). "
+            "The labels from the last iteration are used for these samples.",
+            n_unconverged,
+            100 * n_unconverged / n_samples,
+        )
 
     @staticmethod
     def _reject_short_segments(
