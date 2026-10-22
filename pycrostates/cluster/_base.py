@@ -649,6 +649,22 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             Minimum segment length (in samples). If a segment is shorter than this
             value, it will be recursively reasigned to neighbouring segments based on
             absolute spatial correlation.
+        min_segment_method : ``'ranked'`` | ``'basic'``
+            Method used to reject segments shorter than ``min_segment_length``. It has
+            no effect if ``min_segment_length=0`` (default).
+
+            * ``'ranked'``: short segments are processed from shortest to longest
+              (ties are broken by lowest mean absolute correlation with their own
+              cluster center). Each sample is reassigned to the left or right
+              neighbouring segment based on its absolute spatial correlation with the
+              neighbouring cluster centers.
+            * ``'basic'``: short segments are processed from left to right. Each
+              sample is reassigned to the left or right neighbouring segment based on
+              its absolute spatial correlation with the adjacent data samples.
+
+            Default to ``'ranked'``.
+
+            .. versionadded:: 0.7.0
         reject_edges : bool
             If ``True``, set first and last segments to unlabeled.
         %(reject_by_annotation_raw)s
@@ -673,6 +689,9 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         _check_type(half_window_size, ("int",), item_name="half_window_size")
         _check_type(tol, ("numeric",), item_name="tol")
         _check_type(min_segment_length, ("int",), item_name="min_segment_length")
+        _check_value(
+            min_segment_method, ("ranked", "basic"), item_name="min_segment_method"
+        )
         _check_type(reject_edges, (bool,), item_name="reject_edges")
         _check_type(
             reject_by_annotation,
