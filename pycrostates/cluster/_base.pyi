@@ -298,6 +298,23 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
             neighboring segments, it is possible that the final segmentation
             contains timepoints with correlation smaller than ``min_corr``.
 
+        .. note::
+            The temporal smoothing follows the segmentation smoothing algorithm
+            (Table II) of :footcite:t:`Marqui1995`, with 2 deliberate differences:
+
+            - The neighborhood of a sample includes the sample itself, as in the
+              Matlab implementation of :footcite:t:`Koenig2011`, while the paper
+              excludes it. This favors keeping the current label and makes the
+              smoothing more stable.
+            - Samples near the edges of a segment are smoothed using a truncated
+              window, while the paper leaves the first and last
+              ``half_window_size`` samples unchanged. This matters for the short
+              segments created by ``min_corr`` and ``reject_by_annotation``.
+
+            If the smoothing oscillates between 2 segmentations, the one that best
+            fits the data is kept. A warning is logged if the smoothing does not
+            converge on some of the samples.
+
         Parameters
         ----------
         inst : Raw | Epochs
@@ -325,10 +342,16 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
 
         factor : int
             Factor used for label smoothing. ``0`` means no smoothing. Default to 0.
+
+            .. versionchanged:: 0.7
+                For a given ``factor`` value, the effect on segmentation now
+                matches the original Pascual-Marqui :footcite:p:`Marqui1995`
+                implementation.
         half_window_size : int
             Number of samples used for the half window size while smoothing labels. The
             half window size is defined as ``window_size = 2 * half_window_size + 1``.
-            It has no effect if ``factor=0`` (default). Default to 1.
+            The window includes the current sample. It has no effect if ``factor=0``
+            (default). Default to 1.
         tol : float
             Convergence tolerance.
         min_segment_length : int
@@ -396,8 +419,18 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         factor: int,
         tol: int | float,
         half_window_size: int,
-    ) -> ScalarIntArray:
-        """Create segmentation. Must operate on a copy of states."""
+    ) -> tuple[ScalarIntArray, int]:
+        """Create segmentation.
+
+        The data is average-referenced without per-sample scaling and the maps are
+        L2-normalized, as in :footcite:t:`Marqui1995`. Must operate on a copy of
+        data and states. Returns the labels and the number of samples on which the
+        smoothing did not converge.
+
+        References
+        ----------
+        .. footbibliography::
+        """
 
     @staticmethod
     def _smooth_segmentation(
@@ -407,12 +440,14 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         factor: int,
         tol: int | float,
         half_window_size: int,
-    ) -> ScalarIntArray:
+    ) -> tuple[ScalarIntArray, int]:
         """Apply smoothing independently on each contiguous run of labeled samples.
 
         Unlabeled (-1) samples split the sequence into sub-segments (e.g.
         ``11111222333-1-1111122233`` gives ``[11111222333]`` and ``[111122233]``)
         which are smoothed separately and recombined, leaving -1 samples untouched.
+        Returns the smoothed labels and the number of samples in sub-segments on
+        which the smoothing did not converge.
         """
 
     @staticmethod
@@ -423,20 +458,33 @@ class _BaseCluster(ABC, ChannelsMixin, ContainsMixin, MontageMixin):
         factor: int,
         tol: int | float,
         half_window_size: int,
-    ) -> ScalarIntArray:
+        max_iter: int = 1000,
+    ) -> tuple[ScalarIntArray, bool]:
         """Apply smoothing on a segment containing no -1 labels.
 
-        Adapted from [1].
+        Adapted from :footcite:p:`Marqui1995` (Table II), with 2 deliberate
+        differences:
+
+        - The neighbor count ``Nb`` includes the current sample ``t``, as in
+          ``SmoothLabels.m`` from :footcite:t:`Koenig2011`, while the paper excludes
+          it. This adds a bonus of ``factor`` to the current label, which dampens
+          oscillations of the synchronous update.
+        - All samples are updated, using a truncated window near the edges of the
+          segment, while the paper keeps the first and last ``half_window_size``
+          labels unchanged. This matters for the short segments created by
+          ``min_corr``.
+
+        Expects average-referenced data and unit-norm states. Returns the smoothed
+        labels and whether the smoothing converged within ``max_iter`` iterations.
 
         References
         ----------
-        .. [1] R. D. Pascual-Marqui, C. M. Michel and D. Lehmann.
-               Segmentation of brain electrical activity into microstates:
-               model estimation and validation.
-               IEEE Transactions on Biomedical Engineering,
-               vol. 42, no. 7, pp. 658-665, July 1995,
-               https://doi.org/10.1109/10.391164.
+        .. footbibliography::
         """
+
+    @staticmethod
+    def _warn_unconverged(n_unconverged: int, n_samples: int) -> None:
+        """Warn if the smoothing did not converge on some of the samples."""
 
     @staticmethod
     def _reject_short_segments(
