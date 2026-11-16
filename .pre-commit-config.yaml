@@ -1,12 +1,12 @@
 repos:
     - repo: https://github.com/pycqa/isort
-      rev: 10.0.0b2
+      rev: 10.0.0b3
       hooks:
           - id: isort
             files: pycrostates
 
     - repo: https://github.com/astral-sh/ruff-pre-commit
-      rev: v0.17.4
+      rev: v0.17.5
       hooks:
           - id: ruff
             name: ruff linter
@@ -36,7 +36,7 @@ repos:
             files: docs/references.bib
 
     - repo: https://github.com/pappasam/toml-sort
-      rev: v0.25.0
+      rev: v0.26.0
       hooks:
           - id: toml-sort-fix
             files: pyproject.toml
