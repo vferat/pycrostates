@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+from numpy.testing import assert_array_equal
 
 from pycrostates.cluster._base import _BaseCluster
 
@@ -30,7 +31,7 @@ def test_reject_edge_segments():
     assert ([-1, 1, 2, 3, 2, 2, 3, 0, -1] == segmentation).all()
 
 
-def test_reject_short_segments():
+def test_reject_short_segments_basic():
     """Test method rejecting short segments."""
     segmentation = [0, 0, 1, 1, 1, 3, 3, 3, 1, 2, 2, 2, 2]
     data = np.array(
@@ -40,7 +41,7 @@ def test_reject_short_segments():
             [3, 3, 3, 3, 3, 3, 3, 6, 4, 5, 2, 2, 2],
         ]
     )
-    segmentation = _BaseCluster._reject_short_segments(segmentation, data, 3)
+    segmentation = _BaseCluster._reject_short_segments_basic(segmentation, data, 3)
     # solo 1 should turn to 2; initial 0 should not change
     assert [0, 0, 1, 1, 1, 3, 3, 3, 2, 2, 2, 2, 2] == segmentation
 
@@ -53,7 +54,7 @@ def test_reject_short_segments():
             [3, 3, 3, 3, 3, 3, 3, 6, 4, 4, 6, 2, 2, 2],
         ]
     )
-    segmentation = _BaseCluster._reject_short_segments(segmentation, data, 3)
+    segmentation = _BaseCluster._reject_short_segments_basic(segmentation, data, 3)
     assert [0, 0, 1, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2, 2] == segmentation
 
     # singleton, same correlation
@@ -65,8 +66,28 @@ def test_reject_short_segments():
             [3, 3, 3, 3, 3, 3, 3, 6, 4, 6, 2, 2, 2],
         ]
     )
-    segmentation = _BaseCluster._reject_short_segments(segmentation, data, 3)
+    segmentation = _BaseCluster._reject_short_segments_basic(segmentation, data, 3)
     assert [0, 0, 1, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2] == segmentation
+
+
+def test_reject_short_segments_ranked():
+    """Test method rejecting short segments."""
+    segmentation = [0, 0, 1, 1, 1, 3, 3, 3, 1, 2, 2, 2, 2]
+    cluster_centers = np.array(
+        [
+            [2, 1, 1, 1],
+            [1, 2, 1, 1],
+            [1, 2, 1.1, 1.1],
+            [1, 1, 1, 2],
+        ]
+    )
+    data = cluster_centers[segmentation].T  # (n_channels, n_samples)
+
+    segmentation = _BaseCluster._reject_short_segments_ranked(
+        segmentation, data, cluster_centers, 3
+    )
+    # solo 1 is closer to map 2 than to map 3; initial 0 should not change
+    assert_array_equal(segmentation, [0, 0, 1, 1, 1, 3, 3, 3, 2, 2, 2, 2, 2])
 
 
 def test_smooth_segmentation_splits_on_unlabeled(monkeypatch):
